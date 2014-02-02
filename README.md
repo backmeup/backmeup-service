@@ -1,7 +1,7 @@
-# Welcome to the BackMeUp Prototype
+# Welcome to BackMeUp
 
-The aim of the BackMeUp Prototype is to provide a scalable personal data backup platform.
-The BackMeUp Prototype will allow users to create backups of their personal data that is scattered across
+The aim of  BackMeUp is to provide a scalable personal data backup platform.
+BackMeUp will allow users to create backups of their personal data that is scattered across
 the Web (e.g. on social networks, Web mail services, cloud storage provides or media sharing sites). 
 
 BackMeUp will feature a modular architecture in which new services can be supported through connector plugins.
@@ -10,7 +10,7 @@ encryption or data normalization/format conversion tasks.
 
 ## Prerequisites
 
-The BackMeUp Prototype is built with [Maven] (http://maven.apache.org/).
+BackMeUp is built with [Maven] (http://maven.apache.org/).
 Instructions on how to set up Maven on your machine are [available here] 
 (http://maven.apache.org/download.html#Installation_Instructions).
 

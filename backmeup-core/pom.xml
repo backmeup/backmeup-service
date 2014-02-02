@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.backmeup</groupId>
+		<artifactId>backmeup-service</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>backmeup-core</artifactId>
+	<packaging>jar</packaging>
+	<name>BackMeUp Core</name>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.backmeup</groupId>
+			<artifactId>backmeup-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.backmeup</groupId>
+			<artifactId>backmeup-plugin-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${version.org.slf4j}</version>
+		</dependency>
+				
+		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-actor</artifactId>
+			<version>${version.com.typesafe.akka}</version>
+		</dependency>
+		
+		<dependency>
+  			<groupId>com.rabbitmq</groupId>
+  			<artifactId>amqp-client</artifactId>
+  			<version>${version.com.rabbitmq}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${version.commons-lang}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${version.commons-io}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${version.org.apache.httpcomponents}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers</artifactId>
+			<version>${version.org.apache.tika}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>${version.org.apache.ant}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+      		<groupId>org.apache.felix</groupId>
+      		<artifactId>org.apache.felix.framework</artifactId>
+      		<version>${version.org.apache.felix}</version>
+    	</dependency>
+		
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>${version.org.elasticsearch}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.im4java</groupId>
+			<artifactId>im4java</artifactId>
+			<version>${version.org.im4java}</version>
+		</dependency>   
+		
+		<dependency>
+      		<groupId>javax.enterprise</groupId>
+      		<artifactId>cdi-api</artifactId>
+      		<version>${version.javax.enterprise.cdi-api}</version>
+    	</dependency>
+    	
+    	<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>com.springsource.javax.mail</artifactId>
+			<version>${version.javax.mail.com.springsource.javax.mail}</version>
+		</dependency> 
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.htmlparser.jericho</groupId>
+			<artifactId>jericho-html</artifactId>
+			<version>${version.net.htmlparser.jericho}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
