@@ -30,7 +30,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
 		<!-- Dependency versions
-		     Please keep alphabetical
+			 Please keep alphabetical
 			 Properties should be in form "version.<groupId>", or in case where
 			 multiple artefacts of the same groupId are used  "version.<groupId>.<artifactId>"
 		-->

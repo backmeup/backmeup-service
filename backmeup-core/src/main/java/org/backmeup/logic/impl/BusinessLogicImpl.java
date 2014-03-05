@@ -264,6 +264,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
   public BackMeUpUser deleteUser(String username) {
     conn.begin();
+    ElasticSearchIndexClient client = null;
     try {
       BackMeUpUser u = getUser(username, false);
       Long uid = u.getUserId();
@@ -292,11 +293,14 @@ public class BusinessLogicImpl implements BusinessLogic {
       userDao.delete(u);      
       conn.commit();
       
-      ElasticSearchIndexClient client = getIndexClient();
+      client = getIndexClient();
       client.deleteRecordsForUser(uid);
-      client.close();
+      
       return u;
     } finally {
+      if(client != null){
+    	  client.close();
+      }
       conn.rollback();
     }
     
@@ -915,10 +919,11 @@ public class BusinessLogicImpl implements BusinessLogic {
       conn.beginOrJoin();            
       StatusDao sd = dal.createStatusDao();
       List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
-          
+      ElasticSearchIndexClient client = null;
+      
       // Getting all files for job.getId()
       try {		    
-    	  ElasticSearchIndexClient client = new ElasticSearchIndexClient(indexHost, indexPort);
+    	  client = new ElasticSearchIndexClient(indexHost, indexPort);
     	  org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(job.getId());
 		  // </TODO>
 
@@ -926,11 +931,14 @@ public class BusinessLogicImpl implements BusinessLogic {
     	  for (Status stat : status) {
     	    stat.setFiles(fileItems);
     	  }
-    	  client.close();
     		return status;
 	    } catch (Throwable t) {
 	    	logger.error("", t);
-	    }           
+	    } finally {
+	    	if(client != null){
+	    		client.close();
+	    	}
+	    }
       return null;
     } finally {
       conn.rollback();
@@ -972,16 +980,20 @@ public class BusinessLogicImpl implements BusinessLogic {
   public ProtocolDetails getProtocolDetails(String username, String fileId) {
     try {
       conn.begin();
+      ElasticSearchIndexClient client = null;
       
       try {      
-        ElasticSearchIndexClient client = new ElasticSearchIndexClient(indexHost, indexPort);
+        client = new ElasticSearchIndexClient(indexHost, indexPort);
         org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(username, fileId);        
         ProtocolDetails pd = new ProtocolDetails();
         pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
-        client.close();
         return pd;
       } catch (Throwable t) {
     	  logger.error("", t);
+      } finally {
+    	if(client != null) {
+    		client.close();
+    	}
       }
       return new ProtocolDetails();
     } finally {
