@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.backmeup</groupId>
 		<artifactId>backmeup-service</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>backmeup-service-tests</artifactId>
@@ -30,7 +30,7 @@
 	<build>
 		<plugins>
 			<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
 				<configuration>
@@ -49,6 +49,15 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+    			<artifactId>maven-surefire-plugin</artifactId>
+    			<version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+    			<configuration>
+        			<skipTests>true</skipTests>
+    			</configuration>
 			</plugin>
 		</plugins>
 	</build>

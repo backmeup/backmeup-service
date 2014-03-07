@@ -5,7 +5,7 @@
 
 	<groupId>org.backmeup</groupId>
 	<artifactId>backmeup-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<name>BackMeUp</name>
@@ -68,6 +68,7 @@
 		<version.org.apache.maven.plugins.maven-failsafe-plugin>2.16</version.org.apache.maven.plugins.maven-failsafe-plugin>
 		<version.org.apache.maven.plugins.maven-resources-plugin>2.6</version.org.apache.maven.plugins.maven-resources-plugin>
 		<version.org.apache.maven.plugins.maven-source-plugin>2.2</version.org.apache.maven.plugins.maven-source-plugin>
+		<version.org.apache.maven.plugins.maven-surefire-plugin>2.6</version.org.apache.maven.plugins.maven-surefire-plugin>
 		<version.org.apache.tomcat.maven>2.2</version.org.apache.tomcat.maven>
 	</properties>
 
