@@ -1,7 +1,6 @@
-*/autodeploy/*
-plugins/build/*
-*/osgiTmp/*
-*.pyc
+autodeploy/
+*/autodeploy/
+*/osgiTmp/
 .metadata
 RemoteSystemsTempFiles
 
