@@ -8,9 +8,9 @@
 	<version>1.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-  <prerequisites>
-    <maven>3.0.3</maven>
-  </prerequisites>
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
 
 	<name>BackMeUp</name>
 	<url>http://backmeup.at/</url>
@@ -24,7 +24,7 @@
 		<!-- Project settings -->
 		<java.compiler.source>1.7</java.compiler.source>
 		<java.compiler.target>1.7</java.compiler.target>
-    <project.build.java.target>1.7</project.build.java.target>
+        <project.build.java.target>1.7</project.build.java.target>
 
 		<config.LocalBuildArtefactDirectory>../autodeploy</config.LocalBuildArtefactDirectory>
 		<config.IntegrationTestCategory>org.backmeup.tests.IntegrationTest</config.IntegrationTestCategory>
@@ -32,9 +32,9 @@
 		<config.Tomcat.Manager.Url>http://127.0.0.1:8080/manager/text</config.Tomcat.Manager.Url>
 		<config.Tomcat.Authentication.Id>tomcat7</config.Tomcat.Authentication.Id>
 
-    <encoding>UTF-8</encoding>
-    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
 		<!-- Dependency versions
 			 Please keep alphabetical
@@ -120,25 +120,25 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.2</version>
-          <!--
-          <configuration>
-              <failOnWarning>true</failOnWarning>
-          </configuration>
-          -->
-          <executions>
-               <execution>
-                   <id>check-dependencies</id>
-                   <phase>verify</phase>
-                   <goals>
-                       <goal>analyze</goal>
-                   </goals>
-               </execution>
-           </executions>
-       </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.2</version>
+                <!-- 
+                <configuration>
+                    <failOnWarning>true</failOnWarning>
+                </configuration> 
+                -->
+                <executions>
+                    <execution>
+                        <id>check-dependencies</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 

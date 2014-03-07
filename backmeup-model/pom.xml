@@ -10,7 +10,6 @@
 	<artifactId>backmeup-model</artifactId>
 	<packaging>bundle</packaging>
 	<name>BackMeUp Model</name>
-	
 
 	<dependencies>
 		<dependency>
