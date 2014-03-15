@@ -21,8 +21,7 @@ public class JobCreationRequestParser {
       throw new BackMeUpException("Missing sourceProfiles property!");
     }
     for (String sourceProfile : formParameters.get("sourceProfiles")) {
-      SourceProfileEntry spe = new SourceProfileEntry();
-      spe.setId(Long.parseLong(sourceProfile));
+      SourceProfileEntry spe = new SourceProfileEntry(sourceProfile);
       for (Entry<String, String> entry : getOptions(spe.getId()+"", formParameters).entrySet()) {
         spe.getOptions().put(entry.getKey(), entry.getValue());
       }
@@ -64,8 +63,7 @@ public class JobCreationRequestParser {
     
     if (formParameters.containsKey("sourceProfiles")) {
       for (String sourceProfile : formParameters.get("sourceProfiles")) {
-        SourceProfileEntry spe = new SourceProfileEntry();
-        spe.setId(Long.parseLong(sourceProfile));
+        SourceProfileEntry spe = new SourceProfileEntry(sourceProfile);
         for (Entry<String, String> entry : getOptions(spe.getId()+"", formParameters).entrySet()) {
           spe.getOptions().put(entry.getKey(), entry.getValue());
         }
