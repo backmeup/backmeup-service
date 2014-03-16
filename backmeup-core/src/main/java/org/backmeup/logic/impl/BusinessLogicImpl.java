@@ -1,7 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,8 +31,8 @@ import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
 import org.backmeup.job.JobManager;
 import org.backmeup.job.impl.rabbitmq.RabbitMQJobReceiver;
-import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
+import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
@@ -55,7 +54,6 @@ import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
-import org.backmeup.model.Token;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.ActionProfileEntry;
 import org.backmeup.model.dto.ExecutionTime;
@@ -64,7 +62,6 @@ import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
-import org.backmeup.model.exceptions.PasswordTooShortException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.exceptions.ValidationException;
@@ -117,10 +114,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     private String callbackUrl;
 
     @Inject
-    @Configuration(key="backmeup.minimalPasswordLength")
-    private Integer minimalPasswordLength;
-
-    @Inject
     @Configuration(key="backmeup.index.host")
     private String indexHost;
 
@@ -132,7 +125,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     private DataAccessLayer dal;
 
     @Inject
-    private Keyserver keyserverClient;
+    private Keyserver keyserverClient; // TODO only for RabbitMQJobReceiver
 
     @Inject
     @Named("plugin")
@@ -172,6 +165,10 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private UserRegistration registrationService;
+    
+    @Inject
+    private AuthorizationLogic authorizationService;
+    
     // ---------------------------------------
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -237,11 +234,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             Long uid = u.getUserId();
             UserDao userDao = getUserDao();
 
-            try {
-                keyserverClient.deleteUser(u.getUserId());
-            } catch (Exception ex) {
-                logger.warn(MessageFormat.format("Couldn't delete user \"{0}\" from keyserver", username), ex);
-            }
+            authorizationService.unregister(u);
 
             BackupJobDao jobDao = getBackupJobDao();
             StatusDao statusDao = getStatusDao();
@@ -281,20 +274,9 @@ public class BusinessLogicImpl implements BusinessLogic {
             BackMeUpUser user = registrationService.queryActivatedUser(oldUsername);
             registrationService.ensureNewValuesAvailable(user, newUsername, newEmail);
             
-            // TODO Remove keyring from change user options
-            if (!keyserverClient.validateUser(user.getUserId(), oldPassword)) {
-                conn.rollback();
-                throw new InvalidCredentialsException();
-            }
+            authorizationService.authorize(user, oldPassword);
 
-            if (newPassword != null) {
-                throwIfPasswordInvalid(newPassword);
-                keyserverClient.changeUserPassword(user.getUserId(), oldPassword, newPassword);
-            }
-
-            if (newKeyRingPassword != null && oldKeyRingPassword != null && !oldKeyRingPassword.equals(newKeyRingPassword)) {
-                keyserverClient.changeUserKeyRing(user.getUserId(), oldKeyRingPassword, newKeyRingPassword);
-            }
+            authorizationService.updatePasswords(user, oldPassword, newPassword, oldKeyRingPassword, newKeyRingPassword);
 
             registrationService.updateValues(user, newUsername, newEmail);
             
@@ -311,9 +293,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.begin();
             
             BackMeUpUser user = registrationService.queryExistingUser(username);
-            if (!keyserverClient.validateUser(user.getUserId(), password)) {
-                throw new InvalidCredentialsException();
-            }
+            authorizationService.authorize(user, password);
 
             return user;
         } finally {
@@ -321,26 +301,13 @@ public class BusinessLogicImpl implements BusinessLogic {
         }
     }
 
-    private void throwIfPasswordInvalid(String password) {
-        if (password == null || password.length() < minimalPasswordLength) {
-            throw new PasswordTooShortException(minimalPasswordLength, password == null ? 0 : password.length());
-        }
-    }
-
     @Override
-    public BackMeUpUser register(String username, String password,
-            String keyRingPassword, String email) {
-
-        throwIfPasswordInvalid(password);
-        throwIfPasswordInvalid(keyRingPassword); // TODO PK keyRingPassword unused?
-
+    public BackMeUpUser register(String username, String password, String keyRingPassword, String email) {
         try {
             conn.begin();
             
             BackMeUpUser user = registrationService.register(username, email);
-
-            keyserverClient.registerUser(user.getUserId(), password);
-            
+            authorizationService.register(user, password, keyRingPassword);
             registrationService.sendVerificationEmailFor(user);
             
             conn.commit();
@@ -355,7 +322,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.beginOrJoin();
             
-            BackMeUpUser user = getUser(username);
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
             user.setUserProperty(key, value);
             
             conn.commit();
@@ -369,7 +336,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.beginOrJoin();
             
-            BackMeUpUser user = getUser(username);
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
             user.deleteUserProperty(key);
             
             conn.commit();
@@ -387,9 +354,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<Profile> getDatasourceProfiles(String username) {
         try {
             conn.begin();
-            List<Profile> profiles = getProfileDao()
-                    .findDatasourceProfilesByUsername(username);
-            return profiles;
+
+            return getProfileDao().findDatasourceProfilesByUsername(username);
+
         } finally {
             conn.rollback();
         }
@@ -412,8 +379,8 @@ public class BusinessLogicImpl implements BusinessLogic {
     private Profile deleteProfileX(String username, Long profileId) {
         // TODO PK move
         ProfileDao profileDao = dal.createProfileDao();
-        Profile profile = profileDao.findById(profileId);
-        if (profile == null || !profile.getUser().getUsername().equals(username)) {
+        Profile profile = queryExistingProfile(profileId);
+        if (!profile.getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException();
         }
         profileDao.delete(profile);
@@ -426,15 +393,14 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.beginOrJoin();
             
-            ProfileDao pd = getProfileDao();
-            Profile p = pd.findById(profileId);
+            Profile p = queryExistingProfile(profileId);
             if (!p.getUser().getUsername().equals(username)) {
                 throw new IllegalArgumentException();
             }
             Datasource source = plugins.getDatasource(p.getDescription());
-            Token t = keyserverClient.getToken(p, keyRingPassword, new Date().getTime(), false, null);
-            AuthDataResult authData = keyserverClient.getData(t);
-            Properties accessData = authData.getByProfileId(profileId);
+            
+            Properties accessData = authorizationService.fetchProfileAuthenticationData(p, keyRingPassword);
+            
             return source.getAvailableOptions(accessData);
             
         } catch (PluginException pe) {
@@ -516,17 +482,16 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public List<SourceSinkDescribable> getDatasinks() {
-        List<SourceSinkDescribable> sinks = plugins.getConnectedDatasinks();
-        return sinks;
+        return plugins.getConnectedDatasinks();
     }
 
     @Override
     public List<Profile> getDatasinkProfiles(String username) {
         try {
             conn.begin();
-            List<Profile> profiles = getProfileDao().findDatasinkProfilesByUsername(
-                    username);
-            return profiles;
+            
+            return getProfileDao().findDatasinkProfilesByUsername(username);
+            
         } finally {
             conn.rollback();
         }
@@ -689,9 +654,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.begin();
             BackMeUpUser user = registrationService.queryActivatedUser(username);
 
-            if (!keyserverClient.validateUser(user.getUserId(), request.getKeyRing())) {
-                throw new InvalidCredentialsException();
-            }
+            authorizationService.authorize(user, request.getKeyRing());
 
             Set<ProfileOptions> profiles = getSourceProfilesFor(request);
 
@@ -727,13 +690,12 @@ public class BusinessLogicImpl implements BusinessLogic {
         }
 
 
-        BackMeUpUser user = getUser(username);
-        if (!keyserverClient.validateUser(user.getUserId(), updateRequest.getKeyRing())) {
-            throw new InvalidCredentialsException();
-        }
-
         try {
             conn.begin();
+            
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
+            authorizationService.authorize(user, updateRequest.getKeyRing());
+        
             BackupJob job = getBackupJobDao().findById(updateRequest.getJobId());
             if (job == null || !job.getUser().getUsername().equals(username)) {
                 throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
@@ -939,7 +901,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     public ProtocolOverview getProtocolOverview(String username, String duration) {
         try {
             conn.begin();
-            BackMeUpUser user = getUser(username);
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
             
             Date to = new Date();
             Date from = duration.equals("month") ? new Date(to.getTime() - DELAY_MONTHLY) :
@@ -997,18 +959,15 @@ public class BusinessLogicImpl implements BusinessLogic {
         AuthRequest ar = new AuthRequest();
         try {
             conn.begin();
-            BackMeUpUser user = getUser(username);
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
 
-            if (!keyserverClient.validateUser(user.getUserId(), keyRing)) {
-                conn.rollback();
-                throw new InvalidCredentialsException();
-            }
+            authorizationService.authorize(user, keyRing);
+
             Profile profile = new Profile(getUserDao().findByName(username),
                     profileName, uniqueDescIdentifier, type);
             switch (auth.getAuthType()) {
             case OAuth:
-                OAuthBased oauth = plugins
-                .getOAuthBasedAuthorizable(uniqueDescIdentifier);
+                OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
                 Properties p = new Properties();
                 p.setProperty("callback", callbackUrl);
                 String redirectUrl = oauth.createRedirectURL(p, callbackUrl);
@@ -1016,22 +975,15 @@ public class BusinessLogicImpl implements BusinessLogic {
                 // TODO Store all properties within keyserver & don't store them within the local database!
 
                 profile = getProfileDao().save(profile);
-                if (!keyserverClient.isServiceRegistered(profile.getProfileId())) {
-                    keyserverClient.addService(profile.getProfileId());
-                }
-                keyserverClient.addAuthInfo(profile, keyRing, p);
+                authorizationService.initProfileAuthInformation(profile, p, keyRing);
                 break;
             case InputBased:
-                InputBased ibased = plugins
-                .getInputBasedAuthorizable(uniqueDescIdentifier);
+                InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
                 ar.setRequiredInputs(ibased.getRequiredInputFields());
                 p = new Properties();
                 p.setProperty("callback", callbackUrl);
                 profile = getProfileDao().save(profile);
-                if (!keyserverClient.isServiceRegistered(profile.getProfileId())) {
-                    keyserverClient.addService(profile.getProfileId());
-                }
-                keyserverClient.addAuthInfo(profile, keyRing, p);
+                authorizationService.initProfileAuthInformation(profile, p, keyRing);
                 break;
             default:
                 throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
@@ -1061,16 +1013,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             ProfileDao profileDao = getProfileDao();
             Profile p = profileDao.findById(profileId);
 
-            if (!keyserverClient.isServiceRegistered(p.getProfileId())) {
-                keyserverClient.addService(p.getProfileId());
-            }
-            if (keyserverClient.isAuthInformationAvailable(p, keyRing)) {
-                Token t = keyserverClient.getToken(p, keyRing, new Date().getTime(), false, null);
-                AuthDataResult adr = keyserverClient.getData(t);
-                if (adr.getAuthinfos().length > 0) {
-                    props.putAll(adr.getAuthinfos()[0].getAi_data());
-                }
-            }
+            props.putAll(authorizationService.getProfileAuthInformation(p, keyRing));
 
             Authorizable auth = plugins.getAuthorizable(p.getDescription());
             if (auth.getAuthType() == AuthorizationType.InputBased) {
@@ -1082,10 +1025,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                         p.setIdentification(userId);
                     }
                     profileDao.save(p);
-                    if (keyserverClient.isAuthInformationAvailable(p, keyRing)) {
-                        keyserverClient.deleteAuthInfo(p.getProfileId());
-                    }
-                    keyserverClient.addAuthInfo(p, keyRing, props);
+                    authorizationService.overwriteProfileAuthInformation(p, props, keyRing);
                     conn.commit();
                     return;
                 } else {
@@ -1099,10 +1039,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     p.setIdentification(userId);
                 }
                 profileDao.save(p);
-                if (keyserverClient.isAuthInformationAvailable(p, keyRing)) {
-                    keyserverClient.deleteAuthInfo(p.getProfileId());
-                }
-                keyserverClient.addAuthInfo(p, keyRing, props);
+                authorizationService.overwriteProfileAuthInformation(p, props, keyRing);
                 conn.commit();
             }
         } catch (PluginException pe) {
@@ -1123,9 +1060,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.begin();
             BackMeUpUser user = getUser(username);
 
-            if (!keyserverClient.validateUser(user.getUserId(), keyRingPassword)) {
-                throw new InvalidCredentialsException();
-            }
+            authorizationService.authorize(user, keyRingPassword);
 
             SearchResponse search = new SearchResponse(query, Arrays.asList(typeFilters));
             SearchResponseDao searchDao = getSearchResponseDao();
@@ -1262,37 +1197,24 @@ public class BusinessLogicImpl implements BusinessLogic {
         this.jobManager.start();
     }
 
-    private Properties fetchAuthenticationData(Profile p, String password) {
-        Token t = keyserverClient.getToken(p, password, new Date().getTime(), false, null);
-        AuthDataResult result = keyserverClient.getData(t);
-        Properties props = new Properties();
-        if (result.getAuthinfos().length > 0) {
-            props.putAll(result.getAuthinfos()[0].getAi_data());
-        }
-        return props;
-    }
-
     @Override
     public Properties getMetadata(String username, Long profileId, String keyRing) {
         try {
             conn.beginOrJoin();
-            Profile p = getProfileDao().findById(profileId);
-            if (p == null) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(UNKNOWN_PROFILE), profileId));
-            }
+            Profile p = queryExistingProfile(profileId);
+
             if (!p.getUser().getUsername().equals(username)) {
                 throw new IllegalArgumentException(String.format(
                         textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
             }
+
             SourceSinkDescribable ssd = plugins.getSourceSinkById(p.getDescription());
             if (ssd == null) {
                 throw new IllegalArgumentException(String.format(
                         textBundle.getString(UNKNOWN_SOURCE_SINK), p.getDescription()));
             }
 
-
-            Properties accessData = keyRing != null ? fetchAuthenticationData(p, keyRing) : null;
+            Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
             Properties metadata = ssd.getMetadata(accessData);
             return metadata;
         } finally {
@@ -1312,7 +1234,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
             pluginName = p.getDescription();
             Validationable validator = plugins.getValidator(p.getDescription());
-            Properties accessData = fetchAuthenticationData(p, keyRing);
+            Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
             return validator.validate(accessData);
 
         } catch (PluginUnavailableException pue) {
@@ -1379,24 +1301,25 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.begin();
             
-            ProfileDao dao = getProfileDao();
-            Profile p = dao.findById(profileId);
-            if (p == null) {
-                throw new IllegalArgumentException("Unknown profile " + profileId);
-            }
-            Properties props = new Properties();
-            if (keyserverClient.isAuthInformationAvailable(p, keyRing)) {
-                props.putAll(fetchAuthenticationData(p, keyRing));
-                keyserverClient.deleteAuthInfo(p.getProfileId());
-            }
-            props.putAll(entries);
-            keyserverClient.addAuthInfo(p, keyRing, props);
-            dao.save(p);
+            Profile profile = queryExistingProfile(profileId);
+            
+            authorizationService.appendProfileAuthInformation(profile, entries, keyRing);
+            
+            getProfileDao().save(profile); // TODO why save, has not been changed?
             
             conn.commit();
         } finally {
             conn.rollback();
         }
+    }
+
+    private Profile queryExistingProfile(Long profileId) {
+        // TODO PK move
+        Profile profile = getProfileDao().findById(profileId);
+        if (profile == null) {
+            throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
+        }
+        return profile;
     }
 
     @Override
@@ -1428,7 +1351,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<KeyserverLog> getKeysrvLogs (BackMeUpUser user) {
-        return keyserverClient.getLogs (user);
+    public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
+        return authorizationService.getLogs(user);
     }
 }
