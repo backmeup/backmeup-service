@@ -26,7 +26,6 @@ import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.ProfileDao;
-import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
 import org.backmeup.job.JobManager;
@@ -34,6 +33,7 @@ import org.backmeup.job.impl.rabbitmq.RabbitMQJobReceiver;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BusinessLogic;
+import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
 import org.backmeup.logic.impl.helper.BackUpJobCreationHelper;
@@ -72,9 +72,7 @@ import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.api.actions.encryption.EncryptionDescribable;
 import org.backmeup.plugin.api.actions.filesplitting.FilesplittDescribable;
-import org.backmeup.plugin.api.actions.indexing.ElasticSearchIndexClient;
 import org.backmeup.plugin.api.actions.indexing.IndexDescribable;
-import org.backmeup.plugin.api.actions.indexing.IndexUtils;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
 import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
@@ -106,7 +104,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     private static final String UNKNOWN_PROFILE = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_PROFILE";
     private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
     private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
-    private static final String UNKNOWN_SEARCH_ID = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SEARCH_ID";
     private static final String NO_PROFILE_WITHIN_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_PROFILE_WITHIN_JOB";
 
     @Inject
@@ -114,13 +111,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     private String callbackUrl;
 
     @Inject
-    @Configuration(key="backmeup.index.host")
-    private String indexHost;
+    @Configuration(key = "backmeup.index.host")
+    private String indexHost; // TODO only for RabbitMQJobReceiver
 
     @Inject
-    @Configuration(key="backmeup.index.port")
-    private Integer indexPort;
-
+    @Configuration(key = "backmeup.index.port")
+    private Integer indexPort; // TODO only for RabbitMQJobReceiver
+    
     @Inject
     private DataAccessLayer dal;
 
@@ -168,6 +165,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     
     @Inject
     private AuthorizationLogic authorizationService;
+
+    @Inject
+    private SearchLogic searchService;
     
     // ---------------------------------------
 
@@ -209,10 +209,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         return dal.createStatusDao();
     }
 
-    private SearchResponseDao getSearchResponseDao() {
-        return dal.createSearchResponseDao();
-    }
-
     @Override
     public BackMeUpUser getUser(String username) {
         try {
@@ -228,12 +224,8 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public BackMeUpUser deleteUser(String username) {
         conn.begin();
-        ElasticSearchIndexClient client = null;
         try {
             BackMeUpUser u = registrationService.queryExistingUser(username);
-            Long uid = u.getUserId();
-            UserDao userDao = getUserDao();
-
             authorizationService.unregister(u);
 
             BackupJobDao jobDao = getBackupJobDao();
@@ -250,17 +242,13 @@ public class BusinessLogicImpl implements BusinessLogic {
                 profileDao.delete(p);
             }
 
-            userDao.delete(u);
+            getUserDao().delete(u);
             conn.commit();
 
-            client = getIndexClient();
-            client.deleteRecordsForUser(uid);
+            searchService.deleteIndexOf(u);
 
             return u;
         } finally {
-            if(client != null){
-                client.close();
-            }
             conn.rollback();
         }
     }
@@ -378,12 +366,16 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     private Profile deleteProfileX(String username, Long profileId) {
         // TODO PK move
-        ProfileDao profileDao = dal.createProfileDao();
+        Profile profile = queryExistingUserProfile(profileId, username);
+        getProfileDao().delete(profile);
+        return profile;
+    }
+
+    private Profile queryExistingUserProfile(Long profileId, String username) {
         Profile profile = queryExistingProfile(profileId);
         if (!profile.getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException();
         }
-        profileDao.delete(profile);
         return profile;
     }
 
@@ -393,10 +385,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.beginOrJoin();
             
-            Profile p = queryExistingProfile(profileId);
-            if (!p.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException();
-            }
+            Profile p = queryExistingUserProfile(profileId, username);
             Datasource source = plugins.getDatasource(p.getDescription());
             
             Properties accessData = authorizationService.fetchProfileAuthenticationData(p, keyRingPassword);
@@ -412,20 +401,12 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<String> getStoredDatasourceOptions(String username,
-            Long profileId, Long jobId) {
+    public List<String> getStoredDatasourceOptions(String username, Long profileId, Long jobId) {
         try {
             conn.beginOrJoin();
-            getUser(username);
-            BackupJobDao jobDao = getBackupJobDao();
-            BackupJob job = jobDao.findById(jobId);
-            if (job == null) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
-            }
-            if (!job.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
-                        jobId, username));
-            }
+
+            registrationService.queryActivatedUser(username);
+            BackupJob job = queryExistingUserJob(jobId, username);
             for (ProfileOptions po : job.getSourceProfiles()) {
                 if (po.getProfile().getProfileId().equals(profileId)) {
                     String[] options = po.getOptions();
@@ -435,7 +416,9 @@ public class BusinessLogicImpl implements BusinessLogic {
                     return Arrays.asList(options);
                 }
             }
+
             throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
+
         } finally {
             conn.rollback();
         }
@@ -447,6 +430,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         try
         {
             conn.beginOrJoin();
+            
             ProfileDao pd = getProfileDao ();
             Profile p = pd.findById (profileId);
             if (p == null)
@@ -771,9 +755,10 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<BackupJob> getJobs(String username) {
         try {
             conn.begin();
-            getUser(username);
-            BackupJobDao jobDao = getBackupJobDao();
-            return jobDao.findByUsername(username);
+            
+            registrationService.queryActivatedUser(username);
+            return getBackupJobDao().findByUsername(username);
+            
         } finally {
             conn.rollback();
         }
@@ -783,16 +768,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     public void deleteJob(String username, Long jobId) {
         try {
             conn.begin();
-            getUser(username);
-            BackupJobDao jobDao = getBackupJobDao();
-            BackupJob job = jobDao.findById(jobId);
-            if (job == null) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
-            }
-            if (!job.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
-                        jobId, username));
-            }
+            
+            registrationService.queryActivatedUser(username);
+            BackupJob job = queryExistingUserJob(jobId, username);
 
             // Delete Job status records first
             StatusDao statusDao = getStatusDao();
@@ -800,11 +778,28 @@ public class BusinessLogicImpl implements BusinessLogic {
                 statusDao.delete(status);
             }
 
-            jobDao.delete(job);
+            getBackupJobDao().delete(job);
+            
             conn.commit();
         } finally {
             conn.rollback();
         }
+    }
+    private BackupJob queryExistingJob(Long jobId) {
+        BackupJob job = getBackupJobDao().findById(jobId);
+        if (job == null) {
+            throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
+        }
+        return job;
+    }
+
+    private BackupJob queryExistingUserJob(Long jobId, String username) {
+        BackupJob job = queryExistingJob(jobId);
+        if (!job.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
+                    jobId, username));
+        }
+        return job;
     }
 
     private List<Status> getStatusForJob(BackupJob job) {
@@ -812,26 +807,12 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.beginOrJoin();
             StatusDao sd = dal.createStatusDao();
             List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
-            ElasticSearchIndexClient client = null;
-
-            // Getting all files for job.getId()
-            try {
-                client = new ElasticSearchIndexClient(indexHost, indexPort);
-                org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(job.getId());
-
-                Set<FileItem> fileItems = IndexUtils.convertToFileItems(esResponse);
-                for (Status stat : status) {
-                    stat.setFiles(fileItems);
-                }
-                return status;
-            } catch (Throwable t) {
-                logger.error("", t);
-            } finally {
-                if(client != null){
-                    client.close();
-                }
+            
+            Set<FileItem> fileItems = searchService.getAllFileItems(job);
+            for (Status stat : status) {
+                stat.setFiles(fileItems);
             }
-            return null;
+            return status;
         } finally {
             conn.rollback();
         }
@@ -841,6 +822,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<Status> getStatus(String username, Long jobId) {
         try {
             conn.begin();
+            
             registrationService.queryActivatedUser(username);
             BackupJobDao jobDao = getBackupJobDao();
 
@@ -856,14 +838,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 return status;
             }
 
-            BackupJob job = jobDao.findById(jobId);
-            if (job == null) {
-                throw new IllegalArgumentException(textBundle.getString(String.format(NO_SUCH_JOB, jobId)));
-            }
-            if (!job.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(textBundle.getString(String.format(JOB_USER_MISSMATCH,
-                        jobId, username)));
-            }
+            BackupJob job = queryExistingUserJob(jobId, username);
             List<Status> status = new ArrayList<>();
             status.addAll(getStatusForJob(job));
             return status;
@@ -874,27 +849,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public ProtocolDetails getProtocolDetails(String username, String fileId) {
-        try {
-            conn.begin();
-            ElasticSearchIndexClient client = null;
-
-            try {
-                client = new ElasticSearchIndexClient(indexHost, indexPort);
-                org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(username, fileId);
-                ProtocolDetails pd = new ProtocolDetails();
-                pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
-                return pd;
-            } catch (Throwable t) {
-                logger.error("", t);
-            } finally {
-                if(client != null) {
-                    client.close();
-                }
-            }
-            return new ProtocolDetails();
-        } finally {
-            conn.rollback();
-        }
+        return searchService.getProtocolDetails(username, fileId);
     }
 
     @Override
@@ -915,7 +870,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     private ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to) {
-        // TODO PK only depending on JobProtocolDao - move to service?
+        // TODO PK move
         JobProtocolDao jpd = dal.createJobProtocolDao();
         List<JobProtocol> protocols = jpd.findByUsernameAndDuration(user.getUsername(), from, to);
         ProtocolOverview po = new ProtocolOverview();
@@ -1052,22 +1007,16 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public long searchBackup(String username, String keyRingPassword, String query) {
-        return searchBackup(username, keyRingPassword, query, new String[0]);
-    }
-
-    private long searchBackup(String username, String keyRingPassword, String query, String[] typeFilters) {
         try {
             conn.begin();
-            BackMeUpUser user = getUser(username);
 
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
             authorizationService.authorize(user, keyRingPassword);
+            SearchResponse search = searchService.createSearch(query, new String[0]);
 
-            SearchResponse search = new SearchResponse(query, Arrays.asList(typeFilters));
-            SearchResponseDao searchDao = getSearchResponseDao();
-            search = searchDao.save(search);
             conn.commit();
-
             return search.getId();
+            
         } catch (Throwable t) {
             if (t instanceof BackMeUpException) {
                 throw (BackMeUpException) t;
@@ -1080,101 +1029,54 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public void deleteIndexForUser(String username) {
-        ElasticSearchIndexClient client = null;
         try {
             conn.begin();
 
             BackMeUpUser user = registrationService.queryActivatedUser(username);
-
-            try {
-                client = getIndexClient();
-                client.deleteRecordsForUser(user.getUserId());
-            } catch (Throwable t) {
-                logger.error("", t);
-            }
+            searchService.deleteIndexOf(user);
             
         } finally {
             conn.rollback();
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public void deleteIndexForJobAndTimestamp(Long jobId, Long timestamp) {
-        ElasticSearchIndexClient client = null;
         try {
             conn.begin();
 
-            try {
-                client = getIndexClient();
-                client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
-            } catch (Throwable t) {
-                logger.error("", t);
-            }
+            BackupJob job = queryExistingJob(jobId);
+            searchService.delete(job, timestamp);
+
         } finally {
             conn.rollback();
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public SearchResponse queryBackup(String username, long searchId, Map<String, List<String>> filters) {
-
-        ElasticSearchIndexClient client = null;
         try {
             conn.begin();
 
-            // at least we make sure, that the user exists
-            BackMeUpUser user = getUser(username);
-
-            SearchResponse search = getSearchResponseDao().findById(searchId);
-            if (search == null) {
-                throw new BackMeUpException(textBundle.getString(UNKNOWN_SEARCH_ID));
-            }
-
-            try {
-                String query = search.getQuery();
-
-                client = getIndexClient();
-                org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(user, query, filters);
-                search.setFiles(IndexUtils.convertSearchEntries(esResponse, user));
-                search.setBySource(IndexUtils.getBySource(esResponse));
-                search.setByType(IndexUtils.getByType(esResponse));
-                search.setByJob (IndexUtils.getByJob (esResponse));
-            } catch (Throwable t) {
-                logger.error("", t);
-            }
-            return search;
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
+            return searchService.runSearch(user, searchId, filters);
+            
         } finally {
             conn.rollback();
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public File getThumbnail(String username, String fileId) {
-        // TODO verify that the user is logged in!
+        try {
+            conn.begin();
 
-        ElasticSearchIndexClient client = getIndexClient();
-        String thumbnailPath = client.getThumbnailPathForFile(username, fileId);
-        logger.debug("Got thumbnail path: " + thumbnailPath);
-        if (thumbnailPath != null) {
-            return new File(thumbnailPath);
+            BackMeUpUser user = registrationService.queryActivatedUser(username);
+            return searchService.getThumbnailPathForFile(user, fileId);
+            
+        } finally {
+            conn.rollback();
         }
-
-        client.close();
-
-        return null; // Too bad there's no optional return types in Java...
-    }
-
-    private ElasticSearchIndexClient getIndexClient() {
-        return new ElasticSearchIndexClient(indexHost, indexPort);
     }
 
     @Override
@@ -1302,11 +1204,9 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.begin();
             
             Profile profile = queryExistingProfile(profileId);
-            
             authorizationService.appendProfileAuthInformation(profile, entries, keyRing);
             
             getProfileDao().save(profile); // TODO why save, has not been changed?
-            
             conn.commit();
         } finally {
             conn.rollback();
