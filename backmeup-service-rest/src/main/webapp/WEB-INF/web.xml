@@ -42,6 +42,7 @@
             org.backmeup.rest.exceptionmapper.NullPointerExceptionMapper,
             org.backmeup.rest.exceptionmapper.UnknownUserExceptionMapper,
             org.backmeup.rest.exceptionmapper.UnknownUserPropertyExceptionMapper,       
+    		org.backmeup.rest.provider.BusinessLogicContextResolver,
     		org.backmeup.rest.provider.ObjectMapperContextResolver
 		</param-value>
     </context-param>

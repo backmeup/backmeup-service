@@ -38,24 +38,26 @@
 			<scope>provided</scope>
 		</dependency>
 		
+        <!-- used as CDI implementation, not referenced in source -->        
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet</artifactId>
 			<version>${version.org.jboss.weld.servlet}</version>
 		</dependency>
-		
+
+        <!-- used as JAX-WS implementation, not referenced in source -->		
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-multipart-provider</artifactId>
 			<version>${version.org.jboss.resteasy}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jackson-provider</artifactId>
 			<version>${version.org.jboss.resteasy}</version>
 		</dependency>
 		
+        <!-- used as JPA implementation, not referenced in source -->        
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
