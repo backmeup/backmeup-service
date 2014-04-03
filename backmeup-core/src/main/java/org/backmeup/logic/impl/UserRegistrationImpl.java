@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.codec.binary.Base64;
 import org.backmeup.configuration.cdi.Configuration;
@@ -24,6 +25,8 @@ import org.backmeup.model.exceptions.EmailVerificationException;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.utilities.mail.Mailer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * User registration related business logic.
@@ -37,6 +40,8 @@ public class UserRegistrationImpl implements UserRegistration {
     private static final String VERIFICATION_EMAIL_MIME_TYPE = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_MIME_TYPE";
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle(getClass().getSimpleName());
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     @Configuration(key = "backmeup.emailRegex")
@@ -150,7 +155,14 @@ public class UserRegistrationImpl implements UserRegistration {
     @Override
     public void sendVerificationEmailFor(BackMeUpUser user) {
         String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
-        String subject = textBundle.getString(VERIFICATION_EMAIL_SUBJECT);
+        String subject = "";
+		try {
+			// TODO remove ISO-8859-1 workarround
+			subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
+			subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("Something went wrong in sendVerificationEmailFor", e);
+		}
         String text = MessageFormat.format(textBundle.getString(VERIFICATION_EMAIL_CONTENT), verifierUrl, user.getVerificationKey());
         String mimeType = textBundle.getString(VERIFICATION_EMAIL_MIME_TYPE);
         Mailer.send(user.getEmail(), subject, text, mimeType);
