@@ -131,24 +131,23 @@ public class RabbitMQJobReceiver {
 				public void run() {
 					try {
 						logger.info("Starting message queue receiver");
-						QueueingConsumer consumer = new QueueingConsumer(
-								mqChannel);
+						int timeoutInMS = 500;
+						QueueingConsumer consumer = new QueueingConsumer(mqChannel);
 						mqChannel.basicConsume(mqName, true, consumer);
 
 						while (listening) {
 							try {
-								QueueingConsumer.Delivery delivery = consumer
-										.nextDelivery();
-								String message = new String(delivery.getBody());
-								logger.info("Received: " + message);
+								QueueingConsumer.Delivery delivery = consumer.nextDelivery(timeoutInMS);
+								if(delivery != null) {
+									String message = new String(delivery.getBody());
+									logger.info("Received: " + message);
 
-								BackupJob job = JsonSerializer.deserialize(
-										message, BackupJob.class);
+									BackupJob job = JsonSerializer.deserialize(message, BackupJob.class);
 
-								Storage storage = new LocalFilesystemStorage();
-								BackupJobRunner runner = new BackupJobRunner(
-										plugins, keyserver, conn, dal, indexHost, indexPort, jobTempDir, backupName);
-								runner.executeBackup(job, storage);
+									Storage storage = new LocalFilesystemStorage();
+									BackupJobRunner runner = new BackupJobRunner(plugins, keyserver, conn, dal, indexHost, indexPort, jobTempDir, backupName);
+									runner.executeBackup(job, storage);
+								}
 							} catch (Exception ex) {
 								logger.error("failed to process job", ex);
 							}
@@ -157,7 +156,9 @@ public class RabbitMQJobReceiver {
 						logger.info("Stopping message queue receiver");
 						mqChannel.close();
 						mqConnection.close();
-						plugins.shutdown();
+						// Not necessary to shutdown the plugins infrastructure!?!
+						// 'plugins' will be shutdown in the BusinessLogicImpl.
+//						plugins.shutdown();
 						emFactory.close();
 						logger.info("Message queue receiver stopped");
 					} catch (IOException e) {
