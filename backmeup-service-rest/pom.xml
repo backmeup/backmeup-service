@@ -114,8 +114,8 @@
 						<artifactId>tomcat7-maven-plugin</artifactId>
 						<version>${version.org.apache.tomcat.maven}</version>
 						<configuration>
-							<url>${config.Tomcat.Manager.Url}</url>
-							<server>${config.Tomcat.Authentication.Id}</server>
+							<url>${config.tomcat.manager.url}</url>
+							<server>${config.tomcat.authentication.id}</server>
 						</configuration>
 						<executions>
 							<execution>
