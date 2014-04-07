@@ -81,8 +81,7 @@ public class BackupJobRunner {
     
   private final Logger logger = LoggerFactory.getLogger(BackupJobRunner.class);
   
-  private ResourceBundle textBundle = ResourceBundle
-      .getBundle(BackupJobRunner.class.getSimpleName());
+  private ResourceBundle textBundle = ResourceBundle.getBundle("BackupJobRunner");
 
   public BackupJobRunner(Plugin plugins, Keyserver keyserver, Connection conn,
       DataAccessLayer dal, String indexHost, int indexPort, String jobTempDir, String backupName) {

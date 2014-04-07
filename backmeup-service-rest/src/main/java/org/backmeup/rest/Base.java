@@ -9,40 +9,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * All rest classes derive from this class to 
- * gain access to the BusinessLogic.
+ * All rest classes derive from this class to gain access to the BusinessLogic. 
  * 
- * Note: The derived classes always delegate the incoming REST call
- *       to the business logic.
+ * Note: The derived classes always delegate the incoming REST call to the business logic.
  * 
  * @author fschoeppl
- *
  */
 public class Base {
-	private final Logger logger = LoggerFactory.getLogger(Base.class);
-	
-	private BusinessLogic logic;
-	
-	@Context
-	private ServletContext context;
-	
-	protected BusinessLogic getLogic() {
-	  logic = (BusinessLogic) context.getAttribute("org.backmeup.logic");
-	   
-		if (logic == null) {
-		  // just in case we are running in an embedded server
-		  try {
-			  JNDIBeanManager jndiManager = JNDIBeanManager.getInstance();
-			  logic = jndiManager.getBean(BusinessLogic.class);
-			  context.setAttribute("org.backmeup.logic", logic);
-      } catch (Throwable e) {
-        do {      
-        	logger.error("", e);
-        	e = e.getCause();
-        } while (e.getCause() != e && e.getCause() != null);
-      }
-		}
-		
-		return logic;
-	}
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private BusinessLogic logic;
+
+    @Context
+    private ServletContext context;
+
+    protected BusinessLogic getLogic() {
+        BusinessLogicContextHolder contextHolder = new BusinessLogicContextHolder(context);
+
+        logic = contextHolder.get();
+
+        if (logic == null) {
+            // just in case we are running in an embedded server
+            logic = fetchLogicFromJndi();
+            contextHolder.set(logic);
+        }
+
+        return logic;
+    }
+
+    private BusinessLogic fetchLogicFromJndi() {
+        try {
+            JNDIBeanManager jndiManager = JNDIBeanManager.getInstance();
+            return jndiManager.getBean(BusinessLogic.class);
+        } catch (Exception e) {
+            logger.error("", e);
+            return null;
+        }
+    }
 }
