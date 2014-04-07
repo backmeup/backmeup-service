@@ -37,19 +37,21 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", password)
-			.formParam("keyRing", keyRingPassword)
-			.formParam("email", email)
-		.when()
-			.post("/users/" + username + "/register")
-		.then()
-			.assertThat().statusCode(200)
-			.assertThat().body(containsString("verificationKey"));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("password", password)
+				.formParam("keyRing", keyRingPassword)
+				.formParam("email", email)
+			.when()
+				.post("/users/" + username + "/register")
+			.then()
+				.assertThat().statusCode(200).assertThat()
+				.body(containsString("verificationKey"));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -59,20 +61,22 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", password)
-			.formParam("keyRing", keyRingPassword)
-			.formParam("email", email)
-		.when()
-			.post("/users/" + username + "/register")
-		.then()
-			.statusCode(400);
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("password", password)
+				.formParam("keyRing", keyRingPassword)
+				.formParam("email", email)
+			.when()
+				.post("/users/" + username + "/register")
+			.then()
+				.statusCode(400);
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 		
 	}
 	
@@ -83,22 +87,24 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		
-		String newPassword = "password2";
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", newPassword)
-			.formParam("keyRing", keyRingPassword)
-			.formParam("email", email)
-		.when()
-			.post("/users/" + username + "/register")
-		.then()
-			.statusCode(400);
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+
+			String newPassword = "password2";
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("password", newPassword)
+				.formParam("keyRing", keyRingPassword)
+				.formParam("email", email)
+			.when()
+				.post("/users/" + username + "/register")
+			.then()
+				.statusCode(400);
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -150,16 +156,18 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		
-		when()
-			.get("/users/" + verificationKey + "/verifyEmail")
-		.then()
-			.statusCode(200)
-			.body("username", equalTo(username));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+
+			when()
+				.get("/users/" + verificationKey + "/verifyEmail")
+			.then()
+				.statusCode(200)
+				.body("username", equalTo(username));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 		
 	@Test
@@ -169,32 +177,36 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
+		String newUsername = "";
 		
-		String newUsername = "TestUser2";
-		String newPassword = password;
-		String newKeyRingPassword = keyRingPassword;
-		String newEmail = email;
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", keyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("Account username has been changed"));
-		
-		BackMeUpUtils.deleteUser(newUsername);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			newUsername = "TestUser2";
+			String newPassword = password;
+			String newKeyRingPassword = keyRingPassword;
+			String newEmail = email;
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("username", newUsername)
+				.formParam("oldPassword", password)
+				.formParam("password", newPassword)
+				.formParam("oldKeyring", keyRingPassword)
+				.formParam("newKeyring", newKeyRingPassword)
+				.formParam("email", newEmail)
+			.when()
+				.put("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("Account username has been changed"));
+		} finally {
+			BackMeUpUtils.deleteUser(newUsername);
+		}
 	}
 	
 	@Test
@@ -204,32 +216,36 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
+		String newUsername = "";
 		
-		String newUsername = username;
-		String newPassword = "pw!NW12?aB";
-		String newKeyRingPassword = keyRingPassword;
-		String newEmail = email;
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", keyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("Account password has been changed"));
-		
-		BackMeUpUtils.deleteUser(newUsername);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			newUsername = username;
+			String newPassword = "pw!NW12?aB";
+			String newKeyRingPassword = keyRingPassword;
+			String newEmail = email;
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("username", newUsername)
+				.formParam("oldPassword", password)
+				.formParam("password", newPassword)
+				.formParam("oldKeyring", keyRingPassword)
+				.formParam("newKeyring", newKeyRingPassword)
+				.formParam("email", newEmail)
+			.when()
+				.put("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("Account password has been changed"));
+		} finally {
+			BackMeUpUtils.deleteUser(newUsername);
+		}
 	}
 	
 	@Test
@@ -274,30 +290,34 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
+		String newUsername = "";
 		
-		String newUsername = username;
-		String newPassword = password;
-		String newKeyRingPassword = keyRingPassword;
-		String newEmail = "ChangedTestUsertrash-mail.com";
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", keyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + username)
-		.then()
-			.statusCode(400);
-		
-		BackMeUpUtils.deleteUser(newUsername);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			newUsername = username;
+			String newPassword = password;
+			String newKeyRingPassword = keyRingPassword;
+			String newEmail = "ChangedTestUsertrash-mail.com";
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("username", newUsername)
+				.formParam("oldPassword", password)
+				.formParam("password", newPassword)
+				.formParam("oldKeyring", keyRingPassword)
+				.formParam("newKeyring", newKeyRingPassword)
+				.formParam("email", newEmail)
+			.when()
+				.put("/users/" + username)
+			.then()
+				.statusCode(400);
+		} finally {
+			BackMeUpUtils.deleteUser(newUsername);
+		}
 	}
 	
 	@Test
@@ -312,36 +332,38 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String u2KeyRingPassword = "keyringpassword2";
 		String u2Email = "TestUser2@trash-mail.com";
 		
-		ValidatableResponse u1Response = BackMeUpUtils.addUser(u1Username, u1Password, u1KeyRingPassword, u1Email);
-		String verificationKey = u1Response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		ValidatableResponse u2Response = BackMeUpUtils.addUser(u2Username, u2Password, u2KeyRingPassword, u2Email);
-		verificationKey = u2Response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		String newUsername = "TestUser1";
-		String newPassword = u2Password;
-		String newKeyRingPassword = u2KeyRingPassword;
-		String newEmail = u2Email;
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", u2Password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", u2KeyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + u2Username)
-		.then()
-			.statusCode(400)
-			.body("errorType", equalTo("org.backmeup.model.exceptions.AlreadyRegisteredException"));
-		
-		BackMeUpUtils.deleteUser(u1Username);
-		BackMeUpUtils.deleteUser(u2Username);
+		try {
+			ValidatableResponse u1Response = BackMeUpUtils.addUser(u1Username, u1Password, u1KeyRingPassword, u1Email);
+			String verificationKey = u1Response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			ValidatableResponse u2Response = BackMeUpUtils.addUser(u2Username, u2Password, u2KeyRingPassword, u2Email);
+			verificationKey = u2Response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			String newUsername = "TestUser1";
+			String newPassword = u2Password;
+			String newKeyRingPassword = u2KeyRingPassword;
+			String newEmail = u2Email;
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("username", newUsername)
+				.formParam("oldPassword", u2Password)
+				.formParam("password", newPassword)
+				.formParam("oldKeyring", u2KeyRingPassword)
+				.formParam("newKeyring", newKeyRingPassword)
+				.formParam("email", newEmail)
+			.when()
+				.put("/users/" + u2Username)
+			.then()
+				.statusCode(400)
+				.body("errorType", equalTo("org.backmeup.model.exceptions.AlreadyRegisteredException"));
+		} finally {
+			BackMeUpUtils.deleteUser(u1Username);
+			BackMeUpUtils.deleteUser(u2Username);
+		}
 	}
 	
 	@Test
@@ -351,11 +373,14 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
+		String newUsername = "";
+		
+		try {
 		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
 		String verificationKey = response.extract().path("verificationKey");
 		BackMeUpUtils.verifyEmail(verificationKey);
 		
-		String newUsername = username;
+		newUsername = username;
 		String newPassword = password;
 		String newKeyRingPassword = "nwPW##!123";
 		String newEmail = email;
@@ -373,8 +398,9 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			.put("/users/" + username)
 		.then()
 			.statusCode(200);
-		
-		BackMeUpUtils.deleteUser(newUsername);
+		} finally {
+			BackMeUpUtils.deleteUser(newUsername);
+		}
 	}
 	
 	@Test
@@ -384,18 +410,20 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		when()
-			.get("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("username", equalTo(username))
-			.body("email", equalTo(email));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			when()
+				.get("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("username", equalTo(username))
+				.body("email", equalTo(email));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -416,28 +444,30 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		when()
-			.get("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("username", equalTo(username))
-			.body("email", equalTo(email));
-		
-		BackMeUpUtils.changeUser(username, username, password, "password2", 
-				   keyRingPassword, keyRingPassword, email, email);
-		
-		when()
-			.get("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("username", equalTo(username))
-			.body("email", equalTo(email));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			when()
+				.get("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("username", equalTo(username))
+				.body("email", equalTo(email));
+
+			BackMeUpUtils.changeUser(username, username, password, "password2", 
+					keyRingPassword, keyRingPassword, email, email);
+
+			when()
+				.get("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("username", equalTo(username))
+				.body("email", equalTo(email));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -447,20 +477,22 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", password)
-		.when()
-			.post("/users/" + username + "/login")
-		.then()
-			.statusCode(200);
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("password", password)
+			.when()
+				.post("/users/" + username + "/login")
+			.then()
+				.statusCode(200);
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 		
 	@Test
@@ -470,22 +502,24 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		String wrongPassword = "pw2";
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", wrongPassword)
-		.when()
-			.post("/users/" + username + "/login")
-		.then()
-			.statusCode(401);
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			String wrongPassword = "pw2";
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("password", wrongPassword)
+			.when()
+				.post("/users/" + username + "/login")
+			.then()
+				.statusCode(401);
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -497,21 +531,23 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String propertyKey = "TestPropKey";
 		String propertyValue = "TestPropValue";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-		.when()
-			.post("/users/" + username + "/properties/" + propertyKey + "/" + propertyValue)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("User property has been set"));
-			
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+			.when()
+				.post("/users/" + username + "/properties/" + propertyKey + "/" + propertyValue)
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("User property has been set"));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}	
 	}
 	
 	@Test
@@ -522,17 +558,19 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String email = "TestUser@trash-mail.com";
 		String propertyKey = "unknown";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		when()
-			.get("/users/" + username + "/properties/" + propertyKey)
-		.then()
-			.statusCode(400)
-			.body("errorType", equalTo("org.backmeup.model.exceptions.UnknownUserPropertyException"));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			when()
+				.get("/users/" + username + "/properties/" + propertyKey)
+			.then()
+				.statusCode(400)
+				.body("errorType", equalTo("org.backmeup.model.exceptions.UnknownUserPropertyException"));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -544,20 +582,22 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String propertyKey = "TestPropKey";
 		String propertyValue = "TestPropValue";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		BackMeUpUtils.setUserProperty(username, propertyKey, propertyValue);
-		
-		when()
-			.get("/users/" + username + "/properties/" + propertyKey)
-		.then()
-			.statusCode(200)
-			.body("name", equalTo(propertyKey))
-			.body("value", equalTo(propertyValue));
-			
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			BackMeUpUtils.setUserProperty(username, propertyKey, propertyValue);
+
+			when()
+				.get("/users/" + username + "/properties/" + propertyKey)
+			.then()
+				.statusCode(200)
+				.body("name", equalTo(propertyKey))
+				.body("value", equalTo(propertyValue));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 	
 	@Test
@@ -569,19 +609,21 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String propertyKey = "TestPropKey";
 		String propertyValue = "TestPropValue";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
-		
-		BackMeUpUtils.setUserProperty(username, propertyKey, propertyValue);
-		
-		when()
-			.delete("/users/" + username + "/properties/" + propertyKey)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("User property has been removed"));
-		
-		BackMeUpUtils.deleteUser(username);
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			BackMeUpUtils.setUserProperty(username, propertyKey, propertyValue);
+
+			when()
+				.delete("/users/" + username + "/properties/" + propertyKey)
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("User property has been removed"));
+		} finally {
+			BackMeUpUtils.deleteUser(username);
+		}
 	}
 }
