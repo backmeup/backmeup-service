@@ -35,13 +35,17 @@
     <context-param>
         <param-name>resteasy.providers</param-name>
         <param-value>
-            org.backmeup.rest.exceptionmapper.BackMeUpExceptionMapper,      
-            org.backmeup.rest.exceptionmapper.IllegalArgumentExceptionMapper,
+        	<!-- Backmeup Exceptions -->            
+            org.backmeup.rest.exceptionmapper.BackMeUpExceptionMapper,     
             org.backmeup.rest.exceptionmapper.InvalidCredentialsMapper,
             org.backmeup.rest.exceptionmapper.InvalidKeyExceptionMapper,
-            org.backmeup.rest.exceptionmapper.NullPointerExceptionMapper,
             org.backmeup.rest.exceptionmapper.UnknownUserExceptionMapper,
-            org.backmeup.rest.exceptionmapper.UnknownUserPropertyExceptionMapper,       
+            org.backmeup.rest.exceptionmapper.UnknownUserPropertyExceptionMapper, 
+            
+            <!-- Java Exceptions -->
+            org.backmeup.rest.exceptionmapper.IllegalArgumentExceptionMapper,
+            org.backmeup.rest.exceptionmapper.NullPointerExceptionMapper,
+     
     		org.backmeup.rest.provider.BusinessLogicContextResolver,
     		org.backmeup.rest.provider.ObjectMapperContextResolver
 		</param-value>

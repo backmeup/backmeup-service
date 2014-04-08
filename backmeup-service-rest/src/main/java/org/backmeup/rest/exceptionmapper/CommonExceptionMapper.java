@@ -5,10 +5,16 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.backmeup.rest.data.ErrorEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+// There is a documented error when ExceptionMapper implement statement is in abstract class.
+// The mapping of the exceptions does not work correctly. A workaround is proposed by adding 
+// 'implements ExceptionMapper<ConcreteException>' to the concrete classes. 
+// Also an upgrade to RESTEasy version 3.x should solve the problem.
 public abstract class CommonExceptionMapper<T extends Exception> implements ExceptionMapper<T> {
 
-    private Status status;
+	private Status status;
 
     public CommonExceptionMapper(Status status) {
         this.status = status;
