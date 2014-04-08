@@ -36,7 +36,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 		when()
 			.get("/datasources/")
 		.then()
-			.log().all()
+//			.log().all()
 			.assertThat().statusCode(200)
 			.assertThat().body(containsString("sources"))
 			.assertThat().body(containsString("title"))
@@ -59,7 +59,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 			when()
 				.get("/datasources/" + username + "/profiles")
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(200)
 				.body(containsString("sourceProfiles"));
 		} finally {
@@ -89,7 +89,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 			when()
 				.get("/datasources/" + username + "/profiles")
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(200)
 				.body(containsString("sourceProfiles"))
 				.body(containsString("title"))
@@ -128,7 +128,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/datasources/" + username + "/" + datasourceId + "/auth")
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(200)
 				.body(containsString("profileId"))
 				.body(containsString("type"))
@@ -203,7 +203,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/datasources/" + username + "/profiles/" + profileId + "/options")
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(200)
 				.body(containsString("sourceOptions"));
 		} finally {

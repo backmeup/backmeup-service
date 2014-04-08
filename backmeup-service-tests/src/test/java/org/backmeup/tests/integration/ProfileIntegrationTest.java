@@ -35,7 +35,7 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 		String valueTest = "valueTest";
 		
 		given()
-			.log().all()
+//			.log().all()
 			.contentType("application/x-www-form-urlencoded")
 			.header("Accept", "application/json")
 			.formParam("keyRing", password)
@@ -69,7 +69,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 			
 			response = BackMeUpUtils.authenticateDatasource(username, password, profileName, datasourceId);
 			profileId = response.extract().path("profileId");
-			System.out.println(profileId);
 						
 			given()
 				.contentType("application/x-www-form-urlencoded")
@@ -79,7 +78,7 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/profiles/" + profileId)
 			.then()
-				.log().all()
+//				.log().all()
 				.assertThat().statusCode(204);
 		} finally {
 			BackMeUpUtils.deleteDatasourceProfile(username, profileId);

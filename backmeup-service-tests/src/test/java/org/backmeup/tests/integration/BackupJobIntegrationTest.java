@@ -131,11 +131,11 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
-	@Test
-	public void cleanUser(){
-		String username = "TestUser1";
-		BackMeUpUtils.deleteUser(username);
-	}
+//	@Test
+//	public void cleanUser(){
+//		String username = "TestUser1";
+//		BackMeUpUtils.deleteUser(username);
+//	}
 	
 	@Test
 	public void testCreateBackupJobWrongSourceProfile() {
@@ -187,7 +187,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/jobs/" + username)
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(400)
 				.body("errorMessage", equalTo("Unknown profile " + wrongProfileSourceId))
 				.body("errorType", equalTo("java.lang.IllegalArgumentException"));
@@ -419,14 +419,14 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 						
 			response = BackMeUpUtils.createBackupJob(username, password, profileSourceId, profileSinkId, jobTimeExpression, jobTitle);
 			jobId = response.extract().path("job.jobId");
-			System.out.println("JobId = " + jobId);
+//			System.out.println("JobId = " + jobId);
 			
 			given()
-				.log().all()
+//				.log().all()
 			.when()
 				.get("/jobs/" + username + "/" + jobId + "/status")
 			.then()
-				.log().all()
+//				.log().all()
 				.statusCode(200);
 			
 		} finally {

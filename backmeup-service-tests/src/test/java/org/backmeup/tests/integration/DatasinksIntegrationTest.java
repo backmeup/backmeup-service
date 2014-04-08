@@ -33,7 +33,7 @@ public class DatasinksIntegrationTest extends IntegrationTestBase {
 		when()
 			.get("/datasinks/")
 		.then()
-			.log().all()
+//			.log().all()
 			.assertThat().statusCode(200)
 			.assertThat().body(containsString("sinks"))
 			.assertThat().body(containsString("title"))
