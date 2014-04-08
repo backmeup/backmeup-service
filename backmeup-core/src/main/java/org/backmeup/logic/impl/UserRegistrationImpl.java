@@ -199,7 +199,7 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public void ensureNewValuesAvailable(BackMeUpUser user, String newUsername, String newEmail) {
-        if (newUsername != null && !user.getUserId().equals(newUsername)) {
+        if (newUsername != null && !user.getUsername().equals(newUsername)) {
             ensureUsernameAvailable(newUsername);
         }
 
