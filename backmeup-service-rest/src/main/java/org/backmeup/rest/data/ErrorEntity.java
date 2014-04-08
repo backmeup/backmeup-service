@@ -50,7 +50,7 @@ public class ErrorEntity {
           !m.getDeclaringClass().equals(BackMeUpException.class) && 
           BackMeUpException.class.isAssignableFrom(m.getDeclaringClass())) {        
         try {
-          Object result = m.invoke(exception, (Object)null);
+          Object result = m.invoke(exception, (Object[])null);
           if (result != null) {
             String key = null;
             if (m.getName().startsWith("is")) {
