@@ -8,9 +8,9 @@
 	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
+	<prerequisites>
+		<maven>3.0.3</maven>
+	</prerequisites>
 
 	<name>BackMeUp</name>
 	<url>http://backmeup.at/</url>
@@ -30,11 +30,11 @@
 		<project.build.java.target>1.7</project.build.java.target>
 
 		<!-- Configuration -->
-		<config.LocalBuildArtefactDirectory>../autodeploy</config.LocalBuildArtefactDirectory>
-		<config.IntegrationTestCategory>org.backmeup.tests.IntegrationTest</config.IntegrationTestCategory>
+		<config.localBuildArtefactDirectory>../autodeploy</config.localBuildArtefactDirectory>
+		<config.integrationTestCategory>org.backmeup.tests.IntegrationTest</config.integrationTestCategory>
 
 		<config.tomcat.manager.url>http://127.0.0.1:8080/manager/text</config.tomcat.manager.url>
-		<config.tomcat.authentication.id>tomcat7</config.tomcat.authentication.id>
+		<config.tomcat.authentication.id>backmeup.service.tomcat</config.tomcat.authentication.id>
 
 		<!-- Dependency versions
 			 Please keep alphabetical
@@ -120,33 +120,33 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.2</version>
-                <!-- 
-                <configuration>
-                    <failOnWarning>true</failOnWarning>
-                </configuration> 
-                -->
-                <executions>
-                    <execution>
-                        <id>check-dependencies</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>analyze</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2</version>
+				<!-- 
+				<configuration>
+					<failOnWarning>true</failOnWarning>
+				</configuration> 
+				-->
+				<executions>
+					<execution>
+						<id>check-dependencies</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>analyze</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<repositories>
 		<repository>
-  			<id>typesafe</id>
-  			<name>Typesafe Repository</name>
-  			<url>http://repo.typesafe.com/typesafe/releases/</url>
+			<id>typesafe</id>
+			<name>Typesafe Repository</name>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
 		</repository>
 
 		<repository>

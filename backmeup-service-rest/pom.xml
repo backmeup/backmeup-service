@@ -99,7 +99,7 @@
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${config.LocalBuildArtefactDirectory}</outputDirectory>
+							<outputDirectory>${config.localBuildArtefactDirectory}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

@@ -34,7 +34,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
 				<configuration>
-					<groups>${config.IntegrationTestCategory}</groups>
+					<groups>${config.integrationTestCategory}</groups>
 				</configuration>
 				<executions>
 					<execution>
