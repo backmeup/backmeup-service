@@ -5,8 +5,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.backmeup.rest.data.ErrorEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // There is a documented error when ExceptionMapper implement statement is in abstract class.
 // The mapping of the exceptions does not work correctly. A workaround is proposed by adding 
