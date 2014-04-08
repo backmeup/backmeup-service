@@ -35,6 +35,16 @@
 				<version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
 				<configuration>
 					<groups>${config.integrationTestCategory}</groups>
+					<systemPropertyVariables>
+						<!-- 
+						     For automated integration test, the following properties are specified as 
+							 maven commands (e.g. mvn -Dbackmeup.keyserver.baseuri=xxx). If not specified, 
+							 the settings in the file 'integrationtests.properties' are used. 
+						-->
+						<backmeup.service.baseuri>${backmeup.service.baseuri}</backmeup.service.baseuri>
+						<backmeup.service.port>${backmeup.service.port}</backmeup.service.port>
+						<backmeup.service.basepath>${backmeup.service.basepath}</backmeup.service.basepath>
+					</systemPropertyVariables>
 				</configuration>
 				<executions>
 					<execution>
