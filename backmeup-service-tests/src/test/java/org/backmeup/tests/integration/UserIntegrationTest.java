@@ -255,32 +255,37 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
 		
-		ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		String verificationKey = response.extract().path("verificationKey");
-		BackMeUpUtils.verifyEmail(verificationKey);
+		String newUsername = "";
 		
-		String newUsername = username;
-		String newPassword = password;
-		String newKeyRingPassword = keyRingPassword;
-		String newEmail = "ChangedTestUser@trash-mail.com";
-		
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", keyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("Account email has been changed"));
-		
-		BackMeUpUtils.deleteUser(newUsername);
+		try {	
+			ValidatableResponse response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+
+			newUsername = username;
+			String newPassword = password;
+			String newKeyRingPassword = keyRingPassword;
+			String newEmail = "ChangedTestUser@trash-mail.com";
+
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("username", newUsername)
+				.formParam("oldPassword", password)
+				.formParam("password", newPassword)
+				.formParam("oldKeyring", keyRingPassword)
+				.formParam("newKeyring", newKeyRingPassword)
+				.formParam("email", newEmail)
+			.when()
+				.put("/users/" + username)
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("Account email has been changed"));
+
+		} finally {
+			BackMeUpUtils.deleteUser(newUsername);
+		}
 	}
 	
 	@Test
@@ -566,7 +571,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			when()
 				.get("/users/" + username + "/properties/" + propertyKey)
 			.then()
-				.statusCode(400)
+				.statusCode(404)
 				.body("errorType", equalTo("org.backmeup.model.exceptions.UnknownUserPropertyException"));
 		} finally {
 			BackMeUpUtils.deleteUser(username);
