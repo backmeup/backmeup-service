@@ -142,7 +142,7 @@ public class DatasinksIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testDeleteDatasourceProfile() {
+	public void testDeleteDatasinkProfile() {
 		String username = "TestUser1";
 		String password = "password1";
 		String keyRingPassword = "keyringpassword1";
@@ -160,7 +160,7 @@ public class DatasinksIntegrationTest extends IntegrationTestBase {
 			String profileId = response.extract().path("profileId");
 			
 			when()
-				.delete("/datasources/" + username + "/profiles/" + profileId)
+				.delete("/datasinks/" + username + "/profiles/" + profileId)
 			.then()
 				.statusCode(200);
 		
