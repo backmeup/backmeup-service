@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -211,127 +212,110 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public BackMeUpUser getUser(String username) {
-        try {
-            conn.beginOrJoin();
+    public BackMeUpUser getUser(final String username) {
+        return conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+
+                return registrationService.queryActivatedUser(username);
             
-            return registrationService.queryActivatedUser(username);
-            
-        } finally {
-            conn.rollback();
-        }
+            }
+        });
     }
 
     @Override
-    public BackMeUpUser deleteUser(String username) {
-        conn.begin();
-        try {
-            BackMeUpUser u = registrationService.queryExistingUser(username);
-            authorizationService.unregister(u);
-
-            BackupJobDao jobDao = getBackupJobDao();
-            StatusDao statusDao = getStatusDao();
-            for (BackupJob job : jobDao.findByUsername(username)) {
-                for (Status status : statusDao.findByJobId(job.getId())) {
-                    statusDao.delete(status);
+    public BackMeUpUser deleteUser(final String username) {
+        BackMeUpUser user = conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                BackMeUpUser u = registrationService.queryExistingUser(username);
+                authorizationService.unregister(u);
+                
+                BackupJobDao jobDao = getBackupJobDao();
+                StatusDao statusDao = getStatusDao();
+                for (BackupJob job : jobDao.findByUsername(username)) {
+                    for (Status status : statusDao.findByJobId(job.getId())) {
+                        statusDao.delete(status);
+                    }
+                    jobDao.delete(job);
                 }
-                jobDao.delete(job);
+                
+                ProfileDao profileDao = getProfileDao();
+                for (Profile p : profileDao.findProfilesByUsername(username)) {
+                    profileDao.delete(p);
+                }
+                
+                getUserDao().delete(u);
+                return u;
             }
+        });
 
-            ProfileDao profileDao = getProfileDao();
-            for (Profile p : profileDao.findProfilesByUsername(username)) {
-                profileDao.delete(p);
+        searchService.deleteIndexOf(user);
+        return user;
+    }
+
+    @Override
+    public BackMeUpUser changeUser(final String oldUsername, final String newUsername, final String oldPassword,
+            final String newPassword, final String oldKeyRingPassword, final String newKeyRingPassword, final String newEmail) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                BackMeUpUser user = registrationService.queryActivatedUser(oldUsername);
+                registrationService.ensureNewValuesAvailable(user, newUsername, newEmail);
+                
+                authorizationService.authorize(user, oldPassword);
+
+                authorizationService.updatePasswords(user, oldPassword, newPassword, oldKeyRingPassword, newKeyRingPassword);
+
+                registrationService.updateValues(user, newUsername, newEmail);
+
+                return user;
             }
-
-            getUserDao().delete(u);
-            conn.commit();
-
-            searchService.deleteIndexOf(u);
-
-            return u;
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
-    public BackMeUpUser changeUser(String oldUsername, String newUsername, String oldPassword,
-            String newPassword, String oldKeyRingPassword, String newKeyRingPassword, String newEmail) {
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = registrationService.queryActivatedUser(oldUsername);
-            registrationService.ensureNewValuesAvailable(user, newUsername, newEmail);
-            
-            authorizationService.authorize(user, oldPassword);
-
-            authorizationService.updatePasswords(user, oldPassword, newPassword, oldKeyRingPassword, newKeyRingPassword);
-
-            registrationService.updateValues(user, newUsername, newEmail);
-            
-            conn.commit();
-            return user;
-        } finally {
-            conn.rollback();
-        }
+    public BackMeUpUser login(final String username, final String password) {
+        return conn.txNewReadOnly(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                BackMeUpUser user = registrationService.queryExistingUser(username);
+                authorizationService.authorize(user, password);
+                return user;
+            }
+        });
     }
 
     @Override
-    public BackMeUpUser login(String username, String password) {
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = registrationService.queryExistingUser(username);
-            authorizationService.authorize(user, password);
-
-            return user;
-        } finally {
-            conn.rollback();
-        }
+    public BackMeUpUser register(final String username, final String password, final String keyRingPassword, final String email) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                BackMeUpUser user = registrationService.register(username, email);
+                authorizationService.register(user, password, keyRingPassword);
+                registrationService.sendVerificationEmailFor(user);
+                return user;
+            }
+        });
     }
 
     @Override
-    public BackMeUpUser register(String username, String password, String keyRingPassword, String email) {
-        try {
-            conn.begin();
+    public void setUserProperty(final String username, final String key, final String value) {
+        conn.txJoin(new Runnable() {
+            @Override public void run() {
+
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                user.setUserProperty(key, value);
             
-            BackMeUpUser user = registrationService.register(username, email);
-            authorizationService.register(user, password, keyRingPassword);
-            registrationService.sendVerificationEmailFor(user);
-            
-            conn.commit();
-            return user;
-        } finally {
-            conn.rollback();
-        }
+            }
+        });
     }
 
     @Override
-    public void setUserProperty(String username, String key, String value) {
-        try {
-            conn.beginOrJoin();
-            
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            user.setUserProperty(key, value);
-            
-            conn.commit();
-        } finally {
-            conn.rollback();
-        }
-    }
+    public void deleteUserProperty(final String username, final String key) {
+        conn.txJoin(new Runnable() {
+            @Override public void run() {
 
-    @Override
-    public void deleteUserProperty(String username, String key) {
-        try {
-            conn.beginOrJoin();
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                user.deleteUserProperty(key);
             
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            user.deleteUserProperty(key);
-            
-            conn.commit();
-        } finally {
-            conn.rollback();
-        }
+            }
+        });
     }
 
     @Override
@@ -340,29 +324,25 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<Profile> getDatasourceProfiles(String username) {
-        try {
-            conn.begin();
-
-            return getProfileDao().findDatasourceProfilesByUsername(username);
-
-        } finally {
-            conn.rollback();
-        }
+    public List<Profile> getDatasourceProfiles(final String username) {
+        return conn.txNewReadOnly(new Callable<List<Profile>>() {
+            @Override public List<Profile> call() {
+                
+                return getProfileDao().findDatasourceProfilesByUsername(username);
+                
+            }
+        });
     }
 
     @Override
-    public Profile deleteProfile(String username, Long profileId) {
-        try {
-            conn.begin();
-            
-            Profile profile = deleteProfileX(username, profileId);
-            
-            conn.commit();
-            return profile;
-        } finally {
-            conn.rollback();
-        }
+    public Profile deleteProfile(final String username, final Long profileId) {
+        return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
+                
+                return deleteProfileX(username, profileId);
+                
+            }
+        });
     }
 
     private Profile deleteProfileX(String username, Long profileId) {
@@ -381,83 +361,73 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<String> getDatasourceOptions(String username, Long profileId,
-            String keyRingPassword) {
-        try {
-            conn.beginOrJoin();
-            
-            Profile p = queryExistingUserProfile(profileId, username);
-            Datasource source = plugins.getDatasource(p.getDescription());
-            
-            Properties accessData = authorizationService.fetchProfileAuthenticationData(p, keyRingPassword);
-            
-            return source.getAvailableOptions(accessData);
-            
-        } catch (PluginException pe) {
-            logger.error("Error during getAvailableOptions", pe);
-            throw pe;
-        } finally {
-            conn.rollback();
-        }
+    public List<String> getDatasourceOptions(final String username, final Long profileId,
+            final String keyRingPassword) {
+        return conn.txJoinReadOnly(new Callable<List<String>>() {
+            @Override public List<String> call() {
+                
+                Profile p = queryExistingUserProfile(profileId, username);
+                Datasource source = plugins.getDatasource(p.getDescription());
+                
+                Properties accessData = authorizationService.fetchProfileAuthenticationData(p, keyRingPassword);
+                
+                return source.getAvailableOptions(accessData);
+                
+            }
+        });
     }
 
     @Override
-    public List<String> getStoredDatasourceOptions(String username, Long profileId, Long jobId) {
-        try {
-            conn.beginOrJoin();
+    public List<String> getStoredDatasourceOptions(final String username, final Long profileId, final Long jobId) {
+        return conn.txJoinReadOnly(new Callable<List<String>>() {
+            @Override public List<String> call() {
 
-            registrationService.queryActivatedUser(username);
-            BackupJob job = queryExistingUserJob(jobId, username);
-            for (ProfileOptions po : job.getSourceProfiles()) {
-                if (po.getProfile().getProfileId().equals(profileId)) {
-                    String[] options = po.getOptions();
-                    if (options == null) {
-                        return new ArrayList<>();
+                registrationService.queryActivatedUser(username);
+                BackupJob job = queryExistingUserJob(jobId, username);
+                for (ProfileOptions po : job.getSourceProfiles()) {
+                    if (po.getProfile().getProfileId().equals(profileId)) {
+                        String[] options = po.getOptions();
+                        if (options == null) {
+                            return new ArrayList<>();
+                        }
+                        return Arrays.asList(options);
                     }
-                    return Arrays.asList(options);
                 }
+                
+                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
+            
             }
-
-            throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
-
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
-    public void changeProfile(Long profileId, Long jobId, List<String> sourceOptions)
+    public void changeProfile(final Long profileId, final Long jobId, final List<String> sourceOptions)
     {
-        try
-        {
-            conn.beginOrJoin();
-            
-            ProfileDao pd = getProfileDao ();
-            Profile p = pd.findById (profileId);
-            if (p == null)
-            {
-                throw new IllegalArgumentException (String.format (textBundle.getString(UNKNOWN_PROFILE), profileId));
-            }
+        conn.txJoin(new Runnable() {
+            @Override public void run() {
 
-            BackupJobDao bd = getBackupJobDao ();
-            BackupJob backupjob = bd.findById (jobId);
-
-            Set<ProfileOptions> profileoptions = backupjob.getSourceProfiles ();
-            for (ProfileOptions option : profileoptions)
-            {
-                if (option.getProfile ().getProfileId ().equals(p.getProfileId ()))
+                ProfileDao pd = getProfileDao ();
+                Profile p = pd.findById (profileId);
+                if (p == null)
                 {
-                    String[] new_options = sourceOptions.toArray (new String[sourceOptions.size ()]);
-                    option.setOptions (new_options);
+                    throw new IllegalArgumentException (String.format (textBundle.getString(UNKNOWN_PROFILE), profileId));
                 }
+                
+                BackupJobDao bd = getBackupJobDao ();
+                BackupJob backupjob = bd.findById (jobId);
+                
+                Set<ProfileOptions> profileoptions = backupjob.getSourceProfiles ();
+                for (ProfileOptions option : profileoptions)
+                {
+                    if (option.getProfile ().getProfileId ().equals(p.getProfileId ()))
+                    {
+                        String[] new_options = sourceOptions.toArray (new String[sourceOptions.size ()]);
+                        option.setOptions (new_options);
+                    }
+                }
+            
             }
-
-            conn.commit ();
-        }
-        finally
-        {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
@@ -471,15 +441,14 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<Profile> getDatasinkProfiles(String username) {
-        try {
-            conn.begin();
-            
-            return getProfileDao().findDatasinkProfilesByUsername(username);
-            
-        } finally {
-            conn.rollback();
-        }
+    public List<Profile> getDatasinkProfiles(final String username) {
+        return conn.txNewReadOnly(new Callable<List<Profile>>() {
+            @Override public List<Profile> call() {
+                
+                return getProfileDao().findDatasinkProfilesByUsername(username);
+                
+            }
+        });
     }
 
     @Override
@@ -497,23 +466,24 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public ActionProfile getStoredActionOptions(String actionId, Long jobId) {
-        try {
-            conn.beginOrJoin();
-            BackupJobDao jobDao = getBackupJobDao();
-            BackupJob job = jobDao.findById(jobId);
-            if (job == null) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
-            }
-            for (ActionProfile ap : job.getRequiredActions()) {
-                if (ap.getActionId().equals(actionId)) {
-                    return ap;
+    public ActionProfile getStoredActionOptions(final String actionId, final Long jobId) {
+        return conn.txJoinReadOnly(new Callable<ActionProfile>() {
+            @Override public ActionProfile call() {
+
+                BackupJobDao jobDao = getBackupJobDao();
+                BackupJob job = jobDao.findById(jobId);
+                if (job == null) {
+                    throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
                 }
+                for (ActionProfile ap : job.getRequiredActions()) {
+                    if (ap.getActionId().equals(actionId)) {
+                        return ap;
+                    }
+                }
+                throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
+            
             }
-            throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
@@ -550,25 +520,26 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public void changeActionOptions(String actionId, Long jobId,
-            Map<String, String> actionOptions) {
-        try {
-            conn.beginOrJoin();
-            BackupJobDao jobDao = getBackupJobDao();
-            BackupJob job = jobDao.findById(jobId);
-            if (job == null) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
-            }
-            for (ActionProfile ap : job.getRequiredActions()) {
-                if (ap.getActionId().equals(actionId)) {
-                    ap.getActionOptions().clear();
-                    addActionProperties(ap, actionOptions);
+    public void changeActionOptions(final String actionId, final Long jobId,
+            final Map<String, String> actionOptions) {
+        conn.txJoin(new Runnable() {
+            @Override public void run() {
+
+                BackupJobDao jobDao = getBackupJobDao();
+                BackupJob job = jobDao.findById(jobId);
+                if (job == null) {
+                    throw new IllegalArgumentException(String.format(textBundle.getString(NO_SUCH_JOB), jobId));
                 }
+                for (ActionProfile ap : job.getRequiredActions()) {
+                    if (ap.getActionId().equals(actionId)) {
+                        ap.getActionOptions().clear();
+                        addActionProperties(ap, actionOptions);
+                    }
+                }
+            
             }
-            conn.commit();
-        } finally {
-            conn.rollback();
-        }
+        });
+
     }
 
     @Override
@@ -738,53 +709,50 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public JobUpdateRequest getBackupJob(String username, Long jobId) {
-        try {
-            if (jobId == null) {
-                throw new IllegalArgumentException("Missing parameter " + jobId);
-            }
-            conn.begin();
-            BackupJobDao jobDao = dal.createBackupJobDao();
-            BackupJob job = jobDao.findById(jobId);
-            return BackUpJobConverter.convertJobToUpdateRequest(job);
-        } finally {
-            conn.rollback();
+    public JobUpdateRequest getBackupJob(String username, final Long jobId) {
+        if (jobId == null) {
+            throw new IllegalArgumentException("Missing parameter " + jobId);
         }
+
+        return conn.txNewReadOnly(new Callable<JobUpdateRequest>() {
+            @Override public JobUpdateRequest call() {
+                
+                BackupJobDao jobDao = dal.createBackupJobDao();
+                BackupJob job = jobDao.findById(jobId);
+                return BackUpJobConverter.convertJobToUpdateRequest(job);
+                
+            }
+        });
     }
 
     @Override
-    public List<BackupJob> getJobs(String username) {
-        try {
-            conn.begin();
-            
-            registrationService.queryActivatedUser(username);
-            return getBackupJobDao().findByUsername(username);
-            
-        } finally {
-            conn.rollback();
-        }
+    public List<BackupJob> getJobs(final String username) {
+        return conn.txNewReadOnly(new Callable<List<BackupJob>>() {
+            @Override public List<BackupJob> call() {
+                
+                registrationService.queryActivatedUser(username);
+                return getBackupJobDao().findByUsername(username);
+                
+            }
+        });
     }
 
     @Override
-    public void deleteJob(String username, Long jobId) {
-        try {
-            conn.begin();
-            
-            registrationService.queryActivatedUser(username);
-            BackupJob job = queryExistingUserJob(jobId, username);
+    public void deleteJob(final String username, final Long jobId) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                registrationService.queryActivatedUser(username);
+                BackupJob job = queryExistingUserJob(jobId, username);
 
-            // Delete Job status records first
-            StatusDao statusDao = getStatusDao();
-            for (Status status : statusDao.findByJobId(job.getId())) {
-                statusDao.delete(status);
+                // Delete Job status records first
+                StatusDao statusDao = getStatusDao();
+                for (Status status : statusDao.findByJobId(job.getId())) {
+                    statusDao.delete(status);
+                }
+
+                getBackupJobDao().delete(job);
             }
-
-            getBackupJobDao().delete(job);
-            
-            conn.commit();
-        } finally {
-            conn.rollback();
-        }
+        });
     }
     private BackupJob queryExistingJob(Long jobId) {
         BackupJob job = getBackupJobDao().findById(jobId);
@@ -803,49 +771,44 @@ public class BusinessLogicImpl implements BusinessLogic {
         return job;
     }
 
-    private List<Status> getStatusForJob(BackupJob job) {
-        try {
-            conn.beginOrJoin();
-            StatusDao sd = dal.createStatusDao();
-            List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
-            
-            Set<FileItem> fileItems = searchService.getAllFileItems(job);
-            for (Status stat : status) {
-                stat.setFiles(fileItems);
-            }
-            return status;
-        } finally {
-            conn.rollback();
+    private List<Status> getStatusForJob(final BackupJob job) {
+        StatusDao sd = dal.createStatusDao();
+        List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
+        
+        Set<FileItem> fileItems = searchService.getAllFileItems(job);
+        for (Status stat : status) {
+            stat.setFiles(fileItems);
         }
+        return status;
     }
 
     @Override
-    public List<Status> getStatus(String username, Long jobId) {
-        try {
-            conn.begin();
-            
-            registrationService.queryActivatedUser(username);
-            BackupJobDao jobDao = getBackupJobDao();
-
-            if (jobId == null) {
-                List<Status> status = new ArrayList<>();
-                BackupJob job = jobDao.findLastBackupJob(username);
-                if (job != null) {
-                    status.addAll(getStatusForJob(job));
+    public List<Status> getStatus(final String username, final Long jobId) {
+        return conn.txNewReadOnly(new Callable<List<Status>>() {
+            @Override public List<Status> call() {
+                
+                registrationService.queryActivatedUser(username);
+                BackupJobDao jobDao = getBackupJobDao();
+                
+                if (jobId == null) {
+                    List<Status> status = new ArrayList<>();
+                    BackupJob job = jobDao.findLastBackupJob(username);
+                    if (job != null) {
+                        status.addAll(getStatusForJob(job));
+                    }
+                    // for (BackupJob job : jobs) {
+                    //     status.add(getStatusForJob(job));
+                    // }
+                    return status;
                 }
-                 // for (BackupJob job : jobs) {
-                 //     status.add(getStatusForJob(job));
-                 // }
+                
+                BackupJob job = queryExistingUserJob(jobId, username);
+                List<Status> status = new ArrayList<>();
+                status.addAll(getStatusForJob(job));
                 return status;
+                
             }
-
-            BackupJob job = queryExistingUserJob(jobId, username);
-            List<Status> status = new ArrayList<>();
-            status.addAll(getStatusForJob(job));
-            return status;
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
@@ -854,20 +817,20 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public ProtocolOverview getProtocolOverview(String username, String duration) {
-        try {
-            conn.begin();
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            
-            Date to = new Date();
-            Date from = duration.equals("month") ? new Date(to.getTime() - DELAY_MONTHLY) :
-                new Date(to.getTime() - DELAY_WEEKLY);
-
-            return getProtocolOverview(user, from, to);
-            
-        } finally {
-            conn.rollback();
-        }
+    public ProtocolOverview getProtocolOverview(final String username, final String duration) {
+        return conn.txNewReadOnly(new Callable<ProtocolOverview>() {
+            @Override public ProtocolOverview call() {
+                
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                
+                Date to = new Date();
+                Date from = duration.equals("month") ? new Date(to.getTime() - DELAY_MONTHLY) :
+                    new Date(to.getTime() - DELAY_WEEKLY);
+                
+                return getProtocolOverview(user, from, to);
+                
+            }
+        });
     }
 
     private ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to) {
@@ -911,46 +874,51 @@ public class BusinessLogicImpl implements BusinessLogic {
         Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier);
         SourceSinkDescribable desc = plugins
                 .getSourceSinkById(uniqueDescIdentifier);
-        org.backmeup.model.spi.SourceSinkDescribable.Type type = desc.getType();
-        AuthRequest ar = new AuthRequest();
-        try {
-            conn.begin();
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
+        return preAuth(username, uniqueDescIdentifier, profileName, keyRing, auth, desc);
+    }
 
-            authorizationService.authorize(user, keyRing);
+    private AuthRequest preAuth(final String username, final String uniqueDescIdentifier, final String profileName, final String keyRing,
+            final Authorizable auth, final SourceSinkDescribable desc) {
+        return conn.txNew(new Callable<AuthRequest>() {
+            @Override public AuthRequest call() {
 
-            Profile profile = new Profile(getUserDao().findByName(username),
-                    profileName, uniqueDescIdentifier, type);
-            switch (auth.getAuthType()) {
-            case OAuth:
-                OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
-                Properties p = new Properties();
-                p.setProperty("callback", callbackUrl);
-                String redirectUrl = oauth.createRedirectURL(p, callbackUrl);
-                ar.setRedirectURL(redirectUrl);
-                // TODO Store all properties within keyserver & don't store them within the local database!
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                
+                authorizationService.authorize(user, keyRing);
+                
+                org.backmeup.model.spi.SourceSinkDescribable.Type type = desc.getType();
+                Profile profile = new Profile(getUserDao().findByName(username),
+                        profileName, uniqueDescIdentifier, type);
+                AuthRequest ar = new AuthRequest();
+                switch (auth.getAuthType()) {
+                case OAuth:
+                    OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
+                    Properties p = new Properties();
+                    p.setProperty("callback", callbackUrl);
+                    String redirectUrl = oauth.createRedirectURL(p, callbackUrl);
+                    ar.setRedirectURL(redirectUrl);
+                    // TODO Store all properties within keyserver & don't store them within the local database!
+                    
+                    profile = getProfileDao().save(profile);
+                    authorizationService.initProfileAuthInformation(profile, p, keyRing);
+                    break;
+                case InputBased:
+                    InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
+                    ar.setRequiredInputs(ibased.getRequiredInputFields());
+                    p = new Properties();
+                    p.setProperty("callback", callbackUrl);
+                    profile = getProfileDao().save(profile);
+                    authorizationService.initProfileAuthInformation(profile, p, keyRing);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
+                }
+                
+                ar.setProfile(profile);
+                return ar;
 
-                profile = getProfileDao().save(profile);
-                authorizationService.initProfileAuthInformation(profile, p, keyRing);
-                break;
-            case InputBased:
-                InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
-                ar.setRequiredInputs(ibased.getRequiredInputFields());
-                p = new Properties();
-                p.setProperty("callback", callbackUrl);
-                profile = getProfileDao().save(profile);
-                authorizationService.initProfileAuthInformation(profile, p, keyRing);
-                break;
-            default:
-                throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
             }
-
-            conn.commit();
-            ar.setProfile(profile);
-            return ar;
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
@@ -1007,77 +975,72 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public long searchBackup(String username, String keyRingPassword, String query) {
+    public long searchBackup(final String username, final String keyRingPassword, final String query) {
         try {
-            conn.begin();
 
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            authorizationService.authorize(user, keyRingPassword);
-            SearchResponse search = searchService.createSearch(query, new String[0]);
+            return conn.txNew(new Callable<Long>() {
+                @Override public Long call() {
+                    BackMeUpUser user = registrationService.queryActivatedUser(username);
+                    authorizationService.authorize(user, keyRingPassword);
+                    SearchResponse search = searchService.createSearch(query, new String[0]);
+                    return search.getId();
+                }
+            });
 
-            conn.commit();
-            return search.getId();
-            
-        } catch (Throwable t) {
+        } catch (RuntimeException t) {
             if (t instanceof BackMeUpException) {
                 throw (BackMeUpException) t;
             }
             throw new BackMeUpException(textBundle.getString(ERROR_OCCURED), t);
-        } finally {
-            conn.rollback();
         }
     }
 
     @Override
-    public void deleteIndexForUser(String username) {
-        try {
-            conn.begin();
+    public void deleteIndexForUser(final String username) {
+        conn.txNewReadOnly(new Runnable() {
+            @Override public void run() {
 
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            searchService.deleteIndexOf(user);
-            
-        } finally {
-            conn.rollback();
-        }
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                searchService.deleteIndexOf(user);
+                
+            }
+        });
     }
 
     @Override
-    public void deleteIndexForJobAndTimestamp(Long jobId, Long timestamp) {
-        try {
-            conn.begin();
+    public void deleteIndexForJobAndTimestamp(final Long jobId, final Long timestamp) {
+        conn.txNewReadOnly(new Runnable() {
+            @Override public void run() {
 
-            BackupJob job = queryExistingJob(jobId);
-            searchService.delete(job, timestamp);
-
-        } finally {
-            conn.rollback();
-        }
+                BackupJob job = queryExistingJob(jobId);
+                searchService.delete(job, timestamp);
+                
+            }
+        });
     }
 
     @Override
-    public SearchResponse queryBackup(String username, long searchId, Map<String, List<String>> filters) {
-        try {
-            conn.begin();
+    public SearchResponse queryBackup(final String username, final long searchId, final Map<String, List<String>> filters) {
+        return conn.txNewReadOnly(new Callable<SearchResponse>() {
+            @Override public SearchResponse call() {
+                
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                return searchService.runSearch(user, searchId, filters);
 
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            return searchService.runSearch(user, searchId, filters);
-            
-        } finally {
-            conn.rollback();
-        }
+            }
+        });
     }
 
     @Override
-    public File getThumbnail(String username, String fileId) {
-        try {
-            conn.begin();
+    public File getThumbnail(final String username, final String fileId) {
+        return conn.txNewReadOnly(new Callable<File>() {
+            @Override public File call() {
+                
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                return searchService.getThumbnailPathForFile(user, fileId);
 
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            return searchService.getThumbnailPathForFile(user, fileId);
-            
-        } finally {
-            conn.rollback();
-        }
+            }
+        });
     }
 
     @Override
@@ -1101,117 +1064,121 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public Properties getMetadata(String username, Long profileId, String keyRing) {
-        try {
-            conn.beginOrJoin();
-            Profile p = queryExistingProfile(profileId);
-
-            if (!p.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
+    public Properties getMetadata(final String username, final Long profileId, final String keyRing) {
+        return conn.txJoinReadOnly(new Callable<Properties>() {
+            @Override public Properties call() {
+                
+                Profile p = queryExistingProfile(profileId);
+                
+                if (!p.getUser().getUsername().equals(username)) {
+                    throw new IllegalArgumentException(String.format(
+                            textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
+                }
+                
+                SourceSinkDescribable ssd = plugins.getSourceSinkById(p.getDescription());
+                if (ssd == null) {
+                    throw new IllegalArgumentException(String.format(
+                            textBundle.getString(UNKNOWN_SOURCE_SINK), p.getDescription()));
+                }
+                
+                Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
+                Properties metadata = ssd.getMetadata(accessData);
+                return metadata;
+                
             }
-
-            SourceSinkDescribable ssd = plugins.getSourceSinkById(p.getDescription());
-            if (ssd == null) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(UNKNOWN_SOURCE_SINK), p.getDescription()));
-            }
-
-            Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
-            Properties metadata = ssd.getMetadata(accessData);
-            return metadata;
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     @Override
-    public ValidationNotes validateProfile(String username, Long profileId, String keyRing) {
-        String pluginName = null;
-        try {
-            conn.beginOrJoin();
-            Profile p = getProfileDao().findById(profileId);
-            if (p == null || !p.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
-            }
-            pluginName = p.getDescription();
-            Validationable validator = plugins.getValidator(p.getDescription());
-            Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
-            return validator.validate(accessData);
+    public ValidationNotes validateProfile(final String username, final Long profileId, final String keyRing) {
+        return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
+            @Override public ValidationNotes call() {
 
-        } catch (PluginUnavailableException pue) {
-            ValidationNotes notes = new ValidationNotes();
-            notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName);
-            return notes;
-        } catch (Exception pe) {
-            ValidationNotes notes = new ValidationNotes();
-            notes.addValidationEntry(ValidationExceptionType.Error, pluginName, pe);
-            return notes;
-        } finally {
-            conn.rollback();
-        }
+                String pluginName = null;
+                try {
+                    Profile p = getProfileDao().findById(profileId);
+                    if (p == null || !p.getUser().getUsername().equals(username)) {
+                        throw new IllegalArgumentException(String.format(
+                                textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
+                    }
+                    pluginName = p.getDescription();
+                    Validationable validator = plugins.getValidator(p.getDescription());
+                    Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
+                    return validator.validate(accessData);
+                    
+                } catch (PluginUnavailableException pue) {
+                    ValidationNotes notes = new ValidationNotes();
+                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName);
+                    return notes;
+                } catch (Exception pe) {
+                    ValidationNotes notes = new ValidationNotes();
+                    notes.addValidationEntry(ValidationExceptionType.Error, pluginName, pe);
+                    return notes;
+                }
+            
+            }
+        });
     }
 
     //TODO Add password parameter to get token from keyserver to validate the profile
     @Override
-    public ValidationNotes validateBackupJob(String username, Long jobId, String keyRing) {
-        try {
-            conn.begin();
-            getUser(username);
+    public ValidationNotes validateBackupJob(final String username, final Long jobId, final String keyRing) {
+        return conn.txNewReadOnly(new Callable<ValidationNotes>() {
+            @Override public ValidationNotes call() {
+                
+                getUser(username);
 
-            BackupJob job = jobManager.getBackUpJob(jobId);
-            if (job == null || !job.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(UNKNOWN_JOB_WITH_ID), jobId));
-            }
-
-            ValidationNotes notes = new ValidationNotes();
-            try {
-                // plugin-level validation
-                for (ProfileOptions po : job.getSourceProfiles()) {
-                    SourceSinkDescribable ssd = plugins.getSourceSinkById(po.getProfile()
-                            .getDescription());
-                    if (ssd == null) {
-                        notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, po
-                                .getProfile().getDescription());
-                    }
-
-                    // Validate source plug-in itself
-                    notes.getValidationEntries().addAll(
-                            validateProfile(username, po.getProfile().getProfileId(), keyRing)
-                            .getValidationEntries());
+                BackupJob job = jobManager.getBackUpJob(jobId);
+                if (job == null || !job.getUser().getUsername().equals(username)) {
+                    throw new IllegalArgumentException(String.format(
+                            textBundle.getString(UNKNOWN_JOB_WITH_ID), jobId));
                 }
 
-                // validate sink profile
-                notes.getValidationEntries().addAll(
-                        validateProfile(username, job.getSinkProfile().getProfileId(), keyRing)
-                        .getValidationEntries());
+                ValidationNotes notes = new ValidationNotes();
+                try {
+                    // plugin-level validation
+                    for (ProfileOptions po : job.getSourceProfiles()) {
+                        SourceSinkDescribable ssd = plugins.getSourceSinkById(po.getProfile()
+                                .getDescription());
+                        if (ssd == null) {
+                            notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, po
+                                    .getProfile().getDescription());
+                        }
 
-            } catch (BackMeUpException bme) {
-                notes.addValidationEntry(ValidationExceptionType.Error,
-                        bme);
+                        // Validate source plug-in itself
+                        notes.getValidationEntries().addAll(
+                                validateProfile(username, po.getProfile().getProfileId(), keyRing)
+                                .getValidationEntries());
+                    }
+
+                    // validate sink profile
+                    notes.getValidationEntries().addAll(
+                            validateProfile(username, job.getSinkProfile().getProfileId(), keyRing)
+                            .getValidationEntries());
+
+                } catch (BackMeUpException bme) {
+                    notes.addValidationEntry(ValidationExceptionType.Error,
+                            bme);
+                }
+                return notes;
+
             }
-            return notes;
-        } finally {
-            conn.rollback();
-        }
+        });
     }
 
     //TODO Store profile data within keyserver!
     @Override
-    public void addProfileEntries(Long profileId, Properties entries, String keyRing) {
-        try {
-            conn.begin();
-            
-            Profile profile = queryExistingProfile(profileId);
-            authorizationService.appendProfileAuthInformation(profile, entries, keyRing);
-            
-            getProfileDao().save(profile); // TODO why save, has not been changed?
-            conn.commit();
-        } finally {
-            conn.rollback();
-        }
+    public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile profile = queryExistingProfile(profileId);
+                authorizationService.appendProfileAuthInformation(profile, entries, keyRing);
+                
+                getProfileDao().save(profile); // TODO why save, has not been changed?
+                
+            }
+        });
     }
 
     private Profile queryExistingProfile(Long profileId) {
@@ -1224,31 +1191,25 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public BackMeUpUser verifyEmailAddress(String verificationKey) {
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = registrationService.activateUserFor(verificationKey);
-
-            conn.commit();
-            return user;
-        } finally {
-            conn.rollback();
-        }
+    public BackMeUpUser verifyEmailAddress(final String verificationKey) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                
+                return registrationService.activateUserFor(verificationKey);
+                
+            }
+        });
     }
 
     @Override
-    public BackMeUpUser requestNewVerificationEmail(String username) {
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = registrationService.requestNewVerificationEmail(username);
-            
-            conn.commit();
-            return user;
-        } finally {
-            conn.rollback();
-        }
+    public BackMeUpUser requestNewVerificationEmail(final String username) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+                
+                return registrationService.requestNewVerificationEmail(username);
+                
+            }
+        });
     }
 
     @Override

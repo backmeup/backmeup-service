@@ -1,6 +1,7 @@
 package org.backmeup.dal.jpa.util;
 
 import java.util.Stack;
+import java.util.concurrent.Callable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,6 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.FlushModeType;
 
 import org.backmeup.dal.Connection;
+import org.backmeup.dal.ConnectionTemplate;
 import org.backmeup.dal.DataAccessLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,4 +129,34 @@ public class ConnectionImpl implements Connection {
       joinedTransactions.set(transactionStack);
     }
   }
+
+    @Override
+    public <T> T txNew(Callable<T> getter) {
+        return new ConnectionTemplate(this).insideNewTransaction(getter);
+    }
+
+    @Override
+    public void txNew(Runnable call) {
+        new ConnectionTemplate(this).insideNewTransaction(call);
+    }
+
+    @Override
+    public <T> T txNewReadOnly(Callable<T> getter) {
+        return new ConnectionTemplate(this).insideNewTransactionRolledBack(getter);
+    }
+
+    @Override
+    public void txNewReadOnly(Runnable call) {
+        new ConnectionTemplate(this).insideNewTransactionRolledBack(call);
+    }
+
+    @Override
+    public void txJoin(Runnable call) {
+        new ConnectionTemplate(this).insideJoinedTransaction(call);
+    }
+
+    @Override
+    public <T> T txJoinReadOnly(Callable<T> getter) {
+        return new ConnectionTemplate(this).insideJoinedTransactionRolledBack(getter);
+    }
 }
