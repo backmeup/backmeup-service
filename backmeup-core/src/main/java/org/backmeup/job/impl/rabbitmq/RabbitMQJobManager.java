@@ -20,8 +20,6 @@ import com.rabbitmq.client.ConnectionFactory;
 /**
  * An implementation of {@link AkkaJobManager} that pushes backup jobs into 
  * a RabbitMQ queue, where they can be handled by worker nodes.
- * 
- * @author Rainer Simon <rainer.simon@ait.ac.at>
  */
 @ApplicationScoped
 public class RabbitMQJobManager extends AkkaJobManager {
@@ -38,28 +36,15 @@ public class RabbitMQJobManager extends AkkaJobManager {
 	private Connection mqConnection;
 	
 	private Channel mqChannel;
-	/*
-	public RabbitMQJobManager() throws IOException {
-		//init();
-	}
-	*/
-	/*
-	RabbitMQJobManager(String mqHost, String mqName) throws IOException {
-		this.mqHost = mqHost;
-		this.mqName = mqName;
-		init();
-	}
-	*/
 	
 	@Override
 	public void start() {
-	  super.start();
-	  try {
-      init();
-    } catch (IOException e) {     
-      //TODO: Log or rethrow Exception
-      throw new BackMeUpException(e);
-    }
+		super.start();
+		try {
+			init();
+		} catch (IOException e) {
+			throw new BackMeUpException(e);
+		}
 	}
 	
 	private void init() throws IOException {

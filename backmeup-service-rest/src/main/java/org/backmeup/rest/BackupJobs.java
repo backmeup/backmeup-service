@@ -137,22 +137,4 @@ public class BackupJobs extends Base {
       @QueryParam("toDate") String toDate) {
     return new StatusContainer(getLogic().getStatus(username, null));
   }
-  
-  /*@GET
-  @Path("/{username}/{jobId}")
-  @Produces("application/json")
-  public StatusContainer getJobDetails(
-      @PathParam("username") String username,
-      @QueryParam("fromDate") String fromDate,
-      @QueryParam("toDate") String toDate) {
-    Date fDate = null;
-    Date tDate = null;
-    if (fromDate != null) {
-      fDate = new Date(Long.parseLong(fromDate));
-    }
-    if (toDate != null) {
-      tDate = new Date(Long.parseLong(toDate));
-    }
-    return new StatusContainer(getLogic().getStatus(username, null));
-  }*/
 }
