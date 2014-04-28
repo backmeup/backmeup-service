@@ -14,14 +14,14 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.logic.SearchLogic;
+import org.backmeup.logic.index.ElasticSearchIndexClient;
+import org.backmeup.logic.index.IndexUtils;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.exceptions.BackMeUpException;
-import org.backmeup.plugin.api.actions.indexing.ElasticSearchIndexClient;
-import org.backmeup.plugin.api.actions.indexing.IndexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
