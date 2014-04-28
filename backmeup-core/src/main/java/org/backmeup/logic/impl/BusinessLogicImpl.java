@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -29,7 +28,7 @@ import org.backmeup.dal.ProfileDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
 import org.backmeup.job.JobManager;
-import org.backmeup.job.impl.rabbitmq.RabbitMQJobReceiver;
+//import org.backmeup.job.impl.rabbitmq.RabbitMQJobReceiver;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BusinessLogic;
@@ -70,9 +69,6 @@ import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.Plugin;
-import org.backmeup.plugin.api.actions.encryption.EncryptionDescribable;
-import org.backmeup.plugin.api.actions.filesplitting.FilesplittDescribable;
-import org.backmeup.plugin.api.actions.indexing.IndexDescribable;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
 import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
@@ -158,7 +154,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Configuration(key="backmeup.job.temporaryDirectory")
     private String jobTempDir;
 
-    private List<RabbitMQJobReceiver> jobWorker;
+//    private List<RabbitMQJobReceiver> jobWorker;
 
     @Inject
     private UserRegistration registrationService;
@@ -180,18 +176,18 @@ public class BusinessLogicImpl implements BusinessLogic {
     @PostConstruct
     public void startup() {
         logger.info("Starting job workers");
-        try {
-            jobWorker = new ArrayList<>();
-            for (int i = 0; i < numberOfJobWorker; i++) {
-                RabbitMQJobReceiver rec = new RabbitMQJobReceiver(mqHost,
-                        mqName, indexHost, indexPort, backupName, jobTempDir,
-                        plugins, keyserverClient, dal);
-                rec.start();
-                jobWorker.add(rec);
-            }
-        } catch (Exception e) {
-            logger.error("Error while starting job receivers", e);
-        }
+//        try {
+//            jobWorker = new ArrayList<>();
+//            for (int i = 0; i < numberOfJobWorker; i++) {
+//                RabbitMQJobReceiver rec = new RabbitMQJobReceiver(mqHost,
+//                        mqName, indexHost, indexPort, backupName, jobTempDir,
+//                        plugins, keyserverClient, dal);
+//                rec.start();
+//                jobWorker.add(rec);
+//            }
+//        } catch (Exception e) {
+//            logger.error("Error while starting job receivers", e);
+//        }
     }
 
     private ProfileDao getProfileDao() {
@@ -489,10 +485,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public List<ActionDescribable> getActions() {
         List<ActionDescribable> actions = plugins.getActions();
-        //TODO Move all internal actions to real OSGi bundles!!
-        actions.add(new IndexDescribable());
-        actions.add(new FilesplittDescribable());
-        actions.add(new EncryptionDescribable());
         return actions;
     }
 
@@ -516,30 +508,11 @@ public class BusinessLogicImpl implements BusinessLogic {
         }
     }
 
-    @Override
-    public List<String> getActionOptions(String actionId)
-    {
-        //TODO Move all internal actions to real OSGi bundles!!
-        //ActionDescribable action = plugins.getActionById (actionId);
-        //return action.getAvailableOptions ();
-
-        if (actionId.equals ("org.backmeup.indexer"))
-        {
-            return new IndexDescribable().getAvailableOptions ();
-        }
-        else if (actionId.equals ("org.backmeup.filesplitting"))
-        {
-            return new FilesplittDescribable().getAvailableOptions();
-        }
-        else if (actionId.equals ("org.backmeup.encryption"))
-        {
-            return new EncryptionDescribable().getAvailableOptions ();
-        }
-        else
-        {
-            return new LinkedList<> ();
-        }
-    }
+	@Override
+	public List<String> getActionOptions(String actionId) {
+		ActionDescribable action = plugins.getActionById(actionId);
+		return action.getAvailableOptions();
+	}
 
     private void addActionProperties(ActionProfile ap, Map<String, String> keyValues) {
         for (Map.Entry<String, String> e : keyValues.entrySet()) {
@@ -580,21 +553,13 @@ public class BusinessLogicImpl implements BusinessLogic {
         List<ActionProfile> actions = new ArrayList<>();
 
         for (ActionProfileEntry action : request.getActions()) {
-            ActionDescribable ad = null;
-            // TODO Remove workaround for embedded action plugins
-            if ("org.backmeup.filesplitting".equals(action.getId())) {
-                ad = new FilesplittDescribable();
-            } else if ("org.backmeup.indexer".equals(action.getId())) {
-                ad = new IndexDescribable();
-            } else if ("org.backmeup.encryption".equals(action.getId())) {
-                ad = new EncryptionDescribable();
-            } else {
-                ad = plugins.getActionById(action.getId());
-            }
+            ActionDescribable ad = plugins.getActionById(action.getId());
+
             if (ad == null) {
                 throw new IllegalArgumentException(String.format(
                         textBundle.getString(UNKNOWN_ACTION), action.getId()));
             }
+            
             ActionProfile ap = new ActionProfile(ad.getId(), ad.getPriority());
             for (Map.Entry<String, String> entry : action.getOptions().entrySet()) {
                 ap.addActionOption(entry.getKey(), entry.getValue());
@@ -1089,9 +1054,9 @@ public class BusinessLogicImpl implements BusinessLogic {
         esNode.close();
 
         logger.info("Shutting down job workers!");
-        for (RabbitMQJobReceiver receiver : jobWorker) {
-            receiver.stop();
-        }
+//        for (RabbitMQJobReceiver receiver : jobWorker) {
+//            receiver.stop();
+//        }
     }
 
     @Inject
