@@ -13,6 +13,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.dto.BackupJobDTO;
+import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.rest.data.JobContainer;
@@ -88,6 +90,14 @@ public class BackupJobs extends Base {
   @Produces("application/json")
   public JobUpdateRequest getBackupJob(@PathParam("username") String username, @PathParam("jobId") Long jobId) {
     return getLogic().getBackupJob(username, jobId); 
+  }
+  
+  @GET
+  @Path("/{username}/{jobId}/full")
+  @Produces("application/json")
+  public Job getBackupJobFull(@PathParam("username") String username, @PathParam("jobId") Long jobId) {
+    return getLogic().getBackupJobFull(username, jobId); 
+//	  return null;
   }
 
   @DELETE

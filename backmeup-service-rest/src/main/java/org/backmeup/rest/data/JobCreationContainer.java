@@ -7,15 +7,16 @@ import org.backmeup.model.BackupJob;
 @XmlRootElement
 public class JobCreationContainer {
 	private long jobId;
+
 	public JobCreationContainer() {
 		super();
 	}
 
 	public JobCreationContainer(BackupJob job) {
-    this.jobId = job.getId();
-  }
+		this.jobId = job.getId();
+	}
 
-  public JobCreationContainer(long jobId) {
+	public JobCreationContainer(long jobId) {
 		super();
 		this.jobId = jobId;
 	}

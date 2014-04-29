@@ -23,8 +23,8 @@ public class PreAuthContainer {
 	}
 
 	public PreAuthContainer(String profileId, String type,
-			List<RequiredInputField> requiredInputs,
-			String redirectURL, boolean isSourceProfile) {
+			List<RequiredInputField> requiredInputs, String redirectURL,
+			boolean isSourceProfile) {
 		super();
 		this.profileId = profileId;
 		this.type = type;

@@ -6,7 +6,7 @@ import org.backmeup.model.ProtocolDetails;
 
 @XmlRootElement
 public class ProtocolDetailsContainer {
-	private  ProtocolDetails details;
+	private ProtocolDetails details;
 
 	public ProtocolDetailsContainer() {
 	}
