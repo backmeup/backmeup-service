@@ -1,16 +1,23 @@
 package org.backmeup.model.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class DatasinkProfile {
-	private long datasinkId;
+	private long profileId;
 	private String identification;
+	private String profileName;
+	private String description;
 	
 	public DatasinkProfile() {
 
 	}
 
-	public DatasinkProfile(long datasinkId, String identification) {
-		this.datasinkId = datasinkId;
+	public DatasinkProfile(long profileId, String identification, String profileName, String description) {
+		this.profileId = profileId;
 		this.identification = identification;
+		this.profileName = profileName;
+		this.description = description;
 	}
 
 	public String getIdentification() {
@@ -21,11 +28,27 @@ public class DatasinkProfile {
 		this.identification = identification;
 	}
 
-	public long getDatasinkId() {
-		return datasinkId;
+	public long getProfileId() {
+		return profileId;
 	}
 
-	public void setDatasinkId(long datasinkId) {
-		this.datasinkId = datasinkId;
+	public void setProfileId(long profileId) {
+		this.profileId = profileId;
+	}
+
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

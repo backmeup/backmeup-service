@@ -1,5 +1,8 @@
 package org.backmeup.model.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class DatasourceProfile {
 	private long datasourceId;
 	private String identification;
