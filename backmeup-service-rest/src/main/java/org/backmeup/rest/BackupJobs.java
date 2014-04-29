@@ -97,7 +97,13 @@ public class BackupJobs extends Base {
   @Produces("application/json")
   public Job getBackupJobFull(@PathParam("username") String username, @PathParam("jobId") Long jobId) {
     return getLogic().getBackupJobFull(username, jobId); 
-//	  return null;
+  }
+  
+  @PUT
+  @Path("/{username}/{jobId}/full")
+  @Produces("application/json")
+  public Job updateBackupJobFull(@PathParam("username") String username, @PathParam("jobId") Long jobId, Job backupJob) {    
+    return getLogic().updateBackupJobFull(username, backupJob);
   }
 
   @DELETE

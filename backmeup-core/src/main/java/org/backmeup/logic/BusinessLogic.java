@@ -87,6 +87,7 @@ public interface BusinessLogic {
 	JobUpdateRequest getBackupJob(String username, Long jobId);
 	// Should replace method 'getBackupJob'
 	Job getBackupJobFull(String username, Long jobId);
+	Job updateBackupJobFull(String username, Job backupJob);  
 	ValidationNotes createBackupJob(String username, JobCreationRequest request);
 	List<BackupJob> getJobs(String username);
 	void deleteJob(String username, Long jobId);
@@ -110,5 +111,5 @@ public interface BusinessLogic {
 	void shutdown();
 	
 	// logs
-	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);  
+	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
 }

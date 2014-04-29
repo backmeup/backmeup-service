@@ -14,6 +14,7 @@ import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
+import org.backmeup.model.dto.User;
 
 public class BackUpJobConverter {
 
@@ -72,7 +73,10 @@ public class BackUpJobConverter {
 	}
 
 	public static Job convertToJob(BackupJob backupJob) {
-		Date nextExecTime = backupJob.getNextExecutionTime();
+		Date nextExecTime = null;
+		if (backupJob.getNextExecutionTime() != null) {
+			nextExecTime = backupJob.getNextExecutionTime();
+		}
 		Job job = new Job(
 				backupJob.getId(), 
 				backupJob.getSourceProfiles(),
@@ -84,10 +88,17 @@ public class BackUpJobConverter {
 				backupJob.getDelay(), 
 				backupJob.isOnHold());
 		
+		job.setUser(new User(backupJob.getUser()));
+		
 		job.setLastFail(backupJob.getLastFailed() != null ? backupJob.getLastFailed().getTime() : null);
 		job.setLastSuccessful(backupJob.getLastSuccessful() != null ? backupJob.getLastSuccessful().getTime() : null);
 		job.setStatus(backupJob.getStatus());
 		job.setTimeExpression(backupJob.getTimeExpression());
+		
+		job.setTokenId(backupJob.getToken().getTokenId());
+		job.setToken(backupJob.getToken().getToken());
+		job.setBackupDate(backupJob.getToken().getBackupdate());
+		
 		JobProtocol protocol = backupJob.lastProtocol();
 
 		if (protocol != null) {
