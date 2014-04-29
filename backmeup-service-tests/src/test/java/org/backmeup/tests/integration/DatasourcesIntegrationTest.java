@@ -96,7 +96,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 				.body(containsString("createDate"))
 				.body(containsString("modifyDate"))
 				.body(containsString("pluginName"))
-				.body(containsString("datasourceProfileId"));
+				.body(containsString("profileId"));
 		} finally {
 			BackMeUpUtils.deleteDatasourceProfile(username, profileId);
 			BackMeUpUtils.deleteUser(username);
