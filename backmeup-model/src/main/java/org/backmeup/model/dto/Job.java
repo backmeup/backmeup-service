@@ -13,19 +13,30 @@ import org.backmeup.model.constants.DelayTimes;
 
 @XmlRootElement
 public class Job {
-	private Long backupJobId;
+	private Long jobId;
+	private String jobTitle;
+	
+	private User user;
+	
 	private List<DatasourceProfile> datasources;
 	private DatasinkProfile datasink;
+	
+	private Long tokenId;
+	private String token;
+	private Long backupDate;
+	
 	private Long startDate;
 	private Long createDate;
 	private Long modifyDate;
-	private String jobTitle;
+	
 	private Long delay;
 	private String timeExpression;
+	
 	private Long lastBackup;
-	private Long nextBackup;
 	private Long lastSuccessful;
 	private Long lastFail;
+	private Long nextBackup;
+
 	private JobStatus status;
 	private boolean isOnHold;
 
@@ -35,15 +46,20 @@ public class Job {
 	public Job(long backupJobId, Set<ProfileOptions> datasourceIds,
 			Profile datasinkProfile, Long startDate, Long createDate,
 			Long modifyDate, String jobTitle, Long delay, boolean isOnHold) {
-		this.backupJobId = backupJobId;
+		this.jobId = backupJobId;
 		this.setDatasources(new ArrayList<DatasourceProfile>());
 		for (ProfileOptions po : datasourceIds) {
 			this.getDatasources().add(
-					new DatasourceProfile(po.getProfile().getProfileId(), po
-							.getProfile().getIdentification()));
+					new DatasourceProfile(
+							po.getProfile().getProfileId(), 
+							po.getProfile().getIdentification()));
 		}
-		this.setDatasink(new DatasinkProfile(datasinkProfile.getProfileId(),
-				datasinkProfile.getIdentification()));
+		this.setDatasink(
+				new DatasinkProfile(
+						datasinkProfile.getProfileId(),
+						datasinkProfile.getIdentification(),
+						datasinkProfile.getProfileName(),
+						datasinkProfile.getDescription()));
 		this.startDate = startDate;
 		this.createDate = createDate;
 		this.modifyDate = modifyDate;
@@ -63,12 +79,20 @@ public class Job {
 			setTimeExpression("realtime");
 	}
 
-	public Long getBackupJobId() {
-		return backupJobId;
+	public Long getJobId() {
+		return jobId;
 	}
 
-	public void setBackupJobId(Long backupJobId) {
-		this.backupJobId = backupJobId;
+	public void setJobId(Long jobId) {
+		this.jobId = jobId;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public List<DatasourceProfile> getDatasources() {
@@ -85,6 +109,30 @@ public class Job {
 
 	public void setDatasink(DatasinkProfile datasink) {
 		this.datasink = datasink;
+	}
+
+	public Long getTokenId() {
+		return tokenId;
+	}
+
+	public void setTokenId(Long tokenId) {
+		this.tokenId = tokenId;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Long getBackupDate() {
+		return backupDate;
+	}
+
+	public void setBackupDate(Long backupDate) {
+		this.backupDate = backupDate;
 	}
 
 	public Long getStartDate() {
