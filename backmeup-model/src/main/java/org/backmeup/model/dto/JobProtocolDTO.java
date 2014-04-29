@@ -8,7 +8,7 @@ import org.backmeup.model.JobProtocol;
 
 public class JobProtocolDTO {
 	private Long id;
-	private UserDTO user;
+	private User user;
 	private Long jobId;
 	private String sinkTitle;
 	private Date executionTime;
@@ -23,11 +23,11 @@ public class JobProtocolDTO {
 
 	}
 
-	public UserDTO getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(UserDTO user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 

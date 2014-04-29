@@ -13,7 +13,7 @@ public class BackupJobDTO {
 	}
 
 	private Long id;
-	private UserDTO user;
+	private User user;
 	private String jobTitle;
 
 	private Set<SourceProfileEntry> sourceProfiles = new HashSet<SourceProfileEntry>();
@@ -49,11 +49,11 @@ public class BackupJobDTO {
 		this.id = id;
 	}
 
-	public UserDTO getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(UserDTO user) {
+	public void setUser(User user) {
 		this.modified = new Date();
 		this.user = user;
 	}

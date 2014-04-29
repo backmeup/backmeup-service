@@ -8,7 +8,7 @@ import org.backmeup.model.spi.SourceSinkDescribable.Type;
 public class ProfileDTO {
 	private Long profileId;
 
-	private UserDTO user;
+	private User user;
 	private String profileName;
 	private String description;
 
@@ -25,7 +25,7 @@ public class ProfileDTO {
 
 	public ProfileDTO(Profile profile) {
 		this.profileId = profile.getProfileId();
-		this.user = new UserDTO(profile.getUser());
+		this.user = new User(profile.getUser());
 		this.profileName = profile.getProfileName();
 		this.description = profile.getDescription();
 		this.created = profile.getCreated();
@@ -43,11 +43,11 @@ public class ProfileDTO {
 		this.profileId = profileId;
 	}
 
-	public UserDTO getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(UserDTO user) {
+	public void setUser(User user) {
 		this.modified = new Date();
 		this.user = user;
 	}
