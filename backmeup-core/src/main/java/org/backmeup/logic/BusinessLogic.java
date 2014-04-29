@@ -16,6 +16,7 @@ import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
@@ -35,14 +36,6 @@ import org.backmeup.model.spi.SourceSinkDescribable;
  * @author fschoeppl
  */
 public interface BusinessLogic {
-    // TODO PK type safety/duplication - create enum with times and timeExpressions and conversions in multiple places
-    // constants for scheduler in milliseconds
-    long DELAY_REALTIME = 1 * 1000;
-    long DELAY_DAILY = 24 * 60 * 60 * 1000;
-    long DELAY_WEEKLY = 24 * 60 * 60 * 1000 * 7;
-    long DELAY_MONTHLY = (long) (24 * 60 * 60 * 1000 * 365.242199 / 12.0);
-    long DELAY_YEARLY = (long) (24 * 60 * 60 * 1000 * 365.242199);
-	
 	// user operations 
 	BackMeUpUser getUser(String username);
 	BackMeUpUser deleteUser(String username);
@@ -92,6 +85,8 @@ public interface BusinessLogic {
 	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
 	ValidationNotes updateBackupJob(String username, JobUpdateRequest updateRequest);
 	JobUpdateRequest getBackupJob(String username, Long jobId);
+	// Should replace method 'getBackupJob'
+	Job getBackupJobFull(String username, Long jobId);
 	ValidationNotes createBackupJob(String username, JobCreationRequest request);
 	List<BackupJob> getJobs(String username);
 	void deleteJob(String username, Long jobId);

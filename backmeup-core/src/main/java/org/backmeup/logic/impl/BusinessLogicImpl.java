@@ -55,8 +55,10 @@ import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.ActionProfileEntry;
 import org.backmeup.model.dto.ExecutionTime;
+import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
@@ -684,7 +686,23 @@ public class BusinessLogicImpl implements BusinessLogic {
                 
                 BackupJobDao jobDao = dal.createBackupJobDao();
                 BackupJob job = jobDao.findById(jobId);
-                return BackUpJobConverter.convertJobToUpdateRequest(job);
+                return BackUpJobConverter.convertToUpdateRequest(job);
+                
+            }
+        });
+    }
+    
+    @Override
+    public Job getBackupJobFull(String username, final Long jobId) {
+        if (jobId == null) {
+            throw new IllegalArgumentException("Missing parameter " + jobId);
+        }
+
+        return conn.txNewReadOnly(new Callable<Job>() {
+            @Override public Job call() {
+                BackupJobDao jobDao = dal.createBackupJobDao();
+                BackupJob job = jobDao.findById(jobId);
+                return BackUpJobConverter.convertToJob(job);
                 
             }
         });
@@ -789,8 +807,8 @@ public class BusinessLogicImpl implements BusinessLogic {
                 BackMeUpUser user = registrationService.queryActivatedUser(username);
                 
                 Date to = new Date();
-                Date from = duration.equals("month") ? new Date(to.getTime() - DELAY_MONTHLY) :
-                    new Date(to.getTime() - DELAY_WEEKLY);
+                Date from = duration.equals("month") ? new Date(to.getTime() - DelayTimes.DELAY_MONTHLY) :
+                    new Date(to.getTime() - DelayTimes.DELAY_WEEKLY);
                 
                 return getProtocolOverview(user, from, to);
                 
