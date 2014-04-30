@@ -24,6 +24,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.backmeup.model.constants.BackupJobStatus;
+
 /**
  * The BackupJob class contains all necessary data to
  * perform the backup job. It must be created by the org.backmeup.job.JobManager's 
@@ -34,14 +36,7 @@ import javax.persistence.TemporalType;
  * 
  */
 @Entity
-public class BackupJob {
-  public static enum JobStatus {
-    queued,
-    running,
-    successful,
-    error
-  }
-  
+public class BackupJob { 
   @Id
   @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
@@ -81,7 +76,7 @@ public class BackupJob {
   private Date lastFailed;
   
   @Enumerated(EnumType.STRING)
-  private JobStatus status;
+  private BackupJobStatus status;
 
   private boolean onHold = false;
 
@@ -238,11 +233,11 @@ public class BackupJob {
 		this.reschedule = reschedule;
 	}
 
-  public JobStatus getStatus() {
+  public BackupJobStatus getStatus() {
     return status;
   }
 
-  public void setStatus(JobStatus status) {
+  public void setStatus(BackupJobStatus status) {
     this.status = status;
   }
 
