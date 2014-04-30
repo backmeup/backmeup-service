@@ -81,6 +81,7 @@ public class BackUpJobConverter {
 				backupJob.getId(), 
 				backupJob.getSourceProfiles(),
 				backupJob.getSinkProfile(), 
+				backupJob.getRequiredActions(),
 				backupJob.getStart().getTime(),
 				backupJob.getCreated().getTime(), 
 				backupJob.getModified().getTime(), 
@@ -90,7 +91,7 @@ public class BackUpJobConverter {
 		
 		job.setUser(new User(backupJob.getUser()));
 		
-		job.setLastFail(backupJob.getLastFailed() != null ? backupJob.getLastFailed().getTime() : null);
+		job.setLastFailed(backupJob.getLastFailed() != null ? backupJob.getLastFailed().getTime() : null);
 		job.setLastSuccessful(backupJob.getLastSuccessful() != null ? backupJob.getLastSuccessful().getTime() : null);
 		job.setStatus(backupJob.getStatus());
 		job.setTimeExpression(backupJob.getTimeExpression());

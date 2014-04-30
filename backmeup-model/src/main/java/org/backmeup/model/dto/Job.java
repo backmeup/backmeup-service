@@ -1,14 +1,19 @@
 package org.backmeup.model.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.backmeup.model.ActionProfile;
+import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
-import org.backmeup.model.BackupJob.JobStatus;
+import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 
 @XmlRootElement
@@ -19,6 +24,7 @@ public class Job {
 	private User user;
 	
 	private List<DatasourceProfile> datasources;
+	private List<ActionProfileDTO> actions;
 	private DatasinkProfile datasink;
 	
 	private Long tokenId;
@@ -34,17 +40,18 @@ public class Job {
 	
 	private Long lastBackup;
 	private Long lastSuccessful;
-	private Long lastFail;
+	private Long lastFailed;
 	private Long nextBackup;
 
-	private JobStatus status;
+	private BackupJobStatus status;
 	private boolean isOnHold;
 
 	public Job() {
 	}
 
-	public Job(long backupJobId, Set<ProfileOptions> datasourceIds,
-			Profile datasinkProfile, Long startDate, Long createDate,
+	public Job(
+			long backupJobId, Set<ProfileOptions> datasourceIds, Profile datasinkProfile, 
+			List<ActionProfile> actionProfiles, Long startDate, Long createDate, 
 			Long modifyDate, String jobTitle, Long delay, boolean isOnHold) {
 		this.jobId = backupJobId;
 		this.setDatasources(new ArrayList<DatasourceProfile>());
@@ -52,7 +59,18 @@ public class Job {
 			this.getDatasources().add(
 					new DatasourceProfile(
 							po.getProfile().getProfileId(), 
-							po.getProfile().getIdentification()));
+							po.getProfile().getIdentification(),
+							po.getProfile().getDescription(),
+							new ArrayList<String>(Arrays.asList(po.getOptions()))));
+		}
+		this.setActions(new ArrayList<ActionProfileDTO>());
+		for(ActionProfile ap : actionProfiles){
+			Map<String, String> apOptions = new HashMap<String, String>();
+			for(ActionProperty property : ap.getActionOptions()) {
+				apOptions.put(property.getKey(), property.getValue());
+			}
+			ActionProfileDTO apDTO = new ActionProfileDTO(ap.getActionId(), ap.getPriority(), apOptions);
+			this.getActions().add(apDTO);
 		}
 		this.setDatasink(
 				new DatasinkProfile(
@@ -109,6 +127,14 @@ public class Job {
 
 	public void setDatasink(DatasinkProfile datasink) {
 		this.datasink = datasink;
+	}
+
+	public List<ActionProfileDTO> getActions() {
+		return actions;
+	}
+
+	public void setActions(List<ActionProfileDTO> actions) {
+		this.actions = actions;
 	}
 
 	public Long getTokenId() {
@@ -207,20 +233,20 @@ public class Job {
 		this.lastSuccessful = lastSuccessful;
 	}
 
-	public JobStatus getStatus() {
+	public BackupJobStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(JobStatus status) {
+	public void setStatus(BackupJobStatus status) {
 		this.status = status;
 	}
 
-	public Long getLastFail() {
-		return lastFail;
+	public Long getLastFailed() {
+		return lastFailed;
 	}
 
-	public void setLastFail(Long lastFail) {
-		this.lastFail = lastFail;
+	public void setLastFailed(Long lastFail) {
+		this.lastFailed = lastFail;
 	}
 
 	public boolean isOnHold() {
