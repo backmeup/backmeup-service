@@ -1,26 +1,32 @@
 package org.backmeup.model.dto;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.backmeup.model.JobProtocol;
 
+@XmlRootElement
 public class JobProtocolDTO {
 	private Long id;
 	private User user;
 	private Long jobId;
 	private String sinkTitle;
-	private Date executionTime;
+	private Long executionTime;
 	private boolean successful;
 	private long totalStoredEntries;
-	private Set<JobProtocolMember> members = new HashSet<JobProtocolMember>();
+	private Set<JobProtocolMemberDTO> members = new HashSet<JobProtocolMemberDTO>();
 
 	public JobProtocolDTO() {
 	}
 
 	public JobProtocolDTO(JobProtocol jobProtocol) {
 
+	}
+	
+	public Long getId() {
+		return id;
 	}
 
 	public User getUser() {
@@ -29,6 +35,14 @@ public class JobProtocolDTO {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public Long getJobId() {
+		return jobId;
+	}
+
+	public void setJobId(Long jobId) {
+		this.jobId = jobId;
 	}
 
 	public String getSinkTitle() {
@@ -39,11 +53,11 @@ public class JobProtocolDTO {
 		this.sinkTitle = sinkTitle;
 	}
 
-	public Date getExecutionTime() {
+	public Long getExecutionTime() {
 		return executionTime;
 	}
 
-	public void setExecutionTime(Date executionTime) {
+	public void setExecutionTime(Long executionTime) {
 		this.executionTime = executionTime;
 	}
 
@@ -63,97 +77,15 @@ public class JobProtocolDTO {
 		this.totalStoredEntries = totalStoredEntries;
 	}
 
-	public Set<JobProtocolMember> getMembers() {
+	public Set<JobProtocolMemberDTO> getMembers() {
 		return members;
 	}
 
-	public void addMembers(Set<JobProtocolMember> members) {
+	public void addMembers(Set<JobProtocolMemberDTO> members) {
 		this.members.addAll(members);
 	}
 
-	public void addMember(JobProtocolMember member) {
+	public void addMember(JobProtocolMemberDTO member) {
 		this.members.add(member);
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public Long getJobId() {
-		return jobId;
-	}
-
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
-	}
-
-	public static class JobProtocolMember {
-		private Long id;
-		private JobProtocolDTO protocol;
-		private String title;
-		private double space;
-
-		public JobProtocolMember() {
-		}
-
-		public JobProtocolMember(JobProtocolDTO protocol, String title,
-				double space) {
-			this.protocol = protocol;
-			this.title = title;
-			this.space = space;
-		}
-
-		public JobProtocolDTO getProtocol() {
-			return protocol;
-		}
-
-		public void setProtocol(JobProtocolDTO protocol) {
-			this.protocol = protocol;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
-
-		public double getSpace() {
-			return space;
-		}
-
-		public void setSpace(double space) {
-			this.space = space;
-		}
-
-		public Long getId() {
-			return id;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((id == null) ? 0 : id.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			JobProtocolMember other = (JobProtocolMember) obj;
-			if (id == null) {
-				if (other.id != null)
-					return false;
-			} else if (!id.equals(other.id))
-				return false;
-			return true;
-		}
 	}
 }
