@@ -16,6 +16,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
+import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.rest.data.JobContainer;
 import org.backmeup.rest.data.ProtocolDetailsContainer;
@@ -99,12 +100,12 @@ public class BackupJobs extends Base {
     return getLogic().getBackupJobFull(username, jobId); 
   }
   
-  @PUT
-  @Path("/{username}/{jobId}/full")
-  @Produces("application/json")
-  public Job updateBackupJobFull(@PathParam("username") String username, @PathParam("jobId") Long jobId, Job backupJob) {    
-    return getLogic().updateBackupJobFull(username, backupJob);
-  }
+//  @PUT
+//  @Path("/{username}/{jobId}/full")
+//  @Produces("application/json")
+//  public Job updateBackupJobFull(@PathParam("username") String username, @PathParam("jobId") Long jobId, Job backupJob) {    
+//    return getLogic().updateBackupJobFull(username, backupJob);
+//  }
 
   @DELETE
   @Path("/{username}/{jobId}")
@@ -143,6 +144,21 @@ public class BackupJobs extends Base {
     return new ProtocolOverviewContainer(getLogic().getProtocolOverview(
         username, duration));
   }
+  
+  @PUT
+  @Path("/{username}/{jobId}/protocol")
+  @Produces("application/json")
+  public void updateJobProtocol(@PathParam("username") String username, @PathParam("jobId") Long jobId, JobProtocolDTO jobProtocol) {
+	  getLogic().updateJobProtocol(username, jobId, jobProtocol);
+  }
+  
+  @DELETE
+  @Path("/{username}/protocol")
+  @Produces("application/json")
+  public void deleteJobProtocols(@PathParam("username") String username) {
+	  getLogic().deleteJobProtocols(username);
+  }
+  
 
   @GET
   @Path("/{username}/status")

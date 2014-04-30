@@ -18,6 +18,7 @@ import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
+import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
@@ -85,15 +86,17 @@ public interface BusinessLogic {
 	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
 	ValidationNotes updateBackupJob(String username, JobUpdateRequest updateRequest);
 	JobUpdateRequest getBackupJob(String username, Long jobId);
-	// Should replace method 'getBackupJob'
+	// Should replace method 'getBackupJob' ?
 	Job getBackupJobFull(String username, Long jobId);
-	Job updateBackupJobFull(String username, Job backupJob);  
+//	Job updateBackupJobFull(String username, Job backupJob);  
 	ValidationNotes createBackupJob(String username, JobCreationRequest request);
 	List<BackupJob> getJobs(String username);
 	void deleteJob(String username, Long jobId);
 	List<Status> getStatus(String username, Long jobId);
 	ProtocolDetails getProtocolDetails(String username, String fileId);
 	ProtocolOverview getProtocolOverview(String username, String duration);
+	void updateJobProtocol(String username, Long jobId, JobProtocolDTO jobProtocol);
+	void deleteJobProtocols(String username);
 	
 	//datasink/-source auth operations
 	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;

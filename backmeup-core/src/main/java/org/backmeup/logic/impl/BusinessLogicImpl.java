@@ -55,11 +55,14 @@ import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.ActionProfileEntry;
 import org.backmeup.model.dto.ExecutionTime;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
+import org.backmeup.model.dto.JobProtocolDTO;
+import org.backmeup.model.dto.JobProtocolMemberDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
@@ -706,45 +709,45 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
-    @Override
-    public Job updateBackupJobFull(String username, Job job) {
-    	if (job == null) {
-            throw new IllegalArgumentException("Update must not be null!");
-        }
-
-        if (job.getJobId() == null) {
-            throw new IllegalArgumentException("JobId must not be null!");
-        }
-        
-        boolean scheduleJob = false;
-        
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = registrationService.queryActivatedUser(username);
-            // TODO: Autorize update from backmeup-worker
-            // authorizationService.authorize(user, updateRequest.getKeyRing());
-            
-            BackupJob backupJob = getBackupJobDao().findById(job.getJobId());
-            if (backupJob == null || !backupJob.getUser().getUsername().equals(username)) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
-                		job.getJobId(), username));
-            }
-            
-            conn.commit();
-            if(scheduleJob == true) {
-                // Add the updated job to the queue. 
-            	// (All old queue entrys get invalid and will not be executed)
-                jobManager.runBackUpJob(backupJob);
-                
-
-            }
-        } finally {
-            conn.rollback();
-        }
-        
-        return getBackupJobFull(username, job.getJobId());
-    }
+//    @Override
+//    public Job updateBackupJobFull(String username, Job job) {
+//    	if (job == null) {
+//            throw new IllegalArgumentException("Update must not be null!");
+//        }
+//
+//        if (job.getJobId() == null) {
+//            throw new IllegalArgumentException("JobId must not be null!");
+//        }
+//        
+//        boolean scheduleJob = false;
+//        
+//        try {
+//            conn.begin();
+//            
+//            BackMeUpUser user = registrationService.queryActivatedUser(username);
+//            // TODO: Autorize update from backmeup-worker
+//            // authorizationService.authorize(user, updateRequest.getKeyRing());
+//            
+//            BackupJob backupJob = getBackupJobDao().findById(job.getJobId());
+//            if (backupJob == null || !backupJob.getUser().getUsername().equals(username)) {
+//                throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
+//                		job.getJobId(), username));
+//            }
+//            
+//            conn.commit();
+//            if(scheduleJob == true) {
+//                // Add the updated job to the queue. 
+//            	// (All old queue entrys get invalid and will not be executed)
+//                jobManager.runBackUpJob(backupJob);
+//                
+//
+//            }
+//        } finally {
+//            conn.rollback();
+//        }
+//        
+//        return getBackupJobFull(username, job.getJobId());
+//    }
 
     @Override
     public List<BackupJob> getJobs(final String username) {
@@ -886,6 +889,48 @@ public class BusinessLogicImpl implements BusinessLogic {
         po.setTotalStored(totalSize / 1024 / 1024 +" MB");
         po.setUser(user.getUserId());
         return po;
+    }
+    
+    @Override
+    public void updateJobProtocol(final String username, final Long jobId, final JobProtocolDTO jobProtocol) {
+    	conn.txNew(new Runnable() {
+            @Override public void run() {
+                BackMeUpUser user = registrationService.queryActivatedUser(username);
+                BackupJob job = queryExistingUserJob(jobId, username);
+                
+                JobProtocolDao jpd = dal.createJobProtocolDao();
+                
+                JobProtocol protocol = new JobProtocol();
+                protocol.setUser(user);
+                protocol.setJob(job);
+                protocol.setSuccessful(jobProtocol.isSuccessful());
+                
+                for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+                	protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+                }
+                
+                if (protocol.isSuccessful()) {
+        			job.setLastSuccessful(protocol.getExecutionTime());
+        			job.setStatus(BackupJobStatus.successful);
+        		} else {
+        			job.setLastFailed(protocol.getExecutionTime());
+        			job.setStatus(BackupJobStatus.error);
+        		}
+                
+                jpd.save(protocol);
+            }
+        });
+    }
+    
+    @Override
+    public void deleteJobProtocols(final String username) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                registrationService.queryActivatedUser(username);
+                JobProtocolDao jpd = dal.createJobProtocolDao();
+                jpd.deleteByUsername(username);
+            }
+        });
     }
 
     @Override
