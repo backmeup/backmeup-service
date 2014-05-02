@@ -495,6 +495,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 				.body(containsString("nextBackup"))
 				.body(containsString("datasources"))
 				.body(containsString("datasink"))
+				.body(containsString("actions"))
 				.body(containsString("tokenId"))
 				.body(containsString("token"));
 				
