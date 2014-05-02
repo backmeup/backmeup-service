@@ -45,8 +45,8 @@
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>org.backmeup.*</Export-Package>
-						<Embed-Directory>lib</Embed-Directory>
-						<Embed-Dependency>gson</Embed-Dependency>
+						<Embed-Directory></Embed-Directory>
+						<Embed-Dependency>slf4j-api</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
