@@ -27,203 +27,199 @@ import javax.persistence.TemporalType;
 import org.backmeup.model.constants.BackupJobStatus;
 
 /**
- * The BackupJob class contains all necessary data to
- * perform the backup job. It must be created by the org.backmeup.job.JobManager's 
- * implementation. 
+ * The BackupJob class contains all necessary data to perform the backup job. It
+ * must be created by the org.backmeup.job.JobManager's implementation.
  * 
  * 
  * @author fschoeppl
  * 
  */
 @Entity
-public class BackupJob { 
-  @Id
-  @GeneratedValue(strategy=GenerationType.IDENTITY)
-  @Column(nullable = false)
-  private Long id;
-  @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
-  private BackMeUpUser user;
-  @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
-  private Set<ProfileOptions> sourceProfiles = new HashSet<ProfileOptions>();
-  @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true, mappedBy="job")
-  private Set<JobProtocol> jobProtocols = new HashSet<JobProtocol>();
-  @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
-  private Profile sinkProfile;
-  @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-  private List<ActionProfile> requiredActions = new ArrayList<ActionProfile>();
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date start;
-  private long delay;
-  @OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
-  private Token token;
-  
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date created;
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date modified;
-  private String jobTitle;
-  
-  private String timeExpression;
-  
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date nextExecutionTime;
-  private boolean reschedule;
-  
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date lastSuccessful;
-  
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date lastFailed;
-  
-  @Enumerated(EnumType.STRING)
-  private BackupJobStatus status;
+public class BackupJob {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false)
+	private Long id;
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private BackMeUpUser user;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	private Set<ProfileOptions> sourceProfiles = new HashSet<ProfileOptions>();
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
+	private Set<JobProtocol> jobProtocols = new HashSet<JobProtocol>();
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Profile sinkProfile;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<ActionProfile> requiredActions = new ArrayList<ActionProfile>();
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date start;
+	private long delay;
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	private Token token;
 
-  private boolean onHold = false;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modified;
+	private String jobTitle;
 
-  private UUID validScheduleID = null;
+	private String timeExpression;
 
-  public BackupJob() {
-    super();
-  }
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date nextExecutionTime;
+	private boolean reschedule;
 
-  public BackupJob(BackMeUpUser user, Set<ProfileOptions> sourceProfile,
-      Profile sinkProfile, List<ActionProfile> requiredActions,
-      Date start, long delay, String jobTitle, boolean reschedule) {
-    this.user = user;
-    this.sourceProfiles = sourceProfile;
-    this.sinkProfile = sinkProfile;
-    this.requiredActions = requiredActions;
-    this.start = start;
-    this.delay = delay;
-    
-    this.created = new Date ();
-    this.modified = this.created;
-    this.jobTitle = jobTitle;
-    this.reschedule = reschedule;
-  }
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastSuccessful;
 
-  public Long getId() {
-    return id;
-  }
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastFailed;
 
-  public void setId(Long id) {
-	this.modified = new Date ();
-    this.id = id;
-  }
+	@Enumerated(EnumType.STRING)
+	private BackupJobStatus status;
 
-  public BackMeUpUser getUser() {
-    return user;
-  }
+	private boolean onHold = false;
 
-  public void setUser(BackMeUpUser user) {
-	this.modified = new Date ();
-    this.user = user;
-  }
+	private UUID validScheduleID = null;
 
-  public Set<ProfileOptions> getSourceProfiles() {
-    return sourceProfiles;
-  }
+	public BackupJob() {
+		super();
+	}
 
-  public void setSourceProfiles(Set<ProfileOptions> sourceProfiles) {
-	this.modified = new Date ();
-    this.sourceProfiles = sourceProfiles;
-  }
+	public BackupJob(BackMeUpUser user, Set<ProfileOptions> sourceProfile,
+			Profile sinkProfile, List<ActionProfile> requiredActions,
+			Date start, long delay, String jobTitle, boolean reschedule) {
+		this.user = user;
+		this.sourceProfiles = sourceProfile;
+		this.sinkProfile = sinkProfile;
+		this.requiredActions = requiredActions;
+		this.start = start;
+		this.delay = delay;
 
-  public Profile getSinkProfile() {
-    return sinkProfile;
-  }
+		this.created = new Date();
+		this.modified = this.created;
+		this.jobTitle = jobTitle;
+		this.reschedule = reschedule;
+	}
 
-  public void setSinkProfile(Profile sinkProfile) {
-	this.modified = new Date ();
-    this.sinkProfile = sinkProfile;
-  }
+	public Long getId() {
+		return id;
+	}
 
-  public List<ActionProfile> getRequiredActions() {
-    return requiredActions;
-  }
-  
-  public List<ActionProfile> getSortedRequiredActions() {
-    List<ActionProfile> ap = new ArrayList<ActionProfile>();
-    ap.addAll(requiredActions);
-    Collections.sort(ap, new Comparator<ActionProfile>() {
-      @Override
-      public int compare(ActionProfile o1, ActionProfile o2) {
-        return o1.compareTo(o2);
-      }
-    });
-    return ap;
-  }
+	public void setId(Long id) {
+		this.modified = new Date();
+		this.id = id;
+	}
 
-  public void setRequiredActions(List<ActionProfile> requiredActions) {
-	this.modified = new Date ();
-    this.requiredActions = requiredActions;
-  }
+	public BackMeUpUser getUser() {
+		return user;
+	}
 
-  public Date getStart() {
-    return start;
-  }
+	public void setUser(BackMeUpUser user) {
+		this.modified = new Date();
+		this.user = user;
+	}
 
-  public void setStart(Date start) {
-	this.modified = new Date ();
-    this.start = start;
-  }
+	public Set<ProfileOptions> getSourceProfiles() {
+		return sourceProfiles;
+	}
 
-  public long getDelay() {
-    return delay;
-  }
+	public void setSourceProfiles(Set<ProfileOptions> sourceProfiles) {
+		this.modified = new Date();
+		this.sourceProfiles = sourceProfiles;
+	}
 
-  public void setDelay(long delay) {
-	this.modified = new Date ();
-    this.delay = delay;
-  }
+	public Profile getSinkProfile() {
+		return sinkProfile;
+	}
 
-  public Token getToken() {
-    return token;
-  }
+	public void setSinkProfile(Profile sinkProfile) {
+		this.modified = new Date();
+		this.sinkProfile = sinkProfile;
+	}
 
-  public void setToken(Token token) {
-	this.modified = new Date ();
-    this.token = token;
-  }
+	public List<ActionProfile> getRequiredActions() {
+		return requiredActions;
+	}
 
-	public Date getCreated ()
-	{
+	public List<ActionProfile> getSortedRequiredActions() {
+		List<ActionProfile> ap = new ArrayList<ActionProfile>();
+		ap.addAll(requiredActions);
+		Collections.sort(ap, new Comparator<ActionProfile>() {
+			@Override
+			public int compare(ActionProfile o1, ActionProfile o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		return ap;
+	}
+
+	public void setRequiredActions(List<ActionProfile> requiredActions) {
+		this.modified = new Date();
+		this.requiredActions = requiredActions;
+	}
+
+	public Date getStart() {
+		return start;
+	}
+
+	public void setStart(Date start) {
+		this.modified = new Date();
+		this.start = start;
+	}
+
+	public long getDelay() {
+		return delay;
+	}
+
+	public void setDelay(long delay) {
+		this.modified = new Date();
+		this.delay = delay;
+	}
+
+	public Token getToken() {
+		return token;
+	}
+
+	public void setToken(Token token) {
+		this.modified = new Date();
+		this.token = token;
+	}
+
+	public Date getCreated() {
 		return created;
 	}
-	
-	public Date getModified ()
-	{
+
+	public Date getModified() {
 		return modified;
 	}
-	
-	public String getJobTitle ()
-	{
+
+	public String getJobTitle() {
 		return jobTitle;
 	}
-	
-	public void setJobTitle (String jobTitle)
-	{
-		this.modified = new Date ();
+
+	public void setJobTitle(String jobTitle) {
+		this.modified = new Date();
 		this.jobTitle = jobTitle;
 	}
-	
+
 	public JobProtocol lastProtocol() {
-	  JobProtocol last = null;
-	  for (JobProtocol jp : jobProtocols) {
-	    if (last == null || jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
-	      last = jp;
-	    }
-	  }
-	  return last;
+		JobProtocol last = null;
+		for (JobProtocol jp : jobProtocols) {
+			if (last == null
+					|| jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
+				last = jp;
+			}
+		}
+		return last;
 	}
 
-  public Date getNextExecutionTime() {
-    return nextExecutionTime;
-  }
+	public Date getNextExecutionTime() {
+		return nextExecutionTime;
+	}
 
-  public void setNextExecutionTime(Date nextExecutionTime) {
-    this.nextExecutionTime = nextExecutionTime;
-  }
+	public void setNextExecutionTime(Date nextExecutionTime) {
+		this.nextExecutionTime = nextExecutionTime;
+	}
 
 	public boolean isReschedule() {
 		return reschedule;
@@ -233,30 +229,30 @@ public class BackupJob {
 		this.reschedule = reschedule;
 	}
 
-  public BackupJobStatus getStatus() {
-    return status;
-  }
+	public BackupJobStatus getStatus() {
+		return status;
+	}
 
-  public void setStatus(BackupJobStatus status) {
-    this.status = status;
-  }
+	public void setStatus(BackupJobStatus status) {
+		this.status = status;
+	}
 
-  public Date getLastSuccessful() {
-    return lastSuccessful;
-  }
+	public Date getLastSuccessful() {
+		return lastSuccessful;
+	}
 
-  public void setLastSuccessful(Date lastSuccessful) {
-    this.lastSuccessful = lastSuccessful;
-  }
+	public void setLastSuccessful(Date lastSuccessful) {
+		this.lastSuccessful = lastSuccessful;
+	}
 
-  public Date getLastFailed() {
-    return lastFailed;
-  }
+	public Date getLastFailed() {
+		return lastFailed;
+	}
 
-  public void setLastFailed(Date lastFailed) {
-    this.lastFailed = lastFailed;
-  }
-  
+	public void setLastFailed(Date lastFailed) {
+		this.lastFailed = lastFailed;
+	}
+
 	public boolean isOnHold() {
 		return onHold;
 	}
@@ -265,21 +261,19 @@ public class BackupJob {
 		this.onHold = onHold;
 	}
 
-  public String getTimeExpression() {
-    return timeExpression;
-  }
+	public String getTimeExpression() {
+		return timeExpression;
+	}
 
-  public void setTimeExpression(String timeExpression) {
-    this.timeExpression = timeExpression;
-  }
+	public void setTimeExpression(String timeExpression) {
+		this.timeExpression = timeExpression;
+	}
 
-	public UUID getValidScheduleID ()
-	{
+	public UUID getValidScheduleID() {
 		return validScheduleID;
 	}
-	
-	public void setValidScheduleID (UUID validScheduleID)
-	{
+
+	public void setValidScheduleID(UUID validScheduleID) {
 		this.validScheduleID = validScheduleID;
 	}
 }

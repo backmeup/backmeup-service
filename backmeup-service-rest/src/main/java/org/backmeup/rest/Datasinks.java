@@ -129,12 +129,9 @@ public class Datasinks extends Base {
   
   @PUT
   @Path("/{username}/profiles/{profileId}/{jobId}")
-  public void changeProfile (
-		  @PathParam("username") String username,
-		  @PathParam("profileId") Long profileId,
-		  @PathParam("jobId") Long jobId,
-		  List<String> formParams)
-  {
-	  getLogic ().changeProfile (profileId, jobId, formParams);
-  }
+	public void changeProfile(@PathParam("username") String username,
+			@PathParam("profileId") Long profileId,
+			@PathParam("jobId") Long jobId, List<String> formParams) {
+		getLogic().changeProfile(profileId, jobId, formParams);
+	}
 }

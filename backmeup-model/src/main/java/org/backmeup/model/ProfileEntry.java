@@ -45,8 +45,9 @@ public class ProfileEntry {
 
 	@Override
 	public int hashCode() {
-		if (this.key != null)
+		if (this.key != null) {
 			return this.key.hashCode();
+		}
 		return super.hashCode();
 	}
 
@@ -54,8 +55,9 @@ public class ProfileEntry {
 	public boolean equals(Object obj) {
 		if (obj instanceof ProfileEntry) {
 			ProfileEntry e = (ProfileEntry) obj;
-			if (e.key != null && key != null)
+			if (e.key != null && key != null) {
 				return e.key.equals(key);
+			}
 		}
 		return super.equals(obj);
 	}

@@ -74,8 +74,9 @@ public class BackMeUpUser {
 
     private UserProperty findProperty(String key) {
         for (UserProperty up : getUserProperties()) {
-            if (up.getKey().equals(key))
+            if (up.getKey().equals(key)) {
                 return up;
+            }
         }
         return null;
     }
@@ -92,8 +93,9 @@ public class BackMeUpUser {
 
     public String getUserProperty(String key) {
         UserProperty up = findProperty(key);
-        if (up == null)
+        if (up == null) {
             return null;
+        }
         return up.getValue();
     }
 

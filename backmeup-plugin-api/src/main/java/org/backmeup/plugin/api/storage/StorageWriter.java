@@ -30,8 +30,9 @@ public abstract class StorageWriter {
 			throw new RuntimeException(t);
 		}*/
 		try {
-			if (clazz == null)
+			if (clazz == null) {
 				clazz = Class.forName("org.backmeup.api.storage.filesystem.LocalFilesystemStorageWriter").asSubclass(StorageWriter.class);
+			}
 			return clazz.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

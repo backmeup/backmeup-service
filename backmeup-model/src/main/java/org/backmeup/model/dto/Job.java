@@ -85,16 +85,17 @@ public class Job {
 		this.delay = delay;
 		this.isOnHold = isOnHold;
 
-		if (delay == DelayTimes.DELAY_DAILY)
+		if (delay == DelayTimes.DELAY_DAILY) {
 			setTimeExpression("daily");
-		else if (delay == DelayTimes.DELAY_MONTHLY)
+		} else if (delay == DelayTimes.DELAY_MONTHLY) {
 			setTimeExpression("monthly");
-		else if (delay == DelayTimes.DELAY_WEEKLY)
+		} else if (delay == DelayTimes.DELAY_WEEKLY) {
 			setTimeExpression("weekly");
-		else if (delay == DelayTimes.DELAY_YEARLY)
+		} else if (delay == DelayTimes.DELAY_YEARLY) {
 			setTimeExpression("yearly");
-		else
+		} else {
 			setTimeExpression("realtime");
+		}
 	}
 
 	public Long getJobId() {

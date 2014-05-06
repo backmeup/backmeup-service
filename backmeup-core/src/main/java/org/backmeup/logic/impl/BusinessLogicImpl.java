@@ -401,35 +401,37 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public void changeProfile(final Long profileId, final Long jobId, final List<String> sourceOptions)
-    {
-        conn.txJoin(new Runnable() {
-            @Override public void run() {
+	@Override
+	public void changeProfile(final Long profileId, final Long jobId,
+			final List<String> sourceOptions) {
+		conn.txJoin(new Runnable() {
+			@Override
+			public void run() {
 
-                ProfileDao pd = getProfileDao ();
-                Profile p = pd.findById (profileId);
-                if (p == null)
-                {
-                    throw new IllegalArgumentException (String.format (textBundle.getString(UNKNOWN_PROFILE), profileId));
-                }
-                
-                BackupJobDao bd = getBackupJobDao ();
-                BackupJob backupjob = bd.findById (jobId);
-                
-                Set<ProfileOptions> profileoptions = backupjob.getSourceProfiles ();
-                for (ProfileOptions option : profileoptions)
-                {
-                    if (option.getProfile ().getProfileId ().equals(p.getProfileId ()))
-                    {
-                        String[] new_options = sourceOptions.toArray (new String[sourceOptions.size ()]);
-                        option.setOptions (new_options);
-                    }
-                }
-            
-            }
-        });
-    }
+				ProfileDao pd = getProfileDao();
+				Profile p = pd.findById(profileId);
+				if (p == null) {
+					throw new IllegalArgumentException(String.format(
+							textBundle.getString(UNKNOWN_PROFILE), profileId));
+				}
+
+				BackupJobDao bd = getBackupJobDao();
+				BackupJob backupjob = bd.findById(jobId);
+
+				Set<ProfileOptions> profileoptions = backupjob
+						.getSourceProfiles();
+				for (ProfileOptions option : profileoptions) {
+					if (option.getProfile().getProfileId()
+							.equals(p.getProfileId())) {
+						String[] new_options = sourceOptions
+								.toArray(new String[sourceOptions.size()]);
+						option.setOptions(new_options);
+					}
+				}
+
+			}
+		});
+	}
 
     @Override
     public void deleteDatasourcePlugin(String name) {
@@ -639,36 +641,33 @@ public class BusinessLogicImpl implements BusinessLogic {
 
             ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
 
-            // check if the interval has changed
-            if (job.getTimeExpression ().compareToIgnoreCase (updateRequest.getTimeExpression()) != 0)
-            {
-                scheduleJob = true;
+			// check if the interval has changed
+			if (job.getTimeExpression().compareToIgnoreCase(
+					updateRequest.getTimeExpression()) != 0) {
+				scheduleJob = true;
 
-                // chage start date to now if interval has changed
-                job.setStart (new Date ());
-            }
+				// chage start date to now if interval has changed
+				job.setStart(new Date());
+			}
 
-            job.setTimeExpression(updateRequest.getTimeExpression());
-            job.setDelay(et.getDelay());
-            job.setReschedule (et.isReschedule ());
+			job.setTimeExpression(updateRequest.getTimeExpression());
+			job.setDelay(et.getDelay());
+			job.setReschedule(et.isReschedule());
 
-            if (job.isReschedule () == true)
-            {
-                Date execTime = new Date (new Date().getTime() + job.getDelay());
-                job.setNextExecutionTime (execTime);
-            }
-            else
-            {
-                job.setNextExecutionTime (null);
-            }
+			if (job.isReschedule() == true) {
+				Date execTime = new Date(new Date().getTime() + job.getDelay());
+				job.setNextExecutionTime(execTime);
+			} else {
+				job.setNextExecutionTime(null);
+			}
 
-            conn.commit();
+			conn.commit();
 
-            if(scheduleJob == true)
-            {
-                // add the updated job to the queue. (All old queue entrys get invalid and will not be executed)
-                jobManager.runBackUpJob (job);
-            }
+			if (scheduleJob == true) {
+				// add the updated job to the queue. (All old queue entrys get
+				// invalid and will not be executed)
+				jobManager.runBackUpJob(job);
+			}
 
             ValidationNotes vn = validateBackupJob(username, job.getId(), updateRequest.getKeyRing());
             vn.setJob(job);

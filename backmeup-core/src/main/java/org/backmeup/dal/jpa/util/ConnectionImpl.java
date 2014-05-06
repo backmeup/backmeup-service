@@ -108,8 +108,9 @@ public class ConnectionImpl implements Connection {
 	
 	private void resetEntityManager() {
 	  EntityManager em = getEntityManager();
-	  if (em != null)
+	  if (em != null) {
 	    em.close();
+	  }
 	  threadLocalEntityManager.set(null);
 	  dal.setConnection(null);
 	}
@@ -123,8 +124,9 @@ public class ConnectionImpl implements Connection {
       em.getTransaction().begin();
     } else {
       Stack<Boolean> transactionStack = joinedTransactions.get();
-      if (transactionStack == null) 
+      if (transactionStack == null) { 
         transactionStack = new Stack<Boolean>();
+      }
       transactionStack.push(true);
       joinedTransactions.set(transactionStack);
     }

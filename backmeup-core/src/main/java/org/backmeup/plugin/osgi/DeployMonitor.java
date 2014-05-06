@@ -42,8 +42,9 @@ public class DeployMonitor implements Runnable {
   }
 
   public void start() {
-    if (executor != null)
+    if (executor != null) {
       stop();
+    }
     executor = Executors.newScheduledThreadPool(1);
     executor.scheduleAtFixedRate(this, 0, 5, TimeUnit.SECONDS);
 
@@ -51,10 +52,11 @@ public class DeployMonitor implements Runnable {
 
   public void waitForInitialRun() {
     try {
-      if (!firstRun)
+      if (!firstRun) {
         synchronized (monitor) {
           monitor.wait();
         }
+      }
     } catch (InterruptedException e) {
     	logger.error("", e);
     }

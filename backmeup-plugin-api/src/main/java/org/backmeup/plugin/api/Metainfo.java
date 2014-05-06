@@ -135,18 +135,23 @@ public class Metainfo {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     Metainfo other = (Metainfo) obj;
     if (metainfo == null || metainfo.getProperty(PROP_ID) == null) {
-      if (other.metainfo != null || other.metainfo.getProperty(PROP_ID) != null)
+      if (other.metainfo != null || other.metainfo.getProperty(PROP_ID) != null) {
         return false;
-    } else if (!metainfo.getProperty(PROP_ID).equals(other.metainfo.getProperty(PROP_ID)))
+      }
+    } else if (!metainfo.getProperty(PROP_ID).equals(other.metainfo.getProperty(PROP_ID))) {
       return false;
+    }
     return true;
   }
 

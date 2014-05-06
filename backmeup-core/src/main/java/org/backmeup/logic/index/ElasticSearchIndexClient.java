@@ -72,8 +72,9 @@ public class ElasticSearchIndexClient {
 				StringBuffer sb = new StringBuffer("*");
 				for (int i=0; i<tokens.length; i++) {
 					sb.append(tokens[i]);
-					if (i < tokens.length - 1)
+					if (i < tokens.length - 1) {
 						sb.append("* AND *");
+					}
 				}
 				queryString = sb.toString() + "*";
 			}
@@ -109,8 +110,9 @@ public class ElasticSearchIndexClient {
 	public SearchResponse getFileById(String username, String fileId) {
 		// IDs in backmeup are "owner:hash:timestamp"
 		String[] bmuId = fileId.split(":");
-		if (bmuId.length != 3)
+		if (bmuId.length != 3) {
 			throw new IllegalArgumentException("Invalid file ID: " + fileId);
+		}
 		
 		Long owner = Long.parseLong(bmuId[0]);
 		String hash = bmuId[1];
@@ -151,7 +153,8 @@ public class ElasticSearchIndexClient {
 	}
 	
 	public void close() {
-		if (client != null)
+		if (client != null) {
 			client.close();
+		}
 	}
 }

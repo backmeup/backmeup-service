@@ -28,10 +28,12 @@ public class ValidationNotesContainer {
 		}
 		// Warnings are not being treated as errors!
 		this.hasErrors = errors.size() > 0;
-		if (this.errors.size() == 0)
+		if (this.errors.size() == 0) {
 			this.errors = null;
-		if (this.warnings.size() == 0)
+		}
+		if (this.warnings.size() == 0) {
 			this.warnings = null;
+		}
 
 		setJob(new JobCreationContainer(notes.getJob()));
 	}

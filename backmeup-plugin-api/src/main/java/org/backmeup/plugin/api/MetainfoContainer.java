@@ -100,8 +100,9 @@ public class MetainfoContainer implements Iterable<Metainfo> {
 					metainfoEntry.addProperty(key, value);
 				}
 
-				if (info.getParent() != null)
+				if (info.getParent() != null) {
 					metainfoEntry.addProperty("parent", info.getParent());
+				}
 
 				array.add(metainfoEntry);
 			}

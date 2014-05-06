@@ -51,24 +51,26 @@ public class Users extends Base {
 	@PUT
 	@Path("{oldUsername}")
 	@Produces("application/json")
-	public ResultMessage changeUser(@PathParam("oldUsername") String oldUsername,
-	    @FormParam("username") String username,
+	public ResultMessage changeUser(
+			@PathParam("oldUsername") String oldUsername,
+			@FormParam("username") String username,
 			@FormParam("oldPassword") String oldPassword,
 			@FormParam("password") String newPassword,
 			@FormParam("oldKeyring") String oldKeyring,
 			@FormParam("newKeyring") String newKeyring,
 			@FormParam("email") String newEmail) {
-	  BackMeUpUser oldUser = getLogic().getUser(oldUsername);
-		BackMeUpUser user = getLogic().changeUser(oldUsername, username, oldPassword, newPassword, oldKeyring, newKeyring, newEmail);
+		BackMeUpUser oldUser = getLogic().getUser(oldUsername);
+		BackMeUpUser user = getLogic().changeUser(oldUsername, username,
+				oldPassword, newPassword, oldKeyring, newKeyring, newEmail);
 		ResultMessage rslt = new ResultMessage(Type.success);
 		if (!oldUsername.equals(user.getUsername())) {
-		  rslt.addMessage(Messages.CHANGE_USER_USERNAME);
+			rslt.addMessage(Messages.CHANGE_USER_USERNAME);
 		}
 		if (newPassword != null && !oldPassword.equals(newPassword)) {
-		  rslt.addMessage(Messages.CHANGE_USER_PASSWORD);
-    }
+			rslt.addMessage(Messages.CHANGE_USER_PASSWORD);
+		}
 		if (newEmail != null && !oldUser.getEmail().equals(newEmail)) {
-		  rslt.addMessage(Messages.CHANGE_USER_EMAIL);
+			rslt.addMessage(Messages.CHANGE_USER_EMAIL);
 		}
 		return rslt;
 	}
@@ -129,25 +131,27 @@ public class Users extends Base {
 	@GET
 	@Path("{username}/properties/{property}")
 	@Produces("application/json")
-	public PropertyContainer getUserProperty(@PathParam("username") String username,
-	    @PathParam("property") String property
-	    ) {
-	  String result = getLogic().getUser(username).getUserProperty(property);
-	  if (result == null)
-	    throw new UnknownUserPropertyException(property);
-	  
-	  return new PropertyContainer(property, result);
+	public PropertyContainer getUserProperty(
+			@PathParam("username") String username,
+			@PathParam("property") String property) {
+		String result = getLogic().getUser(username).getUserProperty(property);
+		if (result == null) {
+			throw new UnknownUserPropertyException(property);
+		}
+
+		return new PropertyContainer(property, result);
 	}
 	
-	@POST 
+	@POST
 	@Path("{username}/properties/{property}/{value}")
-  @Produces("application/json")
-	public ResultMessage setUserProperty(@PathParam("username") String username,
-      @PathParam("property") String property,
-      @PathParam("value") String value) {
-    getLogic().setUserProperty(username, property, value);
-    return Messages.MSG_POST_PROPERTY;
-  }
+	@Produces("application/json")
+	public ResultMessage setUserProperty(
+			@PathParam("username") String username,
+			@PathParam("property") String property,
+			@PathParam("value") String value) {
+		getLogic().setUserProperty(username, property, value);
+		return Messages.MSG_POST_PROPERTY;
+	}
 	
 	@DELETE
 	@Path("{username}/properties/{property}")
@@ -160,9 +164,9 @@ public class Users extends Base {
 	@GET
 	@Path("{username}/keysrvlogs")
 	@Produces("application/json")
-	public List<KeyserverLog> getUserKeysrvlogs(@PathParam("username") String username)
-	{
-	  BackMeUpUser user = getLogic().getUser (username);
-	  return getLogic ().getKeysrvLogs (user);
+	public List<KeyserverLog> getUserKeysrvlogs(
+			@PathParam("username") String username) {
+		BackMeUpUser user = getLogic().getUser(username);
+		return getLogic().getKeysrvLogs(user);
 	}
 }

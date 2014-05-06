@@ -39,8 +39,9 @@ public class BackupJobDaoImpl extends BaseDaoImpl<BackupJob> implements
     q.setParameter("username", username);
     q.setMaxResults(1);
     List<BackupJob> jobs = q.getResultList();
-    if (jobs.size() > 0)
+    if (jobs.size() > 0) {
       return jobs.get(0);
+    }
     return null;
   } 
 

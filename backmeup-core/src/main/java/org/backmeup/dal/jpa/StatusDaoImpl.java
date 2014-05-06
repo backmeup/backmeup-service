@@ -42,10 +42,12 @@ public class StatusDaoImpl extends BaseDaoImpl<Status> implements StatusDao {
     TypedQuery<Status> q = em.createQuery(query, Status.class);
     q.setParameter("username", username);
     q.setParameter("jobId", jobId);    
-    if (from != null)
+    if (from != null) {
       q.setParameter("from", from);
-    if (to != null)
+    }
+    if (to != null) {
       q.setParameter("to", to);
+    }
     return q.getResultList();
   }
 

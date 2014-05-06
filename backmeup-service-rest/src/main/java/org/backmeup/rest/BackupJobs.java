@@ -139,8 +139,9 @@ public class BackupJobs extends Base {
   public ProtocolOverviewContainer getProtocolOverview(
       @PathParam("username") String username,
       @QueryParam("duration") String duration) {
-    if (duration == null)
+    if (duration == null) {
       duration = "month";
+    }
     return new ProtocolOverviewContainer(getLogic().getProtocolOverview(
         username, duration));
   }

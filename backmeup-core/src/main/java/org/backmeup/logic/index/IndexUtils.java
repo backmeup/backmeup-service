@@ -74,8 +74,9 @@ public class IndexUtils {
 			fileItem.setTitle(source.get(FIELD_FILENAME).toString());
 			fileItem.setTimeStamp(new Date(timestamp));
 			
-			if (source.get(FIELD_THUMBNAIL_PATH) != null)
+			if (source.get(FIELD_THUMBNAIL_PATH) != null) {
 				fileItem.setThumbnailURL("thumbnails/" + owner + "/" + fileId);
+			}
 			
 			fItems.add(fileItem);
 		}
@@ -84,14 +85,15 @@ public class IndexUtils {
 	}
 	
 	public static FileInfo convertToFileInfo(org.elasticsearch.action.search.SearchResponse esResponse) {
-	  if (esResponse.getHits().totalHits() == 0)
+	  if (esResponse.getHits().totalHits() == 0) {
 	    return null;
+	  }
 	  
 	  SearchHit hit = esResponse.getHits().getHits()[0];
 	  Map<String, Object> source = hit.getSource();
 	  String hash = source.get(FIELD_FILE_HASH).toString();
-    Integer owner = (Integer) source.get(FIELD_OWNER_ID);
-    Long timestamp = (Long) source.get(FIELD_BACKUP_AT);
+      Integer owner = (Integer) source.get(FIELD_OWNER_ID);
+      Long timestamp = (Long) source.get(FIELD_BACKUP_AT);
 	  FileInfo fi = new FileInfo();
 	  fi.setFileId(owner + ":" + hash + ":" + timestamp);
 	  fi.setSource(source.get(FIELD_BACKUP_SOURCE_PLUGIN_NAME) + " (" + source.get(FIELD_BACKUP_SOURCE_IDENTIFICATION) + ")");
@@ -101,10 +103,11 @@ public class IndexUtils {
 	  fi.setPath(source.get(FIELD_PATH).toString());
 	  fi.setSink(source.get(FIELD_BACKUP_SINK).toString());
 	  Object contentType = source.get(FIELD_CONTENT_TYPE);
-	  if (contentType != null)
+	  if (contentType != null) {
 		  fi.setType(getTypeFromMimeType(contentType.toString()));
-	  else
+	  } else {
 		  fi.setType(getTypeFromMimeType("other"));
+	  }
 	  return fi;
 	}
 	
@@ -142,11 +145,13 @@ public class IndexUtils {
 	    		entry.setDatasource(source.get(FIELD_BACKUP_SOURCE_PLUGIN_NAME) + " (" + source.get(FIELD_BACKUP_SOURCE_IDENTIFICATION) + ")");
 	    	}
 	    	
-	    	if (source.get(FIELD_JOB_NAME) != null)
+	    	if (source.get(FIELD_JOB_NAME) != null) {
 	    		entry.setJobName(source.get(FIELD_JOB_NAME).toString());
+	    	}
 	    	
-			if (preview != null)
+			if (preview != null) {
 				entry.setPreviewSnippet(preview.toString().trim());
+			}
 	    	
 	    	Object contentType = source.get(FIELD_CONTENT_TYPE);
 	    	if (contentType != null) {
@@ -157,38 +162,48 @@ public class IndexUtils {
 	    	
 	    	entry.setProperty(FIELD_PATH, source.get(FIELD_PATH).toString());
 	    	
-	    	if (source.get(FIELD_BACKUP_SINK) != null)
+	    	if (source.get(FIELD_BACKUP_SINK) != null) {
 	    		entry.setProperty(FIELD_BACKUP_SINK, source.get(FIELD_BACKUP_SINK).toString());
+	    	}
 	    	
 	    	entry.setProperty(FIELD_FILE_HASH, hash);
 	    	
-			if (source.get(FIELD_THUMBNAIL_PATH) != null)
+			if (source.get(FIELD_THUMBNAIL_PATH) != null) {
 				entry.setThumbnailUrl("thumbnails/" + user.getUsername() + "/" + owner + ":" + hash + ":" + timestamp);
+			}
 			
 			// Custom props
-			if (source.get("destination") != null)
+			if (source.get("destination") != null) {
 				entry.setProperty("destination", source.get("destination").toString());
+			}
 			
-			if (source.get("message") != null)
+			if (source.get("message") != null) {
 				entry.setProperty("message", source.get("message").toString());
+			}
 			
-			if (source.get("parent") != null)
+			if (source.get("parent") != null) {
 				entry.setProperty("parent", source.get("parent").toString());
+			}
 			
-			if (source.get("author") != null)
+			if (source.get("author") != null) {
 				entry.setProperty("author", source.get("author").toString());
+			}
 			
-			if (source.get("source") != null)
+			if (source.get("source") != null) {
 				entry.setProperty("source", source.get("source").toString());
+			}
 			
-			if (source.get("likes") != null)
+			if (source.get("likes") != null) {
 				entry.setProperty("likes", source.get("likes").toString());
+			}
 			
-			if (source.get("tags") != null)
+			if (source.get("tags") != null) {
 				entry.setProperty("tags", source.get("tags").toString());
+			}
 			
-			if (source.get("modified") != null)
+			if (source.get("modified") != null) {
 				entry.setProperty("modified", source.get("modified").toString());
+			}
 			
 	    	entries.add(entry);
 	    }
@@ -264,35 +279,28 @@ public class IndexUtils {
 		return countedEntries;			
 	}
 	
-	private static List<CountedEntry> groupByContentJob (org.elasticsearch.action.search.SearchResponse esResponse)
-	{
+	private static List<CountedEntry> groupByContentJob(org.elasticsearch.action.search.SearchResponse esResponse) {
 		// Now where's my Scala groupBy!? *heul*
-		Map<String, Integer> groupedHits = new HashMap<String, Integer> ();
-		for (SearchHit hit : esResponse.getHits ())
-		{
-			if (hit.getSource ().get (FIELD_JOB_ID) != null)
-			{
-				String backupJobName = hit.getSource ().get (FIELD_JOB_NAME).toString ();
-				String backupTimestamp = hit.getSource ().get (FIELD_BACKUP_AT).toString ();
+		Map<String, Integer> groupedHits = new HashMap<String, Integer>();
+		for (SearchHit hit : esResponse.getHits()) {
+			if (hit.getSource().get(FIELD_JOB_ID) != null) {
+				String backupJobName = hit.getSource().get(FIELD_JOB_NAME).toString();
+				String backupTimestamp = hit.getSource().get(FIELD_BACKUP_AT).toString();
 				String label = backupJobName + " (" + backupTimestamp + ")";
-				Integer count = groupedHits.get (label);
-				if (count == null)
-				{
-					count = Integer.valueOf (1);
+				Integer count = groupedHits.get(label);
+				if (count == null) {
+					count = Integer.valueOf(1);
+				} else {
+					count = Integer.valueOf(count.intValue() + 1);
 				}
-				else
-				{
-					count = Integer.valueOf (count.intValue () + 1);
-				}
-				groupedHits.put (label, count);
+				groupedHits.put(label, count);
 			}
 		}
 
 		// ...and .map
-		List<CountedEntry> countedEntries = new ArrayList<SearchResponse.CountedEntry> ();
-		for (Entry<String, Integer> entry : groupedHits.entrySet ())
-		{
-			countedEntries.add (new CountedEntry (entry.getKey (), entry.getValue ().intValue ()));
+		List<CountedEntry> countedEntries = new ArrayList<SearchResponse.CountedEntry>();
+		for (Entry<String, Integer> entry : groupedHits.entrySet()) {
+			countedEntries.add(new CountedEntry(entry.getKey(), entry.getValue().intValue()));
 		}
 
 		return countedEntries;
@@ -322,17 +330,16 @@ public class IndexUtils {
 	}
 
 	public static String getFilterSuffix(Map<String, List<String>> filters) {
-		if (filters == null)
+		if (filters == null) {
 			return "";
+		}
 		
 		String filterstr = "";
 		
-		if (filters.containsKey ("type") == true)
-		{
+		if (filters.containsKey("type") == true) {
 			filterstr += "(";
-			
-			for(String filter : filters.get ("type"))
-			{
+
+			for (String filter : filters.get("type")) {
 				if (filter.toLowerCase().equals("html")) {
 					filterstr += "Content-Type:*html* OR ";
 				} else if (filter.toLowerCase().equals("image")) {
@@ -345,194 +352,184 @@ public class IndexUtils {
 					filterstr += "Content-Type:text* OR ";
 				}
 			}
-			
+
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring (0, filterstr.length () - 4);
+			filterstr = filterstr.substring(0, filterstr.length() - 4);
 			filterstr += ") AND ";
 		}
 		
-		// TODO if "ProfileName" includes special chars like (,", ... we will have a problem with the search?
-		if (filters.containsKey ("source") == true)
-		{
+		// TODO if "ProfileName" includes special chars like (,", ... we will
+		// have a problem with the search?
+		if (filters.containsKey("source") == true) {
 			filterstr += "(";
-			
+
 			// something like this will come "org.backmeup.source (ProfileName)"
-			for (String filter : filters.get ("source"))
-			{
-				// get out the source plugin, result will be "org.backmeup.source"
-				String source = filter.substring (0, filter.indexOf (" "));
-				
+			for (String filter : filters.get("source")) {
+				// get out the source plugin, result will be
+				// "org.backmeup.source"
+				String source = filter.substring(0, filter.indexOf(" "));
+
 				// get out the profile "(Profilename)"
-				String profile = filter.substring (filter.indexOf (" ") + 1, filter.length ());
-				// remove the brackets at begin and end, result will be "ProfileName"
-				profile = profile.substring (1, profile.length () - 1);
-				
-				filterstr += "(" + FIELD_BACKUP_SOURCE_PLUGIN_NAME + ":" + source + " AND " + FIELD_BACKUP_SOURCE_IDENTIFICATION + ":" + profile + ") OR ";
+				String profile = filter.substring(filter.indexOf(" ") + 1,
+						filter.length());
+				// remove the brackets at begin and end, result will be
+				// "ProfileName"
+				profile = profile.substring(1, profile.length() - 1);
+
+				filterstr += "(" + FIELD_BACKUP_SOURCE_PLUGIN_NAME + ":"
+						+ source + " AND " + FIELD_BACKUP_SOURCE_IDENTIFICATION
+						+ ":" + profile + ") OR ";
 			}
-			
+
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring (0, filterstr.length () - 4);
+			filterstr = filterstr.substring(0, filterstr.length() - 4);
 			filterstr += ") AND ";
 		}
 		
 		// TODO if job contains special chars ...
-		if (filters.containsKey ("job") == true)
-		{
+		if (filters.containsKey("job") == true) {
 			filterstr += "(";
-			
-			// something like this will come "JobName (Timestamp)" (java timestamp -> 13 chars)
-			for (String filter : filters.get ("job"))
-			{
+
+			// something like this will come "JobName (Timestamp)" (java
+			// timestamp -> 13 chars)
+			for (String filter : filters.get("job")) {
 				// get out the timestamp (also remove the "()").
-				String timestamp = filter.substring (filter.length () - 14, filter.length () - 1);
-				
+				String timestamp = filter.substring(filter.length() - 14,
+						filter.length() - 1);
+
 				// get out the job name
-				String jobname = filter.substring (0, filter.length () - 16);
-				
-				filterstr += "(" + FIELD_BACKUP_AT + ":" + timestamp + " AND " + FIELD_JOB_NAME + ":" + jobname + ") OR ";
+				String jobname = filter.substring(0, filter.length() - 16);
+
+				filterstr += "(" + FIELD_BACKUP_AT + ":" + timestamp + " AND "
+						+ FIELD_JOB_NAME + ":" + jobname + ") OR ";
 			}
-			
+
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring (0, filterstr.length () - 4);
+			filterstr = filterstr.substring(0, filterstr.length() - 4);
 			filterstr += ") AND ";
 		}
 		
 		return filterstr;
 	}
 	
-	
-	
-	
-	public static QueryBuilder buildQuery (Long userid, String queryString, Map<String, List<String>> filters)
-	{
+	public static QueryBuilder buildQuery(Long userid, String queryString,
+			Map<String, List<String>> filters) {
 		BoolQueryBuilder qBuilder = new BoolQueryBuilder();
-		qBuilder.must (QueryBuilders.matchQuery (IndexUtils.FIELD_OWNER_ID, userid));
-		qBuilder.must (QueryBuilders.queryString (queryString));
-		
-		if (filters == null)
-		{
+		qBuilder.must(QueryBuilders.matchQuery(IndexUtils.FIELD_OWNER_ID,
+				userid));
+		qBuilder.must(QueryBuilders.queryString(queryString));
+
+		if (filters == null) {
 			return qBuilder;
 		}
-		
-		BoolQueryBuilder typematches = buildTypeQuery (filters);
-		BoolQueryBuilder sourcematches = buildSourceQuery (filters);
-		BoolQueryBuilder jobmatches = buildJobQuery (filters);
-		
-		if (typematches != null)
-		{
+
+		BoolQueryBuilder typematches = buildTypeQuery(filters);
+		BoolQueryBuilder sourcematches = buildSourceQuery(filters);
+		BoolQueryBuilder jobmatches = buildJobQuery(filters);
+
+		if (typematches != null) {
 			qBuilder.must(typematches);
 		}
-		if (sourcematches != null)
-		{
+		if (sourcematches != null) {
 			qBuilder.must(sourcematches);
 		}
-		if (jobmatches != null)
-		{
+		if (jobmatches != null) {
 			qBuilder.must(jobmatches);
 		}
-		
+
 		return qBuilder;
 	}
 	
-	private static BoolQueryBuilder buildTypeQuery (Map<String, List<String>> filters)
-	{
+	private static BoolQueryBuilder buildTypeQuery(
+			Map<String, List<String>> filters) {
 		BoolQueryBuilder typematches = null;
 
-		if (filters.containsKey ("type") == true)
-		{
+		if (filters.containsKey("type") == true) {
 			typematches = new BoolQueryBuilder();
 			// minimum 1 of the should clausels must match
-			typematches.minimumNumberShouldMatch (1);
-			
-			for (String filter : filters.get ("type"))
-			{
-				if (filter.toLowerCase ().equals ("html"))
-				{
-					typematches.should (QueryBuilders.matchPhraseQuery (FIELD_CONTENT_TYPE, "*html*"));
-				}
-				else if (filter.toLowerCase ().equals ("image"))
-				{
-					typematches.should (QueryBuilders.matchPhraseQuery (FIELD_CONTENT_TYPE, "image*"));
-				}
-				else if (filter.toLowerCase ().equals ("video"))
-				{
-					typematches.should (QueryBuilders.matchPhraseQuery (FIELD_CONTENT_TYPE, "video*"));
-				}
-				else if (filter.toLowerCase ().equals ("audio"))
-				{
-					typematches.should (QueryBuilders.matchPhraseQuery (FIELD_CONTENT_TYPE, "audio*"));
-				}
-				else if (filter.toLowerCase ().equals ("text"))
-				{
-					typematches.should (QueryBuilders.matchPhraseQuery (FIELD_CONTENT_TYPE, "text*"));
+			typematches.minimumNumberShouldMatch(1);
+
+			for (String filter : filters.get("type")) {
+				if (filter.toLowerCase().equals("html")) {
+					typematches.should(QueryBuilders.matchPhraseQuery(
+							FIELD_CONTENT_TYPE, "*html*"));
+				} else if (filter.toLowerCase().equals("image")) {
+					typematches.should(QueryBuilders.matchPhraseQuery(
+							FIELD_CONTENT_TYPE, "image*"));
+				} else if (filter.toLowerCase().equals("video")) {
+					typematches.should(QueryBuilders.matchPhraseQuery(
+							FIELD_CONTENT_TYPE, "video*"));
+				} else if (filter.toLowerCase().equals("audio")) {
+					typematches.should(QueryBuilders.matchPhraseQuery(
+							FIELD_CONTENT_TYPE, "audio*"));
+				} else if (filter.toLowerCase().equals("text")) {
+					typematches.should(QueryBuilders.matchPhraseQuery(
+							FIELD_CONTENT_TYPE, "text*"));
 				}
 			}
 		}
-		
+
 		return typematches;
 	}
 	
-	private static BoolQueryBuilder buildSourceQuery (Map<String, List<String>> filters)
-	{
+	private static BoolQueryBuilder buildSourceQuery(
+			Map<String, List<String>> filters) {
 		BoolQueryBuilder sourcematches = null;
-		
-		if (filters.containsKey ("source") == true)
-		{
+
+		if (filters.containsKey("source") == true) {
 			sourcematches = new BoolQueryBuilder();
 			// minimum 1 of the should clausels must match
-			sourcematches.minimumNumberShouldMatch (1);
-			
-			for (String filter : filters.get ("source"))
-			{
-				// get out the source plugin, result will be "org.backmeup.source"
-				String source = filter.substring (0, filter.indexOf (" "));
-				
+			sourcematches.minimumNumberShouldMatch(1);
+
+			for (String filter : filters.get("source")) {
+				// get out the source plugin, result will be
+				// "org.backmeup.source"
+				String source = filter.substring(0, filter.indexOf(" "));
+
 				// get out the profile "(Profilename)"
-				String profile = filter.substring (filter.indexOf (" ") + 1, filter.length ());
-				
-				// remove the brackets at begin and end, result will be "ProfileName"
-				profile = profile.substring (1, profile.length () - 1);
-				
+				String profile = filter.substring(filter.indexOf(" ") + 1, filter.length());
+
+				// remove the brackets at begin and end, result will be
+				// "ProfileName"
+				profile = profile.substring(1, profile.length() - 1);
+
 				BoolQueryBuilder tempbuilder = new BoolQueryBuilder();
-				tempbuilder.must (QueryBuilders.matchPhraseQuery (FIELD_BACKUP_SOURCE_PLUGIN_NAME, source));
-				tempbuilder.must (QueryBuilders.matchPhraseQuery (FIELD_BACKUP_SOURCE_IDENTIFICATION, profile));
-				
+				tempbuilder.must(QueryBuilders.matchPhraseQuery(FIELD_BACKUP_SOURCE_PLUGIN_NAME, source));
+				tempbuilder.must(QueryBuilders.matchPhraseQuery(FIELD_BACKUP_SOURCE_IDENTIFICATION, profile));
+
 				// tempbuilder1 or tempbulder2 or ...
-				sourcematches.should (tempbuilder);
+				sourcematches.should(tempbuilder);
 			}
 		}
-		
+
 		return sourcematches;
 	}
 	
-	private static BoolQueryBuilder buildJobQuery (Map<String, List<String>> filters)
-	{
+	private static BoolQueryBuilder buildJobQuery( Map<String, List<String>> filters) {
 		BoolQueryBuilder jobmatches = null;
-		
-		if (filters.containsKey ("job") == true)
-		{
+
+		if (filters.containsKey("job") == true) {
 			jobmatches = new BoolQueryBuilder();
 			// minimum 1 of the should clausels must match
-			jobmatches.minimumNumberShouldMatch (1);
-			
+			jobmatches.minimumNumberShouldMatch(1);
+
 			// something like this will come "JobName (Timestamp)" (java timestamp -> 13 chars)
-			for (String filter : filters.get ("job"))
-			{
+			for (String filter : filters.get("job")) {
 				// get out the timestamp (also remove the "()").
-				String timestamp = filter.substring (filter.length () - 14, filter.length () - 1);
-				
+				String timestamp = filter.substring(filter.length() - 14, filter.length() - 1);
+
 				// get out the job name
-				String jobname = filter.substring (0, filter.length () - 16);
-				
+				String jobname = filter.substring(0, filter.length() - 16);
+
 				BoolQueryBuilder tempbuilder = new BoolQueryBuilder();
-				tempbuilder.must (QueryBuilders.matchPhraseQuery (FIELD_BACKUP_AT, timestamp));
-				tempbuilder.must (QueryBuilders.matchPhraseQuery (FIELD_JOB_NAME, jobname));
-				
+				tempbuilder.must(QueryBuilders.matchPhraseQuery(FIELD_BACKUP_AT, timestamp));
+				tempbuilder.must(QueryBuilders.matchPhraseQuery(FIELD_JOB_NAME, jobname));
+
 				// tempbuilder1 or tempbulder2 or ...
-				jobmatches.should (tempbuilder);
+				jobmatches.should(tempbuilder);
 			}
 		}
-		
+
 		return jobmatches;
 	}
 }

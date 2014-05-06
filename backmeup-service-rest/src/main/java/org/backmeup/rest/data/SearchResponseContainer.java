@@ -23,20 +23,24 @@ public class SearchResponseContainer {
 
 	public SearchResponseContainer(SearchResponse resp) {
 		this.files = new ArrayList<SearchEntryContainer>();
-		for (SearchEntry entry : resp.getFiles())
+		for (SearchEntry entry : resp.getFiles()) {
 			this.files.add(new SearchEntryContainer(entry));
+		}
 
 		this.bySource = new ArrayList<CountedEntryContainer>();
-		for (CountedEntry entry : resp.getBySource())
+		for (CountedEntry entry : resp.getBySource()) {
 			this.bySource.add(new CountedEntryContainer(entry));
+		}
 
 		this.byType = new ArrayList<CountedEntryContainer>();
-		for (CountedEntry entry : resp.getByType())
+		for (CountedEntry entry : resp.getByType()) {
 			this.byType.add(new CountedEntryContainer(entry));
+		}
 
 		this.byJob = new ArrayList<CountedEntryContainer>();
-		for (CountedEntry entry : resp.getByJob())
+		for (CountedEntry entry : resp.getByJob()) {
 			this.byJob.add(new CountedEntryContainer(entry));
+		}
 
 		this.searchQuery = resp.getQuery();
 

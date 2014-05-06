@@ -29,7 +29,7 @@ public class JobCreationRequestParser {
       jcr.getSourceProfiles().add(spe);
     }
     
-    if (formParameters.containsKey("actions"))
+    if (formParameters.containsKey("actions")) {
       for (String action : formParameters.get("actions")) {
         ActionProfileEntry ape = new ActionProfileEntry();
         ape.setId(action);
@@ -38,22 +38,27 @@ public class JobCreationRequestParser {
         }
         jcr.getActions().add(ape);
       }
+    }
     
     if (!formParameters.containsKey("sinkProfileId")) {
       throw new BackMeUpException("Missing sinkProfileId property!");
     }
     
-    if (formParameters.containsKey("sinkProfileId"))
+    if (formParameters.containsKey("sinkProfileId")) {
       jcr.setSinkProfileId(Long.parseLong(formParameters.getFirst("sinkProfileId")));
+    }
     
-    if (formParameters.containsKey("jobTitle"))
+    if (formParameters.containsKey("jobTitle")) {
       jcr.setJobTitle(formParameters.getFirst("jobTitle"));
+    }
     
-    if (formParameters.containsKey("keyRing"))
+    if (formParameters.containsKey("keyRing")) {
       jcr.setKeyRing(formParameters.getFirst("keyRing"));
+    }
     
-    if (formParameters.containsKey("timeExpression"))
+    if (formParameters.containsKey("timeExpression")) {
       jcr.setTimeExpression(formParameters.getFirst("timeExpression"));
+    }
     
     return jcr;
   }
@@ -72,7 +77,7 @@ public class JobCreationRequestParser {
       }
     }
     
-    if (formParameters.containsKey("actions"))
+    if (formParameters.containsKey("actions")) {
       for (String action : formParameters.get("actions")) {
         ActionProfileEntry ape = new ActionProfileEntry();
         ape.setId(action);
@@ -81,22 +86,27 @@ public class JobCreationRequestParser {
         }
         jcr.getActions().add(ape);
       }
+    }
     
-    
-    if (formParameters.containsKey("sinkProfileId"))
+    if (formParameters.containsKey("sinkProfileId")) {
       jcr.setSinkProfileId(Long.parseLong(formParameters.getFirst("sinkProfileId")));
+    }
     
-    if (formParameters.containsKey("jobTitle"))
+    if (formParameters.containsKey("jobTitle")) {
       jcr.setJobTitle(formParameters.getFirst("jobTitle"));
+    }
     
-    if (formParameters.containsKey("keyRing"))
+    if (formParameters.containsKey("keyRing")) {
       jcr.setKeyRing(formParameters.getFirst("keyRing"));
+    }
     
-    if (formParameters.containsKey("timeExpression"))
+    if (formParameters.containsKey("timeExpression")) {
       jcr.setTimeExpression(formParameters.getFirst("timeExpression"));
+    }
     
-    if (formParameters.containsKey("jobId")) 
+    if (formParameters.containsKey("jobId")) { 
       jcr.setJobId(Long.parseLong(formParameters.getFirst("jobId")));
+    }
     return jcr;
   }
   

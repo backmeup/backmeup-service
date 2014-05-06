@@ -49,8 +49,9 @@ public class ActionProfile implements Comparable<ActionProfile> {
 
   @Override
   public int compareTo(ActionProfile o) {
-    if (o == null)
+    if (o == null) {
       return -1;    
+    }
     return o.getPriority() - this.getPriority();
   }
   
@@ -129,18 +130,23 @@ public class ActionProfile implements Comparable<ActionProfile> {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
         return false;
+      }
       ActionProperty other = (ActionProperty) obj;
       if (key == null) {
-        if (other.key != null)
+        if (other.key != null) {
           return false;
-      } else if (!key.equals(other.key))
+        }
+      } else if (!key.equals(other.key)) {
         return false;
+      }
       return true;
     }
   }

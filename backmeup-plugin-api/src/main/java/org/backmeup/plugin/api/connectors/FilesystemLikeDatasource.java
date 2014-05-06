@@ -45,9 +45,10 @@ public abstract class FilesystemLikeDatasource implements Datasource {
 				progressor.progress(String.format("Downloading file %s failed!", uri.toString()));
 			} else {
 			  URI destination = uri.getMappedUri();
-			  if (destination == null)
+			  if (destination == null) {
 			    destination = uri.getUri();
-				storage.addFile(is, destination.getPath().toString(), metainfo);
+			  }
+			  storage.addFile(is, destination.getPath().toString(), metainfo);
 			}
 		}
 	}

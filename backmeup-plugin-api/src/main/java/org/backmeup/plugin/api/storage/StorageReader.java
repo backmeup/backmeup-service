@@ -29,8 +29,9 @@ public abstract class StorageReader {
 		}*/
 		
 		try {
-			if (clazz == null)
+			if (clazz == null) {
 				clazz = Class.forName("org.backmeup.api.storage.filesystem.LocalFilesystemStorageReader").asSubclass(StorageReader.class);
+			}
 			return clazz.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

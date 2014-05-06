@@ -1,27 +1,22 @@
 package org.backmeup.model;
 
-public class KeyserverLog
-{
+public class KeyserverLog {
 	private String message;
 	private Long date;
 
-	public String getMessage ()
-	{
+	public String getMessage() {
 		return message;
 	}
-	
-	public void setMessage (String message)
-	{
+
+	public void setMessage(String message) {
 		this.message = message;
 	}
 
-	public Long getDate ()
-	{
+	public Long getDate() {
 		return date;
 	}
-	
-	public void setDate (Long date)
-	{
+
+	public void setDate(Long date) {
 		this.date = date;
 	}
 }

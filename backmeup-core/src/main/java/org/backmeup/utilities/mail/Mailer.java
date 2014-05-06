@@ -79,12 +79,13 @@ public class Mailer {
       } catch (Exception e) {
     	  logger.error("", e); 
       } finally {
-        if (is != null)
+        if (is != null) {
           try {
             is.close();
           } catch (IOException e) {
         	  logger.error("", e);
           }
+        }
       }
     }
     return mailSettings;

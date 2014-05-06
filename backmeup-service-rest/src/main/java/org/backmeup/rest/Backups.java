@@ -40,8 +40,7 @@ public class Backups extends Base {
 	public Response search(@PathParam("username") String username,
 			@FormParam("keyRing") String keyRing,
 			@FormParam("query") String query) throws URISyntaxException {
-		long searchId = getLogic().searchBackup(username,
-				keyRing, query);
+		long searchId = getLogic().searchBackup(username, keyRing, query);
 		URI u = new URI(String.format("%sbackups/%s/%d/query", info
 				.getBaseUri().toString(), username, searchId));
 		return Response.status(Status.ACCEPTED).location(u)
@@ -51,49 +50,47 @@ public class Backups extends Base {
 	@GET
 	@Path("/{username}/{searchId}/query")
 	@Produces("application/json")
-	public SearchResponseContainer query(@PathParam("username") String username,
+	public SearchResponseContainer query(
+			@PathParam("username") String username,
 			@PathParam("searchId") Long searchId,
-			@QueryParam("source") String source, @QueryParam("type") String type,
-			@QueryParam("job") String job ) {
+			@QueryParam("source") String source,
+			@QueryParam("type") String type, @QueryParam("job") String job) {
 		SearchResponse sr = null;
 		Map<String, List<String>> filters = null;
-		
-		if ((source != null) || (type != null) || (job != null))
-		{
+
+		if ((source != null) || (type != null) || (job != null)) {
 			filters = new HashMap<String, List<String>>();
-			
-			if (source != null)
-			{
+
+			if (source != null) {
 				List<String> filtervalue = new LinkedList<String>();
-				filtervalue.add (source);
-				filters.put ("source", filtervalue);
+				filtervalue.add(source);
+				filters.put("source", filtervalue);
 			}
-			
-			if (type != null)
-			{
+
+			if (type != null) {
 				List<String> filtervalue = new LinkedList<String>();
-				filtervalue.add (type);
-				filters.put ("type", filtervalue);
+				filtervalue.add(type);
+				filters.put("type", filtervalue);
 			}
-			
-			if (job != null)
-			{
+
+			if (job != null) {
 				List<String> filtervalue = new LinkedList<String>();
-				filtervalue.add (job);
-				filters.put ("job", filtervalue);
+				filtervalue.add(job);
+				filters.put("job", filtervalue);
 			}
-			
+
 		}
-		
+
 		sr = getLogic().queryBackup(username, searchId, filters);
-		
+
 		/*
-		logger.debug("######################################################");
-		logger.debug(sr.getQuery ());
-		logger.debug(new SearchResponseContainer(sr).toString ());
-		logger.debug("######################################################");
-		*/
-		
+		 * logger.debug("######################################################")
+		 * ; logger.debug(sr.getQuery ()); logger.debug(new
+		 * SearchResponseContainer(sr).toString ());
+		 * logger.debug("######################################################"
+		 * );
+		 */
+
 		return new SearchResponseContainer(sr);
 	}
 }
