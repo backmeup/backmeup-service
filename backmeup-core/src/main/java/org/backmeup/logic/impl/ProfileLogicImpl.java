@@ -1,7 +1,7 @@
 package org.backmeup.logic.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -40,7 +40,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void deleteAllProfilesOfUser(String username) {
+    public void deleteProfilesOfUser(String username) {
         ProfileDao profileDao = getProfileDao();
         for (Profile p : profileDao.findProfilesByUsername(username)) {
             profileDao.delete(p);
@@ -48,12 +48,12 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public List<Profile> findAllProfilesOfUser(String username) {
+    public List<Profile> findProfilesOfUser(String username) {
         return getProfileDao().findDatasourceProfilesByUsername(username);
     }
 
     @Override
-    public Profile deleteExistingUserProfile(Long profileId, String username) {
+    public Profile deleteProfileOfUser(Long profileId, String username) {
         Profile profile = queryExistingUserProfile(profileId, username);
         getProfileDao().delete(profile);
         return profile;
@@ -100,19 +100,24 @@ public class ProfileLogicImpl implements ProfileLogic {
     public List<String> getProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles) {
         for (ProfileOptions po : sourceProfiles) {
             if (po.getProfile().getProfileId().equals(profileId)) {
-                String[] options = po.getOptions();
-                if (options == null) {
-                    return new ArrayList<>();
-                }
-                return Arrays.asList(options);
+                return asList(po.getOptions());
             }
         }
 
         throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
     }
 
+    private List<String> asList(String[] options) {
+        if (options == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(options);
+    }
+
     @Override
     public void setProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles, List<String> sourceOptions) {
+        queryExistingProfile(profileId);
+        
         for (ProfileOptions option : sourceProfiles) {
             if (option.getProfile().getProfileId().equals(profileId)) {
                 String[] new_options = sourceOptions.toArray(new String[sourceOptions.size()]);

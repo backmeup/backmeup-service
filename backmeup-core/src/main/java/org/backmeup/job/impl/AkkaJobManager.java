@@ -101,8 +101,7 @@ abstract public class AkkaJobManager implements JobManager {
 
 	}
 	
-	@Override
-	public BackupJob getBackUpJob(Long jobId) {
+	private BackupJob getBackUpJob(Long jobId) {
 		return getDao().findById(jobId);
 	}
 

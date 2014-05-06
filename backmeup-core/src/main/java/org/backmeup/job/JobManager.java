@@ -30,7 +30,6 @@ public interface JobManager {
 			boolean reschedule, String timeExpression);
 
 	
-	public BackupJob getBackUpJob(Long jobId);
 	public void runBackUpJob(BackupJob job);
 	
 	public void start();

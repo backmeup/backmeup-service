@@ -18,11 +18,11 @@ public interface ProfileLogic {
 
     Profile save(Profile profile);
 
-    void deleteAllProfilesOfUser(String username);
+    void deleteProfilesOfUser(String username);
 
-    List<Profile> findAllProfilesOfUser(String username);
+    List<Profile> findProfilesOfUser(String username);
 
-    Profile deleteExistingUserProfile(Long profileId, String username);
+    Profile deleteProfileOfUser(Long profileId, String username);
 
     Profile queryExistingUserProfile(Long profileId, String username);
 
