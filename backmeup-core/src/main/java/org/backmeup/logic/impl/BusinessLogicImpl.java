@@ -717,7 +717,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         StatusDao sd = dal.createStatusDao();
         List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
         
-        Set<FileItem> fileItems = searchService.getAllFileItems(job);
+        Set<FileItem> fileItems = searchService.getAllFileItems(job.getId());
         for (Status stat : status) {
             stat.setFiles(fileItems);
         }
@@ -987,7 +987,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public void run() {
 
                 BackupJob job = queryExistingJob(jobId);
-                searchService.delete(job, timestamp);
+                searchService.delete(job.getId(), timestamp);
                 
             }
         });

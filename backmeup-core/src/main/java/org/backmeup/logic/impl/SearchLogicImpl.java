@@ -17,7 +17,6 @@ import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.index.ElasticSearchIndexClient;
 import org.backmeup.logic.index.IndexUtils;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.BackupJob;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
@@ -92,12 +91,12 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public Set<FileItem> getAllFileItems(BackupJob job) {
+    public Set<FileItem> getAllFileItems(Long jobId) {
         ElasticSearchIndexClient client = null;
         try {
 
             client = getIndexClient();
-            org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(job.getId());
+            org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(jobId);
             return IndexUtils.convertToFileItems(esResponse);
 
         } finally {
@@ -147,12 +146,12 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void delete(BackupJob job, Long timestamp) {
+    public void delete(Long jobId, Long timestamp) {
         ElasticSearchIndexClient client = null;
         try {
 
             client = getIndexClient();
-            client.deleteRecordsForJobAndTimestamp(job.getId(), timestamp);
+            client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
 
         } finally {
             if (client != null) {
