@@ -18,17 +18,17 @@ public interface ProfileLogic {
 
     Profile save(Profile profile);
 
-    void deleteProfilesOfUser(String username);
+    void deleteProfilesOf(String username);
 
-    List<Profile> findProfilesOfUser(String username);
+    List<Profile> getProfilesOf(String username);
 
-    Profile deleteProfileOfUser(Long profileId, String username);
+    Profile deleteProfile(Long profileId, String username);
 
-    Profile queryExistingUserProfile(Long profileId, String username);
+    Profile getExistingUserProfile(Long profileId, String username);
 
     Profile queryExistingProfile(Long profileId);
 
-    List<Profile> findDatasinkProfilesOfUser(String username);
+    List<Profile> getDatasinkProfilesOf(String username);
 
     Set<ProfileOptions> getSourceProfilesOptionsFor(List<SourceProfileEntry> sourceProfiles);
 

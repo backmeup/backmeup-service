@@ -40,7 +40,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void deleteProfilesOfUser(String username) {
+    public void deleteProfilesOf(String username) {
         ProfileDao profileDao = getProfileDao();
         for (Profile p : profileDao.findProfilesByUsername(username)) {
             profileDao.delete(p);
@@ -48,19 +48,19 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public List<Profile> findProfilesOfUser(String username) {
+    public List<Profile> getProfilesOf(String username) {
         return getProfileDao().findDatasourceProfilesByUsername(username);
     }
 
     @Override
-    public Profile deleteProfileOfUser(Long profileId, String username) {
-        Profile profile = queryExistingUserProfile(profileId, username);
+    public Profile deleteProfile(Long profileId, String username) {
+        Profile profile = getExistingUserProfile(profileId, username);
         getProfileDao().delete(profile);
         return profile;
     }
 
     @Override
-    public Profile queryExistingUserProfile(Long profileId, String username) {
+    public Profile getExistingUserProfile(Long profileId, String username) {
         Profile profile = queryExistingProfile(profileId);
         if (!profile.getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException(String.format(textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
@@ -78,7 +78,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public List<Profile> findDatasinkProfilesOfUser(String username) {
+    public List<Profile> getDatasinkProfilesOf(String username) {
         return getProfileDao().findDatasinkProfilesByUsername(username);
     }
 

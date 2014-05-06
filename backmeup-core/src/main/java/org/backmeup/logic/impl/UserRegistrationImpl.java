@@ -40,7 +40,7 @@ public class UserRegistrationImpl implements UserRegistration {
     private static final String VERIFICATION_EMAIL_MIME_TYPE = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_MIME_TYPE";
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("UserRegistrationImpl");
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
@@ -63,7 +63,7 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public BackMeUpUser queryExistingUser(String username) {
+    public BackMeUpUser getExistingUser(String username) {
         BackMeUpUser user = getUserDao().findByName(username);
         if (user == null) {
             throw new UnknownUserException(username);
@@ -72,14 +72,19 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public BackMeUpUser queryActivatedUser(String username) {
-        BackMeUpUser user = queryExistingUser(username);
+    public void ensureUserIsActive(String username) {
+        getActiveUser(username);
+    }
+
+    @Override
+    public BackMeUpUser getActiveUser(String username) {
+        BackMeUpUser user = getExistingUser(username);
         user.ensureActivated();
         return user;
     }
 
     private BackMeUpUser queryNonActivatedUser(String username) {
-        BackMeUpUser user = queryExistingUser(username);
+        BackMeUpUser user = getExistingUser(username);
         user.ensureNotActivated();
         return user;
     }
@@ -156,13 +161,13 @@ public class UserRegistrationImpl implements UserRegistration {
     public void sendVerificationEmailFor(BackMeUpUser user) {
         String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
         String subject = "";
-		try {
-			// TODO remove ISO-8859-1 workarround
-			subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
-			subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
-		} catch (UnsupportedEncodingException e) {
-			logger.error("Something went wrong in sendVerificationEmailFor", e);
-		}
+        try {
+            // TODO remove ISO-8859-1 workarround
+            subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
+            subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Something went wrong in sendVerificationEmailFor", e);
+        }
         String text = MessageFormat.format(textBundle.getString(VERIFICATION_EMAIL_CONTENT), verifierUrl, user.getVerificationKey());
         String mimeType = textBundle.getString(VERIFICATION_EMAIL_MIME_TYPE);
         Mailer.send(user.getEmail(), subject, text, mimeType);
@@ -224,6 +229,11 @@ public class UserRegistrationImpl implements UserRegistration {
         }
 
         save(user);
+    }
+
+    @Override
+    public void delete(BackMeUpUser user) {
+        getUserDao().delete(user);
     }
 
 }

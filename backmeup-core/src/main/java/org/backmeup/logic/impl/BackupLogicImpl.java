@@ -1,22 +1,39 @@
 package org.backmeup.logic.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
+import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
+import org.backmeup.logic.impl.helper.BackUpJobCreationHelper;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.ActionProfile.ActionProperty;
+import org.backmeup.model.JobProtocol.JobProtocolMember;
+import org.backmeup.model.ProtocolOverview.Activity;
+import org.backmeup.model.ProtocolOverview.Entry;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.JobProtocol;
+import org.backmeup.model.Profile;
+import org.backmeup.model.ProfileOptions;
+import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.Status;
+import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.dto.ExecutionTime;
 import org.backmeup.model.dto.Job;
+import org.backmeup.model.dto.JobProtocolDTO;
+import org.backmeup.model.dto.JobProtocolMemberDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 
 @ApplicationScoped
@@ -39,8 +56,12 @@ public class BackupLogicImpl implements BackupLogic {
         return dal.createStatusDao();
     }
 
+    private JobProtocolDao createJobProtocolDao() {
+        return dal.createJobProtocolDao();
+    }
+
     @Override
-    public void deleteJobsOfUser(String username) {
+    public void deleteJobsOf(String username) {
         BackupJobDao jobDao = getBackupJobDao();
         StatusDao statusDao = getStatusDao();
         for (BackupJob job : jobDao.findByUsername(username)) {
@@ -52,7 +73,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public BackupJob queryExistingJob(Long jobId) {
+    public BackupJob getExistingJob(Long jobId) {
         if (jobId == null) {
             throw new IllegalArgumentException("JobId must not be null");
         }
@@ -64,8 +85,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public BackupJob queryExistingUserJob(Long jobId, String username) {
-        BackupJob job = queryExistingJob(jobId);
+    public BackupJob getExistingUserJob(Long jobId, String username) {
+        BackupJob job = getExistingJob(jobId);
         if (!job.getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
                     jobId, username));
@@ -74,8 +95,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public ActionProfile getStoredActionOptions(String actionId, Long jobId) {
-        BackupJob job = queryExistingJob(jobId);
+    public ActionProfile getJobActionOption(String actionId, Long jobId) {
+        BackupJob job = getExistingJob(jobId);
         for (ActionProfile ap : job.getRequiredActions()) {
             if (ap.getActionId().equals(actionId)) {
                 return ap;
@@ -85,8 +106,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions) {
-        BackupJob job = queryExistingJob(jobId);
+    public void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions) {
+        BackupJob job = getExistingJob(jobId);
         for (ActionProfile ap : job.getRequiredActions()) {
             if (ap.getActionId().equals(actionId)) {
                 ap.getActionOptions().clear();
@@ -104,14 +125,14 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public Job getJobFor(Long jobId) {
-        BackupJob job = queryExistingJob(jobId);
+    public Job fullJobFor(Long jobId) {
+        BackupJob job = getExistingJob(jobId);
         return BackUpJobConverter.convertToJob(job);
     }
 
     @Override
     public void deleteJob(String username, Long jobId) {
-        BackupJob job = queryExistingUserJob(jobId, username);
+        BackupJob job = getExistingUserJob(jobId, username);
 
         deleteStatuses(job.getId());
 
@@ -142,7 +163,7 @@ public class BackupLogicImpl implements BackupLogic {
             return status;
         }
         
-        BackupJob job = queryExistingUserJob(jobId, username);
+        BackupJob job = getExistingUserJob(jobId, username);
         List<Status> status = new ArrayList<>();
         status.addAll(getStatusForJob(job));
         return status;
@@ -155,14 +176,102 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public List<BackupJob> findByUsername(String username) {
+    public List<BackupJob> getBackupJobsOf(String username) {
         return getBackupJobDao().findByUsername(username);
     }
 
     @Override
-    public JobUpdateRequest getUpdateRequestFor(Long jobId) {
-        BackupJob job = queryExistingJob(jobId);
+    public JobUpdateRequest updateRequestFor(Long jobId) {
+        BackupJob job = getExistingJob(jobId);
         return BackUpJobConverter.convertToUpdateRequest(job);
     }
-    
+
+    @Override
+    public void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
+            JobUpdateRequest updateRequest) {
+        job.getRequiredActions().clear();
+        job.getRequiredActions().addAll(requiredActions);
+
+        job.getSourceProfiles().clear();
+        job.getSourceProfiles().addAll(sourceProfiles);
+
+        job.setJobTitle(updateRequest.getJobTitle());
+        job.setSinkProfile(sindProfile);
+
+        job.setTimeExpression(updateRequest.getTimeExpression());
+        
+        ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
+        job.setDelay(et.getDelay());
+        job.setReschedule(et.isReschedule());
+
+        if (job.isReschedule()) {
+            Date execTime = new Date(new Date().getTime() + job.getDelay());
+            job.setNextExecutionTime(execTime);
+        } else {
+            job.setNextExecutionTime(null);
+        }
+    }
+
+    @Override
+    public ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to) {
+        List<JobProtocol> protocols = createJobProtocolDao().findByUsernameAndDuration(user.getUsername(), from, to);
+        ProtocolOverview po = new ProtocolOverview();
+        Map<String, Entry> entries = new HashMap<>();
+        double totalSize = 0;
+        long totalCount = 0;
+        for (JobProtocol prot : protocols) {
+            totalCount += prot.getTotalStoredEntries();
+            for (JobProtocolMember member : prot.getMembers()) {
+                Entry entry = entries.get(member.getTitle());
+                if (entry == null) {
+                    entry = new Entry(member.getTitle(), 0, member.getSpace());
+                    entries.put(member.getTitle(), entry);
+                } else {
+                    entry.setAbsolute(entry.getAbsolute() + member.getSpace());
+                }
+                totalSize += member.getSpace();
+            }
+            po.getActivities().add(new Activity(prot.getJob().getJobTitle(), prot.getExecutionTime()));
+        }
+
+        for (Entry entry : entries.values()) {
+            entry.setPercent(100 * entry.getAbsolute() / totalSize);
+            po.getStoredAmount().add(entry);
+        }
+        po.setTotalCount(totalCount+"");
+        // TODO Determine format of bytes (currently MB)
+        po.setTotalStored(totalSize / 1024 / 1024 +" MB");
+        po.setUser(user.getUserId());
+        return po;
+    }
+
+    @Override
+    public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
+        JobProtocolDao jpd = createJobProtocolDao();
+        
+        JobProtocol protocol = new JobProtocol();
+        protocol.setUser(user);
+        protocol.setJob(job);
+        protocol.setSuccessful(jobProtocol.isSuccessful());
+        
+        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+        }
+        
+        if (protocol.isSuccessful()) {
+            job.setLastSuccessful(protocol.getExecutionTime());
+            job.setStatus(BackupJobStatus.successful);
+        } else {
+            job.setLastFailed(protocol.getExecutionTime());
+            job.setStatus(BackupJobStatus.error);
+        }
+        
+        jpd.save(protocol);
+    }
+
+    @Override
+    public void deleteProtocolsOf(String username) {
+        createJobProtocolDao().deleteByUsername(username);
+    }
+
 }
