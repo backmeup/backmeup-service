@@ -2,11 +2,9 @@ package org.backmeup.logic.impl;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -25,14 +23,12 @@ import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
-import org.backmeup.dal.ProfileDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
 import org.backmeup.job.JobManager;
-//import org.backmeup.job.impl.rabbitmq.RabbitMQJobReceiver;
-import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BusinessLogic;
+import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
@@ -64,7 +60,6 @@ import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.JobProtocolMemberDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
-import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.PluginException;
@@ -100,10 +95,8 @@ public class BusinessLogicImpl implements BusinessLogic {
     private static final String NO_SUCH_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_SUCH_JOB";
     private static final String UNKNOWN_JOB_WITH_ID = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_JOB_WITH_ID";
     private static final String UNKNOWN_SOURCE_SINK = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SOURCE_SINK";
-    private static final String USER_HAS_NO_PROFILE = "org.backmeup.logic.impl.BusinessLogicImpl.USER_HAS_NO_PROFILE";
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
     private static final String VALIDATION_OF_ACCESS_DATA_FAILED = "org.backmeup.logic.impl.BusinessLogicImpl.VALIDATION_OF_ACCESS_DATA_FAILED";
-    private static final String UNKNOWN_PROFILE = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_PROFILE";
     private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
     private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
     private static final String NO_PROFILE_WITHIN_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_PROFILE_WITHIN_JOB";
@@ -170,6 +163,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private SearchLogic searchService;
+
+    @Inject
+    private ProfileLogic profileService;
     
     // ---------------------------------------
 
@@ -194,10 +190,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 //        } catch (Exception e) {
 //            logger.error("Error while starting job receivers", e);
 //        }
-    }
-
-    private ProfileDao getProfileDao() {
-        return dal.createProfileDao();
     }
 
     private UserDao getUserDao() {
@@ -239,10 +231,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     jobDao.delete(job);
                 }
                 
-                ProfileDao profileDao = getProfileDao();
-                for (Profile p : profileDao.findProfilesByUsername(username)) {
-                    profileDao.delete(p);
-                }
+                profileService.deleteAllProfilesOfUser(username);
                 
                 getUserDao().delete(u);
                 return u;
@@ -329,7 +318,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<List<Profile>>() {
             @Override public List<Profile> call() {
                 
-                return getProfileDao().findDatasourceProfilesByUsername(username);
+                return profileService.findAllProfilesOfUser(username);
                 
             }
         });
@@ -340,25 +329,10 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
                 
-                return deleteProfileX(username, profileId);
+                return profileService.deleteExistingUserProfile(profileId, username);
                 
             }
         });
-    }
-
-    private Profile deleteProfileX(String username, Long profileId) {
-        // TODO PK move
-        Profile profile = queryExistingUserProfile(profileId, username);
-        getProfileDao().delete(profile);
-        return profile;
-    }
-
-    private Profile queryExistingUserProfile(Long profileId, String username) {
-        Profile profile = queryExistingProfile(profileId);
-        if (!profile.getUser().getUsername().equals(username)) {
-            throw new IllegalArgumentException();
-        }
-        return profile;
     }
 
     @Override
@@ -367,7 +341,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txJoinReadOnly(new Callable<List<String>>() {
             @Override public List<String> call() {
                 
-                Profile p = queryExistingUserProfile(profileId, username);
+                Profile p = profileService.queryExistingUserProfile(profileId, username);
                 Datasource source = plugins.getDatasource(p.getDescription());
                 
                 Properties accessData = authorizationService.fetchProfileAuthenticationData(p, keyRingPassword);
@@ -385,50 +359,23 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 registrationService.queryActivatedUser(username);
                 BackupJob job = queryExistingUserJob(jobId, username);
-                for (ProfileOptions po : job.getSourceProfiles()) {
-                    if (po.getProfile().getProfileId().equals(profileId)) {
-                        String[] options = po.getOptions();
-                        if (options == null) {
-                            return new ArrayList<>();
-                        }
-                        return Arrays.asList(options);
-                    }
-                }
-                
-                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
+                return profileService.getProfileOptions(profileId, job.getSourceProfiles());
             
             }
         });
     }
 
 	@Override
-	public void changeProfile(final Long profileId, final Long jobId,
-			final List<String> sourceOptions) {
+    public void changeProfile(final Long profileId, final Long jobId, final List<String> sourceOptions) {
 		conn.txJoin(new Runnable() {
-			@Override
-			public void run() {
+			@Override public void run() {
 
-				ProfileDao pd = getProfileDao();
-				Profile p = pd.findById(profileId);
-				if (p == null) {
-					throw new IllegalArgumentException(String.format(
-							textBundle.getString(UNKNOWN_PROFILE), profileId));
-				}
-
+			    profileService.queryExistingProfile(profileId);
+				
 				BackupJobDao bd = getBackupJobDao();
 				BackupJob backupjob = bd.findById(jobId);
 
-				Set<ProfileOptions> profileoptions = backupjob
-						.getSourceProfiles();
-				for (ProfileOptions option : profileoptions) {
-					if (option.getProfile().getProfileId()
-							.equals(p.getProfileId())) {
-						String[] new_options = sourceOptions
-								.toArray(new String[sourceOptions.size()]);
-						option.setOptions(new_options);
-					}
-				}
-
+				profileService.setProfileOptions(profileId, backupjob.getSourceProfiles(), sourceOptions);
 			}
 		});
 	}
@@ -448,7 +395,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<List<Profile>>() {
             @Override public List<Profile> call() {
                 
-                return getProfileDao().findDatasinkProfilesByUsername(username);
+                return profileService.findDatasinkProfilesOfUser(username);
                 
             }
         });
@@ -548,34 +495,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         return actions;
     }
 
-    private Set<ProfileOptions> getSourceProfilesFor(JobCreationRequest request) {
-        Set<ProfileOptions> profiles = new HashSet<>();
-        if (request.getSourceProfiles().size() == 0) {
-            throw new IllegalArgumentException(
-                    "There must be at least one source profile to download data from!");
-        }
-
-        for (SourceProfileEntry source : request.getSourceProfiles()) {
-            Profile p = getProfileDao().findById(source.getId());
-            if (p == null) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(UNKNOWN_PROFILE), source.getId()));
-            }
-
-            profiles.add(new ProfileOptions(p, source.getOptions().keySet().toArray(new String[]{})));
-        }
-        return profiles;
-    }
-
-    private Profile getSinkProfileFor(JobCreationRequest request) {
-        Profile sink = getProfileDao().findById(request.getSinkProfileId());
-        if (sink == null) {
-            throw new IllegalArgumentException(String.format(
-                    textBundle.getString(UNKNOWN_PROFILE), request.getSinkProfileId()));
-        }
-        return sink;
-    }
-
     @Override
     public ValidationNotes createBackupJob(String username, JobCreationRequest request) {
         try {
@@ -584,9 +503,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
             authorizationService.authorize(user, request.getKeyRing());
 
-            Set<ProfileOptions> profiles = getSourceProfilesFor(request);
+            Set<ProfileOptions> profiles = profileService.getSourceProfilesOptionsFor(request.getSourceProfiles());
 
-            Profile sink = getSinkProfileFor(request);
+            Profile sink = profileService.queryExistingProfile(request.getSinkProfileId());
 
             List<ActionProfile> actions = getActionProfilesFor(request);
 
@@ -634,10 +553,10 @@ public class BusinessLogicImpl implements BusinessLogic {
             job.getRequiredActions().addAll(getActionProfilesFor(updateRequest));
 
             job.getSourceProfiles().clear();
-            job.getSourceProfiles().addAll(getSourceProfilesFor(updateRequest));
+            job.getSourceProfiles().addAll(profileService.getSourceProfilesOptionsFor(updateRequest.getSourceProfiles()));
 
             job.setJobTitle(updateRequest.getJobTitle());
-            job.setSinkProfile(getSinkProfileFor(updateRequest));
+            job.setSinkProfile(profileService.queryExistingProfile(updateRequest.getSinkProfileId()));
 
             ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
 
@@ -950,34 +869,27 @@ public class BusinessLogicImpl implements BusinessLogic {
                 BackMeUpUser user = registrationService.queryActivatedUser(username);
                 
                 authorizationService.authorize(user, keyRing);
-                
-                org.backmeup.model.spi.SourceSinkDescribable.Type type = desc.getType();
-                Profile profile = new Profile(getUserDao().findByName(username),
-                        profileName, uniqueDescIdentifier, type);
+
                 AuthRequest ar = new AuthRequest();
+                Properties p = new Properties();
+                p.setProperty("callback", callbackUrl);
                 switch (auth.getAuthType()) {
                 case OAuth:
                     OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
-                    Properties p = new Properties();
-                    p.setProperty("callback", callbackUrl);
                     String redirectUrl = oauth.createRedirectURL(p, callbackUrl);
                     ar.setRedirectURL(redirectUrl);
                     // TODO Store all properties within keyserver & don't store them within the local database!
-                    
-                    profile = getProfileDao().save(profile);
-                    authorizationService.initProfileAuthInformation(profile, p, keyRing);
                     break;
                 case InputBased:
                     InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
                     ar.setRequiredInputs(ibased.getRequiredInputFields());
-                    p = new Properties();
-                    p.setProperty("callback", callbackUrl);
-                    profile = getProfileDao().save(profile);
-                    authorizationService.initProfileAuthInformation(profile, p, keyRing);
                     break;
                 default:
                     throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
                 }
+                
+                Profile profile = profileService.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
+                authorizationService.initProfileAuthInformation(profile, p, keyRing);
                 
                 ar.setProfile(profile);
                 return ar;
@@ -999,8 +911,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
 
             conn.begin();
-            ProfileDao profileDao = getProfileDao();
-            Profile p = profileDao.findById(profileId);
+            Profile p = profileService.queryExistingProfile(profileId);
 
             props.putAll(authorizationService.getProfileAuthInformation(p, keyRing));
 
@@ -1010,10 +921,9 @@ public class BusinessLogicImpl implements BusinessLogic {
                         .getDescription());
                 if (inputBasedService.isValid(props)) {
                     String userId = auth.postAuthorize(props);
-                    if (userId != null) {
-                        p.setIdentification(userId);
-                    }
-                    profileDao.save(p);
+
+                    profileService.setIdentification(p, userId);
+                    
                     authorizationService.overwriteProfileAuthInformation(p, props, keyRing);
                     conn.commit();
                     return;
@@ -1024,10 +934,9 @@ public class BusinessLogicImpl implements BusinessLogic {
                 }
             } else {
                 String userId = auth.postAuthorize(props);
-                if (userId != null) {
-                    p.setIdentification(userId);
-                }
-                profileDao.save(p);
+                
+                profileService.setIdentification(p, userId);
+                
                 authorizationService.overwriteProfileAuthInformation(p, props, keyRing);
                 conn.commit();
             }
@@ -1133,12 +1042,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txJoinReadOnly(new Callable<Properties>() {
             @Override public Properties call() {
                 
-                Profile p = queryExistingProfile(profileId);
-                
-                if (!p.getUser().getUsername().equals(username)) {
-                    throw new IllegalArgumentException(String.format(
-                            textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
-                }
+                Profile p = profileService.queryExistingUserProfile(profileId, username);
                 
                 SourceSinkDescribable ssd = plugins.getSourceSinkById(p.getDescription());
                 if (ssd == null) {
@@ -1161,11 +1065,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 String pluginName = null;
                 try {
-                    Profile p = getProfileDao().findById(profileId);
-                    if (p == null || !p.getUser().getUsername().equals(username)) {
-                        throw new IllegalArgumentException(String.format(
-                                textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
-                    }
+                    Profile p = profileService.queryExistingUserProfile(profileId, username);
                     pluginName = p.getDescription();
                     Validationable validator = plugins.getValidator(p.getDescription());
                     Properties accessData = authorizationService.getProfileAuthInformation(p, keyRing);
@@ -1203,11 +1103,9 @@ public class BusinessLogicImpl implements BusinessLogic {
                 try {
                     // plugin-level validation
                     for (ProfileOptions po : job.getSourceProfiles()) {
-                        SourceSinkDescribable ssd = plugins.getSourceSinkById(po.getProfile()
-                                .getDescription());
+                        SourceSinkDescribable ssd = plugins.getSourceSinkById(po.getProfile().getDescription());
                         if (ssd == null) {
-                            notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, po
-                                    .getProfile().getDescription());
+                            notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, po.getProfile().getDescription());
                         }
 
                         // Validate source plug-in itself
@@ -1237,22 +1135,12 @@ public class BusinessLogicImpl implements BusinessLogic {
         conn.txNew(new Runnable() {
             @Override public void run() {
                 
-                Profile profile = queryExistingProfile(profileId);
+                Profile profile = profileService.queryExistingProfile(profileId);
                 authorizationService.appendProfileAuthInformation(profile, entries, keyRing);
-                
-                getProfileDao().save(profile); // TODO why save, has not been changed?
+                profileService.save(profile); // TODO why save, has not been changed?
                 
             }
         });
-    }
-
-    private Profile queryExistingProfile(Long profileId) {
-        // TODO PK move
-        Profile profile = getProfileDao().findById(profileId);
-        if (profile == null) {
-            throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
-        }
-        return profile;
     }
 
     @Override
