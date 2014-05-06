@@ -33,7 +33,8 @@ public class Thumbnails extends Base {
 				logger.debug("Streaming back JPG file...");
 				response = Response.ok(f);
 			}
-		} catch (Throwable t) {
+		} catch (Exception e) {
+			logger.error("", e);
 			response = Response.status(Status.NOT_FOUND);
 		}
 		

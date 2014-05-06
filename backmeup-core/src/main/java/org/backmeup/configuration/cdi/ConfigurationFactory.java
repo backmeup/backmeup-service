@@ -35,7 +35,8 @@ public class ConfigurationFactory {
 					is = new FileInputStream(new File(propertiesFilePath));
 				} catch (FileNotFoundException e) {
 					logger.debug("No properties file found at path: {}",propertiesFilePath);
-				}
+					logger.error("", e);
+				} 
 			}
 
 			if (is == null) {
@@ -48,7 +49,15 @@ public class ConfigurationFactory {
 				properties.load(is);
 			} catch (IOException e) {
 				logger.error("Failed to load properties file. Add {} or add it to the classpath!", propertiesFilePath);
-				throw new RuntimeException("Failed to load properties file");
+				throw new RuntimeException("Failed to load properties file", e);
+			}
+			
+			if(is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					logger.error("", e);
+				}
 			}
 		}
 		return properties;

@@ -53,9 +53,7 @@ public class Mailer {
       // Send message
       Transport.send(message);
     } catch (Exception e) {
-      //TODO: Log exception
       throw new RuntimeException(e);
-      //logger.error("", e);
     } 
   }
   
@@ -79,6 +77,7 @@ public class Mailer {
         props.load(is);          
         mailSettings = props;
       } catch (Exception e) {
+    	  logger.error("", e); 
       } finally {
         if (is != null)
           try {

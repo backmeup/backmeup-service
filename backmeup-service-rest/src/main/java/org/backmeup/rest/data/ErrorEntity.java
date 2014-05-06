@@ -36,10 +36,14 @@ public class ErrorEntity {
     logger.error("", exception);
     try {
       pw.close();
-    } catch (Exception e) {}    
+    } catch (Exception e) {
+    	logger.error("", e);
+    }    
     try {
       sw.close();
-    } catch (Exception e) {}
+    } catch (Exception e) {
+    	logger.error("", e);
+    }
     setTrace(sw.toString().split("\n"));
     this.setErrorMessage(exception.getMessage());
     this.setErrorType(type);
@@ -62,13 +66,10 @@ public class ErrorEntity {
             properties.put(key,  result.toString());
           }
         } catch (IllegalArgumentException e) {
-          // TODO Auto-generated catch block
         	logger.error("", e);
         } catch (IllegalAccessException e) {
-          // TODO Auto-generated catch block
         	logger.error("", e);
         } catch (InvocationTargetException e) {
-          // TODO Auto-generated catch block
         	logger.error("", e);
         }
       }

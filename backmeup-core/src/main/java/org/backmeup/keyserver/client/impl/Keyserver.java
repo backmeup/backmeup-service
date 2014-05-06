@@ -250,6 +250,7 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
           r.content = new Scanner(response.getEntity().getContent())
               .useDelimiter("\\A").next();
         } catch (NoSuchElementException nee) {
+        	throw new BackMeUpException(nee);
         }
       }
       return r;

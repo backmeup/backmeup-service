@@ -681,7 +681,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public JobUpdateRequest getBackupJob(String username, final Long jobId) {
         if (jobId == null) {
-            throw new IllegalArgumentException("Missing parameter " + jobId);
+            throw new IllegalArgumentException("JobId must not be null");
         }
 
         return conn.txNewReadOnly(new Callable<JobUpdateRequest>() {
@@ -698,7 +698,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public Job getBackupJobFull(String username, final Long jobId) {
         if (jobId == null) {
-            throw new IllegalArgumentException("Missing parameter " + jobId);
+        	throw new IllegalArgumentException("JobId must not be null");
         }
 
         return conn.txNewReadOnly(new Callable<Job>() {
@@ -1174,7 +1174,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     
                 } catch (PluginUnavailableException pue) {
                     ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName);
+                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName, pue);
                     return notes;
                 } catch (Exception pe) {
                     ValidationNotes notes = new ValidationNotes();

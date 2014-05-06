@@ -25,7 +25,7 @@ public class BusinessLogicContextResolver implements ContextResolver<BusinessLog
         if (logic == null) {
             try {
                 logic = fetchLogicFromJndi();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 logger.error("", e);
             }
         }

@@ -37,7 +37,7 @@ public class BaseActionDescribable implements ActionDescribable {
         descriptionEntries = new Properties();      
         descriptionEntries.load(is);        
       } catch (IOException e) {
-        throw new PluginException("UNKWN", "Unable to load from " + propertyFilename + " stream!");
+        throw new PluginException("UNKWN", "Unable to load from " + propertyFilename + " stream!", e);
       } finally {
         try {
           if (is != null)

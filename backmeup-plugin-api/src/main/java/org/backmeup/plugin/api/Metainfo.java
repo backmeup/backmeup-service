@@ -21,19 +21,22 @@ public class Metainfo {
   private static final String PROP_MODIFIED = "modified";
   private static final String PROP_CREATED = "created";
   private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss z";  
-  private static final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+
   private Properties metainfo = new Properties();
   
   
   public void setModified(Date modifiedDate) {
+	final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
     metainfo.setProperty(PROP_MODIFIED, formatter.format(modifiedDate));
   }
   
   public void setBackupDate(Date backupTime) {
+	final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
     metainfo.setProperty(PROP_BACKUP_TIME, formatter.format(backupTime));
   }
   
   public void setCreated(Date createdDate) {
+	final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
     metainfo.setProperty(PROP_CREATED, formatter.format(createdDate));
   }
   
@@ -84,6 +87,7 @@ public class Metainfo {
   private Date parseDate(String input) {
     if (input != null) {      
       try {
+    	final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
         return formatter.parse(input);
       } catch (ParseException e) { 
     	  logger.error("", e);

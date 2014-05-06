@@ -221,7 +221,7 @@ public class PluginImpl implements Plugin {
 				refs = bundleContext().getServiceReferences(service.getName(),
 						filter);
 			} catch (InvalidSyntaxException e) {
-				throw new IllegalArgumentException(String.format("The filter '%s' is mallformed.", filter));
+				throw new IllegalArgumentException(String.format("The filter '%s' is mallformed.", filter), e);
 			}
 			if (refs != null && refs.length > 0) {
 				ref = refs[0];
@@ -253,10 +253,10 @@ public class PluginImpl implements Plugin {
 						Object ret = null;
 						try {
 							ret = method.invoke(instance, os);
-						} catch (Throwable t) {
+						} catch (Exception e) {
 							throw new PluginException(filter,
 									"An exception occured during execution of the method "
-											+ method.getName(), t);
+											+ method.getName(), e);
 						} finally {
 							bundleContext().ungetService(ref);
 						}
@@ -282,9 +282,8 @@ public class PluginImpl implements Plugin {
 			Object instance = context.getService(ref);
 			if (instance == null) {
 				logger.error(
-						"FATAL ERROR:\n\tCalling the method \"{}\" of a null-instance \"{}\" from bundle \"{}\"; getService returned null!\n",
-						method.getName(), instance, ref.getBundle()
-								.getSymbolicName());
+						"FATAL ERROR:\n\tCalling the method \"{}\" of a null-instance from bundle \"{}\"; getService returned null!\n",
+						method.getName(), ref.getBundle().getSymbolicName());
 			}
 			try {
 				boolean acc = method.isAccessible();
