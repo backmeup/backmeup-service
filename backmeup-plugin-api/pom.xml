@@ -46,7 +46,7 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>org.backmeup.*</Export-Package>
 						<Embed-Directory></Embed-Directory>
-						<Embed-Dependency>slf4j-api</Embed-Dependency>
+						<Embed-Dependency></Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -69,6 +69,81 @@
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
 									<type>${project.packaging}</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.slf4j</groupId>
+									<artifactId>slf4j-api</artifactId>
+									<version>${version.org.slf4j}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>ch.qos.logback</groupId>
+									<artifactId>logback-classic</artifactId>
+									<version>${version.ch.qos.logback}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>ch.qos.logback</groupId>
+									<artifactId>logback-core</artifactId>
+									<version>${version.ch.qos.logback}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+								
+								<!-- Dependencies for blueprint implementation -->
+								<artifactItem>
+   									<groupId>org.eclipse.gemini</groupId>
+    								<artifactId>org.eclipse.gemini.blueprint.core</artifactId>
+    								<version>1.0.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+   									<groupId>org.eclipse.gemini</groupId>
+								    <artifactId>org.eclipse.gemini.blueprint.extender</artifactId>
+								    <version>1.0.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.eclipse.gemini</groupId>
+								    <artifactId>org.eclipse.gemini.blueprint.io</artifactId>
+								    <version>1.0.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.aopalliance</groupId>
+								    <artifactId>com.springsource.org.aopalliance</artifactId>
+								    <version>1.0.0</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+								    <artifactId>org.springframework.core</artifactId>
+								    <version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+								    <artifactId>org.springframework.aop</artifactId>
+								    <version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+									<artifactId>org.springframework.asm</artifactId>
+									<version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+									<artifactId>org.springframework.beans</artifactId>
+									<version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+									<artifactId>org.springframework.context</artifactId>
+									<version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+									<artifactId>org.springframework.expression</artifactId>
+									<version>3.1.0.RELEASE</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.commons</groupId>
+								    <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+								    <version>1.1.1</version>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${config.localBuildArtefactDirectory}</outputDirectory>

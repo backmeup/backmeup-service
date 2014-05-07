@@ -49,9 +49,7 @@
 						                org.backmeup.model.api,
 						                org.backmeup.model.constants,
 						                org.backmeup.model.exceptions,</Export-Package>
-						<Embed-Directory>lib</Embed-Directory>
-						<Embed-Dependency>gson</Embed-Dependency>
-						<Import-Package>!javax.*</Import-Package>
+						<Import-Package>*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -73,6 +71,18 @@
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.code.gson</groupId>
+									<artifactId>gson</artifactId>
+									<version>${version.com.google.code.gson}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>javax.persistence</groupId>
+    								<artifactId>com.springsource.javax.persistence</artifactId>
+    								<version>2.0.0.Beta1</version>
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>
