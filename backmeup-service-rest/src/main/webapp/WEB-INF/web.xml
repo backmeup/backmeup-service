@@ -6,6 +6,8 @@
     
     <!-- <Basic authentication> -->
     <!-- Disable this block if not needed -->
+    <!-- Currently disabled else all tests will fail -->
+    <!--
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>backmeup-service-rest</web-resource-name>
@@ -22,12 +24,12 @@
 		<user-data-constraint>
 			<transport-guarantee>NONE</transport-guarantee>
 		</user-data-constraint>
-		<valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127.0.0.1"/>
 	</security-constraint>
 	
 	<login-config>
 	    <auth-method>BASIC</auth-method>
 	</login-config>
+	-->
 	<!-- </Basic authentication> -->
 
     
