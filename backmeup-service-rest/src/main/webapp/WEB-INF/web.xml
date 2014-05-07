@@ -22,6 +22,7 @@
 		<user-data-constraint>
 			<transport-guarantee>NONE</transport-guarantee>
 		</user-data-constraint>
+		<valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127.0.0.1"/>
 	</security-constraint>
 	
 	<login-config>
