@@ -3,8 +3,11 @@ package org.backmeup.tests.integration;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
@@ -14,7 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.response.ValidatableResponse;
+import com.jayway.restassured.specification.RequestSpecification;
 
 /*
  * for examples rest-assured see:
@@ -104,7 +109,7 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testAuthenticateDatasource() {
+	public void testAuthenticateDatasourceOAuthBased() {
 		String username = "TestUser1";
 		String password = "password1";
 		String keyRingPassword = "keyringpassword1";
@@ -139,6 +144,101 @@ public class DatasourcesIntegrationTest extends IntegrationTestBase {
 		
 		} finally {
 			BackMeUpUtils.deleteDatasourceProfile(username, profileId);
+			BackMeUpUtils.deleteUser(username);
+		}
+	}
+	
+	@Test
+	public void testAuthenticateDatasourceInputBased() {
+		String username = "TestUser1";
+		String password = "password1";
+		String keyRingPassword = "keyringpassword1";
+		String email = "TestUser@trash-mail.com";
+		
+		String datasourceId = "org.backmeup.filegenerator";
+		String profileName = "FileGeneratorSourceProfile";
+		String profileSourceId = "";
+
+		
+		ValidatableResponse response = null;
+		try {
+			response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+			
+			response = 
+			given()
+				.contentType("application/x-www-form-urlencoded")
+				.header("Accept", "application/json")
+				.formParam("profileName", profileName)
+				.formParam("keyRing", password)
+			.when()
+				.post("/datasources/" + username + "/" + datasourceId + "/auth")
+			.then()
+				.statusCode(200)
+				.body(containsString("profileId"))
+				.body(containsString("type"))
+				.body(containsString("sourceProfile"))
+				.body(containsString("requiredInputs"));
+			
+		} finally {
+			profileSourceId = response.extract().path("profileId");
+			BackMeUpUtils.deleteDatasourceProfile(username, profileSourceId);
+			BackMeUpUtils.deleteUser(username);
+		}
+	}
+	
+	@Test
+	public void testPostAuthenticateDatasourceInputBased() {
+		String username = "TestUser1";
+		String password = "password1";
+		String keyRingPassword = "keyringpassword1";
+		String email = "TestUser@trash-mail.com";
+		
+		String datasourceId = "org.backmeup.filegenerator";
+		String profileSourceName = "FileGeneratorSourceProfile";
+		String profileSourceId = "";
+
+		
+		ValidatableResponse response;
+		try {
+			response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+			
+			response = BackMeUpUtils.authenticateDatasource(username, password, profileSourceName, datasourceId);
+			profileSourceId = response.extract().path("profileId");
+			
+			Properties dsProperties = new Properties();
+			dsProperties.put("text", "true");
+			dsProperties.put("image", "true");
+			dsProperties.put("pdf", "true");
+			dsProperties.put("binary", "true");
+			
+			RequestSpecBuilder reqSpecBuilder = new RequestSpecBuilder();
+			reqSpecBuilder.addHeader("Content-Type", "application/x-www-form-urlencoded");
+			reqSpecBuilder.addHeader("Accept", "application/json");
+			reqSpecBuilder.addParameter("keyRing", password);
+			
+			for(Entry<?,?> entry : dsProperties.entrySet()) {
+				String key = (String) entry.getKey();  
+				String value = (String) entry.getValue();  
+				reqSpecBuilder.addParameter(key, value);
+			}
+			
+			RequestSpecification requestSpec = reqSpecBuilder.build();
+			response = 
+			given()
+				.spec(requestSpec)
+			.when()
+				.post("/datasources/" + username + "/" + profileSourceId + "/auth/post")
+			.then()
+				.statusCode(200)
+				.body("type", equalTo("success"))
+				.body("messages", hasItem("Source profile has been authorized"));
+				
+		} finally {
+			BackMeUpUtils.deleteDatasourceProfile(username, profileSourceId);
 			BackMeUpUtils.deleteUser(username);
 		}
 	}

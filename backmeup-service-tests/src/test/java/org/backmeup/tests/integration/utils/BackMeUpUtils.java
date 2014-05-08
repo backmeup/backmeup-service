@@ -114,8 +114,32 @@ public class BackMeUpUtils {
 				.statusCode(200)
 				.body(containsString("profileId"))
 				.body(containsString("type"))
-				.body(containsString("sourceProfile"))
-				.body(containsString("redirectURL"));
+				.body(containsString("sourceProfile"));
+		return response;
+	}
+	
+	public static ValidatableResponse postAuthenticateDatasource(String username, String password, String profileId, Properties datasourceParameters) {
+		RequestSpecBuilder reqSpecBuilder = new RequestSpecBuilder();
+		reqSpecBuilder.addHeader("Content-Type", "application/x-www-form-urlencoded");
+		reqSpecBuilder.addHeader("Accept", "application/json");
+		reqSpecBuilder.addParameter("keyRing", password);
+		
+		for(Entry<?,?> entry : datasourceParameters.entrySet()) {
+			String key = (String) entry.getKey();  
+			String value = (String) entry.getValue();  
+			reqSpecBuilder.addParameter(key, value);
+		}
+		
+		RequestSpecification requestSpec = reqSpecBuilder.build();
+		ValidatableResponse response = 
+		given()
+			.spec(requestSpec)
+		.when()
+			.post("/datasources/" + username + "/" + profileId + "/auth/post")
+		.then()
+			.statusCode(200)
+			.body("type", equalTo("success"))
+			.body("messages", hasItem("Source profile has been authorized"));
 		return response;
 	}
 	
@@ -127,7 +151,7 @@ public class BackMeUpUtils {
 	}
 	
 	// ========================================================================
-	//  DATASOURCE OPERATIONS
+	//  DATASINK OPERATIONS
 	// ------------------------------------------------------------------------
 		
 	public static ValidatableResponse authenticateDatasink(String username, String password, String profileName, String datasinkId) {
@@ -135,7 +159,6 @@ public class BackMeUpUtils {
 		given()
 			.contentType("application/x-www-form-urlencoded")
 			.header("Accept", "application/json")
-			.formParam("profileName", profileName)
 			.formParam("keyRing", password)
 		.when()
 			.post("/datasinks/" + username + "/" + datasinkId + "/auth")
@@ -183,7 +206,7 @@ public class BackMeUpUtils {
 	}
 	
 	// ========================================================================
-	//  PROFILE OPERATIONS
+	//  BACKUPJOB OPERATIONS
 	// ------------------------------------------------------------------------
 		
 	public static void deleteBackupJob(String username, int jobId) {
