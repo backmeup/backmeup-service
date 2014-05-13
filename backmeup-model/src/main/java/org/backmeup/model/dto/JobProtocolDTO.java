@@ -20,10 +20,6 @@ public class JobProtocolDTO {
 
 	public JobProtocolDTO() {
 	}
-
-	public JobProtocolDTO(JobProtocol jobProtocol) {
-
-	}
 	
 	public Long getId() {
 		return id;
