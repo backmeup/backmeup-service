@@ -1,5 +1,6 @@
 package org.backmeup.model;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -16,13 +17,13 @@ public class ValidationNotes {
   public static final String NO_VALIDATOR_AVAILABLE = "Plugin doesn't provide a validator";
   public static final String PLUGIN_UNAVAILABLE = "Plugin is not available";
   
-  private List<ValidationEntry> validationNotes = new ArrayList<ValidationEntry>();
+  private final List<ValidationEntry> validationNotes = new ArrayList<>();
   private BackupJob job;
   
   private static Map<ValidationExceptionType, String> exceptionText;
   
   static {
-    exceptionText = new HashMap<ValidationExceptionType, String>();
+    exceptionText = new HashMap<>();
     exceptionText.put(ValidationExceptionType.AuthException, AUTH_EXCEPTION);    
     exceptionText.put(ValidationExceptionType.APIException, API_EXCEPTION);
     exceptionText.put(ValidationExceptionType.Error, ERROR);
@@ -66,19 +67,13 @@ public class ValidationNotes {
       this.type = type;
       this.message = message;
       this.pluginId = pluginId;
-      if (cause != null) {
-        this.setCause(cause.getMessage());
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        cause.printStackTrace(pw);    
-        try {
-          pw.close();
-        } catch (Exception e) {}    
-        try {
-          sw.close();
-        } catch (Exception e) {}
-        this.setStackTrace(sw.toString());
-      }
+        if (cause != null) {
+            this.setCause(cause.getMessage());
+            try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+                cause.printStackTrace(pw);
+                this.setStackTrace(sw.toString());
+            } catch (IOException e) { }
+        }
     }
     
     public String getMessage() {

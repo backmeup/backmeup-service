@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ActionProfileEntry {
   private String id;
-  private Map<String, String> options = new HashMap<String, String>();
+  private Map<String, String> options = new HashMap<>();
   
   public String getId() {
     return id;

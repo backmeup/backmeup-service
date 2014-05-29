@@ -10,8 +10,6 @@ import java.util.Properties;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.Constants;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -24,13 +22,6 @@ import com.jayway.restassured.response.ValidatableResponse;
 
 @Category(IntegrationTest.class)
 public class BackupJobIntegrationTest extends IntegrationTestBase {
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void testGetBackupJobWrongUser() {

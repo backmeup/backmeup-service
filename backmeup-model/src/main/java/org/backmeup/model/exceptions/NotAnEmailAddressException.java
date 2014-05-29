@@ -3,8 +3,8 @@ package org.backmeup.model.exceptions;
 public class NotAnEmailAddressException extends BackMeUpException {
   private static final long serialVersionUID = 1L;
   
-  private String expected;
-  private String actual;
+  private final String expected;
+  private final String actual;
   
   public NotAnEmailAddressException(String expected, String actual) {
     super("The given email address is invalid!");

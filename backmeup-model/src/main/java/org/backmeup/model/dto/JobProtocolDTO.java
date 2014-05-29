@@ -16,7 +16,7 @@ public class JobProtocolDTO {
 	private Long executionTime;
 	private boolean successful;
 	private long totalStoredEntries;
-	private Set<JobProtocolMemberDTO> members = new HashSet<JobProtocolMemberDTO>();
+	private final Set<JobProtocolMemberDTO> members = new HashSet<>();
 
 	public JobProtocolDTO() {
 	}
@@ -81,8 +81,8 @@ public class JobProtocolDTO {
 		return members;
 	}
 
-	public void addMembers(Set<JobProtocolMemberDTO> members) {
-		this.members.addAll(members);
+	public void addMembers(Set<JobProtocolMemberDTO> newMembers) {
+		this.members.addAll(newMembers);
 	}
 
 	public void addMember(JobProtocolMemberDTO member) {

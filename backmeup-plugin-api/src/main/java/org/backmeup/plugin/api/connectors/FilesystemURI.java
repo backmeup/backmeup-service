@@ -7,13 +7,13 @@ import org.backmeup.plugin.api.MetainfoContainer;
 
 public class FilesystemURI {
 	
-	private URI uri;
+	private final URI uri;
 	
 	private URI mappedUri;
 	
-	private boolean isDirectory;
+	private final boolean isDirectory;
 
-  private MetainfoContainer metainfoContainer = new MetainfoContainer();
+  private final MetainfoContainer metainfoContainer = new MetainfoContainer();
 	
 	public FilesystemURI(URI uri, boolean isDirectory) {
 		this.uri = uri;

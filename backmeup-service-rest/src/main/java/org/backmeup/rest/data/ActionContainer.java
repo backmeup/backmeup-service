@@ -16,7 +16,7 @@ public class ActionContainer {
 	}
 
 	public ActionContainer(List<ActionDescribable> actions) {
-		this.actions = new ArrayList<ActionElement>();
+		this.actions = new ArrayList<>();
 		for (ActionDescribable ad : actions) {
 			this.actions.add(new ActionElement(ad.getTitle(), ad.getId(), ad.getDescription(), ad.getActionVisibility()));
 		}

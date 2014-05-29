@@ -20,32 +20,38 @@ import org.backmeup.dal.UserDao;
  */
 @ApplicationScoped
 public class DataAccessLayerImpl implements DataAccessLayer {
-  private ThreadLocal<EntityManager> threaLocalEntityManager = new ThreadLocal<EntityManager>();
+  private final ThreadLocal<EntityManager> threaLocalEntityManager = new ThreadLocal<>();
 
   public DataAccessLayerImpl() {
   }
 
-  public UserDao createUserDao() {
+  @Override
+public UserDao createUserDao() {
     return new UserDaoImpl(threaLocalEntityManager.get());
   }
 
-  public ProfileDao createProfileDao() {
+  @Override
+public ProfileDao createProfileDao() {
     return new ProfileDaoImpl(threaLocalEntityManager.get());
   }
 
-  public StatusDao createStatusDao() {
+  @Override
+public StatusDao createStatusDao() {
     return new StatusDaoImpl(threaLocalEntityManager.get());
   }
   
-  public SearchResponseDao createSearchResponseDao() {
+  @Override
+public SearchResponseDao createSearchResponseDao() {
     return new SearchResponseDaoImpl(threaLocalEntityManager.get());
   }
 
-  public BackupJobDao createBackupJobDao() {
+  @Override
+public BackupJobDao createBackupJobDao() {
     return new BackupJobDaoImpl(threaLocalEntityManager.get());
   }
 
-  public ServiceDao createServiceDao() {    
+  @Override
+public ServiceDao createServiceDao() {    
     return new ServiceDaoImpl(threaLocalEntityManager.get());
   }
   
@@ -54,7 +60,8 @@ public class DataAccessLayerImpl implements DataAccessLayer {
     return new JobProtocolDaoImpl(threaLocalEntityManager.get());
   }
 
-  public void setConnection(Object connection) {
+  @Override
+public void setConnection(Object connection) {
     this.threaLocalEntityManager.set((EntityManager) connection);
   }
 }

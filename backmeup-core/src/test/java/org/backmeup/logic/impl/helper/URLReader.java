@@ -19,9 +19,7 @@ public class URLReader {
   private static final Logger logger = LoggerFactory.getLogger(URLReader.class);	
   
   public static String waitForResult() {
-		try {
-			ServerSocket ss = new ServerSocket(9998, 1);
-			Socket client = ss.accept();
+		try (ServerSocket ss = new ServerSocket(9998, 1); Socket client = ss.accept()) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			PrintWriter bw = new PrintWriter(new OutputStreamWriter(client.getOutputStream()), true);
 			String result = br.readLine();
@@ -30,6 +28,7 @@ public class URLReader {
 			  ss.close();
 			  return waitForResult();
 			}
+			
 			bw.write("HTTP/1.0 200 OK\r\n\r\nHello World!"); bw.flush();
 			client.close();
 			String[] results = result.split(" ");

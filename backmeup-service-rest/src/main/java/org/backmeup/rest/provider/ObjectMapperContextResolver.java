@@ -19,7 +19,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 @Produces(MediaType.APPLICATION_JSON)
 public class ObjectMapperContextResolver implements ContextResolver<ObjectMapper> {
 	
-	public ObjectMapper getContext(Class<?> clazz) {
+	@Override
+    public ObjectMapper getContext(Class<?> clazz) {
 		ObjectMapper result = new ObjectMapper();
 		// do not export null properties into JSON, simply ignore them!
 		result.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);

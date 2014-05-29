@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class MetadataContainer {
-	private Map<String, String> metadata = new HashMap<String, String>();
+	private Map<String, String> metadata = new HashMap<>();
 
 	public MetadataContainer() {
 	}

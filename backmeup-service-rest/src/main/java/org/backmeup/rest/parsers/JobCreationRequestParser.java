@@ -111,7 +111,7 @@ public class JobCreationRequestParser {
   }
   
   private static Map<String, String> getOptions(String startString, MultivaluedMap<String, String> formParameters) {
-    Map<String, String> o = new HashMap<String, String>();
+    Map<String, String> o = new HashMap<>();
     for (Entry<String, List<String>> entry : formParameters.entrySet()) {      
       if (entry.getKey().startsWith(startString + ".")) {
         String valueName = entry.getKey().substring((startString + ".").length());

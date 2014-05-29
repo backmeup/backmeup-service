@@ -13,7 +13,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobProtocolDTO;

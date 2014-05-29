@@ -43,13 +43,13 @@ public class BackupJob {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Set<ProfileOptions> sourceProfiles = new HashSet<ProfileOptions>();
+	private Set<ProfileOptions> sourceProfiles = new HashSet<>();
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
-	private Set<JobProtocol> jobProtocols = new HashSet<JobProtocol>();
+	private final Set<JobProtocol> jobProtocols = new HashSet<>();
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Profile sinkProfile;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<ActionProfile> requiredActions = new ArrayList<ActionProfile>();
+	private List<ActionProfile> requiredActions = new ArrayList<>();
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date start;
 	private long delay;
@@ -142,7 +142,7 @@ public class BackupJob {
 	}
 
 	public List<ActionProfile> getSortedRequiredActions() {
-		List<ActionProfile> ap = new ArrayList<ActionProfile>();
+		List<ActionProfile> ap = new ArrayList<>();
 		ap.addAll(requiredActions);
 		Collections.sort(ap, new Comparator<ActionProfile>() {
 			@Override

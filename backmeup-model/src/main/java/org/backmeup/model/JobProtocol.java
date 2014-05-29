@@ -31,7 +31,7 @@ public class JobProtocol {
   @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
   private BackupJob job;
   @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
-  private Set<JobProtocolMember> members = new HashSet<JobProtocolMember>();
+  private final Set<JobProtocolMember> members = new HashSet<>();
   
   public JobProtocol() {
   }
@@ -90,8 +90,8 @@ public class JobProtocol {
     return members;
   }
 
-  public void addMembers(Set<JobProtocolMember> members) {
-    this.members.addAll(members);
+  public void addMembers(Set<JobProtocolMember> newMembers) {
+    this.members.addAll(newMembers);
   }
   
   public void addMember(JobProtocolMember member) {
@@ -163,7 +163,7 @@ public class JobProtocol {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((id == null) ? 0 : id.hashCode());
+      result = prime * result + (id == null ? 0 : id.hashCode());
       return result;
     }
 

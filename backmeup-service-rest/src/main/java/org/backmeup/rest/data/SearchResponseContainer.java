@@ -22,22 +22,22 @@ public class SearchResponseContainer {
 	}
 
 	public SearchResponseContainer(SearchResponse resp) {
-		this.files = new ArrayList<SearchEntryContainer>();
+		this.files = new ArrayList<>();
 		for (SearchEntry entry : resp.getFiles()) {
 			this.files.add(new SearchEntryContainer(entry));
 		}
 
-		this.bySource = new ArrayList<CountedEntryContainer>();
+		this.bySource = new ArrayList<>();
 		for (CountedEntry entry : resp.getBySource()) {
 			this.bySource.add(new CountedEntryContainer(entry));
 		}
 
-		this.byType = new ArrayList<CountedEntryContainer>();
+		this.byType = new ArrayList<>();
 		for (CountedEntry entry : resp.getByType()) {
 			this.byType.add(new CountedEntryContainer(entry));
 		}
 
-		this.byJob = new ArrayList<CountedEntryContainer>();
+		this.byJob = new ArrayList<>();
 		for (CountedEntry entry : resp.getByJob()) {
 			this.byJob.add(new CountedEntryContainer(entry));
 		}

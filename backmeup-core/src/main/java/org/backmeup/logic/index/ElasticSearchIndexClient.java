@@ -28,7 +28,7 @@ public class ElasticSearchIndexClient {
 	
 	private static final String CLUSTER_NAME = "es-backmeup-cluster";
 	
-	private Client client;
+	private final Client client;
 	
 	public ElasticSearchIndexClient(String host, int port) {
 		//host = NetworkUtils.getLocalAddress().getHostName();

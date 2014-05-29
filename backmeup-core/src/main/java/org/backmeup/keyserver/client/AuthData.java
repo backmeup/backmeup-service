@@ -7,7 +7,7 @@ public class AuthData {
   private Long bmu_authinfo_id;
   private Long bmu_user_id;
   private Long bmu_service_id;
-  private HashMap<String, String> ai_data = new HashMap<String, String>();
+  private HashMap<String, String> ai_data = new HashMap<>();
 
   public AuthData() {
     super();

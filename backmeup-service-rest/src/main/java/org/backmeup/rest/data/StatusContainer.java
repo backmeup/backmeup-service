@@ -19,7 +19,7 @@ public class StatusContainer {
 	}
 
 	public StatusContainer(List<Status> backupStatus) {
-		this.backupStatus = new ArrayList<JobStatus>();
+		this.backupStatus = new ArrayList<>();
 		for (Status s : backupStatus) {			
 			this.backupStatus.add(new JobStatus(s.getJob().getId (), s.getType(), s.getCategory (), s.getTimeStamp().getTime(), s.getProgress(), s.getMessage(), s.getFiles()));
 		}

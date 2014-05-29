@@ -8,15 +8,12 @@ import java.util.Properties;
 
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.spi.ActionDescribable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BaseActionDescribable implements ActionDescribable {
-	private final Logger logger = LoggerFactory.getLogger(BaseActionDescribable.class);
 
 	private Properties descriptionEntries;
 
-	private String propertyFilename;
+	private final String propertyFilename;
 
 	public BaseActionDescribable(String propertyFilename) {
 		this.propertyFilename = propertyFilename;
@@ -28,9 +25,7 @@ public class BaseActionDescribable implements ActionDescribable {
 
 	private Properties getDescriptionEntries() throws PluginException {
 		if (descriptionEntries == null) {
-			InputStream is = null;
-			try {
-				is = getClass().getClassLoader().getResourceAsStream(propertyFilename);
+			try (InputStream  is = getClass().getClassLoader().getResourceAsStream(propertyFilename)) {
 				if (is == null) {
 					throw new PluginException("UNKWN", "Please provide "
 							+ propertyFilename + " for your plugins!");
@@ -40,14 +35,6 @@ public class BaseActionDescribable implements ActionDescribable {
 			} catch (IOException e) {
 				throw new PluginException("UNKWN", "Unable to load from "
 						+ propertyFilename + " stream!", e);
-			} finally {
-				try {
-					if (is != null) {
-						is.close();
-					}
-				} catch (Exception ex) {
-					logger.error("", ex);
-				}
 			}
 		}
 		return descriptionEntries;
@@ -80,7 +67,7 @@ public class BaseActionDescribable implements ActionDescribable {
 
 	@Override
 	public List<String> getAvailableOptions() {
-		return new LinkedList<String>();
+		return new LinkedList<>();
 	}
 
 	@Override

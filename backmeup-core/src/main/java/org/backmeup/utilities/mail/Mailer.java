@@ -1,6 +1,5 @@
 package org.backmeup.utilities.mail;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +59,8 @@ public class Mailer {
   public static void send(final String to, final String subject, final String text, final String mimeType) {    
     // Get system properties
     service.submit(new Runnable() {
-      public void run() {
+      @Override
+    public void run() {
         executeSend(to, subject, text, mimeType);
       }
     });    
@@ -71,21 +71,11 @@ public class Mailer {
   private static Properties getMailSettings() {
     if (mailSettings == null) {
       Properties props = new Properties();
-      InputStream is = null;
-      try {
-        is = Mailer.class.getClassLoader().getResourceAsStream("mail.properties");
+      try (InputStream is = Mailer.class.getClassLoader().getResourceAsStream("mail.properties")) {
         props.load(is);          
         mailSettings = props;
       } catch (Exception e) {
     	  logger.error("", e); 
-      } finally {
-        if (is != null) {
-          try {
-            is.close();
-          } catch (IOException e) {
-        	  logger.error("", e);
-          }
-        }
       }
     }
     return mailSettings;

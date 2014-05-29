@@ -1,5 +1,6 @@
 package org.backmeup.rest.data;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -30,25 +31,17 @@ public class ErrorEntity {
     this.setErrorType(type);
   }
 
-  public ErrorEntity(String type, Exception exception) {    
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
+  public ErrorEntity(String type, Exception exception) {
     logger.error("", exception);
-    try {
-      pw.close();
-    } catch (Exception e) {
-    	logger.error("", e);
-    }    
-    try {
-      sw.close();
-    } catch (Exception e) {
-    	logger.error("", e);
-    }
-    setTrace(sw.toString().split("\n"));
+
+    try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+        setTrace(sw.toString().split("\n"));
+    } catch (IOException ex) { }
+    
     this.setErrorMessage(exception.getMessage());
     this.setErrorType(type);
     
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     for (Method m : exception.getClass().getMethods()) {
       if (m.getParameterTypes().length == 0 && (m.getName().startsWith("get") || m.getName().startsWith("is")) &&
           !m.getDeclaringClass().equals(BackMeUpException.class) && 

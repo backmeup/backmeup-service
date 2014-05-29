@@ -3,7 +3,6 @@ package org.backmeup.rest.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,7 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.JobProtocol;
 import org.backmeup.model.dto.Job;
 
 @XmlRootElement
@@ -29,7 +27,7 @@ public class JobContainer {
 	}
 
 	public JobContainer(List<BackupJob> backupJobs, BackMeUpUser user) {
-		this.backupJobs = new ArrayList<Job>();
+		this.backupJobs = new ArrayList<>();
 		for (BackupJob j : backupJobs) {
 			Job job = BackUpJobConverter.convertToJob(j);
 			this.backupJobs.add(job);

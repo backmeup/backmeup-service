@@ -21,7 +21,7 @@ public class ActionProfile implements Comparable<ActionProfile> {
   private String actionId;
   private int priority;
   @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true, mappedBy="profile")
-  private Set<ActionProperty> actionOptions = new HashSet<ActionProperty>();
+  private final Set<ActionProperty> actionOptions = new HashSet<>();
   
   public ActionProfile() {
   }
@@ -124,7 +124,7 @@ public class ActionProfile implements Comparable<ActionProfile> {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((key == null) ? 0 : key.hashCode());
+      result = prime * result + (key == null ? 0 : key.hashCode());
       return result;
     }
 

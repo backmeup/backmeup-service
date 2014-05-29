@@ -57,7 +57,7 @@ public class DatasourceProfile {
 	
 	public void addOption(String option) {
 		if(datasourceOptions == null) {
-			datasourceOptions = new ArrayList<String>();
+			datasourceOptions = new ArrayList<>();
 		}
 		this.datasourceOptions.add(option);
 	}

@@ -12,7 +12,6 @@ import java.util.Set;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails.FileInfo;
-import org.backmeup.model.SearchResponse;
 import org.backmeup.model.SearchResponse.CountedEntry;
 import org.backmeup.model.SearchResponse.SearchEntry;
 import org.elasticsearch.common.text.Text;
@@ -59,7 +58,7 @@ public class IndexUtils {
 
 	
 	public static Set<FileItem> convertToFileItems(org.elasticsearch.action.search.SearchResponse esResponse) {
-		Set<FileItem> fItems = new HashSet<FileItem>();
+		Set<FileItem> fItems = new HashSet<>();
 		
 		for (SearchHit hit : esResponse.getHits()) {
 			FileItem fileItem = new FileItem();
@@ -112,7 +111,7 @@ public class IndexUtils {
 	}
 	
 	public static List<SearchEntry> convertSearchEntries(org.elasticsearch.action.search.SearchResponse esResponse, BackMeUpUser user) {	    
-	    List<SearchEntry> entries = new ArrayList<SearchResponse.SearchEntry>();
+	    List<SearchEntry> entries = new ArrayList<>();
 
 	    logger.debug("converting " + esResponse.getHits().totalHits() + " search results");
 	    
@@ -141,7 +140,7 @@ public class IndexUtils {
 	    	entry.setTimeStamp(new Date(timestamp));
 	    	
 	    	if (source.get(FIELD_BACKUP_SOURCE_ID) != null) {
-	    		entry.setDatasourceId(Long.valueOf(((Integer) source.get(FIELD_BACKUP_SOURCE_ID))));
+	    		entry.setDatasourceId(Long.valueOf((Integer) source.get(FIELD_BACKUP_SOURCE_ID)));
 	    		entry.setDatasource(source.get(FIELD_BACKUP_SOURCE_PLUGIN_NAME) + " (" + source.get(FIELD_BACKUP_SOURCE_IDENTIFICATION) + ")");
 	    	}
 	    	
@@ -225,7 +224,7 @@ public class IndexUtils {
 	
 	private static List<CountedEntry> groupBySource(org.elasticsearch.action.search.SearchResponse esResponse) {
 		// Now where's my Scala groupBy!? *heul*
-		Map<String, Integer> groupedHits = new HashMap<String, Integer>();
+		Map<String, Integer> groupedHits = new HashMap<>();
 		for (SearchHit hit : esResponse.getHits()) {
 			if (hit.getSource().get(FIELD_JOB_ID) != null) {
 				String backupSourcePluginName = hit.getSource().get(FIELD_BACKUP_SOURCE_PLUGIN_NAME).toString();
@@ -242,7 +241,7 @@ public class IndexUtils {
 		}
 		
 		// ...and .map
-		List<CountedEntry> countedEntries = new ArrayList<SearchResponse.CountedEntry>();
+		List<CountedEntry> countedEntries = new ArrayList<>();
 		for (Entry<String, Integer> entry : groupedHits.entrySet()) {
 			countedEntries.add(new CountedEntry(entry.getKey(), entry.getValue().intValue()));
 		}
@@ -252,7 +251,7 @@ public class IndexUtils {
 	
 	private static List<CountedEntry> groupByContentType(org.elasticsearch.action.search.SearchResponse esResponse) {
 		// Now where's my Scala groupBy!? *heul*
-		Map<String, Integer> groupedHits = new HashMap<String, Integer>();
+		Map<String, Integer> groupedHits = new HashMap<>();
 		for (SearchHit hit : esResponse.getHits()) {
 			String type;
 			if (hit.getSource().get(FIELD_CONTENT_TYPE) != null) {
@@ -271,7 +270,7 @@ public class IndexUtils {
 		}
 		
 		// ...and .map
-		List<CountedEntry> countedEntries = new ArrayList<SearchResponse.CountedEntry>();
+		List<CountedEntry> countedEntries = new ArrayList<>();
 		for (Entry<String, Integer> entry : groupedHits.entrySet()) {
 			countedEntries.add(new CountedEntry(entry.getKey(), entry.getValue().intValue()));
 		}
@@ -281,7 +280,7 @@ public class IndexUtils {
 	
 	private static List<CountedEntry> groupByContentJob(org.elasticsearch.action.search.SearchResponse esResponse) {
 		// Now where's my Scala groupBy!? *heul*
-		Map<String, Integer> groupedHits = new HashMap<String, Integer>();
+		Map<String, Integer> groupedHits = new HashMap<>();
 		for (SearchHit hit : esResponse.getHits()) {
 			if (hit.getSource().get(FIELD_JOB_ID) != null) {
 				String backupJobName = hit.getSource().get(FIELD_JOB_NAME).toString();
@@ -298,7 +297,7 @@ public class IndexUtils {
 		}
 
 		// ...and .map
-		List<CountedEntry> countedEntries = new ArrayList<SearchResponse.CountedEntry>();
+		List<CountedEntry> countedEntries = new ArrayList<>();
 		for (Entry<String, Integer> entry : groupedHits.entrySet()) {
 			countedEntries.add(new CountedEntry(entry.getKey(), entry.getValue().intValue()));
 		}

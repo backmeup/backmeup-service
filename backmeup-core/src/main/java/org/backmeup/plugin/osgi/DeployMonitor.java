@@ -22,18 +22,17 @@ import org.slf4j.LoggerFactory;
  * OSGi.
  * 
  * @author fschoeppl
- * 
  */
 public class DeployMonitor implements Runnable {
   private final Logger logger = LoggerFactory.getLogger(DeployMonitor.class);
 
-  private Map<File, Bundle> deployed = new HashMap<File, Bundle>();
+  private final Map<File, Bundle> deployed = new HashMap<>();
   private ScheduledExecutorService executor;
-  private List<Bundle> newlyInstalledBundles = new LinkedList<Bundle>();
-  private List<File> toBeRemovedBundles = new LinkedList<File>();
-  private BundleContext context;
-  private File deploymentDirectory;
-  private Object monitor = new Object();
+  private final List<Bundle> newlyInstalledBundles = new LinkedList<>();
+  private final List<File> toBeRemovedBundles = new LinkedList<>();
+  private final BundleContext context;
+  private final File deploymentDirectory;
+  private final Object monitor = new Object();
   private boolean firstRun = false;
 
   public DeployMonitor(BundleContext context, File deploymentDirectory) {
@@ -77,7 +76,8 @@ public class DeployMonitor implements Runnable {
     }
   }
 
-  public void run() {
+  @Override
+public void run() {
     if (!deploymentDirectory.exists()) {
       deploymentDirectory.mkdirs();
     }

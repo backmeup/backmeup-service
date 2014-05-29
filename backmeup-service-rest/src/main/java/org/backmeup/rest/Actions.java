@@ -53,7 +53,7 @@ public class Actions extends Base {
       @PathParam("actionId") String actionId,
       @PathParam("jobId") Long jobId,
       MultivaluedMap<String, String> formParams) {
-	  Map<String, String> actionOptions = new HashMap<String, String>();
+	  Map<String, String> actionOptions = new HashMap<>();
 	  for (Entry<String, List<String>> entry : formParams.entrySet()) {
 	    actionOptions.put(entry.getKey(), entry.getValue().get(0));
 	  }

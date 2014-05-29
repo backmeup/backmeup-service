@@ -17,8 +17,8 @@ public class ValidationNotesContainer {
 	private JobCreationContainer job;
 
 	public ValidationNotesContainer(ValidationNotes notes) {
-		this.errors = new ArrayList<ValidationEntry>();
-		this.warnings = new ArrayList<ValidationEntry>();
+		this.errors = new ArrayList<>();
+		this.warnings = new ArrayList<>();
 		for (ValidationEntry e : notes.getValidationEntries()) {
 			if (e.getType() == ValidationExceptionType.NoValidatorAvailable) {
 				warnings.add(e);

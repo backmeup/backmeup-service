@@ -110,7 +110,8 @@ public class PluginImpl implements Plugin {
 		this.started = false;
 	}
 
-	@PostConstruct
+	@Override
+    @PostConstruct
 	public void startup() {
 		if (!started) {
 			logger.debug("Starting up PluginImpl!");
@@ -135,10 +136,11 @@ public class PluginImpl implements Plugin {
 		this.deploymentMonitor.start();
 	}
 
-	public List<SourceSinkDescribable> getConnectedDatasources() {
+	@Override
+    public List<SourceSinkDescribable> getConnectedDatasources() {
 		Iterable<SourceSinkDescribable> sourceSinkDescs = services(
 				SourceSinkDescribable.class, null);
-		List<SourceSinkDescribable> result = new ArrayList<SourceSinkDescribable>();
+		List<SourceSinkDescribable> result = new ArrayList<>();
 		for (SourceSinkDescribable ssd : sourceSinkDescs) {
 			if (ssd.getType() == Type.Source || ssd.getType() == Type.Both) {
 				result.add(ssd);
@@ -150,8 +152,8 @@ public class PluginImpl implements Plugin {
 	public static boolean deleteDir(File dir) {
 		if (dir.isDirectory()) {
 			String[] children = dir.list();
-			for (int i = 0; i < children.length; i++) {
-				boolean success = deleteDir(new File(dir, children[i]));
+			for (String element : children) {
+				boolean success = deleteDir(new File(dir, element));
 				if (!success) {
 					return false;
 				}
@@ -167,7 +169,7 @@ public class PluginImpl implements Plugin {
 			if (temporaryDirectory.exists()) {
 				deleteDir(temporaryDirectory);
 			}
-			Map<String, String> config = new HashMap<String, String>();
+			Map<String, String> config = new HashMap<>();
 			
 			config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exportedPackages);
 			config.put(Constants.FRAMEWORK_STORAGE, temporaryDirectory.getAbsolutePath());
@@ -240,7 +242,8 @@ public class PluginImpl implements Plugin {
 		return (T) Proxy.newProxyInstance(PluginImpl.class.getClassLoader(),
 				new Class[] { service }, new InvocationHandler() {
 
-					public Object invoke(Object o, Method method, Object[] os)
+					@Override
+                    public Object invoke(Object o, Method method, Object[] os)
 							throws Throwable {
 						ServiceReference ref = getReference(service, filter);
 						if (ref == null) {
@@ -267,15 +270,16 @@ public class PluginImpl implements Plugin {
 
 	private static class SpecialInvocationHandler implements InvocationHandler {
 		private final Logger logger = LoggerFactory.getLogger(SpecialInvocationHandler.class);
-		private ServiceReference reference;
-		private BundleContext context;
+		private final ServiceReference reference;
+		private final BundleContext context;
 
 		public SpecialInvocationHandler(BundleContext context, ServiceReference reference) {
 			this.reference = reference;
 			this.context = context;
 		}
 
-		public Object invoke(Object o, Method method, Object[] os) throws Throwable {
+		@Override
+        public Object invoke(Object o, Method method, Object[] os) throws Throwable {
 			ServiceReference ref = reference;
 			Object ret = null;
 			@SuppressWarnings("unchecked")
@@ -306,25 +310,29 @@ public class PluginImpl implements Plugin {
 	public <T> Iterable<T> services(final Class<T> service, final String filter) {
 		return new Iterable<T>() {
 
-			public Iterator<T> iterator() {
+			@Override
+            public Iterator<T> iterator() {
 				try {
 					ServiceReference[] refs = bundleContext()
 							.getServiceReferences(service.getName(), filter);
 					if (refs == null) {
 						return new Iterator<T>() {
-							public boolean hasNext() {
+							@Override
+                            public boolean hasNext() {
 								return false;
 							}
 
-							public T next() {
+							@Override
+                            public T next() {
 								return null;
 							}
 
-							public void remove() {
+							@Override
+                            public void remove() {
 							}
 						};
 					}
-					List<T> services = new ArrayList<T>();
+					List<T> services = new ArrayList<>();
 					for (ServiceReference s : refs) {
 						services.add((T) Proxy.newProxyInstance(
 								PluginImpl.class.getClassLoader(),
@@ -339,7 +347,8 @@ public class PluginImpl implements Plugin {
 		};
 	}
 
-	public void shutdown() {
+	@Override
+    public void shutdown() {
 		if (started) {
 			logger.debug("Shutting down PluginImpl!");
 			this.deploymentMonitor.stop();
@@ -348,23 +357,26 @@ public class PluginImpl implements Plugin {
 		}
 	}
 
-	public List<ActionDescribable> getActions() {
+	@Override
+    public List<ActionDescribable> getActions() {
 		Iterable<ActionDescribable> actions = services(ActionDescribable.class, null);
-		List<ActionDescribable> actionList = new ArrayList<ActionDescribable>();
+		List<ActionDescribable> actionList = new ArrayList<>();
 		for (ActionDescribable ad : actions) {
 			actionList.add(ad);
 		}
 		return actionList;
 	}
 
-	public ActionDescribable getActionById(String actionId) {
+	@Override
+    public ActionDescribable getActionById(String actionId) {
 		return service(ActionDescribable.class, "(name=" + actionId + ")");
 	}
 
-	public List<SourceSinkDescribable> getConnectedDatasinks() {
+	@Override
+    public List<SourceSinkDescribable> getConnectedDatasinks() {
 		Iterable<SourceSinkDescribable> sourceSinkDescs = services(
 				SourceSinkDescribable.class, null);
-		List<SourceSinkDescribable> result = new ArrayList<SourceSinkDescribable>();
+		List<SourceSinkDescribable> result = new ArrayList<>();
 		for (SourceSinkDescribable ssd : sourceSinkDescs) {
 			if (ssd.getType() == Type.Sink || ssd.getType() == Type.Both) {
 				result.add(ssd);
@@ -373,27 +385,33 @@ public class PluginImpl implements Plugin {
 		return result;
 	}
 
-	public SourceSinkDescribable getSourceSinkById(String sourceSinkId) {
+	@Override
+    public SourceSinkDescribable getSourceSinkById(String sourceSinkId) {
 		return service(SourceSinkDescribable.class, "(name=" + sourceSinkId + ")");
 	}
 
-	public Authorizable getAuthorizable(String sourceSinkId) {
+	@Override
+    public Authorizable getAuthorizable(String sourceSinkId) {
 		return service(Authorizable.class, "(name=" + sourceSinkId + ")");
 	}
 
-	public OAuthBased getOAuthBasedAuthorizable(String sourceSinkId) {
+	@Override
+    public OAuthBased getOAuthBasedAuthorizable(String sourceSinkId) {
 		return service(OAuthBased.class, "(name=" + sourceSinkId + ")");
 	}
 
-	public InputBased getInputBasedAuthorizable(String sourceSinkId) {
+	@Override
+    public InputBased getInputBasedAuthorizable(String sourceSinkId) {
 		return service(InputBased.class, "(name=" + sourceSinkId + ")");
 	}
 
-	public Datasource getDatasource(String sourceId) {
+	@Override
+    public Datasource getDatasource(String sourceId) {
 		return service(Datasource.class, "(name=" + sourceId + ")");
 	}
 
-	public Datasink getDatasink(String sinkId) {
+	@Override
+    public Datasink getDatasink(String sinkId) {
 		return service(Datasink.class, "(name=" + sinkId + ")");
 	}
 

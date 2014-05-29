@@ -22,7 +22,7 @@ public class Metainfo {
   private static final String PROP_CREATED = "created";
   private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss z";  
 
-  private Properties metainfo = new Properties();
+  private final Properties metainfo = new Properties();
   
   
   public void setModified(Date modifiedDate) {
@@ -129,7 +129,7 @@ public class Metainfo {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((metainfo.getProperty(PROP_ID) == null) ? 0 : metainfo.getProperty(PROP_ID).hashCode());
+    result = prime * result + (metainfo.getProperty(PROP_ID) == null ? 0 : metainfo.getProperty(PROP_ID).hashCode());
     return result;
   }
 

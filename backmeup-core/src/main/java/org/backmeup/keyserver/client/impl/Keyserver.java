@@ -454,8 +454,8 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 	@Override
 	public Token getToken(BackupJob job, String userPwd, Long backupdate,
 			boolean reusable, String encryptionPwd) {
-		List<Long> usedServices = new ArrayList<Long>();
-		List<Long> authenticationInfos = new ArrayList<Long>();
+		List<Long> usedServices = new ArrayList<>();
+		List<Long> authenticationInfos = new ArrayList<>();
 		usedServices.add(job.getSinkProfile().getProfileId());
 		authenticationInfos.add(job.getSinkProfile().getProfileId());
 		for (ProfileOptions p : job.getSourceProfiles()) {
