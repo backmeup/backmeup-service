@@ -29,7 +29,6 @@ public class ValidationNotes {
     exceptionText.put(ValidationExceptionType.Error, ERROR);
     exceptionText.put(ValidationExceptionType.NoValidatorAvailable, NO_VALIDATOR_AVAILABLE);
     exceptionText.put(ValidationExceptionType.PluginUnavailable, NO_VALIDATOR_AVAILABLE);
-    
   }
   
   public void addValidationEntry(ValidationExceptionType type, String pluginId, Exception cause) {
@@ -70,9 +69,11 @@ public class ValidationNotes {
         if (cause != null) {
             this.setCause(cause.getMessage());
             try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-                cause.printStackTrace(pw);
+                cause.printStackTrace(pw); // NOSONAR log the stack trace into pw
                 this.setStackTrace(sw.toString());
-            } catch (IOException e) { }
+            } catch (IOException e) { 
+                // can never happen because StringWriter has no IO
+            }
         }
     }
     

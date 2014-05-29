@@ -1,5 +1,6 @@
 package org.backmeup.logic.index;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ElasticSearchIndexClient {
+public class ElasticSearchIndexClient implements Closeable {
 	private final Logger logger = LoggerFactory.getLogger(ElasticSearchIndexClient.class);
 	
 	private static final String INDEX_NAME = "backmeup";
@@ -152,7 +153,8 @@ public class ElasticSearchIndexClient {
 			.setQuery(qBuilder).execute().actionGet();
 	}
 	
-	public void close() {
+	@Override
+    public void close() {
 		if (client != null) {
 			client.close();
 		}

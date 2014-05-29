@@ -306,9 +306,11 @@ public class IndexUtils {
 	}
 	
 	private static String getTypeFromMimeType(String mime) {
-		mime = mime.toLowerCase();
-		
-		if (mime.contains("html"))
+		return getTypeFromMimeTypeLowerCase(mime.toLowerCase());
+	}
+
+    private static String getTypeFromMimeTypeLowerCase(String mime) {
+        if (mime.contains("html"))
 			return "html";	
 		if (mime.startsWith("image"))
 			return "image";
@@ -322,45 +324,44 @@ public class IndexUtils {
 			return "text";
 		if (mime.contains("ogg"))
 			return "audio";
-		
+
 		// Add more special rules as needed 
 		return "other";
-					
-	}
+    }
 
 	public static String getFilterSuffix(Map<String, List<String>> filters) {
 		if (filters == null) {
 			return "";
 		}
 		
-		String filterstr = "";
+		StringBuilder filterstr = new StringBuilder();
 		
-		if (filters.containsKey("type") == true) {
-			filterstr += "(";
+		if (filters.containsKey("type")) {
+			filterstr.append('(');
 
 			for (String filter : filters.get("type")) {
 				if (filter.toLowerCase().equals("html")) {
-					filterstr += "Content-Type:*html* OR ";
+				    filterstr.append("Content-Type:*html* OR ");
 				} else if (filter.toLowerCase().equals("image")) {
-					filterstr += "Content-Type:image* OR ";
+				    filterstr.append("Content-Type:image* OR ");
 				} else if (filter.toLowerCase().equals("video")) {
-					filterstr += "Content-Type:video* OR ";
+				    filterstr.append("Content-Type:video* OR ");
 				} else if (filter.toLowerCase().equals("audio")) {
-					filterstr += "Content-Type:audio* OR ";
+				    filterstr.append("Content-Type:audio* OR ");
 				} else if (filter.toLowerCase().equals("text")) {
-					filterstr += "Content-Type:text* OR ";
+				    filterstr.append("Content-Type:text* OR ");
 				}
 			}
 
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring(0, filterstr.length() - 4);
-			filterstr += ") AND ";
+            filterstr.setLength(filterstr.length() - 4);
+			filterstr.append(") AND ");
 		}
 		
 		// TODO if "ProfileName" includes special chars like (,", ... we will
 		// have a problem with the search?
-		if (filters.containsKey("source") == true) {
-			filterstr += "(";
+		if (filters.containsKey("source")) {
+            filterstr.append('(');
 
 			// something like this will come "org.backmeup.source (ProfileName)"
 			for (String filter : filters.get("source")) {
@@ -375,19 +376,19 @@ public class IndexUtils {
 				// "ProfileName"
 				profile = profile.substring(1, profile.length() - 1);
 
-				filterstr += "(" + FIELD_BACKUP_SOURCE_PLUGIN_NAME + ":"
+				filterstr.append("(" + FIELD_BACKUP_SOURCE_PLUGIN_NAME + ":"
 						+ source + " AND " + FIELD_BACKUP_SOURCE_IDENTIFICATION
-						+ ":" + profile + ") OR ";
+						+ ":" + profile + ") OR ");
 			}
 
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring(0, filterstr.length() - 4);
-			filterstr += ") AND ";
+            filterstr.setLength(filterstr.length() - 4);
+            filterstr.append(") AND ");
 		}
 		
 		// TODO if job contains special chars ...
 		if (filters.containsKey("job") == true) {
-			filterstr += "(";
+            filterstr.append('(');
 
 			// something like this will come "JobName (Timestamp)" (java
 			// timestamp -> 13 chars)
@@ -399,16 +400,16 @@ public class IndexUtils {
 				// get out the job name
 				String jobname = filter.substring(0, filter.length() - 16);
 
-				filterstr += "(" + FIELD_BACKUP_AT + ":" + timestamp + " AND "
-						+ FIELD_JOB_NAME + ":" + jobname + ") OR ";
+				filterstr.append("(" + FIELD_BACKUP_AT + ":" + timestamp + " AND "
+						+ FIELD_JOB_NAME + ":" + jobname + ") OR ");
 			}
 
 			// remove the last " OR " and close the search string for this part
-			filterstr = filterstr.substring(0, filterstr.length() - 4);
-			filterstr += ") AND ";
+            filterstr.setLength(filterstr.length() - 4);
+            filterstr.append(") AND ");
 		}
 		
-		return filterstr;
+		return filterstr.toString();
 	}
 	
 	public static QueryBuilder buildQuery(Long userid, String queryString,

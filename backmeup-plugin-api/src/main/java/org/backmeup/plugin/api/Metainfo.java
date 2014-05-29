@@ -138,23 +138,17 @@ public class Metainfo {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
     Metainfo other = (Metainfo) obj;
-    if (metainfo == null || metainfo.getProperty(PROP_ID) == null) {
-      if (other.metainfo != null || other.metainfo.getProperty(PROP_ID) != null) {
-        return false;
-      }
-    } else if (!metainfo.getProperty(PROP_ID).equals(other.metainfo.getProperty(PROP_ID))) {
-      return false;
+    if (metainfo == null) {
+        return other.metainfo == null;
     }
-    return true;
+    if (metainfo.getProperty(PROP_ID) == null) {
+        return other.metainfo != null && other.metainfo.getProperty(PROP_ID) == null; 
+    } 
+    return other.metainfo != null && metainfo.getProperty(PROP_ID).equals(other.metainfo.getProperty(PROP_ID));
   }
 
-  
-  
 }

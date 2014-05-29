@@ -14,9 +14,9 @@ public class MetadataContainer {
 	}
 
 	public MetadataContainer(Properties props) {
-		for (Object key : props.keySet()) {
-			String keyStr = (String) key;
-			String valueStr = (String) props.get(key);
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+			String keyStr = (String) entry.getKey();
+			String valueStr = (String) entry.getValue();
 			setProperty(keyStr, valueStr);
 		}
 	}

@@ -51,7 +51,7 @@ public class DeployMonitor implements Runnable {
 
   public void waitForInitialRun() {
     try {
-      if (!firstRun) {
+      while (!firstRun) {
         synchronized (monitor) {
           monitor.wait();
         }
@@ -77,7 +77,7 @@ public class DeployMonitor implements Runnable {
   }
 
   @Override
-public void run() {
+  public void run() {
     if (!deploymentDirectory.exists()) {
       deploymentDirectory.mkdirs();
     }
