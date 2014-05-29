@@ -34,7 +34,7 @@ public interface PluginsLogic {
 
     void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
 
-    void configureAuth(AuthRequest ar, Properties props, String uniqueDescIdentifier);
+    AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
 
     String getAuthorizedUserId(String sourceSinkId, Properties props);
 

@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
@@ -36,6 +37,10 @@ public class PluginsLogicImpl implements PluginsLogic {
     private static final String UNKNOWN_SOURCE_SINK = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SOURCE_SINK";
     private static final String VALIDATION_OF_ACCESS_DATA_FAILED = "org.backmeup.logic.impl.BusinessLogicImpl.VALIDATION_OF_ACCESS_DATA_FAILED";
     private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
+
+    @Inject
+    @Configuration(key="backmeup.callbackUrl")
+    private String callbackUrl;
 
     @Inject
     @Named("plugin")
@@ -119,12 +124,16 @@ public class PluginsLogicImpl implements PluginsLogic {
     }
 
     @Override
-    public void configureAuth(AuthRequest ar, Properties props, String uniqueDescIdentifier) {
+    public AuthRequest configureAuth(Properties props, String uniqueDescIdentifier) {
+        props.setProperty("callback", callbackUrl);
+
+        AuthRequest ar = new AuthRequest();
+        
         Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier);
         switch (auth.getAuthType()) {
         case OAuth:
             OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
-            String redirectUrl = oauth.createRedirectURL(props, props.getProperty("callback"));
+            String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
             ar.setRedirectURL(redirectUrl);
             // TODO Store all properties within keyserver & don't store them within the local database!
             break;
@@ -135,6 +144,8 @@ public class PluginsLogicImpl implements PluginsLogic {
         default:
             throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
         }
+        
+        return ar;
     }
 
     @Override

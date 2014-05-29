@@ -9,12 +9,10 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
@@ -74,21 +72,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
     private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
 
-    @Inject
-    @Configuration(key="backmeup.callbackUrl")
-    private String callbackUrl;
-
-    @Inject
-    @Configuration(key = "backmeup.index.host")
-    private String indexHost; // TODO only for RabbitMQJobReceiver
-
-    @Inject
-    @Configuration(key = "backmeup.index.port")
-    private Integer indexPort; // TODO only for RabbitMQJobReceiver
-    
-//    @Inject
-//    private Keyserver keyserverClient; // TODO only for RabbitMQJobReceiver
-
     // See setJobManager()
     private JobManager jobManager;
 
@@ -97,29 +80,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private Node esNode;
-
-    // RabbitMQJobReceiver -------------------
-    @Inject
-    @Configuration(key="backmeup.message.queue.host")
-    private String mqHost;
-
-    @Inject
-    @Configuration(key="backmeup.message.queue.name")
-    private String mqName;
-
-    @Inject
-    @Configuration(key="backmeup.message.queue.receivers")
-    private Integer numberOfJobWorker;
-
-    @Inject
-    @Configuration(key="backmeup.job.backupname")
-    private String backupName;
-
-    @Inject
-    @Configuration(key="backmeup.job.temporaryDirectory")
-    private String jobTempDir;
-
-//    private List<RabbitMQJobReceiver> jobWorker;
 
     @Inject
     private UserRegistration registration;
@@ -138,6 +98,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private PluginsLogic plugins; 
+
+    // @Inject
+    // private MqLogicImpl mq; 
     
     // ---------------------------------------
 
@@ -146,23 +109,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     // There seems to be a problem with weld (can't find resource bundle 
     // with getClass().getSimpleName()). Therefore use class name. 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BusinessLogicImpl");
-
-    @PostConstruct
-    public void startup() {
-        logger.info("Starting job workers");
-//        try {
-//            jobWorker = new ArrayList<>();
-//            for (int i = 0; i < numberOfJobWorker; i++) {
-//                RabbitMQJobReceiver rec = new RabbitMQJobReceiver(mqHost,
-//                        mqName, indexHost, indexPort, backupName, jobTempDir,
-//                        plugins, keyserverClient, dal);
-//                rec.start();
-//                jobWorker.add(rec);
-//            }
-//        } catch (Exception e) {
-//            logger.error("Error while starting job receivers", e);
-//        }
-    }
 
     @Override
     public BackMeUpUser getUser(final String username) {
@@ -638,11 +584,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 BackMeUpUser user = getAuthorizedUser(username, keyRing);
 
-                AuthRequest ar = new AuthRequest();
                 Properties p = new Properties();
-                p.setProperty("callback", callbackUrl);
-
-                plugins.configureAuth(ar, p, uniqueDescIdentifier);
+                AuthRequest ar = plugins.configureAuth(p, uniqueDescIdentifier);
                 
                 SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
                 Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
@@ -767,11 +710,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         logger.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
         jobManager.shutdown();
         esNode.close();
-
-        logger.info("Shutting down job workers!");
-//        for (RabbitMQJobReceiver receiver : jobWorker) {
-//            receiver.stop();
-//        }
     }
 
     @Inject
@@ -830,20 +768,15 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public ValidationNotes call() {
                 
                 registration.ensureUserIsActive(username);
+                return validatePluginProfiles();
 
+            }
+
+            private ValidationNotes validatePluginProfiles() {
                 ValidationNotes notes = new ValidationNotes();
                 try {
-                    // plugin-level validation
                     BackupJob job = backupJobs.getExistingUserJob(jobId, username); 
-                    Set<ProfileOptions> sourceProfiles = job.getSourceProfiles();
-                    for (ProfileOptions po : sourceProfiles) {
-
-                        String sourceSinkId = po.getProfile().getDescription();
-                        plugins.validateSourceSinkExists(sourceSinkId, notes);
-
-                        Long profileId = po.getProfile().getProfileId();
-                        getValidationEntriesForProfile(profileId, notes);
-                    }
+                    validateSourceProfiles(job.getSourceProfiles(), notes);
 
                     Long sinkProfileId = job.getSinkProfile().getProfileId();
                     getValidationEntriesForProfile(sinkProfileId, notes);
@@ -852,7 +785,17 @@ public class BusinessLogicImpl implements BusinessLogic {
                     notes.addValidationEntry(ValidationExceptionType.Error, bme);
                 }
                 return notes;
+            }
 
+            private void validateSourceProfiles(Set<ProfileOptions> sourceProfiles, ValidationNotes notes) {
+                for (ProfileOptions po : sourceProfiles) {
+
+                    String sourceSinkId = po.getProfile().getDescription();
+                    plugins.validateSourceSinkExists(sourceSinkId, notes);
+
+                    Long profileId = po.getProfile().getProfileId();
+                    getValidationEntriesForProfile(profileId, notes);
+                }
             }
 
             private void getValidationEntriesForProfile(Long id, ValidationNotes notes) {
