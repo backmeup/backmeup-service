@@ -15,6 +15,7 @@ import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.StatusDao;
+import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.impl.helper.BackUpJobConverter;
 import org.backmeup.logic.impl.helper.BackUpJobCreationHelper;
 import org.backmeup.model.ActionProfile;

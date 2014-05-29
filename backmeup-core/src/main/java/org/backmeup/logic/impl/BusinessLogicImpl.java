@@ -18,6 +18,7 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
+import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
