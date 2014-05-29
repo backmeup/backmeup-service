@@ -44,10 +44,7 @@ import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
-import org.backmeup.model.exceptions.InvalidCredentialsException;
-import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
-import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
@@ -576,8 +573,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
-            final String profileName, final String keyRing) throws PluginException,
-            InvalidCredentialsException {
+            final String profileName, final String keyRing) {
 
         return conn.txNew(new Callable<AuthRequest>() {
             @Override public AuthRequest call() {
@@ -609,8 +605,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public void postAuth(final Long profileId, final Properties props, final String keyRing)
-            throws PluginException, ValidationException, InvalidCredentialsException {
+    public void postAuth(final Long profileId, final Properties props, final String keyRing) {
         if (keyRing == null) {
             throw new IllegalArgumentException("keyRing-Parameter cannot be null!");
         } else if (profileId == null) {
