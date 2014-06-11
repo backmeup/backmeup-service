@@ -133,8 +133,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Configuration(key="backmeup.job.temporaryDirectory")
     private String jobTempDir;
 
-//    private List<RabbitMQJobReceiver> jobWorker;
-
     @Inject
     private UserRegistration registration;
     
@@ -160,19 +158,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @PostConstruct
     public void startup() {
-        logger.info("Starting job workers");
-//        try {
-//            jobWorker = new ArrayList<>();
-//            for (int i = 0; i < numberOfJobWorker; i++) {
-//                RabbitMQJobReceiver rec = new RabbitMQJobReceiver(mqHost,
-//                        mqName, indexHost, indexPort, backupName, jobTempDir,
-//                        plugins, keyserverClient, dal);
-//                rec.start();
-//                jobWorker.add(rec);
-//            }
-//        } catch (Exception e) {
-//            logger.error("Error while starting job receivers", e);
-//        }
+
     }
 
     @Override
@@ -835,11 +821,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         jobManager.shutdown();
         plugins.shutdown();
         esNode.close();
-
-        logger.info("Shutting down job workers!");
-//        for (RabbitMQJobReceiver receiver : jobWorker) {
-//            receiver.stop();
-//        }
     }
 
     @Inject
