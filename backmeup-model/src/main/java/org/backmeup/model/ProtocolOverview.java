@@ -11,14 +11,13 @@ import java.util.Set;
  * about a certain user.
  * 
  * @author fschoeppl
- *
  */
 public class ProtocolOverview {
   private Long userId;  
 	private String totalCount;
 	private String totalStored;
-	private Set<Entry> storedAmount = new HashSet<Entry>();	
-	private List<Activity> activities = new ArrayList<Activity>();
+	private Set<Entry> storedAmount = new HashSet<>();	
+	private List<Activity> activities = new ArrayList<>();
 	
 	public ProtocolOverview() {
 	}
@@ -135,7 +134,7 @@ public class ProtocolOverview {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((title == null) ? 0 : title.hashCode());
+      result = prime * result + (title == null ? 0 : title.hashCode());
       return result;
     }  
 

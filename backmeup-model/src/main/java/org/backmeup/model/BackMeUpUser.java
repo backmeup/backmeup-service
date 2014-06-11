@@ -37,11 +37,11 @@ public class BackMeUpUser {
     private String verificationKey;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "user")
-    private List<JobProtocol> protocols = new ArrayList<>();
+    private final List<JobProtocol> protocols = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     //@Fetch(value = FetchMode.SUBSELECT)
-    private Set<UserProperty> properties = new HashSet<>();
+    private final Set<UserProperty> properties = new HashSet<>();
 
     public String getUsername() {
         return username;

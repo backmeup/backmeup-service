@@ -60,14 +60,11 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient();) {
 
             SearchResponse search = queryExistingSearch(searchId);
-
             String query = search.getQuery();
-
-            client = getIndexClient();
+            
             org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(user, query, filters);
             search.setFiles(IndexUtils.convertSearchEntries(esResponse, user));
             search.setBySource(IndexUtils.getBySource(esResponse));
@@ -75,11 +72,7 @@ public class SearchLogicImpl implements SearchLogic {
             search.setByJob(IndexUtils.getByJob(esResponse));
             return search;
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
-        }
+        } 
     }
 
     private SearchResponse queryExistingSearch(long searchId) {
@@ -92,86 +85,56 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public Set<FileItem> getAllFileItems(Long jobId) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            client = getIndexClient();
             org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(jobId);
             return IndexUtils.convertToFileItems(esResponse);
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
-        }
+        } 
     }
 
     @Override
     public ProtocolDetails getProtocolDetails(String username, String fileId) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            client = getIndexClient();
             org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(username, fileId);
 
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
             return pd;
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public File getThumbnailPathForFile(BackMeUpUser user, String fileId) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            client = getIndexClient();
             String thumbnailPath = client.getThumbnailPathForFile(user.getUsername(), fileId);
             logger.debug("Got thumbnail path: " + thumbnailPath);
-            if (thumbnailPath != null) {
+            if (thumbnailPath != null) { // NOSONAR can be null!
                 return new File(thumbnailPath);
             }
             return null; // Too bad there's no optional return types in Java...
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public void delete(Long jobId, Long timestamp) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            client = getIndexClient();
             client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     @Override
     public void deleteIndexOf(BackMeUpUser user) {
-        ElasticSearchIndexClient client = null;
-        try {
+        try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            client = getIndexClient();
             client.deleteRecordsForUser(user.getUserId());
 
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 

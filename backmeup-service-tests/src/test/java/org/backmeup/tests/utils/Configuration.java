@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Configuration {
-	private Properties properties;
+	private final Properties properties;
 	
 	public Configuration() {
 		properties = new Properties();

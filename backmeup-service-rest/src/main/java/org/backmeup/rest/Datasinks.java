@@ -39,7 +39,7 @@ public class Datasinks extends Base {
   @GET
   @Produces("application/json")
   public DatasinkContainer getDatasinks() {
-    List<Datasink> l = new ArrayList<Datasink>();
+    List<Datasink> l = new ArrayList<>();
     List<SourceSinkDescribable> descs = getLogic().getDatasinks();
     for (SourceSinkDescribable d : descs) {
       l.add(new Datasink(d.getId(), d.getTitle(), d.getImageURL(), d

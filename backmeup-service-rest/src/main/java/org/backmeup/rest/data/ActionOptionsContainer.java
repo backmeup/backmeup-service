@@ -28,7 +28,7 @@ public class ActionOptionsContainer {
 	}
 	
 	public ActionOptionsContainer(ActionProfile ap) {
-	  this.actionOptions = new ArrayList<String>();
+	  this.actionOptions = new ArrayList<>();
 	  for (ActionProperty prop : ap.getActionOptions()) {
 	    actionOptions.add(prop.getKey());
 	  }

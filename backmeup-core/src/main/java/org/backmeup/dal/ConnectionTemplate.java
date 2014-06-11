@@ -84,7 +84,7 @@ public class ConnectionTemplate {
         return new Callable<Void>() {
             @Override
             public Void call() {
-                runnable.run();
+                runnable.run(); // NOSONAR we are not running Threads but reusing Runnable as function/closure. 
                 return null;
             }
         };

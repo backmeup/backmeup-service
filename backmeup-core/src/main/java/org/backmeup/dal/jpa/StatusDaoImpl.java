@@ -16,7 +16,8 @@ public class StatusDaoImpl extends BaseDaoImpl<Status> implements StatusDao {
     super(em);
   }
   
-  public List<Status> findLastByJob(String username, Long jobId) {
+  @Override
+public List<Status> findLastByJob(String username, Long jobId) {
     String query = "SELECT s FROM " + entityClass.getName()
         + " s WHERE s.job.id=:jobId AND s.job.user.username=:username ORDER BY s.timeStamp DESC";
     

@@ -15,7 +15,6 @@ import org.backmeup.model.api.RequiredInputField;
  *  
  * @see org.backmeup.logic.BusinessLogic#preAuth
  * @author fschoeppl
- *
  */
 public class AuthRequest {
 	private List<RequiredInputField> requiredInputs;

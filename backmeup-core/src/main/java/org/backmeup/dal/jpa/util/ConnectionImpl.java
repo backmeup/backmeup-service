@@ -19,20 +19,19 @@ import org.slf4j.LoggerFactory;
  * easier for the BusinessLogicImpl class.
  * 
  * @author fschoeppl
- *
  */
 @ApplicationScoped
 public class ConnectionImpl implements Connection {
 	private final Logger logger = LoggerFactory.getLogger(ConnectionImpl.class);
 	
 	private EntityManagerFactory emFactory;
-	private ThreadLocal<EntityManager> threadLocalEntityManager;
-	private ThreadLocal<Stack<Boolean>> joinedTransactions;
+	private final ThreadLocal<EntityManager> threadLocalEntityManager;
+	private final ThreadLocal<Stack<Boolean>> joinedTransactions;
 	private DataAccessLayer dal;
 		
 	public ConnectionImpl() {
-	  this.threadLocalEntityManager = new ThreadLocal<EntityManager>();
-	  joinedTransactions = new ThreadLocal<Stack<Boolean>>(); 
+	  this.threadLocalEntityManager = new ThreadLocal<>();
+	  joinedTransactions = new ThreadLocal<>(); 
 	}
 	
 	@Inject
@@ -57,7 +56,8 @@ public class ConnectionImpl implements Connection {
     return em;
 	}
 	
-	public void begin() {	  
+	@Override
+    public void begin() {	  
 	  EntityManager em = getOrCreateEntityManager(); 
 		
 		if (em.getTransaction().isActive()) {
@@ -71,7 +71,8 @@ public class ConnectionImpl implements Connection {
 		}
 	}
 	
-	public void rollback() {
+	@Override
+    public void rollback() {
 	  EntityManager em = getEntityManager();
 	  
 		if (em == null) {		  
@@ -93,7 +94,8 @@ public class ConnectionImpl implements Connection {
 		return threadLocalEntityManager.get();
 	}
 	
-	public void commit() {
+	@Override
+    public void commit() {
 	  EntityManager em = getEntityManager();
 	  
 		if (em == null) {
@@ -125,7 +127,7 @@ public class ConnectionImpl implements Connection {
     } else {
       Stack<Boolean> transactionStack = joinedTransactions.get();
       if (transactionStack == null) { 
-        transactionStack = new Stack<Boolean>();
+        transactionStack = new Stack<>();
       }
       transactionStack.push(true);
       joinedTransactions.set(transactionStack);

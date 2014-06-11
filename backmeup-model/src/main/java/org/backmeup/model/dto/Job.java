@@ -61,11 +61,11 @@ public class Job {
 							po.getProfile().getProfileId(), 
 							po.getProfile().getIdentification(),
 							po.getProfile().getDescription(),
-							new ArrayList<String>(Arrays.asList(po.getOptions()))));
+							new ArrayList<>(Arrays.asList(po.getOptions()))));
 		}
 		this.setActions(new ArrayList<ActionProfileDTO>());
 		for(ActionProfile ap : actionProfiles){
-			Map<String, String> apOptions = new HashMap<String, String>();
+			Map<String, String> apOptions = new HashMap<>();
 			for(ActionProperty property : ap.getActionOptions()) {
 				apOptions.put(property.getKey(), property.getValue());
 			}

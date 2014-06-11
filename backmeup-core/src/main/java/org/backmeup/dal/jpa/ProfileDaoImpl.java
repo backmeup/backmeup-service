@@ -22,7 +22,8 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 		super(em);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public List<Profile> findDatasourceProfilesByUsername(String username) {		
 		Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username AND p.sourceAndOrSink IN ('Source', 'Both')");
 		q.setParameter("username", username);
@@ -30,7 +31,8 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 		return profiles;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
   public List<Profile> findDatasinkProfilesByUsername(String username) {    
     Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username AND p.sourceAndOrSink IN ('Sink', 'Both')");
     q.setParameter("username", username);

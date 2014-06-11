@@ -1,6 +1,5 @@
 package org.backmeup.utilities.mail;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -19,10 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class Mailer {
   private static final Logger logger = LoggerFactory.getLogger(Mailer.class);
-  private static ExecutorService service;
-  static {
-    service = Executors.newFixedThreadPool(4);
-  }
+  private static final ExecutorService service = Executors.newFixedThreadPool(4);
   
   public static void send(final String to, final String subject, final String text) {
     send(to, subject, text, "text/plain");
@@ -60,34 +56,26 @@ public class Mailer {
   public static void send(final String to, final String subject, final String text, final String mimeType) {    
     // Get system properties
     service.submit(new Runnable() {
-      public void run() {
+      @Override
+    public void run() {
         executeSend(to, subject, text, mimeType);
       }
     });    
   }
   
-  private static Properties mailSettings;
+  private static final Properties mailSettings = loadMailSettings();
   
   private static Properties getMailSettings() {
-    if (mailSettings == null) {
+    return mailSettings;
+  }
+
+  private static Properties loadMailSettings() {
       Properties props = new Properties();
-      InputStream is = null;
-      try {
-        is = Mailer.class.getClassLoader().getResourceAsStream("mail.properties");
+      try (InputStream is = Mailer.class.getClassLoader().getResourceAsStream("mail.properties")) {
         props.load(is);          
-        mailSettings = props;
       } catch (Exception e) {
     	  logger.error("", e); 
-      } finally {
-        if (is != null) {
-          try {
-            is.close();
-          } catch (IOException e) {
-        	  logger.error("", e);
-          }
-        }
       }
-    }
-    return mailSettings;
+      return props;
   }
 }

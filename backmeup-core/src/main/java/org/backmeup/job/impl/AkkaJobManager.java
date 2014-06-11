@@ -130,7 +130,8 @@ abstract public class AkkaJobManager implements JobManager {
 
 	protected abstract void runJob(BackupJob job);
 
-	public void runBackUpJob(BackupJob job) {
+	@Override
+    public void runBackUpJob(BackupJob job) {
 		queueJob(job);
 	}
 	
@@ -194,9 +195,9 @@ abstract public class AkkaJobManager implements JobManager {
 	private class RunAndReschedule implements Runnable {
 		private final Logger logger = LoggerFactory.getLogger(RunAndReschedule.class);
 
-		private BackupJob job;
-		private DataAccessLayer dal;
-		private UUID schedulerID;
+		private final BackupJob job;
+		private final DataAccessLayer dal;
+		private final UUID schedulerID;
 
 		RunAndReschedule(BackupJob job, DataAccessLayer dal, UUID schedulerID) {
 			this.job = job;

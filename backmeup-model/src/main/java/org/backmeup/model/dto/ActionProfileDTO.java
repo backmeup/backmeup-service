@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ActionProfileDTO {
 	private String actionId;
 	private int priority;
-	private Map<String, String> options = new HashMap<String, String>();
+	private Map<String, String> options = new HashMap<>();
 
 	public ActionProfileDTO() {
 	}

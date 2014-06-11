@@ -21,7 +21,7 @@ public class ActionProfile implements Comparable<ActionProfile> {
   private String actionId;
   private int priority;
   @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true, mappedBy="profile")
-  private Set<ActionProperty> actionOptions = new HashSet<ActionProperty>();
+  private final Set<ActionProperty> actionOptions = new HashSet<>();
   
   public ActionProfile() {
   }
@@ -52,7 +52,7 @@ public class ActionProfile implements Comparable<ActionProfile> {
     if (o == null) {
       return -1;    
     }
-    return o.getPriority() - this.getPriority();
+    return o.priority - this.priority;
   }
   
   public Set<ActionProperty> getActionOptions() {
@@ -71,6 +71,21 @@ public class ActionProfile implements Comparable<ActionProfile> {
 
   public void setPriority(int priority) {
     this.priority = priority;
+  }
+  
+  @Override
+  public int hashCode() {
+    return priority * 31;
+  }
+    
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+        return true;
+    if (obj == null || getClass() != obj.getClass())
+        return false;
+    ActionProfile other = (ActionProfile) obj;
+    return priority == other.priority;
   }
 
   @Entity
@@ -124,7 +139,7 @@ public class ActionProfile implements Comparable<ActionProfile> {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((key == null) ? 0 : key.hashCode());
+      result = prime * result + (key == null ? 0 : key.hashCode());
       return result;
     }
 

@@ -16,11 +16,11 @@ public class BackupJobDTO {
 	private User user;
 	private String jobTitle;
 
-	private Set<SourceProfileEntry> sourceProfiles = new HashSet<SourceProfileEntry>();
+	private Set<SourceProfileEntry> sourceProfiles = new HashSet<>();
 	private ProfileDTO sinkProfile;
-	private List<ActionProfileEntry> actions = new ArrayList<ActionProfileEntry>();
+	private List<ActionProfileEntry> actions = new ArrayList<>();
 
-	private Set<JobProtocolDTO> jobProtocols = new HashSet<JobProtocolDTO>();
+	private final Set<JobProtocolDTO> jobProtocols = new HashSet<>();
 	private Date start;
 	private long delay;
 	private TokenDTO token;

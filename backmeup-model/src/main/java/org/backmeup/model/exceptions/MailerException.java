@@ -2,10 +2,10 @@ package org.backmeup.model.exceptions;
 
 public class MailerException extends BackMeUpException {
   private static final long serialVersionUID = 1L;
-  private String to;
-  private String subject;
-  private String message;
-  private String mimeType;
+  private final String to;
+  private final String subject;
+  private final String message;
+  private final String mimeType;
   
   public MailerException(String to, String subject, String message, String mimeType, Exception innerException) {
     super("Failed to send email!", innerException);
@@ -23,7 +23,8 @@ public class MailerException extends BackMeUpException {
     return subject;
   }
 
-  public String getMessage() {
+  @Override
+public String getMessage() {
     return message;
   }
 

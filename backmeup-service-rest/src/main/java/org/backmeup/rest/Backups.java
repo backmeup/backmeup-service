@@ -58,23 +58,23 @@ public class Backups extends Base {
 		SearchResponse sr = null;
 		Map<String, List<String>> filters = null;
 
-		if ((source != null) || (type != null) || (job != null)) {
-			filters = new HashMap<String, List<String>>();
+		if (source != null || type != null || job != null) {
+			filters = new HashMap<>();
 
 			if (source != null) {
-				List<String> filtervalue = new LinkedList<String>();
+				List<String> filtervalue = new LinkedList<>();
 				filtervalue.add(source);
 				filters.put("source", filtervalue);
 			}
 
 			if (type != null) {
-				List<String> filtervalue = new LinkedList<String>();
+				List<String> filtervalue = new LinkedList<>();
 				filtervalue.add(type);
 				filters.put("type", filtervalue);
 			}
 
 			if (job != null) {
-				List<String> filtervalue = new LinkedList<String>();
+				List<String> filtervalue = new LinkedList<>();
 				filtervalue.add(job);
 				filters.put("job", filtervalue);
 			}

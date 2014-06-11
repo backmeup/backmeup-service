@@ -2,7 +2,7 @@ package org.backmeup.plugin.osgi.impl.test;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.plugin.Plugin;

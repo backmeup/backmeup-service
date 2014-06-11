@@ -8,8 +8,8 @@ import org.backmeup.rest.messages.Messages;
 @XmlRootElement
 public class UserLoginContainer {
 	private boolean activated;
-	private String type = "success";
-	private String message = Messages.LOGIN_USER;
+	private final String type = "success";
+	private final String message = Messages.LOGIN_USER;
 	private Long userId;
 
 	public String getType() {

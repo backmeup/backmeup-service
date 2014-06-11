@@ -1,8 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +9,16 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
+import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
+import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
@@ -40,7 +37,6 @@ import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
-import org.backmeup.model.dto.ActionProfileEntry;
 import org.backmeup.model.dto.ExecutionTime;
 import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobCreationRequest;
@@ -48,20 +44,12 @@ import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
-import org.backmeup.model.exceptions.InvalidCredentialsException;
-import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
-import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
-import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.api.connectors.Datasource;
-import org.backmeup.plugin.spi.Authorizable;
-import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
-import org.backmeup.plugin.spi.InputBased;
-import org.backmeup.plugin.spi.OAuthBased;
 import org.elasticsearch.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,30 +66,8 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped // TODO PK is ApplicationScoped correct when all calls share the same connection? are multiple calls within the same application possible? 
 public class BusinessLogicImpl implements BusinessLogic {
 
-    private static final String UNKNOWN_SOURCE_SINK = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SOURCE_SINK";
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
-    private static final String VALIDATION_OF_ACCESS_DATA_FAILED = "org.backmeup.logic.impl.BusinessLogicImpl.VALIDATION_OF_ACCESS_DATA_FAILED";
-    private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
     private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
-
-    @Inject
-    @Configuration(key="backmeup.callbackUrl")
-    private String callbackUrl;
-
-    @Inject
-    @Configuration(key = "backmeup.index.host")
-    private String indexHost; // TODO only for RabbitMQJobReceiver
-
-    @Inject
-    @Configuration(key = "backmeup.index.port")
-    private Integer indexPort; // TODO only for RabbitMQJobReceiver
-    
-//    @Inject
-//    private Keyserver keyserverClient; // TODO only for RabbitMQJobReceiver
-
-    @Inject
-    @Named("plugin")
-    private Plugin plugins;
 
     // See setJobManager()
     private JobManager jobManager;
@@ -111,27 +77,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private Node esNode;
-
-    // RabbitMQJobReceiver -------------------
-    @Inject
-    @Configuration(key="backmeup.message.queue.host")
-    private String mqHost;
-
-    @Inject
-    @Configuration(key="backmeup.message.queue.name")
-    private String mqName;
-
-    @Inject
-    @Configuration(key="backmeup.message.queue.receivers")
-    private Integer numberOfJobWorker;
-
-    @Inject
-    @Configuration(key="backmeup.job.backupname")
-    private String backupName;
-
-    @Inject
-    @Configuration(key="backmeup.job.temporaryDirectory")
-    private String jobTempDir;
 
     @Inject
     private UserRegistration registration;
@@ -147,6 +92,12 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private BackupLogic backupJobs;
+
+    @Inject
+    private PluginsLogic plugins; 
+
+    // @Inject
+    // private MqLogicImpl mq; 
     
     // ---------------------------------------
 
@@ -155,11 +106,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     // There seems to be a problem with weld (can't find resource bundle 
     // with getClass().getSimpleName()). Therefore use class name. 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BusinessLogicImpl");
-
-    @PostConstruct
-    public void startup() {
-
-    }
 
     @Override
     public BackMeUpUser getUser(final String username) {
@@ -197,9 +143,8 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNew(new Callable<BackMeUpUser>() {
             @Override public BackMeUpUser call() {
                 
-                BackMeUpUser user = registration.getActiveUser(oldUsername);
+                BackMeUpUser user = getAuthorizedUser(oldUsername, oldPassword);
                 registration.ensureNewValuesAvailable(user, newUsername, newEmail);
-                authorization.authorize(user, oldPassword);
                 authorization.updatePasswords(user, oldPassword, newPassword, oldKeyRingPassword, newKeyRingPassword);
                 registration.updateValues(user, newUsername, newEmail);
                 return user;
@@ -372,8 +317,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
 	@Override
 	public List<String> getActionOptions(String actionId) {
-		ActionDescribable action = plugins.getActionById(actionId);
-		return action.getAvailableOptions();
+	    return plugins.getActionOptions(actionId);
 	}
 
     @Override
@@ -393,32 +337,14 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     private List<ActionProfile> getActionProfilesFor(JobCreationRequest request) {
-        List<ActionProfile> actions = new ArrayList<>();
-        // TODO PK extract plugins
-        for (ActionProfileEntry action : request.getActions()) {
-            ActionDescribable ad = plugins.getActionById(action.getId());
-
-            if (ad == null) {
-                throw new IllegalArgumentException(String.format(
-                        textBundle.getString(UNKNOWN_ACTION), action.getId()));
-            }
-            
-            ActionProfile ap = new ActionProfile(ad.getId(), ad.getPriority());
-            for (Map.Entry<String, String> entry : action.getOptions().entrySet()) {
-                ap.addActionOption(entry.getKey(), entry.getValue());
-            }
-            actions.add(ap);
-        }
-        Collections.sort(actions);
-        return actions;
+        return plugins.getActionProfilesFor(request);
     }
 
     @Override
     public ValidationNotes createBackupJob(String username, JobCreationRequest request) {
         try {
             conn.begin();
-            BackMeUpUser user = registration.getActiveUser(username);
-            authorization.authorize(user, request.getKeyRing());
+            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
 
             List<SourceProfileEntry> sourceProfiles = request.getSourceProfiles();
             Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
@@ -453,8 +379,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         BackupJob j = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                BackMeUpUser user = registration.getActiveUser(username);
-                authorization.authorize(user, updateRequest.getKeyRing());
+                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
 
                 List<ActionProfile> requiredActions = getActionProfilesFor(updateRequest);
                 Set<ProfileOptions> sourceProfiles = profiles.getSourceProfilesOptionsFor(updateRequest.getSourceProfiles());
@@ -647,42 +572,18 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public AuthRequest preAuth(String username, String uniqueDescIdentifier,
-            String profileName, String keyRing) throws PluginException,
-            InvalidCredentialsException {
-        Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier);
-        SourceSinkDescribable desc = plugins
-                .getSourceSinkById(uniqueDescIdentifier);
-        return preAuth(username, uniqueDescIdentifier, profileName, keyRing, auth, desc);
-    }
+    public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
+            final String profileName, final String keyRing) {
 
-    private AuthRequest preAuth(final String username, final String uniqueDescIdentifier, final String profileName, final String keyRing,
-            final Authorizable auth, final SourceSinkDescribable desc) {
         return conn.txNew(new Callable<AuthRequest>() {
             @Override public AuthRequest call() {
 
-                BackMeUpUser user = registration.getActiveUser(username);
-                
-                authorization.authorize(user, keyRing);
+                BackMeUpUser user = getAuthorizedUser(username, keyRing);
 
-                AuthRequest ar = new AuthRequest();
                 Properties p = new Properties();
-                p.setProperty("callback", callbackUrl);
-                switch (auth.getAuthType()) {
-                case OAuth:
-                    OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
-                    String redirectUrl = oauth.createRedirectURL(p, callbackUrl);
-                    ar.setRedirectURL(redirectUrl);
-                    // TODO Store all properties within keyserver & don't store them within the local database!
-                    break;
-                case InputBased:
-                    InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
-                    ar.setRequiredInputs(ibased.getRequiredInputFields());
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
-                }
+                AuthRequest ar = plugins.configureAuth(p, uniqueDescIdentifier);
                 
+                SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
                 Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
                 authorization.initProfileAuthInformation(profile, p, keyRing);
                 
@@ -693,54 +594,39 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    private BackMeUpUser getAuthorizedUser(String username, String keyRing) {
+        BackMeUpUser user = registration.getActiveUser(username);
+        authorization.authorize(user, keyRing);
+        return user;
+    }
+
+    private void ensureUserIsAuthorized(String username, String keyRing) {
+        getAuthorizedUser(username, keyRing);
+    }
+    
     @Override
-    public void postAuth(Long profileId, Properties props, String keyRing)
-            throws PluginException, ValidationException, InvalidCredentialsException {
-        try {
-            if (keyRing == null) {
-                throw new IllegalArgumentException("keyRing-Parameter cannot be null!");
-            } else if (profileId == null) {
-                throw new IllegalArgumentException("profileId-Parameter cannot be null!");
-            } else if (props == null) {
-                throw new IllegalArgumentException("properties-Parameter cannot be null!");
-            }
-
-            conn.begin();
-            Profile p = profiles.queryExistingProfile(profileId);
-
-            props.putAll(authorization.getProfileAuthInformation(p, keyRing));
-
-            Authorizable auth = plugins.getAuthorizable(p.getDescription());
-            if (auth.getAuthType() == AuthorizationType.InputBased) {
-                InputBased inputBasedService = plugins.getInputBasedAuthorizable(p
-                        .getDescription());
-                if (inputBasedService.isValid(props)) {
-                    String userId = auth.postAuthorize(props);
-
-                    profiles.setIdentification(p, userId);
-                    
-                    authorization.overwriteProfileAuthInformation(p, props, keyRing);
-                    conn.commit();
-                    return;
-                } else {
-                    conn.rollback();
-                    throw new ValidationException(ValidationExceptionType.AuthException,
-                            textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
-                }
-            } else {
-                String userId = auth.postAuthorize(props);
-                
-                profiles.setIdentification(p, userId);
-                
-                authorization.overwriteProfileAuthInformation(p, props, keyRing);
-                conn.commit();
-            }
-        } catch (PluginException pe) {
-            logger.error("", pe);
-            throw pe;
-        } finally {
-            conn.rollback();
+    public void postAuth(final Long profileId, final Properties props, final String keyRing) {
+        if (keyRing == null) {
+            throw new IllegalArgumentException("keyRing-Parameter cannot be null!");
+        } else if (profileId == null) {
+            throw new IllegalArgumentException("profileId-Parameter cannot be null!");
+        } else if (props == null) {
+            throw new IllegalArgumentException("properties-Parameter cannot be null!");
         }
+        
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile p = profiles.queryExistingProfile(profileId);
+                props.putAll(authorization.getProfileAuthInformation(p, keyRing));
+
+                String sourceSinkId = p.getDescription();
+                String userId = plugins.getAuthorizedUserId(sourceSinkId, props);
+                profiles.setIdentification(p, userId);
+                authorization.overwriteProfileAuthInformation(p, props, keyRing);
+
+            }
+        });
     }
 
     @Override
@@ -750,8 +636,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             return conn.txNew(new Callable<Long>() {
                 @Override public Long call() {
                     
-                    BackMeUpUser user = registration.getActiveUser(username);
-                    authorization.authorize(user, keyRingPassword);
+                    ensureUserIsAuthorized(username, keyRingPassword);
                     SearchResponse searchResp = search.createSearch(query, new String[0]);
                     return searchResp.getId();
                     
@@ -819,7 +704,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     public void shutdown() {
         logger.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
         jobManager.shutdown();
-        plugins.shutdown();
         esNode.close();
     }
 
@@ -835,14 +719,8 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public Properties call() {
                 
                 Profile profile = profiles.getExistingUserProfile(profileId, username);
-                
-                // TODO PK move to plugins
-                SourceSinkDescribable ssd = plugins.getSourceSinkById(profile.getDescription());
-                if (ssd == null) {
-                    throw new IllegalArgumentException(String.format(
-                            textBundle.getString(UNKNOWN_SOURCE_SINK), profile.getDescription()));
-                }
-                
+                String sourceSinkId = profile.getDescription();
+                SourceSinkDescribable ssd = plugins.getExistingSourceSink(sourceSinkId);
                 Properties accessData = authorization.getProfileAuthInformation(profile, keyRing);
                 return ssd.getMetadata(accessData);
                 
@@ -885,42 +763,45 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public ValidationNotes call() {
                 
                 registration.ensureUserIsActive(username);
+                return validatePluginProfiles();
 
-                BackupJob job = backupJobs.getExistingUserJob(jobId, username); 
-                Set<ProfileOptions> sourceProfiles = job.getSourceProfiles();
-                Long sinkProfileId = job.getSinkProfile().getProfileId();
+            }
 
+            private ValidationNotes validatePluginProfiles() {
                 ValidationNotes notes = new ValidationNotes();
                 try {
-                    // plugin-level validation
-                    for (ProfileOptions po : sourceProfiles) {
-                        SourceSinkDescribable ssd = plugins.getSourceSinkById(po.getProfile().getDescription());
-                        if (ssd == null) {
-                            notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, po.getProfile().getDescription());
-                        }
+                    BackupJob job = backupJobs.getExistingUserJob(jobId, username); 
+                    validateSourceProfiles(job.getSourceProfiles(), notes);
 
-                        // Validate source plug-in itself
-                        notes.getValidationEntries().addAll(
-                                validateProfile(username, po.getProfile().getProfileId(), keyRing)
-                                .getValidationEntries());
-                    }
-
-                    // validate sink profile
-                    notes.getValidationEntries().addAll(
-                            validateProfile(username, sinkProfileId, keyRing)
-                            .getValidationEntries());
+                    Long sinkProfileId = job.getSinkProfile().getProfileId();
+                    getValidationEntriesForProfile(sinkProfileId, notes);
 
                 } catch (BackMeUpException bme) {
-                    notes.addValidationEntry(ValidationExceptionType.Error,
-                            bme);
+                    notes.addValidationEntry(ValidationExceptionType.Error, bme);
                 }
                 return notes;
+            }
 
+            private void validateSourceProfiles(Set<ProfileOptions> sourceProfiles, ValidationNotes notes) {
+                for (ProfileOptions po : sourceProfiles) {
+
+                    String sourceSinkId = po.getProfile().getDescription();
+                    plugins.validateSourceSinkExists(sourceSinkId, notes);
+
+                    Long profileId = po.getProfile().getProfileId();
+                    getValidationEntriesForProfile(profileId, notes);
+                }
+            }
+
+            private void getValidationEntriesForProfile(Long id, ValidationNotes notes) {
+                notes.getValidationEntries().addAll(
+                        validateProfile(username, id, keyRing)
+                        .getValidationEntries());
             }
         });
     }
 
-    //TODO Store profile data within keyserver!
+    // TODO Store profile data within keyserver!
     @Override
     public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
         conn.txNew(new Runnable() {
@@ -928,7 +809,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 
                 Profile profile = profiles.queryExistingProfile(profileId);
                 authorization.appendProfileAuthInformation(profile, entries, keyRing);
-                profiles.save(profile); // TODO why save, has not been changed?
+                profiles.save(profile); // TODO why save? has not been changed
                 
             }
         });
@@ -960,4 +841,5 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
         return authorization.getLogs(user);
     }
+
 }

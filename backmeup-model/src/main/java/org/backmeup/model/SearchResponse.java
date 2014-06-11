@@ -193,7 +193,7 @@ public class SearchResponse {
 		private Long datasourceId;
 		private String jobName;
 		private String preview;
-		private Map<String, String> properties = new HashMap<String, String>();
+		private final Map<String, String> properties = new HashMap<>();
 		
 		public SearchEntry() {
 			

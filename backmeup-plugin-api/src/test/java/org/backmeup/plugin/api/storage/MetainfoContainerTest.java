@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-
-
 import org.backmeup.plugin.api.Metainfo;
 import org.backmeup.plugin.api.MetainfoContainer;
 import org.junit.Assert;
@@ -30,7 +28,7 @@ public class MetainfoContainerTest {
 		System.out.println("serialized: " + json);
 		
 		MetainfoContainer after = MetainfoContainer.fromJSON(json);
-		List<Metainfo> metainfo = new ArrayList<Metainfo>();
+		List<Metainfo> metainfo = new ArrayList<>();
 		Iterator<Metainfo> it = after.iterator();
 		while (it.hasNext())
 			metainfo.add(it.next());

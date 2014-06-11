@@ -9,16 +9,16 @@ public class ResultMessage {
 	}
 
 	private Type type;
-	private List<String> messages;
+	private final List<String> messages;
 
 	public ResultMessage(Type type) {
 		this.type = type;
-		this.messages = new ArrayList<String>();
+		this.messages = new ArrayList<>();
 	}
 
 	public ResultMessage(Type type, String... messages) {
 		this.type = type;
-		this.messages = new ArrayList<String>();
+		this.messages = new ArrayList<>();
 		for (String msg : messages) {
 			this.messages.add(msg);
 		}

@@ -12,7 +12,7 @@ import org.backmeup.rest.data.ErrorEntity;
 // Also an upgrade to RESTEasy version 3.x should solve the problem.
 public abstract class CommonExceptionMapper<T extends Exception> implements ExceptionMapper<T> {
 
-	private Status status;
+	private final Status status;
 
     public CommonExceptionMapper(Status status) {
         this.status = status;

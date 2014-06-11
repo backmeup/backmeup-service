@@ -1,4 +1,4 @@
-package org.backmeup.logic.impl;
+package org.backmeup.logic;
 
 import java.util.Date;
 import java.util.List;

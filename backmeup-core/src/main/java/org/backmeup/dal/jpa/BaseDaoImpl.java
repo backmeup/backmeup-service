@@ -26,27 +26,32 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 		entityClass = (Class<T>) superType.getActualTypeArguments()[0];
 	} 
 	
-	public T merge(T entity) {
+	@Override
+    public T merge(T entity) {
 	  return em.merge(entity);
 	}
  
-	public T findById(long id) {
+	@Override
+    public T findById(long id) {
 		T item = em.find(entityClass, id);
 		return item;
 	}
  
-	public boolean delete(T entity) {
+	@Override
+    public boolean delete(T entity) {
 		entity = em.merge(entity);
 		em.remove(entity);
 		return true;
 	}
  
-	public T save(T entity) {
+	@Override
+    public T save(T entity) {
 		entity = em.merge(entity);		
 		return entity;
 	} 
 	
-	public long count() {
+	@Override
+    public long count() {
 		Query q = em.createQuery("SELECT COUNT(u) FROM " + entityClass.getName() + " u");
 		Long cnt = (Long) q.getSingleResult();
 		return cnt;

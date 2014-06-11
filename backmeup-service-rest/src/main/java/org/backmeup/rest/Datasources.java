@@ -40,7 +40,7 @@ public class Datasources extends Base {
 	@GET
 	@Produces("application/json")
 	public DatasourceContainer getDatasources() {
-		List<Datasource> l = new ArrayList<Datasource>();
+		List<Datasource> l = new ArrayList<>();
 		List<SourceSinkDescribable> descs = getLogic().getDatasources();
 		for (SourceSinkDescribable d : descs) {
 			l.add(new Datasource(d.getId(), d.getTitle(), d.getImageURL()));

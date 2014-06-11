@@ -27,7 +27,7 @@ public class MetainfoContainer implements Iterable<Metainfo> {
 		gson = builder.create();
 	}
 	
-	private List<Metainfo> metainfo = new ArrayList<Metainfo>();
+	private final List<Metainfo> metainfo = new ArrayList<>();
 
 	public void addMetainfo(Metainfo info) {
 		this.metainfo.add(info);

@@ -3,9 +3,9 @@ package org.backmeup.model.exceptions;
 public class PasswordTooShortException extends BackMeUpException{
   private static final long serialVersionUID = 1L;
   
-  private int minimalLength;
+  private final int minimalLength;
   
-  private int actualLength;
+  private final int actualLength;
   
   public PasswordTooShortException(int minimalLength, int actualLength) {
     super("Password too short!");

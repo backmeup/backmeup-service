@@ -31,7 +31,7 @@ public class SearchEntryContainer {
 		this.setDatasource(entry.getDatasource());
 		this.setPreview(entry.getPreviewSnippet());
 		this.setJobName(entry.getJobName());
-		this.properties = new ArrayList<SearchEntryContainer.KeyValue>();
+		this.properties = new ArrayList<>();
 		for (String key : entry.getPropertyKeys()) {
 			this.properties.add(new KeyValue(key, entry.getProperty(key)));
 		}

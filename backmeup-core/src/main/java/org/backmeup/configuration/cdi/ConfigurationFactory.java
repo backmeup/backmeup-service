@@ -45,19 +45,19 @@ public class ConfigurationFactory {
 			}
 			
 			properties = new Properties();
-			try {
+			try { 
 				properties.load(is);
 			} catch (IOException e) {
 				logger.error("Failed to load properties file. Add {} or add it to the classpath!", propertiesFilePath);
 				throw new RuntimeException("Failed to load properties file", e);
-			}
-			
-			if(is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					logger.error("", e);
-				}
+			} finally {
+			    if(is != null) {
+			        try {
+			            is.close();
+			        } catch (IOException e) {
+			            logger.error("", e);
+			        }
+			    }
 			}
 		}
 		return properties;

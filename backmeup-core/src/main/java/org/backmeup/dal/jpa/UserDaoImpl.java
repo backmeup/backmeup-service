@@ -21,7 +21,8 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
 		super(em);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public BackMeUpUser findByName(String username) {
 		Query q = em.createQuery("SELECT u FROM BackMeUpUser u WHERE username = :username");
 		q.setParameter("username", username);		

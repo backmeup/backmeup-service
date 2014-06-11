@@ -13,9 +13,9 @@ public abstract class IntegrationTestBase {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		Configuration config = new Configuration();
-		InputStream in = IntegrationTestBase.class.getClassLoader().getResourceAsStream("integrationtests.properties");
-		config.load(in);
-		in.close();
+		try (InputStream in = IntegrationTestBase.class.getClassLoader().getResourceAsStream("integrationtests.properties")) {
+		    config.load(in);
+		}
 		
 		RestAssured.baseURI = config.getProperty("backmeup.service.baseuri");
 		RestAssured.port = Integer.parseInt(config.getProperty("backmeup.service.port"));
@@ -25,7 +25,7 @@ public abstract class IntegrationTestBase {
 	}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
+	public static void tearDownAfterClass() {
 		RestAssured.reset();
 	}
 }

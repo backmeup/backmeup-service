@@ -15,7 +15,7 @@ import org.backmeup.model.spi.ValidationExceptionType;
 public class ValidationException extends BackMeUpException {
 	private static final long serialVersionUID = 1L;
 	
-  private ValidationExceptionType type;
+  private final ValidationExceptionType type;
 	
 	public ValidationException(ValidationExceptionType type, String message, Throwable cause) {
 		super(message, cause);
