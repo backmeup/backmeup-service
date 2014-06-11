@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.backmeup.model.BackMeUpUser;
@@ -146,10 +147,11 @@ public class BackupJobs extends Base {
         username, duration));
   }
   
-  @PUT
+  @POST
   @Path("/{username}/{jobId}/protocol")
-  @Produces("application/json")
-  public void updateJobProtocol(@PathParam("username") String username, @PathParam("jobId") Long jobId, JobProtocolDTO jobProtocol) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void storeJobProtocol(@PathParam("username") String username, @PathParam("jobId") Long jobId, JobProtocolDTO jobProtocol) {
 	  getLogic().updateJobProtocol(username, jobId, jobProtocol);
   }
   
