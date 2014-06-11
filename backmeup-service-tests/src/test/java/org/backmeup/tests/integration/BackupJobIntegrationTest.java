@@ -506,6 +506,75 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			BackMeUpUtils.deleteUser(username);
 		}
 	}
+		
+	@Test
+	public void testGetBackupJobFileGen() {
+		String username = "TestUser1";
+		String password = "password1";
+		String keyRingPassword = "keyringpassword1";
+		String email = "TestUser@trash-mail.com";
+		
+		String datasourceId = "org.backmeup.filegenerator";
+		String datasinkId   = "org.backmeup.dummy";
+		String profileSourceName = "FileGeneratorSourceProfile";
+		String profileSinkName   = "DummySinkProfile";
+		String profileSourceId = "";
+		String profileSinkId = "";
+		
+		String jobTitle = "TestUserJob1";
+		String jobTimeExpression = "weekly";
+		int jobId = 0;
+		
+		ValidatableResponse response;
+		try {
+			response = BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			String verificationKey = response.extract().path("verificationKey");
+			BackMeUpUtils.verifyEmail(verificationKey);
+			
+			response = BackMeUpUtils.authenticateDatasource(username, password, profileSourceName, datasourceId);
+			profileSourceId = response.extract().path("profileId");
+			
+			Properties dsProperties = new Properties();
+			dsProperties.put("text", "true");
+			dsProperties.put("image", "false");
+			dsProperties.put("pdf", "false");
+			dsProperties.put("binary", "false");
+			BackMeUpUtils.postAuthenticateDatasource(username, password, profileSourceId, dsProperties);
+			
+			response = BackMeUpUtils.authenticateDatasink(username, password, profileSinkName, datasinkId);
+			profileSinkId = response.extract().path("profileId");
+						
+			response = BackMeUpUtils.createBackupJob(username, password, profileSourceId, profileSinkId, jobTimeExpression, jobTitle);
+			jobId = response.extract().path("job.jobId");
+			
+			given()
+//				.log().all()
+			.when()
+				.get("/jobs/" + username + "/" + jobId + "/full")
+			.then()
+				.log().all()
+				.statusCode(200)
+				.body("jobId", equalTo(jobId))
+				.body("timeExpression", equalTo(jobTimeExpression))
+				.body("onHold", equalTo(false))
+				.body("jobTitle", equalTo(jobTitle))
+				.body("status", equalTo("queued"))
+				.body(containsString("createDate"))
+				.body(containsString("modifyDate"))
+				.body(containsString("nextBackup"))
+				.body(containsString("datasources"))
+				.body(containsString("datasink"))
+				.body(containsString("actions"))
+				.body(containsString("tokenId"))
+				.body(containsString("token"));
+				
+		} finally {
+			BackMeUpUtils.deleteBackupJob(username, jobId);
+			BackMeUpUtils.deleteDatasourceProfile(username, profileSourceId);
+			BackMeUpUtils.deleteDatasinkProfile(username, profileSinkId);
+			BackMeUpUtils.deleteUser(username);
+		}
+	}
 	/*
 	@Test
 	public void Cleanup() {
