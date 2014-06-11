@@ -95,9 +95,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private PluginsLogic plugins; 
-
-    // @Inject
-    // private MqLogicImpl mq; 
     
     // ---------------------------------------
 
