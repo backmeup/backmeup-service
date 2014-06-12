@@ -11,9 +11,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Whenever a object will be converted into JSON,
  * it should not contain null values.
- * 
- * @author fschoeppl
- *
  */
 @Provider
 @Produces(MediaType.APPLICATION_JSON)

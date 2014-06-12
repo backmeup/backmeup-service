@@ -10,12 +10,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class looks up the BusinessLogic implementation by using Weld.
- * 
- * @author fschoeppl
  */
 @Provider
 public class BusinessLogicContextResolver implements ContextResolver<BusinessLogic> {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private BusinessLogic logic;
@@ -41,5 +38,4 @@ public class BusinessLogicContextResolver implements ContextResolver<BusinessLog
             return null;
         }
     }
-
 }
