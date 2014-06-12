@@ -10,12 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class creates one single EntityManager for the
- * whole application. It will be injected into the
- * Connection class of the business layer.
- * 
- * @author fschoeppl
- *
+ * This class creates one single EntityManager for the whole application. 
+ * It will be injected into the connection class of the business layer.
  */
 public class EntityManagerFactoryProducer {
 	private final Logger logger = LoggerFactory.getLogger(EntityManagerFactoryProducer.class); 

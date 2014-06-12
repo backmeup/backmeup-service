@@ -5,7 +5,6 @@ import javax.servlet.ServletContext;
 import org.backmeup.logic.BusinessLogic;
 
 public class BusinessLogicContextHolder {
-
     private static final String BACKMEUP_LOGIC_ATTR_NAME = "org.backmeup.logic";
 
     private final ServletContext servletContext;
