@@ -61,8 +61,12 @@ public class RabbitMQJobManager extends AkkaJobManager {
 	public void shutdown() {
 		super.shutdown();
 		try {
-			mqChannel.close();
-			mqConnection.close();
+			if (mqChannel.isOpen()) {
+				mqChannel.close();
+			}
+			if (mqConnection.isOpen()) {
+				mqConnection.close();
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
