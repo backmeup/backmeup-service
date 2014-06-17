@@ -9,7 +9,7 @@
 	
 	<artifactId>backmeup-service-rest</artifactId>
 	<packaging>war</packaging>
-	<name>BackMeUp REST Service</name>
+	<name>BackMeUp Service</name>
 	
 	<dependencies>
 		<dependency>
@@ -36,10 +36,10 @@
 			<version>${version.javax.el}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+				
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 			<version>${version.javax.servlet}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -51,12 +51,13 @@
 			<version>${version.org.jboss.weld.servlet}</version>
 		</dependency>
 
-        <!-- used as JAX-WS implementation, not referenced in source -->		
+        <!-- used as JAX-RS implementation, not referenced in source -->		
 		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-multipart-provider</artifactId>
-			<version>${version.org.jboss.resteasy}</version>
-		</dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-servlet-initializer</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+        </dependency>
+				
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jackson-provider</artifactId>
@@ -74,6 +75,25 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${version.org.postgresql}</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>net.sf.dozer</groupId>
+    		<artifactId>dozer</artifactId>
+    		<version>${version.net.sf.dozer}</version>
+    		<exclusions>
+    			<exclusion>
+    				<artifactId>slf4j-log4j12</artifactId>
+    				<groupId>org.slf4j</groupId>
+    			</exclusion>
+    		</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${version.junit}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
