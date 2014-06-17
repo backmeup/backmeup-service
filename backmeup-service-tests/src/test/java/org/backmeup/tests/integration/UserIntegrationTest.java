@@ -41,10 +41,24 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.body("name", equalTo(name))
 				.body("password", equalTo(null))
 				.body("email", equalTo(email))
-				.body(containsString("userId"))
-				.body(containsString("verificationKey"));
+				.body(containsString("userId"));
 		} finally {
 //			BackMeUpUtils.deleteUser(email);
+		}
+	}
+	
+	@Test
+	public void testGetUserList() {		
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+			.when()
+				.get("/users/")
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
 		}
 	}
 	

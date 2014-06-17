@@ -11,7 +11,6 @@ public class UserDTO {
     private String password;
     private String email;
     private boolean activated;
-    private String verificationKey;
     
     public UserDTO() {
     	
@@ -71,13 +70,5 @@ public class UserDTO {
 
 	private void setActivated(Boolean activated) {
 		this.activated = activated;
-	}
-
-	public String getVerificationKey() {
-		return verificationKey;
-	}
-
-	private void setVerificationKey(String verificationKey) {
-		this.verificationKey = verificationKey;
 	}
 }

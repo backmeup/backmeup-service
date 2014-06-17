@@ -22,9 +22,5 @@
   			<a>activated</a>
   			<b is-accessible="true">activated</b>
 		</field> 
-		<field>
-  			<a>verificationKey</a>
-  			<b is-accessible="true">verificationKey</b>
-		</field> 
 	</mapping>
 </mappings> 

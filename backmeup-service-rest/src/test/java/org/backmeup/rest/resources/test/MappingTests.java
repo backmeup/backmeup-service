@@ -35,7 +35,6 @@ public class MappingTests {
 		assertEquals(srcUser.getUsername(), destUser.getName());
 		assertEquals(srcUser.getEmail(), destUser.getEmail());
 		assertEquals(srcUser.isActivated(), destUser.isActivated());
-		assertEquals(srcUser.getVerificationKey(), destUser.getVerificationKey());
 	}
 	
 	@SuppressWarnings("serial")
