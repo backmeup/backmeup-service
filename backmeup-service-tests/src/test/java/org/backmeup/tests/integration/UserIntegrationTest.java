@@ -1,19 +1,15 @@
 package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
-import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
-import com.jayway.restassured.response.ValidatableResponse;
 
 @Category(IntegrationTest.class)
 public class UserIntegrationTest extends IntegrationTestBase {
@@ -38,7 +34,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.statusCode(200)
 				.body("firstname", equalTo(name))
-				.body("name", equalTo(name))
+				.body("lastname", equalTo(name))
 				.body("password", equalTo(null))
 				.body("email", equalTo(email))
 				.body(containsString("userId"));

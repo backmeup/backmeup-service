@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class UserDTO {
     private Long userId;
     private String firstname;
-    private String name;
+    private String lastname;
     private String password;
     private String email;
     private boolean activated;
@@ -16,9 +16,9 @@ public class UserDTO {
     	
     }
 
-    public UserDTO(String firstname, String name, String password, String email) {
+    public UserDTO(String firstname, String lastname, String password, String email) {
     	this.firstname = firstname;
-    	this.name = name;
+    	this.lastname = lastname;
     	this.password = password;
     	this.email = email;
     	this.activated = false;
@@ -32,12 +32,12 @@ public class UserDTO {
 		this.firstname = firstname;
 	}
 
-	public String getName() {
-		return name;
+	public String getLastname() {
+		return lastname;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLastname(String name) {
+		this.lastname = name;
 	}
 	
 	public String getPassword() {

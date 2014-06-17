@@ -40,7 +40,7 @@ public class Users extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO addUser(UserDTO user) {
-		BackMeUpUser userModel = getLogic().register(user.getName(), user.getPassword(), user.getPassword(), user.getEmail());
+		BackMeUpUser userModel = getLogic().register(user.getLastname(), user.getPassword(), user.getPassword(), user.getEmail());
 		user = getMapper().map(userModel, UserDTO.class);
 		return user;
 	}

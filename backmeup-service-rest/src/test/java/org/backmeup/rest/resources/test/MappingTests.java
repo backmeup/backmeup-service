@@ -32,7 +32,7 @@ public class MappingTests {
 		
 		assertEquals(srcUser.getUserId(), destUser.getUserId());
 		assertEquals(srcUser.getUsername(), destUser.getFirstname());
-		assertEquals(srcUser.getUsername(), destUser.getName());
+		assertEquals(srcUser.getUsername(), destUser.getLastname());
 		assertEquals(srcUser.getEmail(), destUser.getEmail());
 		assertEquals(srcUser.isActivated(), destUser.isActivated());
 	}
