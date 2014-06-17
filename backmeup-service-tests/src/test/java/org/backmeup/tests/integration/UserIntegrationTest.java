@@ -6,44 +6,49 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
+import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
-
-/*
- * for examples rest-assured see:
- * https://github.com/jayway/rest-assured/tree/master/examples/rest-assured-itest-java/src/test/java/com/jayway/restassured/itest/java
- */
 
 @Category(IntegrationTest.class)
 public class UserIntegrationTest extends IntegrationTestBase {
 
 	@Test
-	public void testRegisterUser() {
-		String username = "TestUser1";
+	public void testAddUser() {
+		String firstname = "John";
+		String name = "Doe";
 		String password = "password1";
-		String keyRingPassword = "keyringpassword1";
 		String email = "TestUser@trash-mail.com";
+		
+		UserDTO newUser = new UserDTO(firstname, name, password, email);
 		
 		try {
 			given()
-				.contentType("application/x-www-form-urlencoded")
+				.log().all()
 				.header("Accept", "application/json")
-				.formParam("password", password)
-				.formParam("keyRing", keyRingPassword)
-				.formParam("email", email)
+				.body(newUser, ObjectMapperType.JACKSON_1)
 			.when()
-				.post("/users/" + username + "/register")
+				.post("/users/")
 			.then()
-				.assertThat().statusCode(200).assertThat()
+				.log().all()
+				.statusCode(200)
+				.body("firstname", equalTo(name))
+				.body("name", equalTo(name))
+				.body("password", equalTo(null))
+				.body("email", equalTo(email))
+				.body(containsString("userId"))
 				.body(containsString("verificationKey"));
 		} finally {
-			BackMeUpUtils.deleteUser(username);
+//			BackMeUpUtils.deleteUser(email);
 		}
 	}
+	
+	/*
 	
 	@Test
 	public void testAlreadyRegisteredUser() {
@@ -426,9 +431,12 @@ public class UserIntegrationTest extends IntegrationTestBase {
 	public void testGetUnknownUser() {
 		String username = "TestUser1";
 		
-		when()
+		given()
+			.log().all()
+		.when()
 			.get("/users/" + username)
 		.then()
+			.log().all()
 			.statusCode(404)
 			.body("errorType", equalTo("org.backmeup.model.exceptions.UnknownUserException"));
 	}
@@ -622,4 +630,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			BackMeUpUtils.deleteUser(username);
 		}
 	}
+	
+	*/
 }
