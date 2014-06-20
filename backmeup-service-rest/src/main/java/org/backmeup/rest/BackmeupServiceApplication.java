@@ -5,7 +5,9 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.backmeup.rest.filters.TimingResourceFilter;
 import org.backmeup.rest.provider.JacksonJsonConfiguration;
+import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Users;
 
 public class BackmeupServiceApplication extends Application {
@@ -15,8 +17,10 @@ public class BackmeupServiceApplication extends Application {
 
 	public BackmeupServiceApplication() {
 		 singletons.add(new Users());
+		 singletons.add(new Plugins());
 		
 		 set.add(JacksonJsonConfiguration.class);
+		 set.add(TimingResourceFilter.class);
 	}
 
 	@Override
