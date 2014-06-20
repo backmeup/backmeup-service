@@ -12,17 +12,16 @@ import org.dozer.Mapper;
 @ApplicationScoped
 public class MapperProducer {
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
-	
+
 	private Mapper mapper;
-	
+
 	@Produces
-	@SuppressWarnings("serial")
 	public Mapper getMapper() {
-		if(mapper == null) {
-			List<String> list = new ArrayList<String>() { 
-				{add(DOZER_USER_MAPPING);}
-			};
-			mapper = new DozerBeanMapper(list);
+		if (mapper == null) {
+			List<String> configList = new ArrayList<String>();
+			configList.add(DOZER_USER_MAPPING);
+			
+			mapper = new DozerBeanMapper(configList);
 		}
 		return mapper;
 	}
