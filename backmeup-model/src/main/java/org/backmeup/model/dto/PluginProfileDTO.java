@@ -1,5 +1,6 @@
 package org.backmeup.model.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,13 @@ public class PluginProfileDTO {
 
 	public void setOptions(List<String> options) {
 		this.options = options;
+	}
+	
+	public void addOption(String option) {
+		if(options == null) {
+			options = new ArrayList<>();
+		}
+		options.add(option);
 	}
 	
 }
