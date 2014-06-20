@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.backmeup.model.BackMeUpUser;
@@ -24,14 +25,10 @@ public class Users extends Base {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<UserDTO> listUsers() {
-		@SuppressWarnings("serial")
-		List<UserDTO> userList = new ArrayList<UserDTO>() {
-			{ 
-				add(new UserDTO("John", "Doe", null, "john.doe@example.com"));
-				add(new UserDTO("Bob", "Doe", null, "bob.doe@example.com"));
-			}
-		};
+	public List<UserDTO> listUsers(@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+		List<UserDTO> userList = new ArrayList<UserDTO>();
+		userList.add(new UserDTO("John", "Doe", null, "john.doe@example.com"));
+		userList.add(new UserDTO("Bob", "Doe", null, "bob.doe@example.com"));
 		return userList;
 	}
 	
@@ -41,8 +38,7 @@ public class Users extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO addUser(UserDTO user) {
 		BackMeUpUser userModel = getLogic().register(user.getLastname(), user.getPassword(), user.getPassword(), user.getEmail());
-		user = getMapper().map(userModel, UserDTO.class);
-		return user;
+		return getMapper().map(userModel, UserDTO.class);
 	}
 	
 	@GET
@@ -50,8 +46,7 @@ public class Users extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO getUser(@PathParam("userId") String userId) {
 		BackMeUpUser userModel = getLogic().getUser(userId);
-		UserDTO user = getMapper().map(userModel, UserDTO.class);
-		return user;
+		return getMapper().map(userModel, UserDTO.class);
 	}
 	
 	@PUT
@@ -59,6 +54,9 @@ public class Users extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO updateUser(@PathParam("userId") String userId, UserDTO user) {
+		BackMeUpUser userModel = getLogic().getUser(userId);
+//		BackMeUpUser newUser = getLogic().changeUser(userModel.getUsername(), user.getLastname(), user.getPassword(), user.getEmail());
+//		return getMapper().map(newUser, UserDTO.class);
 		return user;
 	}
 	
