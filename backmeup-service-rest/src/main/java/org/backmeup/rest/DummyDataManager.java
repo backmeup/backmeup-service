@@ -1,14 +1,27 @@
 package org.backmeup.rest;
 
+import java.util.Date;
+
 import org.backmeup.model.api.RequiredInputField.Type;
+import org.backmeup.model.dto.BackupJobDTO;
+import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
+import org.backmeup.model.dto.TokenDTO;
+import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 
 public class DummyDataManager {
+	public static UserDTO getUserDTO() {
+		UserDTO user = new UserDTO("John", "Doe", null, "john.doe@example.com");
+		return user;
+	}
+	
 	public static PluginDTO getPluginDTO(boolean expandProfiles) {
 		PluginDTO plugin = new PluginDTO();
 		plugin.setPluginId("org.backmeup.mail");
@@ -54,5 +67,73 @@ public class DummyDataManager {
 		}
 
 		return pluginProfile;
+	}
+	
+	public static TokenDTO getTokenDTO() {
+		TokenDTO token = new TokenDTO();
+		token.setTokenId(11254L);
+		token.setToken("Vm9lSEliY...t1S3c9PQ==");
+		return token;
+	}
+	
+	public static JobProtocolDTO getJobProtocolDTOSuccessful() {
+		JobProtocolDTO prot = new JobProtocolDTO();
+		prot.setProtocolId(3L);
+		prot.setTimestamp(1402025132472L);
+		prot.setStart(1401099531932L);
+		prot.setExecutionTime(925600540L);
+		prot.setSuccessful(true);
+		prot.setProcessedItems(19463L);
+		prot.setSpace(128000);
+		prot.setMessage("");
+		return prot;
+	}
+	
+	public static JobProtocolDTO getJobProtocolDTOError() {
+		JobProtocolDTO prot = new JobProtocolDTO();
+		prot.setProtocolId(62L);
+		prot.setTimestamp(1401101262264L);
+		prot.setStart(1401099641492L);
+		prot.setExecutionTime(1620772L);
+		prot.setSuccessful(false);
+		prot.setProcessedItems(0);
+		prot.setSpace(0);
+		prot.setMessage("java.lang.NullPointerException at ...");
+		return prot;
+	}
+	
+	public static BackupJobDTO getBackupJobDTO(boolean expand) {
+		BackupJobDTO job = new BackupJobDTO();
+		job.setJobId(1L);
+		job.setJobTitle("BackupJob1");
+		job.setJobStatus(JobStatus.queued);
+		job.setSchedule(JobFrequency.weekly);
+		job.setCreated(new Date(1401201920089L));
+		job.setModified(new Date(1401201921774L));
+		job.setStart(new Date(1401201920087L));
+		job.setNext(new Date(1401806728634L));
+		job.setDelay(604800000);
+		
+		if (expand) {
+			job.setUser(getUserDTO());
+			job.setToken(getTokenDTO());
+			
+			PluginProfileDTO source = getPluginProfileDTO(false);
+			source.setProfileType(PluginType.source);
+			job.setSource(source);
+			
+			PluginProfileDTO action = getPluginProfileDTO(false);
+			action.setProfileType(PluginType.action);
+			job.addAction(action);
+			
+			PluginProfileDTO sink = getPluginProfileDTO(false);
+			sink.setProfileType(PluginType.sink);
+			job.setSink(sink);
+			
+			job.addProtocol(getJobProtocolDTOSuccessful());
+			job.addProtocol(getJobProtocolDTOError());
+		}
+		
+		return job;
 	}
 }
