@@ -20,9 +20,6 @@ import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.rest.DummyDataManager;
 
-/**
- * All user specific operations will be handled within this class.
- */
 @Path("/plugins")
 public class Plugins extends Base {
 	public enum PluginSelectionType {
