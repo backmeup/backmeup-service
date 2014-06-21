@@ -1,16 +1,11 @@
 package org.backmeup.model.dto;
 
-import org.backmeup.model.Token;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class TokenDTO {
 	private Long id;
 	private String token;
-	private Long backupdate;
-
-	public TokenDTO(Token token) {
-		this.token = token.getToken();
-		this.id = token.getTokenId();
-	}
 
 	public TokenDTO() {
 
@@ -30,13 +25,5 @@ public class TokenDTO {
 
 	public void setTokenId(Long tokenId) {
 		this.id = tokenId;
-	}
-
-	public Long getBackupdate() {
-		return backupdate;
-	}
-
-	public void setBackupdate(Long backupdate) {
-		this.backupdate = backupdate;
 	}
 }

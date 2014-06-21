@@ -255,9 +255,9 @@ public class BackupLogicImpl implements BackupLogic {
         protocol.setJob(job);
         protocol.setSuccessful(jobProtocol.isSuccessful());
         
-        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
-            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
-        }
+//        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+//        }
         
         if (protocol.isSuccessful()) {
             job.setLastSuccessful(protocol.getExecutionTime());

@@ -1,52 +1,43 @@
 package org.backmeup.model.dto;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.backmeup.model.JobProtocol;
 
 @XmlRootElement
 public class JobProtocolDTO {
-	private Long id;
-	private User user;
-	private Long jobId;
-	private String sinkTitle;
+	private Long protocolId;
+	private Long timestamp;
+	private Long start;
 	private Long executionTime;
 	private boolean successful;
-	private long totalStoredEntries;
-	private final Set<JobProtocolMemberDTO> members = new HashSet<>();
+	private long processedItems;
+	private int space;
+	private String message = ""; 
 
 	public JobProtocolDTO() {
 	}
-	
-	public Long getId() {
-		return id;
+
+	public Long getProtocolId() {
+		return protocolId;
 	}
 
-	public User getUser() {
-		return user;
+	public void setProtocolId(Long protocolId) {
+		this.protocolId = protocolId;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	public Long getJobId() {
-		return jobId;
+	public Long getTimestamp() {
+		return timestamp;
 	}
 
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
 	}
 
-	public String getSinkTitle() {
-		return sinkTitle;
+	public Long getStart() {
+		return start;
 	}
 
-	public void setSinkTitle(String sinkTitle) {
-		this.sinkTitle = sinkTitle;
+	public void setStart(Long start) {
+		this.start = start;
 	}
 
 	public Long getExecutionTime() {
@@ -65,23 +56,27 @@ public class JobProtocolDTO {
 		this.successful = successful;
 	}
 
-	public long getTotalStoredEntries() {
-		return totalStoredEntries;
+	public long getProcessedItems() {
+		return processedItems;
 	}
 
-	public void setTotalStoredEntries(long totalStoredEntries) {
-		this.totalStoredEntries = totalStoredEntries;
+	public void setProcessedItems(long processedItems) {
+		this.processedItems = processedItems;
 	}
 
-	public Set<JobProtocolMemberDTO> getMembers() {
-		return members;
+	public int getSpace() {
+		return space;
 	}
 
-	public void addMembers(Set<JobProtocolMemberDTO> newMembers) {
-		this.members.addAll(newMembers);
+	public void setSpace(int space) {
+		this.space = space;
 	}
 
-	public void addMember(JobProtocolMemberDTO member) {
-		this.members.add(member);
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }
