@@ -102,7 +102,9 @@ public class DummyDataManager {
 		return prot;
 	}
 	
-	public static BackupJobDTO getBackupJobDTO(boolean expand) {
+	public static BackupJobDTO getBackupJobDTO(
+			boolean expandUser, boolean expandToken, 
+			boolean expandProfiles, boolean expandProtocol) {
 		BackupJobDTO job = new BackupJobDTO();
 		job.setJobId(1L);
 		job.setJobTitle("BackupJob1");
@@ -114,22 +116,29 @@ public class DummyDataManager {
 		job.setNext(new Date(1401806728634L));
 		job.setDelay(604800000);
 		
-		if (expand) {
+		if (expandUser) {
 			job.setUser(getUserDTO());
+		}
+
+		if (expandToken) {
 			job.setToken(getTokenDTO());
-			
+		}
+
+		if (expandProfiles) {
 			PluginProfileDTO source = getPluginProfileDTO(false);
 			source.setProfileType(PluginType.source);
 			job.setSource(source);
-			
+
 			PluginProfileDTO action = getPluginProfileDTO(false);
 			action.setProfileType(PluginType.action);
 			job.addAction(action);
-			
+
 			PluginProfileDTO sink = getPluginProfileDTO(false);
 			sink.setProfileType(PluginType.sink);
 			job.setSink(sink);
-			
+		}
+
+		if (expandProtocol) {
 			job.addProtocol(getJobProtocolDTOSuccessful());
 			job.addProtocol(getJobProtocolDTOError());
 		}

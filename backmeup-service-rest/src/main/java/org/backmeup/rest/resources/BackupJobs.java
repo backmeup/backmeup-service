@@ -16,7 +16,12 @@ public class BackupJobs extends Base {
 	@GET
 	@Path("/{jobId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public BackupJobDTO getPlugin(@PathParam("jobId") String pluginId, @QueryParam("expandProtocol") @DefaultValue("false") boolean expandProtocol) {
-		return DummyDataManager.getBackupJobDTO(true);
+	public BackupJobDTO getPlugin(
+			@PathParam("jobId") String pluginId, 
+			@QueryParam("expandUser") @DefaultValue("false") boolean expandUser,
+			@QueryParam("expandToken") @DefaultValue("false") boolean expandToken,
+			@QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles,
+			@QueryParam("expandProtocol") @DefaultValue("false") boolean expandProtocol) {
+		return DummyDataManager.getBackupJobDTO(expandUser, expandToken, expandProfiles, expandProtocol);
 	}
 }
