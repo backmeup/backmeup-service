@@ -3,7 +3,6 @@ package org.backmeup.logic.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -15,10 +14,10 @@ import javax.inject.Named;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.model.ActionProfile;
+import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.AuthRequest;
+import org.backmeup.model.BackupJob;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.dto.ActionProfileEntry;
-import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
@@ -27,9 +26,9 @@ import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
+import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
 import org.backmeup.plugin.spi.InputBased;
 import org.backmeup.plugin.spi.OAuthBased;
-import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
 
 @ApplicationScoped
 public class PluginsLogicImpl implements PluginsLogic {
@@ -49,18 +48,18 @@ public class PluginsLogicImpl implements PluginsLogic {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("PluginsLogicImpl");
 
     @Override
-    public List<ActionProfile> getActionProfilesFor(JobCreationRequest request) {
+    public List<ActionProfile> getActionProfilesFor(BackupJob request) {
         List<ActionProfile> actions = new ArrayList<>();
 
-        for (ActionProfileEntry action : request.getActions()) {
-            ActionDescribable ad = plugins.getActionById(action.getId());
+        for (ActionProfile action : request.getRequiredActions()) {
+            ActionDescribable ad = plugins.getActionById(action.getActionId());
 
             if (ad == null) {
                 throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
             }
 
             ActionProfile ap = new ActionProfile(ad.getId(), ad.getPriority());
-            for (Map.Entry<String, String> entry : action.getOptions().entrySet()) {
+            for (ActionProperty entry : action.getActionOptions()) {
                 ap.addActionOption(entry.getKey(), entry.getValue());
             }
             actions.add(ap);

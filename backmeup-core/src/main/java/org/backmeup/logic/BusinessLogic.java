@@ -16,10 +16,7 @@ import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.dto.Job;
-import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.dto.JobUpdateRequest;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.PluginException;
@@ -84,12 +81,12 @@ public interface BusinessLogic {
 	
 	//job & validation operations
 	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
-	ValidationNotes updateBackupJob(String username, JobUpdateRequest updateRequest);
-	JobUpdateRequest getBackupJob(String username, Long jobId);
+	ValidationNotes updateBackupJob(String username, BackupJob updateRequest);
+	BackupJob getBackupJob(String username, Long jobId);
 	// Should replace method 'getBackupJob' ?
-	Job getBackupJobFull(String username, Long jobId);
+	BackupJob getBackupJobFull(String username, Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
-	ValidationNotes createBackupJob(String username, JobCreationRequest request);
+	ValidationNotes createBackupJob(String username, BackupJob request);
 	List<BackupJob> getJobs(String username);
 	void deleteJob(String username, Long jobId);
 	List<Status> getStatus(String username, Long jobId);

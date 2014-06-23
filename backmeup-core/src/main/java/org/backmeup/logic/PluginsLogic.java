@@ -5,8 +5,8 @@ import java.util.Properties;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
+import org.backmeup.model.BackupJob;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.Validationable;
@@ -14,7 +14,7 @@ import org.backmeup.plugin.api.connectors.Datasource;
 
 public interface PluginsLogic {
 
-    List<ActionProfile> getActionProfilesFor(JobCreationRequest request);
+    List<ActionProfile> getActionProfilesFor(BackupJob request);
 
     List<String> getActionOptions(String actionId);
 

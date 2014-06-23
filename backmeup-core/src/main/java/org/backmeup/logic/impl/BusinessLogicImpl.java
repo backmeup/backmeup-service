@@ -22,7 +22,6 @@ import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
-import org.backmeup.logic.impl.helper.BackUpJobCreationHelper;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
@@ -37,12 +36,7 @@ import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
-import org.backmeup.model.dto.ExecutionTime;
-import org.backmeup.model.dto.Job;
-import org.backmeup.model.dto.JobCreationRequest;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.dto.JobUpdateRequest;
-import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.spi.ActionDescribable;
@@ -333,30 +327,31 @@ public class BusinessLogicImpl implements BusinessLogic {
         throw new UnsupportedOperationException("delete Action Plugin not implemented");
     }
 
-    private List<ActionProfile> getActionProfilesFor(JobCreationRequest request) {
+    private List<ActionProfile> getActionProfilesFor(BackupJob request) {
         return plugins.getActionProfilesFor(request);
     }
 
     @Override
-    public ValidationNotes createBackupJob(String username, JobCreationRequest request) {
+    public ValidationNotes createBackupJob(String username, BackupJob request) {
         try {
             conn.begin();
-            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
+//            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
 
-            List<SourceProfileEntry> sourceProfiles = request.getSourceProfiles();
-            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
-            Profile sink = profiles.queryExistingProfile(request.getSinkProfileId());
+            Set<ProfileOptions> pos = request.getSourceProfiles();
+//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
+            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
 
             List<ActionProfile> actions = getActionProfilesFor(request);
 
-            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
+//            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
 
             conn.rollback();
-            BackupJob job = jobManager.createBackupJob(user, pos, sink, actions,
-                    execTime.getStart(), execTime.getDelay(), request.getKeyRing(), request.getJobTitle(), execTime.isReschedule(), request.getTimeExpression());
-            ValidationNotes vn = validateBackupJob(username, job.getId(), request.getKeyRing());
-            vn.setJob(job);
-            return vn;
+//            BackupJob job = jobManager.createBackupJob(user, pos, sink, actions,
+//                    execTime.getStart(), execTime.getDelay(), request.getKeyRing(), request.getJobTitle(), execTime.isReschedule(), request.getTimeExpression());
+//            ValidationNotes vn = validateBackupJob(username, job.getId(), request.getKeyRing());
+//            vn.setJob(job);
+//            return vn;
+            return null;
         } finally {
             conn.rollback();
         }
@@ -364,11 +359,11 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // Note: keyRing won't be overridden
     @Override
-    public ValidationNotes updateBackupJob(final String username, final JobUpdateRequest updateRequest) {
+    public ValidationNotes updateBackupJob(final String username, final BackupJob updateRequest) {
         if (updateRequest == null) {
             throw new IllegalArgumentException("Update must not be null!");
         }
-        if (updateRequest.getJobId() == null) {
+        if (updateRequest.getId() == null) {
             throw new IllegalArgumentException("JobId must not be null!");
         }
         
@@ -376,13 +371,13 @@ public class BusinessLogicImpl implements BusinessLogic {
         BackupJob j = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
+//                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
 
                 List<ActionProfile> requiredActions = getActionProfilesFor(updateRequest);
-                Set<ProfileOptions> sourceProfiles = profiles.getSourceProfilesOptionsFor(updateRequest.getSourceProfiles());
-                Profile sindProfile = profiles.queryExistingProfile(updateRequest.getSinkProfileId());
+                Set<ProfileOptions> sourceProfiles = updateRequest.getSourceProfiles();
+                Profile sindProfile = updateRequest.getSinkProfile();
 
-                BackupJob job = backupJobs.getExistingUserJob(updateRequest.getJobId(), username);
+                BackupJob job = backupJobs.getExistingUserJob(updateRequest.getId(), username);
 
                 // check if the interval has changed
                 if (job.getTimeExpression().compareToIgnoreCase(updateRequest.getTimeExpression()) != 0) {
@@ -404,15 +399,16 @@ public class BusinessLogicImpl implements BusinessLogic {
 			jobManager.runBackUpJob(j);
 		}
 
-        ValidationNotes vn = validateBackupJob(username, j.getId(), updateRequest.getKeyRing());
-        vn.setJob(j);
-        return vn;
+//        ValidationNotes vn = validateBackupJob(username, j.getId(), updateRequest.getKeyRing());
+//        vn.setJob(j);
+//        return vn;
+		return null;
     }
 
     @Override
-    public JobUpdateRequest getBackupJob(String username, final Long jobId) {
-        return conn.txNewReadOnly(new Callable<JobUpdateRequest>() {
-            @Override public JobUpdateRequest call() {
+    public BackupJob getBackupJob(String username, final Long jobId) {
+        return conn.txNewReadOnly(new Callable<BackupJob>() {
+            @Override public BackupJob call() {
 
                 return backupJobs.updateRequestFor(jobId);
                 
@@ -421,9 +417,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public Job getBackupJobFull(String username, final Long jobId) {
-        return conn.txNewReadOnly(new Callable<Job>() {
-            @Override public Job call() {
+    public BackupJob getBackupJobFull(String username, final Long jobId) {
+        return conn.txNewReadOnly(new Callable<BackupJob>() {
+            @Override public BackupJob call() {
                 
                 return backupJobs.fullJobFor(jobId);
                 

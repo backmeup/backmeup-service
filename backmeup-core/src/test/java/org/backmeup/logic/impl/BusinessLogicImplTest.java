@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,10 +16,6 @@ import org.backmeup.logic.impl.helper.AuthenticationPerformer;
 import org.backmeup.logic.impl.helper.DropboxAutomaticAuthorizer;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.BackupJob;
-import org.backmeup.model.Status;
-import org.backmeup.model.dto.JobCreationRequest;
-import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
 import org.backmeup.model.exceptions.PasswordTooShortException;
@@ -80,17 +75,17 @@ public class BusinessLogicImplTest {
         props.setProperty("code", code);
         logic.postAuth(ar2.getProfile().getProfileId(), props, "apassword");
 
-        List<SourceProfileEntry> sources = new ArrayList<>();
-        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
-
-        // create and exceute a backupjob from moodle to skydrive
-        JobCreationRequest r = new JobCreationRequest();
-        r.setSourceProfiles(sources);
-        r.setSinkProfileId(ar2.getProfile().getProfileId());
-        r.setTimeExpression("now");
-        r.setKeyRing("apassword");
-        
-        logic.createBackupJob("fjungwirth", r);
+//        List<SourceProfileEntry> sources = new ArrayList<>();
+//        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//
+//        // create and exceute a backupjob from moodle to skydrive
+//        JobCreationRequest r = new JobCreationRequest();
+//        r.setSourceProfiles(sources);
+//        r.setSinkProfileId(ar2.getProfile().getProfileId());
+//        r.setTimeExpression("now");
+//        r.setKeyRing("apassword");
+//        
+//        logic.createBackupJob("fjungwirth", r);
     }
 
     @Test
@@ -225,28 +220,28 @@ public class BusinessLogicImplTest {
         }
         logic.postAuth(ar.getProfile().getProfileId(), p, "hi");
 
-        System.out.println("Using source as sink...");
-        Long sinkProfileId = ar.getProfile().getProfileId();
-        List<SourceProfileEntry> sourcesList = new ArrayList<>();
-        sourcesList.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
-
-        JobCreationRequest r = new JobCreationRequest();
-        r.setSourceProfiles(sourcesList);
-        r.setSinkProfileId(sinkProfileId);
-        r.setTimeExpression("weekly");
-        r.setKeyRing("hi");
-        
-        BackupJob bj = logic.createBackupJob(u.getUsername(), r).getJob();
-        assertNotNull(bj.getId());
-        // assertNotNull(bj.getCronExpression());
-        assertNotNull(bj.getUser());
-        assertNotNull(bj.getSinkProfile());
-        assertNotNull(bj.getSourceProfiles());
-
-        List<Status> results = logic.getStatus("backuper", bj.getId());
-        for (Status s : results) {
-            System.out.println(s.getProgress() + ", " + s.getType() + ": " + s.getMessage());
-        }
+//        System.out.println("Using source as sink...");
+//        Long sinkProfileId = ar.getProfile().getProfileId();
+//        List<SourceProfileEntry> sourcesList = new ArrayList<>();
+//        sourcesList.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//
+//        JobCreationRequest r = new JobCreationRequest();
+//        r.setSourceProfiles(sourcesList);
+//        r.setSinkProfileId(sinkProfileId);
+//        r.setTimeExpression("weekly");
+//        r.setKeyRing("hi");
+//        
+//        BackupJob bj = logic.createBackupJob(u.getUsername(), r).getJob();
+//        assertNotNull(bj.getId());
+//        // assertNotNull(bj.getCronExpression());
+//        assertNotNull(bj.getUser());
+//        assertNotNull(bj.getSinkProfile());
+//        assertNotNull(bj.getSourceProfiles());
+//
+//        List<Status> results = logic.getStatus("backuper", bj.getId());
+//        for (Status s : results) {
+//            System.out.println(s.getProgress() + ", " + s.getType() + ": " + s.getMessage());
+//        }
     }
 
     @Test
@@ -308,18 +303,18 @@ public class BusinessLogicImplTest {
 
         logic.postAuth(ar2.getProfile().getProfileId(), props, "12345678");
 
-        List<SourceProfileEntry> sources = new ArrayList<>();
-
-        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
-
-        // create and exceute a backupjob from moodle to skydrive
-        JobCreationRequest r = new JobCreationRequest();
-        r.setSourceProfiles(sources);
-        r.setSinkProfileId(ar2.getProfile().getProfileId());
-        r.setTimeExpression("now");
-        r.setKeyRing("12345678");
-
-        logic.createBackupJob("fjungwirth", r);
+//        List<SourceProfileEntry> sources = new ArrayList<>();
+//
+//        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//
+//        // create and exceute a backupjob from moodle to skydrive
+//        JobCreationRequest r = new JobCreationRequest();
+//        r.setSourceProfiles(sources);
+//        r.setSinkProfileId(ar2.getProfile().getProfileId());
+//        r.setTimeExpression("now");
+//        r.setKeyRing("12345678");
+//
+//        logic.createBackupJob("fjungwirth", r);
     }
 
     @Test
@@ -376,18 +371,18 @@ public class BusinessLogicImplTest {
 
         logic.postAuth(ar2.getProfile().getProfileId(), props, "12345678");
 
-        List<SourceProfileEntry> sources = new ArrayList<>();
-
-        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
-
-        // create and exceute a backupjob from moodle to skydrive
-        JobCreationRequest r = new JobCreationRequest();
-        r.setSourceProfiles(sources);
-        r.setSinkProfileId(ar2.getProfile().getProfileId());
-        r.setTimeExpression("now");
-        r.setKeyRing("12345678");
-
-        logic.createBackupJob("michaela.murauer@yahoo.com", r);
+//        List<SourceProfileEntry> sources = new ArrayList<>();
+//
+//        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//
+//        // create and exceute a backupjob from moodle to skydrive
+//        JobCreationRequest r = new JobCreationRequest();
+//        r.setSourceProfiles(sources);
+//        r.setSinkProfileId(ar2.getProfile().getProfileId());
+//        r.setTimeExpression("now");
+//        r.setKeyRing("12345678");
+//
+//        logic.createBackupJob("michaela.murauer@yahoo.com", r);
     }
 
     @Test
@@ -443,16 +438,16 @@ public class BusinessLogicImplTest {
 
         logic.postAuth(ar2.getProfile().getProfileId(), props, "12345678");
 
-        List<SourceProfileEntry> sources = new ArrayList<>();
-        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//        List<SourceProfileEntry> sources = new ArrayList<>();
+//        sources.add(new SourceProfileEntry(ar.getProfile().getProfileId()));
+//
+//        // create and exceute a backupjob from moodle to skydrive
+//        JobCreationRequest r = new JobCreationRequest();
+//        r.setSourceProfiles(sources);
+//        r.setSinkProfileId(ar2.getProfile().getProfileId());
+//        r.setTimeExpression("now");
+//        r.setKeyRing("12345678");
 
-        // create and exceute a backupjob from moodle to skydrive
-        JobCreationRequest r = new JobCreationRequest();
-        r.setSourceProfiles(sources);
-        r.setSinkProfileId(ar2.getProfile().getProfileId());
-        r.setTimeExpression("now");
-        r.setKeyRing("12345678");
-
-        logic.createBackupJob("michaela.murauer@yahoo.com", r);
+//        logic.createBackupJob("michaela.murauer@yahoo.com", r);
     }
 }

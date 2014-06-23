@@ -12,9 +12,7 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.Status;
-import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.dto.JobUpdateRequest;
 
 public interface BackupLogic {
 
@@ -28,7 +26,7 @@ public interface BackupLogic {
 
     void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
 
-    Job fullJobFor(Long jobId);
+    BackupJob fullJobFor(Long jobId);
 
     void deleteJob(String username, Long jobId);
 
@@ -36,10 +34,10 @@ public interface BackupLogic {
 
     List<BackupJob> getBackupJobsOf(String username);
 
-    JobUpdateRequest updateRequestFor(Long jobId);
+    BackupJob updateRequestFor(Long jobId);
 
     void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
-            JobUpdateRequest updateRequest);
+    		BackupJob updateRequest);
 
     ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to);
 

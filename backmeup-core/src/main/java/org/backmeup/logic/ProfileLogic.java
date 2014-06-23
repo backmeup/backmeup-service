@@ -6,7 +6,6 @@ import java.util.Set;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
-import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.spi.SourceSinkDescribable.Type;
 
 /**
@@ -30,7 +29,7 @@ public interface ProfileLogic {
 
     List<Profile> getDatasinkProfilesOf(String username);
 
-    Set<ProfileOptions> getSourceProfilesOptionsFor(List<SourceProfileEntry> sourceProfiles);
+    Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
 
     List<String> getProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles);
 

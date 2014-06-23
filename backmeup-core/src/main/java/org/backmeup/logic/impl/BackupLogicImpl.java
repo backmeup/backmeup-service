@@ -16,26 +16,20 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.logic.BackupLogic;
-import org.backmeup.logic.impl.helper.BackUpJobConverter;
-import org.backmeup.logic.impl.helper.BackUpJobCreationHelper;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.ActionProfile.ActionProperty;
-import org.backmeup.model.JobProtocol.JobProtocolMember;
-import org.backmeup.model.ProtocolOverview.Activity;
-import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
+import org.backmeup.model.JobProtocol.JobProtocolMember;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolOverview;
+import org.backmeup.model.ProtocolOverview.Activity;
+import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.Status;
 import org.backmeup.model.constants.BackupJobStatus;
-import org.backmeup.model.dto.ExecutionTime;
-import org.backmeup.model.dto.Job;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.dto.JobProtocolMemberDTO;
-import org.backmeup.model.dto.JobUpdateRequest;
 
 @ApplicationScoped
 public class BackupLogicImpl implements BackupLogic {
@@ -126,9 +120,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public Job fullJobFor(Long jobId) {
-        BackupJob job = getExistingJob(jobId);
-        return BackUpJobConverter.convertToJob(job);
+    public BackupJob fullJobFor(Long jobId) {
+        return getExistingJob(jobId);
     }
 
     @Override
@@ -182,14 +175,13 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public JobUpdateRequest updateRequestFor(Long jobId) {
-        BackupJob job = getExistingJob(jobId);
-        return BackUpJobConverter.convertToUpdateRequest(job);
+    public BackupJob updateRequestFor(Long jobId) {
+        return getExistingJob(jobId);
     }
 
     @Override
     public void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
-            JobUpdateRequest updateRequest) {
+    		BackupJob updateRequest) {
         job.getRequiredActions().clear();
         job.getRequiredActions().addAll(requiredActions);
 
@@ -201,9 +193,9 @@ public class BackupLogicImpl implements BackupLogic {
 
         job.setTimeExpression(updateRequest.getTimeExpression());
         
-        ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
-        job.setDelay(et.getDelay());
-        job.setReschedule(et.isReschedule());
+//        ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
+//        job.setDelay(et.getDelay());
+//        job.setReschedule(et.isReschedule());
 
         if (job.isReschedule()) {
             Date execTime = new Date(new Date().getTime() + job.getDelay());

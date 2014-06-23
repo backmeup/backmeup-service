@@ -16,7 +16,6 @@ import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
-import org.backmeup.model.dto.SourceProfileEntry;
 import org.backmeup.model.spi.SourceSinkDescribable.Type;
 
 @ApplicationScoped
@@ -83,15 +82,16 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public Set<ProfileOptions> getSourceProfilesOptionsFor(List<SourceProfileEntry> sourceProfileEntries) {
+    public Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfileEntries) {
         if (sourceProfileEntries.size() == 0) {
             throw new IllegalArgumentException("There must be at least one source profile to download data from!");
         }
 
         Set<ProfileOptions> profileOptions = new HashSet<>();
-        for (SourceProfileEntry sourceEntry : sourceProfileEntries) {
-            Profile sourceProfile = queryExistingProfile(sourceEntry.getId());
-            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
+        for (Profile sourceEntry : sourceProfileEntries) {
+            Profile sourceProfile = queryExistingProfile(sourceEntry.getProfileId());
+            //TODO
+//            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
         }
         return profileOptions;
     }
