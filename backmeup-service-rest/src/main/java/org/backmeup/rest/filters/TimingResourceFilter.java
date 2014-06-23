@@ -23,14 +23,17 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
 
 	@Override
 	public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
-		long reqProcessingTimeInMs = timer.stop();
-		logger.info("Request processing time: " + reqProcessingTimeInMs + "ms");
+		try {
+			long reqProcessingTimeInMs = timer.stop();
+			logger.info("Request processing time: " + reqProcessingTimeInMs + "ms");
+		} finally {
+			timer.remove();
+		}
 	}
 
 	@Override
 	public void filter(ContainerRequestContext request) throws IOException {
 		timer.start();
-
 	}
 
 	private final static class TimerThreadLocal extends ThreadLocal<Long> {
