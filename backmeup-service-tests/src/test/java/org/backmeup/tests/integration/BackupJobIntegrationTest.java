@@ -5,14 +5,18 @@ import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.util.Date;
 import java.util.Properties;
 
+import org.backmeup.model.dto.BackupJobCreationDTO;
+import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.Constants;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
 
 /*
@@ -22,6 +26,99 @@ import com.jayway.restassured.response.ValidatableResponse;
 
 @Category(IntegrationTest.class)
 public class BackupJobIntegrationTest extends IntegrationTestBase {
+	
+	@Test
+	public void testGetBackupJobNew() {	
+		String jobId = "1";
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+			.when()
+				.get("/backupjobs/" + jobId)
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+		}
+	}
+	
+	@Test
+	public void testGetBackupJobNewFull() {	
+		String jobId = "1";
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+			.when()
+				.get("/backupjobs/" + jobId + "?expandUser=true&expandToken=true&expandProfiles=true&expandProtocol=true")
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+		}
+	}
+	
+	@Test
+	public void testGetBackupJobList() {	
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+			.when()
+				.get("/backupjobs/")
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+		}
+	}
+	
+	@Test
+	public void testGetBackupJobListFilter() {	
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+			.when()
+				.get("/backupjobs?jobStatus=queued")
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+		}
+	}
+	
+	@Test
+	public void testCreateBackupJobNew() {	
+		String jobTitle = "BackupJob1";
+		JobFrequency schedule = JobFrequency.weekly;
+		Date start = new Date(1401201920087L);
+		Long sourceProfileId = 2L;
+		Long actionProfileId = 3L;
+		Long sinkProfileId = 4L;
+		
+		BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
+		backupJob.setJobTitle(jobTitle);
+		backupJob.setSchedule(schedule);
+		backupJob.setStart(start);
+		backupJob.setSource(sourceProfileId);
+		backupJob.addAction(actionProfileId);
+		backupJob.setSink(sinkProfileId);
+		
+		try {
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.body(backupJob, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/backupjobs")
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+		}
+	}
 
 	@Test
 	public void testGetBackupJobWrongUser() {
