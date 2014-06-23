@@ -1,6 +1,6 @@
 package org.backmeup.logic;
 
-import org.backmeup.model.User;
+import org.backmeup.model.BackMeUpUser;
 
 /**
  * User registration related business logic.
@@ -9,26 +9,26 @@ import org.backmeup.model.User;
  */
 public interface UserRegistration {
 
-	User getExistingUser(String username);
+    BackMeUpUser getExistingUser(String username);
 
     void ensureUserIsActive(String username);
     
-    User getActiveUser(String username);
+    BackMeUpUser getActiveUser(String username);
     
-    User register(String username, String email);
+    BackMeUpUser register(String username, String email);
 
-    void setNewVerificationKeyTo(User user);
+    void setNewVerificationKeyTo(BackMeUpUser user);
 
-    void sendVerificationEmailFor(User user);
+    void sendVerificationEmailFor(BackMeUpUser user);
 
-    User requestNewVerificationEmail(String username);
+    BackMeUpUser requestNewVerificationEmail(String username);
 
-    User activateUserFor(String verificationKey);
+    BackMeUpUser activateUserFor(String verificationKey);
 
-    void ensureNewValuesAvailable(User user, String newUsername, String newEmail);
+    void ensureNewValuesAvailable(BackMeUpUser user, String newUsername, String newEmail);
 
-    void updateValues(User user, String newUsername, String newEmail);
+    void updateValues(BackMeUpUser user, String newUsername, String newEmail);
 
-    void delete(User user);
+    void delete(BackMeUpUser user);
 
 }

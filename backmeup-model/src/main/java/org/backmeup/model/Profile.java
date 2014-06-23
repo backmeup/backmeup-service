@@ -32,7 +32,7 @@ public class Profile {
 	@GeneratedValue
 	private Long profileId;
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
-	private User user;
+	private BackMeUpUser user;
 	private String profileName;
 	private String description;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -49,12 +49,12 @@ public class Profile {
 	public Profile() {
 	}
 
-	public Profile(User user, String profileName, String desc,
+	public Profile(BackMeUpUser user, String profileName, String desc,
 			Type source) {
 		this(null, user, profileName, desc, source);
 	}
 
-	public Profile(Long profileId, User user, String profileName,
+	public Profile(Long profileId, BackMeUpUser user, String profileName,
 			String desc, Type sourceAndOrSink) {
 		this.profileId = profileId;
 		this.user = user;
@@ -74,11 +74,11 @@ public class Profile {
 		this.profileId = profileId;
 	}
 
-	public User getUser() {
+	public BackMeUpUser getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(BackMeUpUser user) {
 		this.modified = new Date();
 		this.user = user;
 	}

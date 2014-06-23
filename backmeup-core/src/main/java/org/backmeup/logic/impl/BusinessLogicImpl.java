@@ -24,6 +24,7 @@ import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.KeyserverLog;
@@ -33,7 +34,6 @@ import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
-import org.backmeup.model.User;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -99,9 +99,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BusinessLogicImpl");
 
     @Override
-    public User getUser(final String username) {
-        return conn.txJoinReadOnly(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser getUser(final String username) {
+        return conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
 
                 return registration.getActiveUser(username);
             
@@ -110,11 +110,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User deleteUser(final String username) {
-    	User user = conn.txNew(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser deleteUser(final String username) {
+        BackMeUpUser user = conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
-            	User u = registration.getExistingUser(username);
+                BackMeUpUser u = registration.getExistingUser(username);
                 authorization.unregister(u);
                 backupJobs.deleteJobsOf(username);
                 profiles.deleteProfilesOf(username);
@@ -129,12 +129,12 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User changeUser(final String oldUsername, final String newUsername, final String oldPassword,
+    public BackMeUpUser changeUser(final String oldUsername, final String newUsername, final String oldPassword,
             final String newPassword, final String oldKeyRingPassword, final String newKeyRingPassword, final String newEmail) {
-        return conn.txNew(new Callable<User>() {
-            @Override public User call() {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
-            	User user = getAuthorizedUser(oldUsername, oldPassword);
+                BackMeUpUser user = getAuthorizedUser(oldUsername, oldPassword);
                 registration.ensureNewValuesAvailable(user, newUsername, newEmail);
                 authorization.updatePasswords(user, oldPassword, newPassword, oldKeyRingPassword, newKeyRingPassword);
                 registration.updateValues(user, newUsername, newEmail);
@@ -145,11 +145,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User login(final String username, final String password) {
-        return conn.txNewReadOnly(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser login(final String username, final String password) {
+        return conn.txNewReadOnly(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
-            	User user = registration.getExistingUser(username);
+                BackMeUpUser user = registration.getExistingUser(username);
                 authorization.authorize(user, password);
                 return user;
                 
@@ -158,11 +158,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User register(final String username, final String password, final String keyRingPassword, final String email) {
-        return conn.txNew(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser register(final String username, final String password, final String keyRingPassword, final String email) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
-            	User user = registration.register(username, email);
+                BackMeUpUser user = registration.register(username, email);
                 authorization.register(user, password, keyRingPassword);
                 registration.sendVerificationEmailFor(user);
                 return user;
@@ -176,7 +176,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         conn.txJoin(new Runnable() {
             @Override public void run() {
 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 user.setUserProperty(key, value);
             
             }
@@ -188,7 +188,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         conn.txJoin(new Runnable() {
             @Override public void run() {
 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 user.deleteUserProperty(key); 
             
             }
@@ -527,7 +527,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<ProtocolOverview>() {
             @Override public ProtocolOverview call() {
                 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 
                 Date to = new Date();
                 Date from = duration.equals("month") ? new Date(to.getTime() - DelayTimes.DELAY_MONTHLY) :
@@ -544,7 +544,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     	conn.txNew(new Runnable() {
             @Override public void run() {
                 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 BackupJob job = backupJobs.getExistingUserJob(jobId, username);
                 backupJobs.createJobProtocol(user, job, jobProtocol);
                 
@@ -571,7 +571,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNew(new Callable<AuthRequest>() {
             @Override public AuthRequest call() {
 
-            	User user = getAuthorizedUser(username, keyRing);
+                BackMeUpUser user = getAuthorizedUser(username, keyRing);
 
                 Properties p = new Properties();
                 AuthRequest ar = plugins.configureAuth(p, uniqueDescIdentifier);
@@ -587,8 +587,8 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    private User getAuthorizedUser(String username, String keyRing) {
-    	User user = registration.getActiveUser(username);
+    private BackMeUpUser getAuthorizedUser(String username, String keyRing) {
+        BackMeUpUser user = registration.getActiveUser(username);
         authorization.authorize(user, keyRing);
         return user;
     }
@@ -649,7 +649,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         conn.txNewReadOnly(new Runnable() {
             @Override public void run() {
 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 search.deleteIndexOf(user);
                 
             }
@@ -673,7 +673,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override public SearchResponse call() {
                 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 return search.runSearch(user, searchId, filters);
 
             }
@@ -685,7 +685,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<File>() {
             @Override public File call() {
                 
-            	User user = registration.getActiveUser(username);
+                BackMeUpUser user = registration.getActiveUser(username);
                 return search.getThumbnailPathForFile(user, fileId);
 
             }
@@ -809,9 +809,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User verifyEmailAddress(final String verificationKey) {
-        return conn.txNew(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser verifyEmailAddress(final String verificationKey) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
                 return registration.activateUserFor(verificationKey);
                 
@@ -820,9 +820,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public User requestNewVerificationEmail(final String username) {
-        return conn.txNew(new Callable<User>() {
-            @Override public User call() {
+    public BackMeUpUser requestNewVerificationEmail(final String username) {
+        return conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
                 
                 return registration.requestNewVerificationEmail(username);
                 
@@ -831,7 +831,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<KeyserverLog> getKeysrvLogs(User user) {
+    public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
         return authorization.getLogs(user);
     }
 

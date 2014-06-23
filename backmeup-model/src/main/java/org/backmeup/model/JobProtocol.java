@@ -24,7 +24,7 @@ public class JobProtocol {
   @Temporal(TemporalType.TIMESTAMP)
   private Date executionTime;
   @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
-  private User user;
+  private BackMeUpUser user;
   private boolean successful;
   private long totalStoredEntries;  
   private String sinkTitle;
@@ -36,7 +36,7 @@ public class JobProtocol {
   public JobProtocol() {
   }
 
-  public JobProtocol(Date executionTime, User user, boolean successful,
+  public JobProtocol(Date executionTime, BackMeUpUser user, boolean successful,
       long totalStoredEntries, String sinkTitle, Set<JobProtocolMember> members) {
     this.executionTime = executionTime;
     this.user = user;
@@ -54,11 +54,11 @@ public class JobProtocol {
     this.executionTime = executionTime;
   }
 
-  public User getUser() {
+  public BackMeUpUser getUser() {
     return user;
   }
 
-  public void setUser(User user) {
+  public void setUser(BackMeUpUser user) {
     this.user = user;
   }
 

@@ -15,7 +15,7 @@ import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.impl.helper.AuthenticationPerformer;
 import org.backmeup.logic.impl.helper.DropboxAutomaticAuthorizer;
 import org.backmeup.model.AuthRequest;
-import org.backmeup.model.User;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
 import org.backmeup.model.exceptions.PasswordTooShortException;
@@ -94,9 +94,9 @@ public class BusinessLogicImplTest {
             logic.deleteUser("Seppl");
         } catch (Exception e) {
         }
-        User u = logic.register("Seppl", "12345678", "12345678", "backmeup1@trash-mail.com");
+        BackMeUpUser u = logic.register("Seppl", "12345678", "12345678", "backmeup1@trash-mail.com");
         logic.verifyEmailAddress(u.getVerificationKey());
-        User u2 = logic.getUser("Seppl");
+        BackMeUpUser u2 = logic.getUser("Seppl");
 
         assertNotNull(u);
         assertNotNull(u2);
@@ -114,7 +114,7 @@ public class BusinessLogicImplTest {
         } catch (Exception e) {
 
         }
-        User u = logic.register("Seppl", "superlongpassword", "superlongpassword", "backmeup1@trash-mail.com");
+        BackMeUpUser u = logic.register("Seppl", "superlongpassword", "superlongpassword", "backmeup1@trash-mail.com");
         assertNotNull(u);
         assertEquals("Seppl", u.getUsername());
         assertEquals("backmeup1@trash-mail.com", u.getEmail());
@@ -194,7 +194,7 @@ public class BusinessLogicImplTest {
 
     @Test
     public void testCreateBackupJob() {
-    	User u;
+        BackMeUpUser u;
         try {
             u = logic.register("backuper", "hi", "hi", "amail");
         } catch (AlreadyRegisteredException are) {
@@ -252,7 +252,7 @@ public class BusinessLogicImplTest {
         }
 
         try {
-        	User u = logic.register("fjungwirth", "12345678", "12345678", "jungwirth.florian@gmail.com");
+            BackMeUpUser u = logic.register("fjungwirth", "12345678", "12345678", "jungwirth.florian@gmail.com");
             logic.verifyEmailAddress(u.getVerificationKey());
 
         } catch (AlreadyRegisteredException are) {
@@ -324,7 +324,7 @@ public class BusinessLogicImplTest {
         } catch (Exception e) {
         }
         try {
-        	User u = logic.register("michaela.murauer@yahoo.com", "12345678", "12345678", "michaela.murauer@yahoo.com");
+            BackMeUpUser u = logic.register("michaela.murauer@yahoo.com", "12345678", "12345678", "michaela.murauer@yahoo.com");
             logic.verifyEmailAddress(u.getVerificationKey());
 
         } catch (AlreadyRegisteredException are) {
@@ -393,7 +393,7 @@ public class BusinessLogicImplTest {
         }
 
         try {
-        	User u = logic.register("michaela.murauer@yahoo.com", "12345678", "12345678", "michaela.murauer@yahoo.com");
+            BackMeUpUser u = logic.register("michaela.murauer@yahoo.com", "12345678", "12345678", "michaela.murauer@yahoo.com");
             logic.verifyEmailAddress(u.getVerificationKey());
         } catch (AlreadyRegisteredException are) {
         }

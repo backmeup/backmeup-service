@@ -16,10 +16,10 @@ import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.index.ElasticSearchIndexClient;
 import org.backmeup.logic.index.IndexUtils;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
-import org.backmeup.model.User;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public SearchResponse runSearch(User user, long searchId, Map<String, List<String>> filters) {
+    public SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters) {
         try (ElasticSearchIndexClient client = getIndexClient();) {
 
             SearchResponse search = queryExistingSearch(searchId);
@@ -107,7 +107,7 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public File getThumbnailPathForFile(User user, String fileId) {
+    public File getThumbnailPathForFile(BackMeUpUser user, String fileId) {
         try (ElasticSearchIndexClient client = getIndexClient()) {
 
             String thumbnailPath = client.getThumbnailPathForFile(user.getUsername(), fileId);
@@ -130,7 +130,7 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void deleteIndexOf(User user) {
+    public void deleteIndexOf(BackMeUpUser user) {
         try (ElasticSearchIndexClient client = getIndexClient()) {
 
             client.deleteRecordsForUser(user.getUserId());

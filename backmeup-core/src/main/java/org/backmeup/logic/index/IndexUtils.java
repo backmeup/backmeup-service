@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails.FileInfo;
 import org.backmeup.model.SearchResponse.CountedEntry;
 import org.backmeup.model.SearchResponse.SearchEntry;
-import org.backmeup.model.User;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -101,7 +101,7 @@ public class IndexUtils {
 	  return fi;
 	}
 	
-	public static List<SearchEntry> convertSearchEntries(org.elasticsearch.action.search.SearchResponse esResponse, User user) {	    
+	public static List<SearchEntry> convertSearchEntries(org.elasticsearch.action.search.SearchResponse esResponse, BackMeUpUser user) {	    
 	    List<SearchEntry> entries = new ArrayList<>();
 
 	    LOGGER.debug("converting " + esResponse.getHits().totalHits() + " search results");

@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
@@ -14,7 +15,6 @@ import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
-import org.backmeup.model.User;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
@@ -35,13 +35,13 @@ import org.backmeup.model.spi.SourceSinkDescribable;
  */
 public interface BusinessLogic {
 	// user operations 
-	User getUser(String username);
-	User deleteUser(String username);
-	User changeUser(String oldUsername, String newUsername, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword, String newEmail);	
-	User login(String username, String password);
-	User register(String username, String password, String keyRing, String email) throws AlreadyRegisteredException, IllegalArgumentException;
-	User verifyEmailAddress(String verificationKey);
-	User requestNewVerificationEmail(String username);
+	BackMeUpUser getUser(String username);
+	BackMeUpUser deleteUser(String username);
+	BackMeUpUser changeUser(String oldUsername, String newUsername, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword, String newEmail);	
+	BackMeUpUser login(String username, String password);
+	BackMeUpUser register(String username, String password, String keyRing, String email) throws AlreadyRegisteredException, IllegalArgumentException;
+	BackMeUpUser verifyEmailAddress(String verificationKey);
+	BackMeUpUser requestNewVerificationEmail(String username);
 	
 	// user property operations
 	void setUserProperty(String username, String key, String value);
@@ -111,5 +111,5 @@ public interface BusinessLogic {
 	void shutdown();
 	
 	// logs
-	List<KeyserverLog> getKeysrvLogs (User user);
+	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
 }
