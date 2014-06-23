@@ -14,7 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.User;
 import org.backmeup.model.dto.UserDTO;
 
 /**
@@ -37,7 +37,7 @@ public class Users extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO addUser(UserDTO user) {
-		BackMeUpUser userModel = getLogic().register(user.getLastname(), user.getPassword(), user.getPassword(), user.getEmail());
+		User userModel = getLogic().register(user.getLastname(), user.getPassword(), user.getPassword(), user.getEmail());
 		return getMapper().map(userModel, UserDTO.class);
 	}
 	
@@ -45,7 +45,7 @@ public class Users extends Base {
 	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO getUser(@PathParam("userId") String userId) {
-		BackMeUpUser userModel = getLogic().getUser(userId);
+		User userModel = getLogic().getUser(userId);
 		return getMapper().map(userModel, UserDTO.class);
 	}
 	
@@ -54,7 +54,7 @@ public class Users extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserDTO updateUser(@PathParam("userId") String userId, UserDTO user) {
-		BackMeUpUser userModel = getLogic().getUser(userId);
+		User userModel = getLogic().getUser(userId);
 //		BackMeUpUser newUser = getLogic().changeUser(userModel.getUsername(), user.getLastname(), user.getPassword(), user.getEmail());
 //		return getMapper().map(newUser, UserDTO.class);
 		return user;

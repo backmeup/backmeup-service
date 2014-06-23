@@ -40,12 +40,12 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.AuthUsrPwd;
 import org.backmeup.keyserver.client.TokenRequest;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.Token;
+import org.backmeup.model.User;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -470,7 +470,7 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 	}
 
 	@Override
-	public List<KeyserverLog> getLogs(BackMeUpUser user) {
+	public List<KeyserverLog> getLogs(User user) {
 		Result response = execute(path + "/logs/" + user.getUserId(),
 				ReqType.GET);
 

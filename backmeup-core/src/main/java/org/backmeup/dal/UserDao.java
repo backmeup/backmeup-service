@@ -1,18 +1,18 @@
 package org.backmeup.dal;
 
-import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.User;
 
 /**
  * The UserDao contains all database relevant operations for the model class User.
  * 
  * @author fschoeppl
  */
-public interface UserDao extends BaseDao<BackMeUpUser> {
+public interface UserDao extends BaseDao<User> {
 
-    BackMeUpUser findByName(String username);
+	User findByName(String username);
 
-    BackMeUpUser findByVerificationKey(String verificationKey);
+	User findByVerificationKey(String verificationKey);
 
-    BackMeUpUser findByEmail(String email);
+	User findByEmail(String email);
 
 }

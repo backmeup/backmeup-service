@@ -3,9 +3,9 @@ package org.backmeup.logic;
 import java.util.List;
 import java.util.Set;
 
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
+import org.backmeup.model.User;
 import org.backmeup.model.spi.SourceSinkDescribable.Type;
 
 /**
@@ -35,7 +35,7 @@ public interface ProfileLogic {
 
     void setProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles, List<String> sourceOptions);
 
-    Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, Type type);
+    Profile createNewProfile(User user, String uniqueDescIdentifier, String profileName, Type type);
 
     void setIdentification(Profile profile, String userId);
 

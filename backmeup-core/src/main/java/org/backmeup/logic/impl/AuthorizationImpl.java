@@ -12,10 +12,10 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.AuthorizationLogic;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
+import org.backmeup.model.User;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.PasswordTooShortException;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
     private Keyserver keyserverClient;
 
     @Override
-    public void register(BackMeUpUser user, String password, String keyRingPassword) {
+    public void register(User user, String password, String keyRingPassword) {
         throwIfPasswordInvalid(password);
         throwIfPasswordInvalid(keyRingPassword); // TODO keyRingPassword is unused
         keyserverClient.registerUser(user.getUserId(), password);
@@ -47,7 +47,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public void unregister(BackMeUpUser user) {
+    public void unregister(User user) {
         try {
             keyserverClient.deleteUser(user.getUserId());
         } catch (Exception ex) {
@@ -56,14 +56,14 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public void authorize(BackMeUpUser user, String keyRingPassword) {
+    public void authorize(User user, String keyRingPassword) {
         if (!keyserverClient.validateUser(user.getUserId(), keyRingPassword)) {
             throw new InvalidCredentialsException();
         }
     }
 
     @Override
-    public void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRing, String newKeyRing) {
+    public void updatePasswords(User user, String oldPassword, String newPassword, String oldKeyRing, String newKeyRing) {
         if (newPassword != null) {
             throwIfPasswordInvalid(newPassword);
             keyserverClient.changeUserPassword(user.getUserId(), oldPassword, newPassword);
@@ -140,7 +140,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public List<KeyserverLog> getLogs(BackMeUpUser user) {
+    public List<KeyserverLog> getLogs(User user) {
         return keyserverClient.getLogs(user);
     }
 

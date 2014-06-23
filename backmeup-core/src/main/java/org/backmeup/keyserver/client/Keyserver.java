@@ -3,11 +3,11 @@ package org.backmeup.keyserver.client;
 import java.util.List;
 import java.util.Properties;
 
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
+import org.backmeup.model.User;
 
 public interface Keyserver {
     // User operations
@@ -51,5 +51,5 @@ public interface Keyserver {
     AuthDataResult getData(Token token);
 
     // Logs
-    List<KeyserverLog> getLogs(BackMeUpUser user);
+    List<KeyserverLog> getLogs(User user);
 }

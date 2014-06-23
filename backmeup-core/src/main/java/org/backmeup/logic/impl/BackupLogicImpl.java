@@ -18,7 +18,6 @@ import org.backmeup.dal.StatusDao;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.ActionProfile.ActionProperty;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
@@ -28,6 +27,7 @@ import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.Status;
+import org.backmeup.model.User;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.JobProtocolDTO;
 
@@ -206,7 +206,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to) {
+    public ProtocolOverview getProtocolOverview(User user, Date from, Date to) {
         List<JobProtocol> protocols = createJobProtocolDao().findByUsernameAndDuration(user.getUsername(), from, to);
         ProtocolOverview po = new ProtocolOverview();
         Map<String, Entry> entries = new HashMap<>();
@@ -239,7 +239,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
+    public void createJobProtocol(User user, BackupJob job, JobProtocolDTO jobProtocol) {
         JobProtocolDao jpd = createJobProtocolDao();
         
         JobProtocol protocol = new JobProtocol();

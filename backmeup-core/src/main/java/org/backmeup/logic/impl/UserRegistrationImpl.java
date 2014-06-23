@@ -18,7 +18,7 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.UserDao;
 import org.backmeup.logic.UserRegistration;
-import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.User;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.EmailVerificationException;
@@ -58,13 +58,13 @@ public class UserRegistrationImpl implements UserRegistration {
         return dal.createUserDao();
     }
 
-    private BackMeUpUser save(BackMeUpUser user) {
+    private User save(User user) {
         return getUserDao().save(user);
     }
 
     @Override
-    public BackMeUpUser getExistingUser(String username) {
-        BackMeUpUser user = getUserDao().findByName(username);
+    public User getExistingUser(String username) {
+    	User user = getUserDao().findByName(username);
         if (user == null) {
             throw new UnknownUserException(username);
         }
@@ -77,20 +77,20 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public BackMeUpUser getActiveUser(String username) {
-        BackMeUpUser user = getExistingUser(username);
+    public User getActiveUser(String username) {
+    	User user = getExistingUser(username);
         user.ensureActivated();
         return user;
     }
 
-    private BackMeUpUser queryNonActivatedUser(String username) {
-        BackMeUpUser user = getExistingUser(username);
+    private User queryNonActivatedUser(String username) {
+    	User user = getExistingUser(username);
         user.ensureNotActivated();
         return user;
     }
 
     @Override
-    public BackMeUpUser register(String username, String email) {
+    public User register(String username, String email) {
         if (username == null || email == null) {
             throw new IllegalArgumentException(textBundle.getString(PARAMETER_NULL));
         }
@@ -99,7 +99,7 @@ public class UserRegistrationImpl implements UserRegistration {
         ensureUsernameAvailable(username);
         ensureEmailAvailable(email);
 
-        BackMeUpUser newUser = new BackMeUpUser(username, email);
+        User newUser = new User(username, email);
         newUser.setActivated(false);
         setNewVerificationKeyTo(newUser);
 
@@ -116,26 +116,26 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     private void ensureUsernameAvailable(String username) {
-        BackMeUpUser existingUser = getUserDao().findByName(username);
+    	User existingUser = getUserDao().findByName(username);
         if (existingUser != null) {
             throw new AlreadyRegisteredException(existingUser.getUsername());
         }
     }
 
     private void ensureEmailAvailable(String email) {
-        BackMeUpUser existingUser = getUserDao().findByEmail(email);
+    	User existingUser = getUserDao().findByEmail(email);
         if (existingUser != null) {
             throw new AlreadyRegisteredException(existingUser.getEmail());
         }
     }
 
     @Override
-    public void setNewVerificationKeyTo(BackMeUpUser user) {
+    public void setNewVerificationKeyTo(User user) {
         String timeStamp = Long.toString(new Date().getTime());
         generateNewVerificationKey(user, timeStamp);
     }
 
-    private void generateNewVerificationKey(BackMeUpUser user, String additionalPart) {
+    private void generateNewVerificationKey(User user, String additionalPart) {
         String payLoad = user.getUsername() + "." + additionalPart;
         String verificationKey = createKey(payLoad);
         user.setVerificationKey(verificationKey);
@@ -158,7 +158,7 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public void sendVerificationEmailFor(BackMeUpUser user) {
+    public void sendVerificationEmailFor(User user) {
         String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
         String subject = "";
         try {
@@ -174,8 +174,8 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public BackMeUpUser requestNewVerificationEmail(String username) {
-        BackMeUpUser user = queryNonActivatedUser(username);
+    public User requestNewVerificationEmail(String username) {
+    	User user = queryNonActivatedUser(username);
 
         setNewVerificationKeyTo(user);
         save(user);
@@ -186,8 +186,8 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public BackMeUpUser activateUserFor(String verificationKey) {
-        BackMeUpUser user = getUserDao().findByVerificationKey(verificationKey);
+    public User activateUserFor(String verificationKey) {
+    	User user = getUserDao().findByVerificationKey(verificationKey);
         if (user == null) {
             throw new EmailVerificationException(verificationKey);
         }
@@ -203,7 +203,7 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public void ensureNewValuesAvailable(BackMeUpUser user, String newUsername, String newEmail) {
+    public void ensureNewValuesAvailable(User user, String newUsername, String newEmail) {
         if (newUsername != null && !user.getUsername().equals(newUsername)) {
             ensureUsernameAvailable(newUsername);
         }
@@ -214,7 +214,7 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public void updateValues(BackMeUpUser user, String newUsername, String newEmail) {
+    public void updateValues(User user, String newUsername, String newEmail) {
         if (newUsername != null && !user.getUsername().equals(newUsername)) {
             user.setUsername(newUsername);
         }
@@ -232,7 +232,7 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public void delete(BackMeUpUser user) {
+    public void delete(User user) {
         getUserDao().delete(user);
     }
 

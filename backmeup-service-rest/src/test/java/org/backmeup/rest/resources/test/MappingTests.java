@@ -1,11 +1,11 @@
 package org.backmeup.rest.resources.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.User;
 import org.backmeup.model.dto.UserDTO;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
@@ -22,7 +22,7 @@ public class MappingTests {
 		boolean activated = true;
 		String verificationKey = "123ABC";
 		
-		BackMeUpUser srcUser = new BackMeUpUser(userId, username, email);
+		User srcUser = new User(userId, username, email);
 		srcUser.setActivated(activated);
 		srcUser.setVerificationKey(verificationKey);
 		

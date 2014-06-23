@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.backmeup.model.ActionProfile;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.Status;
+import org.backmeup.model.User;
 import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
@@ -39,9 +39,9 @@ public interface BackupLogic {
     void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
     		BackupJob updateRequest);
 
-    ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to);
+    ProtocolOverview getProtocolOverview(User user, Date from, Date to);
 
-    void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);
+    void createJobProtocol(User user, BackupJob job, JobProtocolDTO jobProtocol);
 
     void deleteProtocolsOf(String username);
 

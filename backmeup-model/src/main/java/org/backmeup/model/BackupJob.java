@@ -41,7 +41,7 @@ public class BackupJob {
 	@Column(nullable = false)
 	private Long id;
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private BackMeUpUser user;
+	private User user;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private Set<ProfileOptions> sourceProfiles = new HashSet<>();
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
@@ -85,7 +85,7 @@ public class BackupJob {
 		super();
 	}
 
-	public BackupJob(BackMeUpUser user, Set<ProfileOptions> sourceProfile,
+	public BackupJob(User user, Set<ProfileOptions> sourceProfile,
 			Profile sinkProfile, List<ActionProfile> requiredActions,
 			Date start, long delay, String jobTitle, boolean reschedule) {
 		this.user = user;
@@ -110,11 +110,11 @@ public class BackupJob {
 		this.id = id;
 	}
 
-	public BackMeUpUser getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(BackMeUpUser user) {
+	public void setUser(User user) {
 		this.modified = new Date();
 		this.user = user;
 	}
