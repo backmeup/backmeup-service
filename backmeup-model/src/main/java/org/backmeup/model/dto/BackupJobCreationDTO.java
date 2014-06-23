@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 
+@XmlRootElement
 public class BackupJobCreationDTO {
 	private String jobTitle;
 	private JobFrequency schedule;
