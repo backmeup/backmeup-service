@@ -9,13 +9,17 @@ import org.backmeup.model.BackMeUpUser;
  */
 public interface UserRegistration {
 
-    BackMeUpUser getExistingUser(String username);
-
-    void ensureUserIsActive(String username);
+    BackMeUpUser getUserByUsername(String username, boolean ensureActivated);
+	
+	BackMeUpUser getUserByUserId(String userId);
     
-    BackMeUpUser getActiveUser(String username);
+    BackMeUpUser getUserByUserId(String userId, boolean ensureActivated);
     
-    BackMeUpUser register(String username, String email);
+    BackMeUpUser register(BackMeUpUser user);
+    
+    BackMeUpUser update(BackMeUpUser user);
+    
+    void delete(BackMeUpUser user);
 
     void setNewVerificationKeyTo(BackMeUpUser user);
 
@@ -26,9 +30,4 @@ public interface UserRegistration {
     BackMeUpUser activateUserFor(String verificationKey);
 
     void ensureNewValuesAvailable(BackMeUpUser user, String newUsername, String newEmail);
-
-    void updateValues(BackMeUpUser user, String newUsername, String newEmail);
-
-    void delete(BackMeUpUser user);
-
 }

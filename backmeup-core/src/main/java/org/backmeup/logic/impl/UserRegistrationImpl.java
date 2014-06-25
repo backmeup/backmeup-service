@@ -42,6 +42,10 @@ public class UserRegistrationImpl implements UserRegistration {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("UserRegistrationImpl");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    
+    @Inject
+    @Configuration(key = "backmeup.autoVerifyUser")
+    private Boolean autoVerifyUser;
 
     @Inject
     @Configuration(key = "backmeup.emailRegex")
@@ -61,49 +65,52 @@ public class UserRegistrationImpl implements UserRegistration {
     private BackMeUpUser save(BackMeUpUser user) {
         return getUserDao().save(user);
     }
-
+    
     @Override
-    public BackMeUpUser getExistingUser(String username) {
-        BackMeUpUser user = getUserDao().findByName(username);
+    public BackMeUpUser getUserByUserId(String userId) {
+    	return getUserByUserId(userId, false);
+    }
+    
+    @Override
+    public BackMeUpUser getUserByUserId(String userId, boolean ensureActivated) {
+    	BackMeUpUser user = getUserDao().findById(Long.parseLong(userId));
+        if (user == null) {
+            throw new UnknownUserException(userId);
+        }
+        
+        if(ensureActivated) {
+        	user.ensureActivated();
+        }
+        return user;
+    }
+    
+    @Override
+    public BackMeUpUser getUserByUsername(String username, boolean ensureActivated) {
+    	BackMeUpUser user = getUserDao().findByName(username);
         if (user == null) {
             throw new UnknownUserException(username);
         }
+        
+        if(ensureActivated) {
+        	user.ensureActivated();
+        }
         return user;
     }
 
     @Override
-    public void ensureUserIsActive(String username) {
-        getActiveUser(username);
-    }
-
-    @Override
-    public BackMeUpUser getActiveUser(String username) {
-        BackMeUpUser user = getExistingUser(username);
-        user.ensureActivated();
-        return user;
-    }
-
-    private BackMeUpUser queryNonActivatedUser(String username) {
-        BackMeUpUser user = getExistingUser(username);
-        user.ensureNotActivated();
-        return user;
-    }
-
-    @Override
-    public BackMeUpUser register(String username, String email) {
-        if (username == null || email == null) {
+    public BackMeUpUser register(BackMeUpUser user) {
+        if (user.getUsername() == null || user.getEmail() == null) {
             throw new IllegalArgumentException(textBundle.getString(PARAMETER_NULL));
         }
-        throwIfEmailInvalid(email);
+        throwIfEmailInvalid(user.getEmail());
 
-        ensureUsernameAvailable(username);
-        ensureEmailAvailable(email);
+        ensureUsernameAvailable(user.getUsername());
+        ensureEmailAvailable(user.getEmail());
 
-        BackMeUpUser newUser = new BackMeUpUser(username, email);
-        newUser.setActivated(false);
-        setNewVerificationKeyTo(newUser);
+        setNewVerificationKeyTo(user);
 
-        newUser = save(newUser);
+        BackMeUpUser newUser = save(user);
+        newUser.setPassword(user.getPassword());
         return newUser;
     }
 
@@ -175,7 +182,8 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public BackMeUpUser requestNewVerificationEmail(String username) {
-        BackMeUpUser user = queryNonActivatedUser(username);
+        BackMeUpUser user = getUserByUsername(username, false);
+        user.ensureNotActivated();
 
         setNewVerificationKeyTo(user);
         save(user);
@@ -214,21 +222,27 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     @Override
-    public void updateValues(BackMeUpUser user, String newUsername, String newEmail) {
-        if (newUsername != null && !user.getUsername().equals(newUsername)) {
-            user.setUsername(newUsername);
+    public BackMeUpUser update(BackMeUpUser user) {
+    	BackMeUpUser persistentUser = getUserByUsername(user.getUsername(), true);
+    	
+    	if (user.getFirstname() != null && !user.getFirstname().equals(persistentUser.getFirstname())){
+    		persistentUser.setFirstname(user.getFirstname());
+    	}
+    	
+    	if (user.getLastname() != null && !user.getLastname().equals(persistentUser.getLastname())){
+    		persistentUser.setLastname(user.getLastname());
+    	}
+
+        if (user.getEmail() != null && !user.getEmail().equals(persistentUser.getEmail())) {
+            persistentUser.setEmail(user.getEmail());
+			if (autoVerifyUser) {
+				persistentUser.setActivated(false);
+				setNewVerificationKeyTo(user);
+				sendVerificationEmailFor(user);
+			}
         }
 
-        if (newEmail != null && !newEmail.equals(user.getEmail())) {
-            user.setEmail(newEmail);
-
-            // Decativate user. Send new activation Mail
-            user.setActivated(false);
-            setNewVerificationKeyTo(user);
-            sendVerificationEmailFor(user);
-        }
-
-        save(user);
+        return save(persistentUser);
     }
 
     @Override
