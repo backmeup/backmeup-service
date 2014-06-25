@@ -18,7 +18,7 @@ import org.backmeup.model.dto.PluginDTO.PluginType;
 
 public class DummyDataManager {
 	public static UserDTO getUserDTO() {
-		UserDTO user = new UserDTO("John", "Doe", null, "john.doe@example.com");
+		UserDTO user = new UserDTO("john.doe", "John", "Doe", null, "john.doe@example.com");
 		return user;
 	}
 	

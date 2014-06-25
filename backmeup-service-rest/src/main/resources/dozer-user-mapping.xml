@@ -11,14 +11,6 @@
   			<b is-accessible="true">userId</b>
 		</field> 
 		<field>
-			<a>username</a>
-			<b>firstname</b>
-		</field>
-		<field>
-			<a>username</a>
-			<b>lastname</b>
-		</field>
-		<field>
   			<a>activated</a>
   			<b is-accessible="true">activated</b>
 		</field> 

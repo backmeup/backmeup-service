@@ -48,7 +48,7 @@ public class SerializiationTests {
   
   @Test
   public void testBackupJobSerializiation() {
-    BackMeUpUser user = new BackMeUpUser(1L, "Sepp", "Sepp@Mail.at");
+    BackMeUpUser user = new BackMeUpUser(1L, "john.doe", "John", "Doe", "Sepp@Mail.at", "John123!#");
     Set<ProfileOptions> options = new HashSet<>();
     Profile source = new Profile(2L, user, "TestProfile", "org.backmeup.source", Type.Source);
     ProfileOptions po = new ProfileOptions(source, new String[]{"folder1", "folder2"});

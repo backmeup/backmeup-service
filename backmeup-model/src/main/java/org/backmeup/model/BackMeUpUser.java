@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.backmeup.model.exceptions.UserAlreadyActivatedException;
 import org.backmeup.model.exceptions.UserNotActivatedException;
@@ -28,20 +29,55 @@ public class BackMeUpUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long userId;
-    // TODO: Move to keyserver!!
+
     @Column(unique = true, nullable = false)
     private String username;
+    
+    private String firstname;
+    
+    private String lastname;
+    
     @Column(unique = true, nullable = false)
     private String email;
-    private boolean isActivated;
+    
+    @Transient
+    private String password;
+    
+    private boolean activated;
+    
     private String verificationKey;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "user")
     private final List<JobProtocol> protocols = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    //@Fetch(value = FetchMode.SUBSELECT)
     private final Set<UserProperty> properties = new HashSet<>();
+    
+    public BackMeUpUser() {
+    	
+    }
+
+    public BackMeUpUser(String username, String firstname, String lastname, String email, String password) {
+        this(null, username, firstname, lastname, email, password);
+    }
+
+    public BackMeUpUser(Long userId, String username, String firstname, String lastname, String email, String password) {
+        this.userId = userId;
+        this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.password = password;
+        this.activated = false;
+    }
+    
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getUsername() {
         return username;
@@ -51,34 +87,64 @@ public class BackMeUpUser {
         this.username = username;
     }
 
-    public String getEmail() {
+    public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
+    
+    public String getPassword() {
+		return password;
+	}
 
-    public BackMeUpUser() {
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public boolean isActivated() {
+        return activated;
     }
 
-    public BackMeUpUser(String username, String email) {
-        this(null, username, email);
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+    
+    public String getVerificationKey() {
+        return verificationKey;
     }
 
-    public BackMeUpUser(Long userId, String username, String email) {
-        this.userId = userId;
-        this.username = username;
-        this.email = email;
+    public void setVerificationKey(String verificationKey) {
+        this.verificationKey = verificationKey;
     }
-
-    private UserProperty findProperty(String key) {
-        for (UserProperty up : getUserProperties()) {
-            if (up.getKey().equals(key)) {
-                return up;
-            }
+ 
+    public Set<UserProperty> getUserProperties() {
+        return properties;
+    }
+    
+    public String getUserProperty(String key) {
+        UserProperty up = findProperty(key);
+        if (up == null) {
+            return null;
         }
-        return null;
+        return up.getValue();
     }
 
     public void setUserProperty(String key, String value) {
@@ -91,53 +157,20 @@ public class BackMeUpUser {
         }
     }
 
-    public String getUserProperty(String key) {
-        UserProperty up = findProperty(key);
-        if (up == null) {
-            return null;
-        }
-        return up.getValue();
-    }
-
     public void deleteUserProperty(String key) {
         UserProperty up = new UserProperty(key, null);
         this.getUserProperties().remove(up);
     }
-
-    public Long getUserId() {
-        return userId;
+    
+    private UserProperty findProperty(String key) {
+        for (UserProperty up : getUserProperties()) {
+            if (up.getKey().equals(key)) {
+                return up;
+            }
+        }
+        return null;
     }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getVerificationKey() {
-        return verificationKey;
-    }
-
-    public void setVerificationKey(String verificationKey) {
-        this.verificationKey = verificationKey;
-    }
-
-    public boolean isActivated() {
-        return isActivated;
-    }
-
-    public void setActivated(boolean isActivated) {
-        this.isActivated = isActivated;
-    }
-
-    public Set<UserProperty> getUserProperties() {
-        return properties;
-    }
-
-    @Override
-    public String toString() {
-        // For debug purposes
-        return username;
-    }
-
+    
     public void ensureActivated() {
         if (!isActivated()) {
             throw new UserNotActivatedException(getUsername());
@@ -148,5 +181,10 @@ public class BackMeUpUser {
         if (isActivated()) {
             throw new UserAlreadyActivatedException(getUsername());
         }
+    }
+
+    @Override
+    public String toString() {
+        return username;
     }
 }
