@@ -34,10 +34,9 @@ public class AuthorizationImpl implements AuthorizationLogic {
     private Keyserver keyserverClient;
 
     @Override
-    public void register(BackMeUpUser user, String password, String keyRingPassword) {
-        throwIfPasswordInvalid(password);
-        throwIfPasswordInvalid(keyRingPassword); // TODO keyRingPassword is unused
-        keyserverClient.registerUser(user.getUserId(), password);
+    public void register(BackMeUpUser user) {
+        throwIfPasswordInvalid(user.getPassword());
+        keyserverClient.registerUser(user.getUserId(), user.getPassword());
     }
 
     private void throwIfPasswordInvalid(String password) {
@@ -56,12 +55,13 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public void authorize(BackMeUpUser user, String keyRingPassword) {
-        if (!keyserverClient.validateUser(user.getUserId(), keyRingPassword)) {
+    public void authorize(BackMeUpUser user, String password) {
+        if (!keyserverClient.validateUser(user.getUserId(), password)) {
             throw new InvalidCredentialsException();
         }
     }
 
+    /*
     @Override
     public void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRing, String newKeyRing) {
         if (newPassword != null) {
@@ -75,6 +75,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
             keyserverClient.changeUserKeyRing(user.getUserId(), oldKeyRing, newKeyRing);
         }
     }
+    */
 
     @Override
     public Properties getProfileAuthInformation(Profile profile, String keyRing) {

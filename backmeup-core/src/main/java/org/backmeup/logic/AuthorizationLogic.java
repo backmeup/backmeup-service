@@ -14,13 +14,13 @@ import org.backmeup.model.Profile;
  */
 public interface AuthorizationLogic {
 
-    void register(BackMeUpUser user, String password, String keyRingPassword);
+    void register(BackMeUpUser user);
 
     void unregister(BackMeUpUser user);
 
-    void authorize(BackMeUpUser user, String keyRingPassword);
+    void authorize(BackMeUpUser user, String password);
 
-    void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword);
+//    void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword);
 
     Properties getProfileAuthInformation(Profile profile, String keyRing);
 
