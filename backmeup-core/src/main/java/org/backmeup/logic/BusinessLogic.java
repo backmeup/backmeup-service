@@ -35,18 +35,12 @@ import org.backmeup.model.spi.SourceSinkDescribable;
  */
 public interface BusinessLogic {
 	// user operations 
-	BackMeUpUser getUser(String username);
-	BackMeUpUser deleteUser(String username);
-	BackMeUpUser changeUser(String oldUsername, String newUsername, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword, String newEmail);	
-	BackMeUpUser login(String username, String password);
-	BackMeUpUser register(String username, String password, String keyRing, String email) throws AlreadyRegisteredException, IllegalArgumentException;
-	BackMeUpUser verifyEmailAddress(String verificationKey);
-	BackMeUpUser requestNewVerificationEmail(String username);
-	
-	// user property operations
-	void setUserProperty(String username, String key, String value);
-	void deleteUserProperty(String username, String key);
-	
+	BackMeUpUser getUserByUsername(String username);
+	BackMeUpUser getUserByUserId(String userId);
+	BackMeUpUser deleteUser(String userId);
+	BackMeUpUser updateUser(BackMeUpUser user);
+	BackMeUpUser addUser(BackMeUpUser user);
+
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
 	ActionProfile getStoredActionOptions(String actionId, Long jobId);
