@@ -18,11 +18,14 @@ public class MappingTests {
 	public void testUserMapping() {
 		Long userId = 1L;
 		String username = "johndoe";
+		String firstname = "John";
+		String lastname = "Doe";
 		String email = "johndoe@example.com";
 		boolean activated = true;
 		String verificationKey = "123ABC";
+		String password = "john123!#";
 		
-		BackMeUpUser srcUser = new BackMeUpUser(userId, username, email);
+		BackMeUpUser srcUser = new BackMeUpUser(userId, username, firstname, lastname, email, password);
 		srcUser.setActivated(activated);
 		srcUser.setVerificationKey(verificationKey);
 		
@@ -31,8 +34,9 @@ public class MappingTests {
 		UserDTO destUser = mapper.map(srcUser, UserDTO.class);
 		
 		assertEquals(srcUser.getUserId(), destUser.getUserId());
-		assertEquals(srcUser.getUsername(), destUser.getFirstname());
-		assertEquals(srcUser.getUsername(), destUser.getLastname());
+		assertEquals(srcUser.getUsername(), destUser.getUsername());
+		assertEquals(srcUser.getFirstname(), destUser.getFirstname());
+		assertEquals(srcUser.getLastname(), destUser.getLastname());
 		assertEquals(srcUser.getEmail(), destUser.getEmail());
 		assertEquals(srcUser.isActivated(), destUser.isActivated());
 	}
