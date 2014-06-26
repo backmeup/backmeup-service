@@ -269,12 +269,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 	}
     
     // ========================================================================
-
-
-
-
-
-
+	
+	// Plugin operations ------------------------------------------------------
 
 
     @Override
@@ -347,11 +343,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 	}
 
     @Override
-    public void deleteDatasourcePlugin(String name) {
-        throw new UnsupportedOperationException("delete Datasource Plugin not implemented");
-    }
-
-    @Override
     public List<SourceSinkDescribable> getDatasinks() {
         return plugins.getConnectedDatasinks();
     }
@@ -365,11 +356,6 @@ public class BusinessLogicImpl implements BusinessLogic {
                 
             }
         });
-    }
-
-    @Override
-    public void deleteDatasinkPlugin(String name) {
-        throw new UnsupportedOperationException("delete Datasink Plugin not implemented");
     }
 
     @Override
@@ -404,11 +390,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public void deleteActionPlugin(String name) {
-        throw new UnsupportedOperationException("delete Action Plugin not implemented");
-    }
-
     private List<ActionProfile> getActionProfilesFor(BackupJob request) {
         return plugins.getActionProfilesFor(request);
     }
@@ -438,54 +419,56 @@ public class BusinessLogicImpl implements BusinessLogic {
             conn.rollback();
         }
     }
-
-    // Note: keyRing won't be overridden
+    
     @Override
-    public ValidationNotes updateBackupJob(final String username, final BackupJob updateRequest) {
-        if (updateRequest == null) {
-            throw new IllegalArgumentException("Update must not be null!");
-        }
-        if (updateRequest.getId() == null) {
-            throw new IllegalArgumentException("JobId must not be null!");
-        }
-        
-        final Boolean[] scheduleJob = { false };
-        BackupJob j = conn.txNew(new Callable<BackupJob>() {
-            @Override public BackupJob call() {
+    public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
+            final String profileName, final String keyRing) {
 
-//                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
+        return conn.txNew(new Callable<AuthRequest>() {
+            @Override public AuthRequest call() {
 
-                List<ActionProfile> requiredActions = getActionProfilesFor(updateRequest);
-                Set<ProfileOptions> sourceProfiles = updateRequest.getSourceProfiles();
-                Profile sindProfile = updateRequest.getSinkProfile();
+                BackMeUpUser user = getAuthorizedUser(username, keyRing);
 
-                BackupJob job = backupJobs.getExistingUserJob(updateRequest.getId(), username);
+                Properties p = new Properties();
+                AuthRequest ar = plugins.configureAuth(p, uniqueDescIdentifier);
+                
+                SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
+                Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
+                authorization.initProfileAuthInformation(profile, p, keyRing);
+                
+                ar.setProfile(profile);
+                return ar;
 
-                // check if the interval has changed
-                if (job.getTimeExpression().compareToIgnoreCase(updateRequest.getTimeExpression()) != 0) {
-                    scheduleJob[0] = true;
-
-                    // chage start date to now if interval has changed
-                    job.setStart(new Date());
-                }
-
-                backupJobs.updatelJob(job, requiredActions, sourceProfiles, sindProfile, updateRequest);
-                return job;
-            
             }
         });
-
-		if (scheduleJob[0]) {
-			// add the updated job to the queue. (All old queue entrys get
-			// invalid and will not be executed)
-			jobManager.runBackUpJob(j);
-		}
-
-//        ValidationNotes vn = validateBackupJob(username, j.getId(), updateRequest.getKeyRing());
-//        vn.setJob(j);
-//        return vn;
-		return null;
     }
+    
+    @Override
+    public void postAuth(final Long profileId, final Properties props, final String keyRing) {
+        if (keyRing == null) {
+            throw new IllegalArgumentException("keyRing-Parameter cannot be null!");
+        } else if (profileId == null) {
+            throw new IllegalArgumentException("profileId-Parameter cannot be null!");
+        } else if (props == null) {
+            throw new IllegalArgumentException("properties-Parameter cannot be null!");
+        }
+        
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile p = profiles.queryExistingProfile(profileId);
+                props.putAll(authorization.getProfileAuthInformation(p, keyRing));
+
+                String sourceSinkId = p.getDescription();
+                String userId = plugins.getAuthorizedUserId(sourceSinkId, props);
+                profiles.setIdentification(p, userId);
+                authorization.overwriteProfileAuthInformation(p, props, keyRing);
+
+            }
+        });
+    }
+    
+    // ========================================================================
 
     @Override
     public BackupJob getBackupJob(String username, final Long jobId) {
@@ -549,6 +532,54 @@ public class BusinessLogicImpl implements BusinessLogic {
 //        return getBackupJobFull(username, job.getJobId());
 //    }
 
+ // Note: keyRing won't be overridden
+    @Override
+    public ValidationNotes updateBackupJob(final String username, final BackupJob updateRequest) {
+        if (updateRequest == null) {
+            throw new IllegalArgumentException("Update must not be null!");
+        }
+        if (updateRequest.getId() == null) {
+            throw new IllegalArgumentException("JobId must not be null!");
+        }
+        
+        final Boolean[] scheduleJob = { false };
+        BackupJob j = conn.txNew(new Callable<BackupJob>() {
+            @Override public BackupJob call() {
+
+//                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
+
+                List<ActionProfile> requiredActions = getActionProfilesFor(updateRequest);
+                Set<ProfileOptions> sourceProfiles = updateRequest.getSourceProfiles();
+                Profile sindProfile = updateRequest.getSinkProfile();
+
+                BackupJob job = backupJobs.getExistingUserJob(updateRequest.getId(), username);
+
+                // check if the interval has changed
+                if (job.getTimeExpression().compareToIgnoreCase(updateRequest.getTimeExpression()) != 0) {
+                    scheduleJob[0] = true;
+
+                    // chage start date to now if interval has changed
+                    job.setStart(new Date());
+                }
+
+                backupJobs.updatelJob(job, requiredActions, sourceProfiles, sindProfile, updateRequest);
+                return job;
+            
+            }
+        });
+
+		if (scheduleJob[0]) {
+			// add the updated job to the queue. (All old queue entrys get
+			// invalid and will not be executed)
+			jobManager.runBackUpJob(j);
+		}
+
+//        ValidationNotes vn = validateBackupJob(username, j.getId(), updateRequest.getKeyRing());
+//        vn.setJob(j);
+//        return vn;
+		return null;
+    }
+    
     @Override
     public List<BackupJob> getJobs(final String username) {
         return conn.txNewReadOnly(new Callable<List<BackupJob>>() {
@@ -648,56 +679,6 @@ public class BusinessLogicImpl implements BusinessLogic {
             	registration.getUserByUsername(username, true);
                 backupJobs.deleteProtocolsOf(username);
                 
-            }
-        });
-    }
-
-    @Override
-    public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
-            final String profileName, final String keyRing) {
-
-        return conn.txNew(new Callable<AuthRequest>() {
-            @Override public AuthRequest call() {
-
-                BackMeUpUser user = getAuthorizedUser(username, keyRing);
-
-                Properties p = new Properties();
-                AuthRequest ar = plugins.configureAuth(p, uniqueDescIdentifier);
-                
-                SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
-                Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
-                authorization.initProfileAuthInformation(profile, p, keyRing);
-                
-                ar.setProfile(profile);
-                return ar;
-
-            }
-        });
-    }
-
-
-    
-    @Override
-    public void postAuth(final Long profileId, final Properties props, final String keyRing) {
-        if (keyRing == null) {
-            throw new IllegalArgumentException("keyRing-Parameter cannot be null!");
-        } else if (profileId == null) {
-            throw new IllegalArgumentException("profileId-Parameter cannot be null!");
-        } else if (props == null) {
-            throw new IllegalArgumentException("properties-Parameter cannot be null!");
-        }
-        
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-                
-                Profile p = profiles.queryExistingProfile(profileId);
-                props.putAll(authorization.getProfileAuthInformation(p, keyRing));
-
-                String sourceSinkId = p.getDescription();
-                String userId = plugins.getAuthorizedUserId(sourceSinkId, props);
-                profiles.setIdentification(p, userId);
-                authorization.overwriteProfileAuthInformation(p, props, keyRing);
-
             }
         });
     }

@@ -34,12 +34,14 @@ import org.backmeup.model.spi.SourceSinkDescribable;
  * @author fschoeppl
  */
 public interface BusinessLogic {
-	// user operations 
+	// user operations --------------------------------------------------------
 	BackMeUpUser getUserByUsername(String username);
 	BackMeUpUser getUserByUserId(String userId);
 	BackMeUpUser deleteUser(String userId);
 	BackMeUpUser updateUser(BackMeUpUser user);
 	BackMeUpUser addUser(BackMeUpUser user);
+	
+	// plugin operations ------------------------------------------------------
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
@@ -52,12 +54,10 @@ public interface BusinessLogic {
 	List<String> getDatasourceOptions(String username, Long profileId, String keyRingPassword);
 	List<String> getStoredDatasourceOptions(String username, Long profileId, Long jobId);
 	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
-	void deleteDatasourcePlugin(String name);
 	
 	//datasink operations
 	List<SourceSinkDescribable> getDatasinks();
 	List<Profile> getDatasinkProfiles(String username);
-	void deleteDatasinkPlugin(String name);
 	
     //profile operation
     void addProfileEntries(Long profileId, Properties entries, String keyRing);
@@ -71,7 +71,8 @@ public interface BusinessLogic {
 	//action operations
 	List<ActionDescribable> getActions();
 	List<String> getActionOptions(String actionId);
-	void deleteActionPlugin(String name);
+	
+	// backupjob operations ---------------------------------------------------
 	
 	//job & validation operations
 	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
@@ -93,17 +94,17 @@ public interface BusinessLogic {
 	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;
 	void postAuth(Long profileId, Properties props, String keyRing) throws PluginException, ValidationException, InvalidCredentialsException;
 	
-	//search operations
+	// search operations ------------------------------------------------------
 	long searchBackup(String username, String keyRingPassword, String query);
 	//SearchResponse queryBackup(String username, long searchId, String filterType, String filterValue);
 	SearchResponse queryBackup(String username, long searchId, Map<String, List<String>> filters);
 	File getThumbnail(String username, String fileId);
 	void deleteIndexForUser(String username);
 	void deleteIndexForJobAndTimestamp(Long jobId, Long timestamp);
-		
-	//misc operations
-	void shutdown();
 	
-	// logs
+	// log operations ---------------------------------------------------------
 	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
+	
+	// lifecycle operations ---------------------------------------------------
+	void shutdown();
 }
