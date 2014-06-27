@@ -42,6 +42,7 @@ public interface BusinessLogic {
 	BackMeUpUser addUser(BackMeUpUser user);
 	
 	// plugin operations ------------------------------------------------------
+	SourceSinkDescribable getPluginDescribable(String pluginId);
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);

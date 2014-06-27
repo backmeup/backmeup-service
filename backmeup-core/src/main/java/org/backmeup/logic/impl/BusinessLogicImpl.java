@@ -277,6 +277,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<SourceSinkDescribable> getDatasources() {
         return plugins.getConnectedDatasources();
     }
+    
+    @Override
+    public SourceSinkDescribable getPluginDescribable(String pluginId) {
+    	return plugins.getSourceSinkById(pluginId);
+    }
 
     @Override
     public List<Profile> getDatasourceProfiles(final String username) {
@@ -393,32 +398,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     private List<ActionProfile> getActionProfilesFor(BackupJob request) {
         return plugins.getActionProfilesFor(request);
     }
-
-    @Override
-    public ValidationNotes createBackupJob(String username, BackupJob request) {
-        try {
-            conn.begin();
-//            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
-
-            Set<ProfileOptions> pos = request.getSourceProfiles();
-//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
-            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
-
-            List<ActionProfile> actions = getActionProfilesFor(request);
-
-//            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
-
-            conn.rollback();
-//            BackupJob job = jobManager.createBackupJob(user, pos, sink, actions,
-//                    execTime.getStart(), execTime.getDelay(), request.getKeyRing(), request.getJobTitle(), execTime.isReschedule(), request.getTimeExpression());
-//            ValidationNotes vn = validateBackupJob(username, job.getId(), request.getKeyRing());
-//            vn.setJob(job);
-//            return vn;
-            return null;
-        } finally {
-            conn.rollback();
-        }
-    }
     
     @Override
     public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
@@ -469,6 +448,32 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     // ========================================================================
+    
+    @Override
+    public ValidationNotes createBackupJob(String username, BackupJob request) {
+        try {
+            conn.begin();
+//            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
+
+            Set<ProfileOptions> pos = request.getSourceProfiles();
+//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
+            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
+
+            List<ActionProfile> actions = getActionProfilesFor(request);
+
+//            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
+
+            conn.rollback();
+//            BackupJob job = jobManager.createBackupJob(user, pos, sink, actions,
+//                    execTime.getStart(), execTime.getDelay(), request.getKeyRing(), request.getJobTitle(), execTime.isReschedule(), request.getTimeExpression());
+//            ValidationNotes vn = validateBackupJob(username, job.getId(), request.getKeyRing());
+//            vn.setJob(job);
+//            return vn;
+            return null;
+        } finally {
+            conn.rollback();
+        }
+    }
 
     @Override
     public BackupJob getBackupJob(String username, final Long jobId) {
