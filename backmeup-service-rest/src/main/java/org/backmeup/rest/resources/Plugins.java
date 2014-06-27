@@ -2,6 +2,10 @@ package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,6 +22,8 @@ import javax.ws.rs.core.MediaType;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
+import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.SourceSinkDescribable.Type;
 import org.backmeup.rest.DummyDataManager;
 
 @Path("/plugins")
@@ -56,7 +62,39 @@ public class Plugins extends Base {
 	@Path("/{pluginId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public PluginDTO getPlugin(@PathParam("pluginId") String pluginId, @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
-		return DummyDataManager.getPluginDTO(expandProfiles);
+//		return DummyDataManager.getPluginDTO(expandProfiles);
+		SourceSinkDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
+		PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
+
+		switch (pluginDescribable.getType()) {
+		case Source:
+			pluginDTO.setPluginType(PluginType.source);
+			break;
+			
+		case Sink:
+			pluginDTO.setPluginType(PluginType.sink);
+			break;
+			
+		case Both:
+			pluginDTO.setPluginType(PluginType.sourcesink);
+
+		default:
+			break;
+		}
+		
+		Set<Entry<Object, Object>> metadataProperties = pluginDescribable.getMetadata(new Properties()).entrySet();
+		for (Entry<Object, Object> e : metadataProperties) {
+			String key = (String) e.getKey();
+			String value = (String) e.getValue();
+			pluginDTO.addMetadata(key, value);
+		} 
+		
+		
+		if(expandProfiles){
+			
+		}
+		
+		return pluginDTO;
 	}
 	
 	@POST

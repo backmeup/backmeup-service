@@ -6,7 +6,6 @@ import javax.ws.rs.core.Context;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.rest.BusinessLogicContextHolder;
 import org.backmeup.rest.cdi.JNDIBeanManager;
-import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
