@@ -399,6 +399,8 @@ public class BusinessLogicImpl implements BusinessLogic {
         return plugins.getActionProfilesFor(request);
     }
     
+    /*
+    
     @Override
     public AuthRequest preAuth(final String username, final String uniqueDescIdentifier,
             final String profileName, final String keyRing) {
@@ -421,6 +423,31 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    */
+    
+    @Override
+    public AuthRequest getPluginConfiguration(final String pluginId) {
+    	return conn.txNew(new Callable<AuthRequest>() {
+            @Override public AuthRequest call() {
+
+//                BackMeUpUser user = getAuthorizedUser(username, keyRing);
+
+                Properties p = new Properties();
+                AuthRequest ar = plugins.configureAuth(p, pluginId);
+                
+//                SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
+//                Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
+//                authorization.initProfileAuthInformation(profile, p, keyRing);
+                
+//                ar.setProfile(profile);
+                return ar;
+
+            }
+        });
+    }
+    
+    /*
     
     @Override
     public void postAuth(final Long profileId, final Properties props, final String keyRing) {
@@ -447,6 +474,99 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
+    */
+    
+    @Override
+    public void addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    	conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
+                String userId = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, userId); // ?
+                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+
+            }
+        });
+    }
+    
+    @Override
+    public void updatePluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    	conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile p = profiles.queryExistingProfile(profile.getProfileId());
+                if(p == null) {
+                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
+                }
+
+                String userId = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, userId); // ?
+                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+
+            }
+        });
+    }
+    /*
+ // TODO Store profile data within keyserver!
+    @Override
+    public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile profile = profiles.queryExistingProfile(profileId);
+                authorization.appendProfileAuthInformation(profile, entries, keyRing);
+                profiles.save(profile); // TODO why save? has not been changed
+                
+            }
+        });
+    }
+    */
+    
+    @Override
+    public ValidationNotes validateProfile(final String username, final Long profileId, final String keyRing) {
+        return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
+            @Override public ValidationNotes call() {
+
+                String pluginName = null;
+                try {
+                    
+                    Profile p = profiles.getExistingUserProfile(profileId, username);
+                    pluginName = p.getDescription();
+                    Validationable validator = plugins.getValidator(p.getDescription());
+                    Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
+                    return validator.validate(accessData);
+                    
+                } catch (PluginUnavailableException pue) {
+                    ValidationNotes notes = new ValidationNotes();
+                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName, pue);
+                    return notes;
+                } catch (Exception pe) {
+                    ValidationNotes notes = new ValidationNotes();
+                    notes.addValidationEntry(ValidationExceptionType.Error, pluginName, pe);
+                    return notes;
+                }
+            
+            }
+        });
+    }
+    
+    /*
+    @Override
+    public Properties getMetadata(final String username, final Long profileId, final String keyRing) {
+        return conn.txJoinReadOnly(new Callable<Properties>() {
+            @Override public Properties call() {
+                
+                Profile profile = profiles.getExistingUserProfile(profileId, username);
+                String sourceSinkId = profile.getDescription();
+                SourceSinkDescribable ssd = plugins.getExistingSourceSink(sourceSinkId);
+                Properties accessData = authorization.getProfileAuthInformation(profile, keyRing);
+                return ssd.getMetadata(accessData);
+                
+            }
+        });
+    }
+    */
     // ========================================================================
     
     @Override
@@ -761,49 +881,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public Properties getMetadata(final String username, final Long profileId, final String keyRing) {
-        return conn.txJoinReadOnly(new Callable<Properties>() {
-            @Override public Properties call() {
-                
-                Profile profile = profiles.getExistingUserProfile(profileId, username);
-                String sourceSinkId = profile.getDescription();
-                SourceSinkDescribable ssd = plugins.getExistingSourceSink(sourceSinkId);
-                Properties accessData = authorization.getProfileAuthInformation(profile, keyRing);
-                return ssd.getMetadata(accessData);
-                
-            }
-        });
-    }
-
-    @Override
-    public ValidationNotes validateProfile(final String username, final Long profileId, final String keyRing) {
-        return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
-            @Override public ValidationNotes call() {
-
-                String pluginName = null;
-                try {
-                    
-                    Profile p = profiles.getExistingUserProfile(profileId, username);
-                    pluginName = p.getDescription();
-                    Validationable validator = plugins.getValidator(p.getDescription());
-                    Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
-                    return validator.validate(accessData);
-                    
-                } catch (PluginUnavailableException pue) {
-                    ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName, pue);
-                    return notes;
-                } catch (Exception pe) {
-                    ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.Error, pluginName, pe);
-                    return notes;
-                }
-            
-            }
-        });
-    }
-
     //TODO Add password parameter to get token from keyserver to validate the profile
     @Override
     public ValidationNotes validateBackupJob(final String username, final Long jobId, final String keyRing) {
@@ -846,20 +923,6 @@ public class BusinessLogicImpl implements BusinessLogic {
                 notes.getValidationEntries().addAll(
                         validateProfile(username, id, keyRing)
                         .getValidationEntries());
-            }
-        });
-    }
-
-    // TODO Store profile data within keyserver!
-    @Override
-    public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-                
-                Profile profile = profiles.queryExistingProfile(profileId);
-                authorization.appendProfileAuthInformation(profile, entries, keyRing);
-                profiles.save(profile); // TODO why save? has not been changed
-                
             }
         });
     }

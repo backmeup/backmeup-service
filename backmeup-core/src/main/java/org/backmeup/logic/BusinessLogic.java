@@ -43,6 +43,9 @@ public interface BusinessLogic {
 	
 	// plugin operations ------------------------------------------------------
 	SourceSinkDescribable getPluginDescribable(String pluginId);
+	AuthRequest getPluginConfiguration(String pluginId);
+	void addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
@@ -59,19 +62,20 @@ public interface BusinessLogic {
 	//datasink operations
 	List<SourceSinkDescribable> getDatasinks();
 	List<Profile> getDatasinkProfiles(String username);
-	
-    //profile operation
-    void addProfileEntries(Long profileId, Properties entries, String keyRing);
 
-    //validate profile operation
-    ValidationNotes validateProfile(String username, Long profileId, String keyRing);
-
-    //metadata operations 
-    Properties getMetadata(String username, Long profileId, String keyRing);
-	
 	//action operations
 	List<ActionDescribable> getActions();
 	List<String> getActionOptions(String actionId);
+	
+	// Profile/Auth operations
+//	void addProfileEntries(Long profileId, Properties entries, String keyRing);
+	ValidationNotes validateProfile(String username, Long profileId, String keyRing);
+//	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;
+//	void postAuth(Long profileId, Properties props, String keyRing) throws PluginException, ValidationException, InvalidCredentialsException;
+	
+	//metadata operations 
+//    Properties getMetadata(String username, Long profileId, String keyRing);
+		
 	
 	// backupjob operations ---------------------------------------------------
 	
@@ -90,10 +94,6 @@ public interface BusinessLogic {
 	ProtocolOverview getProtocolOverview(String username, String duration);
 	void updateJobProtocol(String username, Long jobId, JobProtocolDTO jobProtocol);
 	void deleteJobProtocols(String username);
-	
-	//datasink/-source auth operations
-	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;
-	void postAuth(Long profileId, Properties props, String keyRing) throws PluginException, ValidationException, InvalidCredentialsException;
 	
 	// search operations ------------------------------------------------------
 	long searchBackup(String username, String keyRingPassword, String query);
