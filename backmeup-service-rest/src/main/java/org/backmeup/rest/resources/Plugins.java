@@ -1,8 +1,8 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -19,9 +19,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.backmeup.model.AuthRequest;
+import org.backmeup.model.Profile;
+import org.backmeup.model.dto.PluginConfigurationDTO;
+import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
+import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable.Type;
 import org.backmeup.rest.DummyDataManager;
@@ -41,20 +46,27 @@ public class Plugins extends Base {
 	public List<PluginDTO> listPlugins(
 			@QueryParam("types") @DefaultValue("all") PluginSelectionType pluginType,
 			@QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
-		PluginDTO plugin = DummyDataManager.getPluginDTO(expandProfiles);
+		Set<String> pluginIds = new HashSet<>();
 
-		if(pluginType == PluginSelectionType.all) {
-			// ...
-		} else if(pluginType == PluginSelectionType.source) {
-			plugin.setPluginType(PluginType.source);
-		} else if(pluginType == PluginSelectionType.sink) {
-			plugin.setPluginType(PluginType.sink);
-		} else if(pluginType == PluginSelectionType.action) {
-			plugin.setPluginType(PluginType.action);
+		if ((pluginType == PluginSelectionType.source) || (pluginType == PluginSelectionType.all)) {
+			for (SourceSinkDescribable desc : getLogic().getDatasources()) {
+				pluginIds.add(desc.getId());
+			}
+		} else if ((pluginType == PluginSelectionType.sink) || (pluginType == PluginSelectionType.all)) {
+			for(SourceSinkDescribable desc : getLogic().getDatasinks()) {
+				pluginIds.add(desc.getId());
+			}
+		} else if ((pluginType == PluginSelectionType.action) || (pluginType == PluginSelectionType.all)) {
+			for(ActionDescribable desc : getLogic().getActions()) {
+				pluginIds.add(desc.getId());
+			}
+		}
+		
+		List<PluginDTO> pluginList= new ArrayList<>();
+		for(String pluginId : pluginIds) {
+			pluginList.add(getPlugin(pluginId, false));
 		}
 
-		List<PluginDTO> pluginList= new ArrayList<>();
-		pluginList.add(plugin);
 		return pluginList;
 	}
 	
@@ -65,6 +77,9 @@ public class Plugins extends Base {
 //		return DummyDataManager.getPluginDTO(expandProfiles);
 		SourceSinkDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
 		PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
+		
+		// TODO: check why id is not mapped automatically
+		pluginDTO.setPluginId(pluginDescribable.getId());
 
 		switch (pluginDescribable.getType()) {
 		case Source:
@@ -89,6 +104,15 @@ public class Plugins extends Base {
 			pluginDTO.addMetadata(key, value);
 		} 
 		
+		AuthRequest authInfo = getLogic().getPluginConfiguration(pluginId);
+		PluginConfigurationDTO pluginConfig = getMapper().map(authInfo, PluginConfigurationDTO.class);
+		if ((authInfo.getRedirectURL() != null) && (authInfo.getRedirectURL() != "")) {
+			pluginConfig.setConfigType(PluginConfigurationType.oauth);
+		} else {
+			pluginConfig.setConfigType(PluginConfigurationType.input);
+		}
+		pluginDTO.setConfig(pluginConfig);
+		
 		
 		if(expandProfiles){
 			
@@ -102,8 +126,22 @@ public class Plugins extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public PluginProfileDTO addPluginProfile(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {
-		pluginProfile.setProfileId(1L);
-		return pluginProfile;
+//		pluginProfile.setProfileId(1L);
+//		return pluginProfile;
+		
+		Profile profile = new Profile();
+		profile.setProfileName(pluginProfile.getTitle());
+		profile.setType(Type.Source);
+		profile.setUser(null);
+		
+		Properties profileProps = new Properties();
+		profileProps.putAll(pluginProfile.getConfigProperties());
+		
+		List<String> profileOptions = pluginProfile.getOptions();
+		
+		getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
+		
+		return null;
 	}
 	
 	@GET

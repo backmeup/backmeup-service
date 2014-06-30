@@ -7,7 +7,7 @@
 		<class-b>org.backmeup.model.dto.PluginDTO</class-b>
 		
 		<field>
-  			<a get-method="getId">pluginId</a>
+  			<a get-method="getId">id</a>
   			<b>pluginId</b>
 		</field> 
 		<field>
@@ -28,5 +28,15 @@
   			<a get-method="getImageURL">imageURL</a>
   			<b>imageURL</b>
 		</field>
+	</mapping>
+	
+	<mapping>
+		<class-a>org.backmeup.model.AuthRequest</class-a>
+		<class-b>org.backmeup.model.dto.PluginConfigurationDTO</class-b>
+	</mapping>
+	
+	<mapping>
+		<class-a>org.backmeup.model.api.RequiredInputField</class-a>
+		<class-b>org.backmeup.model.dto.PluginInputFieldDTO</class-b>
 	</mapping>
 </mappings> 
