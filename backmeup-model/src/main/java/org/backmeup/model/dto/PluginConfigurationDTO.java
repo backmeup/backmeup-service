@@ -15,6 +15,10 @@ public class PluginConfigurationDTO {
 	private String redirectURL;
 	private List<PluginInputFieldDTO> requiredInputs;
 	
+	public PluginConfigurationDTO() {
+		
+	}
+	
 	public PluginConfigurationDTO( PluginConfigurationType type) {
 		this.configType = type;
 	}
