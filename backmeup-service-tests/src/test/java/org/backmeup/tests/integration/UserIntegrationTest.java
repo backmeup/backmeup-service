@@ -1,29 +1,35 @@
 package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
+import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
+import com.jayway.restassured.response.ValidatableResponse;
 
 @Category(IntegrationTest.class)
 public class UserIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddUser() {
+		String username = "john.doe";
 		String firstname = "John";
-		String name = "Doe";
+		String lastname = "Doe";
 		String password = "password1";
 		String email = "TestUser@trash-mail.com";
 		
-		UserDTO newUser = new UserDTO(firstname, name, password, email);
+		UserDTO newUser = new UserDTO(username, firstname, lastname, password, email);
 		
+		ValidatableResponse response = null;
 		try {
+			response = 
 			given()
 				.log().all()
 				.header("Accept", "application/json")
@@ -33,14 +39,112 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			.then()
 				.log().all()
 				.statusCode(200)
-				.body("firstname", equalTo(name))
-				.body("lastname", equalTo(name))
+				.body("username", equalTo(username))
+				.body("firstname", equalTo(firstname))
+				.body("lastname", equalTo(lastname))
 				.body("password", equalTo(null))
 				.body("email", equalTo(email))
+				.body("activated", equalTo(true))
 				.body(containsString("userId"));
 		} finally {
-//			BackMeUpUtils.deleteUser(email);
+			String userId = response.extract().path("userId").toString();
+			BackMeUpUtils.deleteUser(userId);
 		}
+	}
+	
+	@Test
+	public void testAddUserAlreadyRegistered() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "TestUser@trash-mail.com";
+		
+		String userId = "";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			
+			UserDTO newUser = new UserDTO(username, firstname, lastname, password, email);
+
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.body(newUser, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/users/")
+			.then()
+				.log().all()
+				.statusCode(500);
+		} finally {
+			BackMeUpUtils.deleteUser(userId);
+		}
+		
+	}
+	
+	@Test
+	public void testDeleteUser() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "TestUser@trash-mail.com";
+		
+		ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+		String userId = response.extract().path("userId").toString();
+		
+		when()
+			.delete("/users/" + userId)
+		.then()
+			.log().all()
+			.statusCode(204);
+	}
+	
+	@Test
+	public void testGetUser() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			
+			given()
+				.log().all()
+				.header("Authorization", userId + ";" + password)
+			.when()
+				.get("/users/" + userId)
+			.then()
+				.log().all()
+				.statusCode(200)
+				.body("username", equalTo(username))
+				.body("firstname", equalTo(firstname))
+				.body("lastname", equalTo(lastname))
+				.body("email", equalTo(email))
+				.body("activated", equalTo(true))
+				.body(containsString("userId"));
+		} finally {
+//			BackMeUpUtils.deleteUser(userId);
+		}
+	}
+	
+	@Test
+	public void testGetUnknownUser() {
+		String userId = "1000";
+		
+		given()
+			.log().all()
+		.when()
+			.get("/users/" + userId)
+		.then()
+			.log().all()
+			.statusCode(500);
 	}
 	
 	@Test
@@ -58,33 +162,55 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
-	/*
-	
 	@Test
-	public void testAlreadyRegisteredUser() {
-		String username = "TestUser1";
+	public void testUpdateUser() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
 		String password = "password1";
-		String keyRingPassword = "keyringpassword1";
-		String email = "TestUser@trash-mail.com";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
 		
 		try {
-			BackMeUpUtils.addUser(username, password, keyRingPassword, email);
+			UserDTO user = new UserDTO(username, firstname, lastname, password, email);
+			
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
+			user = response.extract().as(UserDTO.class);
+			userId = response.extract().path("userId").toString();
+
+			String newFirstname = "Bob";
+			String newLastname = "Jones";
+			String newEmail = "bob.jones@example.com";
+			
+			user.setFirstname(newFirstname);
+			user.setLastname(newLastname);
+			user.setEmail(newEmail);
 
 			given()
-				.contentType("application/x-www-form-urlencoded")
+				.log().all()
+				.contentType("application/json")
 				.header("Accept", "application/json")
-				.formParam("password", password)
-				.formParam("keyRing", keyRingPassword)
-				.formParam("email", email)
+				.body(user, ObjectMapperType.JACKSON_1)
 			.when()
-				.post("/users/" + username + "/register")
+				.put("/users/" + userId)
 			.then()
-				.statusCode(400);
+				.log().all()
+				.statusCode(200)
+				.body("username", equalTo(user.getUsername()))
+				.body("firstname", equalTo(user.getFirstname()))
+				.body("lastname", equalTo(user.getLastname()))
+				.body("email", equalTo(user.getEmail()))
+				.body("activated", equalTo(true))
+				.body(containsString("userId"));
 		} finally {
-			BackMeUpUtils.deleteUser(username);
+			BackMeUpUtils.deleteUser(userId);
 		}
-		
 	}
+	
+	/*
+	
+
 	
 	@Test
 	public void testRegisterAlreadyExistingUsername() {
@@ -111,23 +237,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		} finally {
 			BackMeUpUtils.deleteUser(username);
 		}
-	}
-	
-	@Test
-	public void testDeleteUser() {
-		String username = "TestUser1";
-		String password = "password1";
-		String keyRingPassword = "keyringpassword1";
-		String email = "TestUser@trash-mail.com";
-		
-		BackMeUpUtils.addUser(username, password, keyRingPassword, email);
-		
-		when()
-			.delete("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("User has been deleted"));
 	}
 		
 	@Test

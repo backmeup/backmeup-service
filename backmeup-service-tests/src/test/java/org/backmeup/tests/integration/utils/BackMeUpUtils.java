@@ -9,7 +9,10 @@ import static org.hamcrest.Matchers.hasItem;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.backmeup.model.dto.UserDTO;
+
 import com.jayway.restassured.builder.RequestSpecBuilder;
+import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
 import com.jayway.restassured.specification.RequestSpecification;
 
@@ -19,42 +22,43 @@ public class BackMeUpUtils {
 	//  USER OPERATIONS
 	// ------------------------------------------------------------------------
 	
-	public static ValidatableResponse getUser(String username) {		
-		ValidatableResponse response = 
-		when()
-			.get("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body(containsString("userId"))
-			.body(containsString("username"))
-			.body(containsString("email"));
-		return response;
+	public static ValidatableResponse addUser(String username, String password,
+			String keyRingPassword, String email) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
-	public static void deleteUser(String username){
-		when()
-			.delete("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("User has been deleted"));
+	public static ValidatableResponse addUser(String username, String firstname, String lastname, String password, String email){
+		UserDTO newUser = new UserDTO(username, firstname, lastname, password, email);
+		return addUser(newUser);
 	}
 	
-	public static ValidatableResponse addUser(String username, String password, String keyRingPassword, String email){
+	public static ValidatableResponse addUser(UserDTO user){
 		ValidatableResponse response = 
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("password", password)
-			.formParam("keyRing", keyRingPassword)
-			.formParam("email", email)
-		.when()
-			.post("/users/" + username + "/register")
-		.then()
-			.assertThat().statusCode(200)
-			.assertThat().body(containsString("verificationKey"));
+			given()
+//				.log().all()
+				.header("Accept", "application/json")
+				.body(user, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/users/")
+			.then()
+//				.log().all()
+				.statusCode(200)
+				.body("username", equalTo(user.getUsername()))
+				.body("firstname", equalTo(user.getFirstname()))
+				.body("lastname", equalTo(user.getLastname()))
+				.body("email", equalTo(user.getEmail()))
+				.body("activated", equalTo(true))
+				.body(containsString("userId"));
 		
 		return response;
+	}
+	
+	public static void deleteUser(String userId){
+		when()
+			.delete("/users/" + userId)
+		.then()
+			.statusCode(204);
 	}
 	
 	public static void verifyEmail(String verificationKey){
@@ -64,38 +68,18 @@ public class BackMeUpUtils {
 			.statusCode(200);
 	}
 	
-	public static void changeUser(String username, String newUsername, String password, 
-			                String newPassword, String keyRingPassword, 
-			                String newKeyRingPassword, String email, 
-			                String newEmail ) {
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("username", newUsername)
-			.formParam("oldPassword", password)
-			.formParam("password", newPassword)
-			.formParam("oldKeyring", keyRingPassword)
-			.formParam("newKeyring", newKeyRingPassword)
-			.formParam("email", newEmail)
-		.when()
-			.put("/users/" + username)
-		.then()
-			.statusCode(200)
-			.body(containsString("type"))
-			.body(containsString("messages"));
-	}
+//	public static ValidatableResponse getUser(String username) {		
+//	ValidatableResponse response = 
+//	when()
+//		.get("/users/" + username)
+//	.then()
+//		.statusCode(200)
+//		.body(containsString("userId"))
+//		.body(containsString("username"))
+//		.body(containsString("email"));
+//	return response;
+//}
 	
-	public static void setUserProperty(String username, String propertyKey, String propertyValue) {
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-		.when()
-			.post("/users/" + username + "/properties/" + propertyKey + "/" + propertyValue)
-		.then()
-			.statusCode(200)
-			.body(containsString("type"))
-			.body(containsString("messages"));
-	}
 	
 	// ========================================================================
 	//  DATASOURCE OPERATIONS
