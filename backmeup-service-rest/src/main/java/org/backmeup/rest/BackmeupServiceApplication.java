@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.backmeup.rest.filters.SecurityInterceptor;
 import org.backmeup.rest.filters.TimingResourceFilter;
 import org.backmeup.rest.provider.JacksonJsonConfiguration;
 import org.backmeup.rest.resources.BackupJobs;
@@ -23,6 +24,7 @@ public class BackmeupServiceApplication extends Application {
 		
 		 set.add(JacksonJsonConfiguration.class);
 		 set.add(TimingResourceFilter.class);
+		 set.add(SecurityInterceptor.class);
 	}
 
 	@Override
