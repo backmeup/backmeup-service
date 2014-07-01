@@ -20,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.backmeup.model.AuthRequest;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
@@ -129,19 +130,25 @@ public class Plugins extends Base {
 //		pluginProfile.setProfileId(1L);
 //		return pluginProfile;
 		
+		BackMeUpUser user = null;
+		
 		Profile profile = new Profile();
 		profile.setProfileName(pluginProfile.getTitle());
 		profile.setType(Type.Source);
-		profile.setUser(null);
+		profile.setUser(user);
 		
 		Properties profileProps = new Properties();
 		profileProps.putAll(pluginProfile.getConfigProperties());
 		
 		List<String> profileOptions = pluginProfile.getOptions();
 		
-		getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
+		profile = getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
 		
-		return null;
+		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
+		profileDTO.setConfigProperties(pluginProfile.getConfigProperties());
+		profileDTO.setOptions(pluginProfile.getOptions());
+		
+		return profileDTO;
 	}
 	
 	@GET

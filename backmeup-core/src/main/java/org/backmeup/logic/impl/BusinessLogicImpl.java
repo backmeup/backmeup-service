@@ -477,15 +477,15 @@ public class BusinessLogicImpl implements BusinessLogic {
     */
     
     @Override
-    public void addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
-    	conn.txNew(new Runnable() {
-            @Override public void run() {
+    public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    	return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
                 
                 Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
                 String userId = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
                 profiles.setIdentification(p, userId); // ?
                 authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-
+                return p;
             }
         });
     }

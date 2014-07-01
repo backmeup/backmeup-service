@@ -17,10 +17,6 @@ import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.exceptions.AlreadyRegisteredException;
-import org.backmeup.model.exceptions.InvalidCredentialsException;
-import org.backmeup.model.exceptions.PluginException;
-import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 
@@ -44,7 +40,7 @@ public interface BusinessLogic {
 	// plugin operations ------------------------------------------------------
 	SourceSinkDescribable getPluginDescribable(String pluginId);
 	AuthRequest getPluginConfiguration(String pluginId);
-	void addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 
 	// action operations
