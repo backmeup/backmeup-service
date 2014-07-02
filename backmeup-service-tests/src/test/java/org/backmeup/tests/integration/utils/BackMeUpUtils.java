@@ -22,10 +22,10 @@ public class BackMeUpUtils {
 	//  USER OPERATIONS
 	// ------------------------------------------------------------------------
 	
+	@Deprecated
 	public static ValidatableResponse addUser(String username, String password,
 			String keyRingPassword, String email) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	public static ValidatableResponse addUser(String username, String firstname, String lastname, String password, String email){
@@ -54,18 +54,24 @@ public class BackMeUpUtils {
 		return response;
 	}
 	
+	@Deprecated
 	public static void deleteUser(String userId){
-		when()
+		throw new UnsupportedOperationException();
+	}
+	
+	public static void deleteUser(String accessToken, String userId){
+		given()
+//			.log().all()
+			.header("Authorization", accessToken)
+		.when()
 			.delete("/users/" + userId)
 		.then()
+//			.log().all()
 			.statusCode(204);
 	}
 	
 	public static void verifyEmail(String verificationKey){
-		when()
-			.get("/users/" + verificationKey + "/verifyEmail")
-		.then()
-			.statusCode(200);
+		throw new UnsupportedOperationException();
 	}
 	
 //	public static ValidatableResponse getUser(String username) {		

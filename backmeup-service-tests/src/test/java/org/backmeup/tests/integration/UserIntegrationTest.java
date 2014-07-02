@@ -1,7 +1,6 @@
 package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -24,6 +23,8 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String lastname = "Doe";
 		String password = "password1";
 		String email = "TestUser@trash-mail.com";
+		
+		String accessToken;
 		
 		UserDTO newUser = new UserDTO(username, firstname, lastname, password, email);
 		
@@ -48,7 +49,8 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.body(containsString("userId"));
 		} finally {
 			String userId = response.extract().path("userId").toString();
-			BackMeUpUtils.deleteUser(userId);
+			accessToken = userId + ";" + password;
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
@@ -60,6 +62,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String password = "password1";
 		String email = "TestUser@trash-mail.com";
 		
+		String accessToken;
 		String userId = "";
 		
 		try {
@@ -78,7 +81,8 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.statusCode(500);
 		} finally {
-			BackMeUpUtils.deleteUser(userId);
+			accessToken = userId + ";" + password;
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 		
 	}
@@ -93,8 +97,12 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		
 		ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
 		String userId = response.extract().path("userId").toString();
+		String accessToken = userId + ";" + password;
 		
-		when()
+		given()
+			.log().all()
+			.header("Authorization", accessToken)
+		.when()
 			.delete("/users/" + userId)
 		.then()
 			.log().all()
@@ -110,14 +118,16 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String email = "john.doe@example.com";
 		
 		String userId = "";
+		String accessToken = "";
 		
 		try {
 			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
 			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
 			
 			given()
 				.log().all()
-				.header("Authorization", userId + ";" + password)
+				.header("Authorization", accessToken)
 			.when()
 				.get("/users/" + userId)
 			.then()
@@ -130,12 +140,12 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.body("activated", equalTo(true))
 				.body(containsString("userId"));
 		} finally {
-//			BackMeUpUtils.deleteUser(userId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
 	@Test
-	public void testGetUnknownUser() {
+	public void testGetUserUnauthorized() {
 		String userId = "1000";
 		
 		given()
@@ -144,24 +154,39 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			.get("/users/" + userId)
 		.then()
 			.log().all()
-			.statusCode(500);
+			.statusCode(401);
 	}
 	
 	@Test
-	public void testGetUserList() {		
+	public void testGetUserForbidden() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String forbiddenUserId = "4711";
+		String accessToken = "";
+		
 		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
 			given()
 				.log().all()
-				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
 			.when()
-				.get("/users/")
+				.get("/users/" + forbiddenUserId)
 			.then()
 				.log().all()
-				.statusCode(200);
+				.statusCode(403);
 		} finally {
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
-	
+		
 	@Test
 	public void testUpdateUser() {
 		String username = "john.doe";
@@ -171,6 +196,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 		String email = "john.doe@example.com";
 		
 		String userId = "";
+		String accessToken = "";
 		
 		try {
 			UserDTO user = new UserDTO(username, firstname, lastname, password, email);
@@ -178,6 +204,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			user = response.extract().as(UserDTO.class);
 			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
 
 			String newFirstname = "Bob";
 			String newLastname = "Jones";
@@ -191,6 +218,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.contentType("application/json")
 				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
 				.body(user, ObjectMapperType.JACKSON_1)
 			.when()
 				.put("/users/" + userId)
@@ -204,7 +232,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
 				.body("activated", equalTo(true))
 				.body(containsString("userId"));
 		} finally {
-			BackMeUpUtils.deleteUser(userId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
