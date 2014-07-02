@@ -235,7 +235,7 @@ public class UserRegistrationImpl implements UserRegistration {
 
         if (user.getEmail() != null && !user.getEmail().equals(persistentUser.getEmail())) {
             persistentUser.setEmail(user.getEmail());
-			if (autoVerifyUser) {
+			if (!autoVerifyUser) {
 				persistentUser.setActivated(false);
 				setNewVerificationKeyTo(user);
 				sendVerificationEmailFor(user);
