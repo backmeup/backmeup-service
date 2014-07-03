@@ -7,6 +7,7 @@ import org.dozer.MappingException;
 
 public class PluginTypeConverter implements CustomConverter {
 
+	@SuppressWarnings("rawtypes")
 	public Object convert(Object destination, Object source, Class destClass, Class sourceClass) {
 		if (source == null) {
 			return null;
