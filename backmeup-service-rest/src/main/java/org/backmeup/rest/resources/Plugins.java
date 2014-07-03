@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -17,7 +18,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Response.Status;
 
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
@@ -31,6 +36,7 @@ import org.backmeup.model.spi.ActionDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.SourceSinkDescribable.Type;
 import org.backmeup.rest.DummyDataManager;
+import org.backmeup.rest.auth.BackmeupPrincipal;
 
 @Path("/plugins")
 public class Plugins extends Base {
@@ -41,6 +47,10 @@ public class Plugins extends Base {
 	    all
 	}
 	
+	@Context
+    private SecurityContext securityContext;
+	
+	@RolesAllowed("user")
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -71,6 +81,7 @@ public class Plugins extends Base {
 		return pluginList;
 	}
 	
+	@RolesAllowed("user")
 	@GET
 	@Path("/{pluginId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -122,6 +133,7 @@ public class Plugins extends Base {
 		return pluginDTO;
 	}
 	
+	@RolesAllowed("user")
 	@POST
 	@Path("/{pluginId}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -130,17 +142,22 @@ public class Plugins extends Base {
 //		pluginProfile.setProfileId(1L);
 //		return pluginProfile;
 		
-		BackMeUpUser user = null;
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		Profile profile = new Profile();
 		profile.setProfileName(pluginProfile.getTitle());
 		profile.setType(Type.Source);
-		profile.setUser(user);
+		profile.setUser(activeUser);
 		
 		Properties profileProps = new Properties();
-		profileProps.putAll(pluginProfile.getConfigProperties());
+		if (pluginProfile.getConfigProperties() != null) {
+			profileProps.putAll(pluginProfile.getConfigProperties());
+		}
 		
 		List<String> profileOptions = pluginProfile.getOptions();
+		if(profileOptions == null) {
+			profileOptions = new ArrayList<>();
+		}
 		
 		profile = getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
 		
@@ -151,6 +168,7 @@ public class Plugins extends Base {
 		return profileDTO;
 	}
 	
+	@RolesAllowed("user")
 	@GET
 	@Path("/{pluginId}/{profileId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -161,6 +179,7 @@ public class Plugins extends Base {
 		return DummyDataManager.getPluginProfileDTO(expandConfig);
 	}
 	
+	@RolesAllowed("user")
 	@PUT
 	@Path("/{pluginId}/{profileId}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -170,6 +189,7 @@ public class Plugins extends Base {
 		return pluginProfile;
 	}
 	
+	@RolesAllowed("user")
 	@DELETE
 	@Path("/{pluginId}/{profileId}")
 	@Produces(MediaType.APPLICATION_JSON)

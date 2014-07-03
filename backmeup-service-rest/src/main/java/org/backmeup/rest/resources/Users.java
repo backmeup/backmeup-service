@@ -22,7 +22,6 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.UserDTO;
-import org.backmeup.rest.DummyDataManager;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 /**

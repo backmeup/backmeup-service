@@ -102,6 +102,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 					 return;
 				 }
 
+				 user.setPassword(password);
 				 requestContext.setSecurityContext(new BackmeupSecurityContext(user));
 			 }
 		 }
