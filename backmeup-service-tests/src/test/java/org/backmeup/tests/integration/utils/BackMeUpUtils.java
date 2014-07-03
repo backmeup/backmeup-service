@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.hasItem;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 
 import com.jayway.restassured.builder.RequestSpecBuilder;
@@ -74,17 +76,53 @@ public class BackMeUpUtils {
 		throw new UnsupportedOperationException();
 	}
 	
-//	public static ValidatableResponse getUser(String username) {		
-//	ValidatableResponse response = 
-//	when()
-//		.get("/users/" + username)
-//	.then()
-//		.statusCode(200)
-//		.body(containsString("userId"))
-//		.body(containsString("username"))
-//		.body(containsString("email"));
-//	return response;
-//}
+	// ========================================================================
+	//  PLUGIN OPERATIONS
+	// ------------------------------------------------------------------------
+	public static void deleteProfile(String accessToken, String pluginId, String profileId) {
+		given()
+			.log().all()
+			.header("Authorization", accessToken)
+		.when()
+			.delete("/plugins/" +  pluginId + "/" + profileId)
+		.then()
+			.log().all()
+			.statusCode(204);
+	}
+	
+	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, Properties configProps) {
+
+				
+		PluginProfileDTO pluginProfile = new PluginProfileDTO();
+		pluginProfile.setTitle(profileName);
+		pluginProfile.setPluginId(pluginId);
+		pluginProfile.setProfileType(profileType);
+		
+		for(Entry<?,?> entry : configProps.entrySet()) {
+			String key = (String) entry.getKey();  
+			String value = (String) entry.getValue();  
+			pluginProfile.addConfigProperties(key, value);
+		}
+		
+		return addProfile(accessToken, pluginId, pluginProfile);
+	}
+	
+	public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
+		ValidatableResponse response = 
+		given()
+			.log().all()
+			.contentType("application/json")
+			.header("Accept", "application/json")
+			.header("Authorization", accessToken)
+			.body(pluginProfile, ObjectMapperType.JACKSON_1)
+		.when()
+			.post("/plugins/" + pluginId)
+		.then()
+			.log().all()
+			.statusCode(200);
+		
+		return response;
+	}
 	
 	
 	// ========================================================================
