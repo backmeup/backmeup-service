@@ -1,22 +1,26 @@
 package org.backmeup.rest.resources.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.Profile;
 import org.backmeup.model.dto.PluginDTO;
+import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.SourceSinkDescribable.Type;
 import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.osgi.PluginImpl;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
-import org.junit.Before;
 import org.junit.Test;
 
 public class MappingTests {
+	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
 	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
 
@@ -67,12 +71,51 @@ public class MappingTests {
 		((PluginImpl) plugin).shutdown();
 	}
 	
+	@Test
+	public void testPluginProfileMapping() {
+		String username = "johndoe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String email = "johndoe@example.com";
+		String password = "john123!#";
+		
+		
+		Long profileId = 1L;
+		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
+		String profileName = "TestProfile";
+		String description = "Description of test profile";
+		String identification = "identification";
+		Type profileTypeModel = Type.Source;
+		PluginType profileTypeDTO = PluginType.source;
+		
+		Profile profile = new Profile(profileId, user, profileName, description, Type.Source);
+		profile.setIdentification(identification);
+		
+		List<String> configList = new ArrayList<String>();
+		configList.add(DOZER_CUSTOM_CONVERTERS);
+		configList.add(DOZER_USER_MAPPING);
+		configList.add(DOZER_PROFILE_MAPPING);
+		
+		Mapper mapper = getMapper(configList);
+		
+		PluginProfileDTO profileDTO = mapper.map(profile, PluginProfileDTO.class);
+		
+		assertEquals(profile.getProfileId().longValue(), profileDTO.getProfileId());
+		assertEquals(profile.getProfileName(), profileDTO.getTitle());
+		assertEquals(profile.getType(), profileTypeModel);
+		assertEquals(profileDTO.getProfileType(), profileTypeDTO);
+	}
+	
 	@SuppressWarnings("serial")
 	private Mapper getMapper(final String mappingFile) {
 		List<String> list = new ArrayList<String>() { 
 			{add(mappingFile);}
 		};
-		return new DozerBeanMapper(list);
+		return getMapper(list);
+	}
+	
+	private Mapper getMapper(final List<String> mappingFiles) {
+		return new DozerBeanMapper(mappingFiles);
 	}
 	
 	private Plugin setupPluginInfrastructure() {

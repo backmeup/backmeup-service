@@ -11,7 +11,9 @@ import org.dozer.Mapper;
 
 @ApplicationScoped
 public class MapperProducer {
+	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
+	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
 
 	private Mapper mapper;
 
@@ -19,7 +21,9 @@ public class MapperProducer {
 	public Mapper getMapper() {
 		if (mapper == null) {
 			List<String> configList = new ArrayList<String>();
+			configList.add(DOZER_CUSTOM_CONVERTERS);
 			configList.add(DOZER_USER_MAPPING);
+			configList.add(DOZER_PROFILE_MAPPING);
 			
 			mapper = new DozerBeanMapper(configList);
 		}

@@ -39,4 +39,19 @@
 		<class-a>org.backmeup.model.api.RequiredInputField</class-a>
 		<class-b>org.backmeup.model.dto.PluginInputFieldDTO</class-b>
 	</mapping>
+	
+	<mapping>
+		<class-a>org.backmeup.model.Profile</class-a>
+		<class-b>org.backmeup.model.dto.PluginProfileDTO</class-b>
+		
+		<field>
+  			<a>profileName</a>
+  			<b>title</b>
+  		</field>
+  		
+  		<field>
+  			<a>type</a>
+  			<b>profileType</b>
+		</field> 
+	</mapping>
 </mappings> 
