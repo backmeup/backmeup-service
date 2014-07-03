@@ -293,6 +293,17 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Override
+    public Profile getPluginProfile(final Long profileId) {
+    	return conn.txNewReadOnly(new Callable<Profile>() {
+            @Override public Profile call() {
+                
+                return profiles.queryExistingProfile(profileId);
+                
+            }
+        });
+    }
 
     @Override
     public Profile deleteProfile(final String username, final Long profileId) {
@@ -500,8 +511,8 @@ public class BusinessLogicImpl implements BusinessLogic {
                 	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
                 }
 
-                String userId = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, userId); // ?
+                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, identification); // ?
                 authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
 
             }
