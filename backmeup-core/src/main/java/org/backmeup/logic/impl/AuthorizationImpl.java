@@ -100,6 +100,10 @@ public class AuthorizationImpl implements AuthorizationLogic {
 
     @Override
     public void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
+        if (!keyserverClient.isServiceRegistered(profile.getProfileId())) {
+            keyserverClient.addService(profile.getProfileId());
+        }
+        
         if (keyserverClient.isAuthInformationAvailable(profile, keyRing)) {
             keyserverClient.deleteAuthInfo(profile.getProfileId());
         }
