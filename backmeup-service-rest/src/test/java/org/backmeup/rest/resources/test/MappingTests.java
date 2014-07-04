@@ -5,10 +5,14 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
+import org.backmeup.model.api.RequiredInputField;
+import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.SourceSinkDescribable;
@@ -106,6 +110,61 @@ public class MappingTests {
 		assertEquals(profileDTO.getProfileType(), profileTypeDTO);
 	}
 	
+	@Test
+	public void testPluginConfigurationMapping() {
+		String username = "johndoe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String email = "johndoe@example.com";
+		String password = "john123!#";
+		
+		
+		Long profileId = 1L;
+		String profileName = "TestProfile";
+		String description = "Description of test profile";
+		String identification = "identification";
+		
+		String inputName = "username";
+		String inputLabel = "Username";
+		String inputDesc = "Username for the service";
+		boolean inputRequired = true;
+		int inputOrder = 0;
+		RequiredInputField.Type inputType = RequiredInputField.Type.String;
+		
+		
+		String redirectUrl = "http://redirecturl";
+		
+		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
+		
+		Profile profile = new Profile(profileId, user, profileName, description, Type.Source);
+		profile.setIdentification(identification);
+		
+		RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType);
+		List<RequiredInputField> inputFields = new ArrayList<>();
+		inputFields.add(inputModel);
+		
+		AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
+		
+		List<String> configList = new ArrayList<String>();
+		configList.add(DOZER_CUSTOM_CONVERTERS);
+		configList.add(DOZER_USER_MAPPING);
+		configList.add(DOZER_PROFILE_MAPPING);
+		
+		Mapper mapper = getMapper(configList);
+		
+		PluginConfigurationDTO pluginConfigDTO = mapper.map(authRequest, PluginConfigurationDTO.class);	
+		
+		assertEquals(authRequest.getRedirectURL(), pluginConfigDTO.getRedirectURL());
+		
+		PluginInputFieldDTO inputDTO = pluginConfigDTO.getRequiredInputs().get(0);
+		assertEquals(inputModel.getLabel(), inputDTO.getLabel());
+		assertEquals(inputModel.getName(), inputDTO.getName());
+		assertEquals(inputModel.getDescription(), inputDTO.getDescription());
+		assertEquals(inputModel.isRequired(), inputDTO.isRequired());
+		assertEquals(inputModel.getOrder(), inputDTO.getOrder());
+		assertEquals(inputModel.getType(), inputDTO.getType());
+	}
+	
 	@SuppressWarnings("serial")
 	private Mapper getMapper(final String mappingFile) {
 		List<String> list = new ArrayList<String>() { 
@@ -122,7 +181,9 @@ public class MappingTests {
 		Plugin plugin = new PluginImpl(
 				"/data/backmeup-service/autodeploy",
 				"/data/backmeup-service/osgi-tmp",
-				"org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api");
+				"org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi "
+				+ "org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage "
+				+ "com.google.gson org.backmeup.plugin.api");
 
 		plugin.startup();
 		((PluginImpl) plugin).waitForInitialStartup();
