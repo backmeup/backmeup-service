@@ -16,10 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.ActionProfile;
@@ -28,7 +26,6 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.ValidationNotes.ValidationEntry;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
@@ -88,25 +85,31 @@ public class BackupJobs extends Base {
 		
 		long delay = DelayTimes.DELAY_MONTHLY;
 		boolean reschedule = false;
+		String timeExpression = "monthly";
 		
 		if (backupJob.getSchedule().equals(JobFrequency.daily)) {
 			delay = DelayTimes.DELAY_DAILY;
+			timeExpression = "daily";
 			reschedule = true;
 		} else if (backupJob.getSchedule().equals(JobFrequency.weekly)) {
 			delay = DelayTimes.DELAY_WEEKLY;
+			timeExpression = "weekly";
 			reschedule = true;
 			
 		} else if (backupJob.getSchedule().equals(JobFrequency.montly)) {
 			delay = DelayTimes.DELAY_MONTHLY;
+			timeExpression = "monthly";
 			reschedule = true;
 			
 		} else if (backupJob.getSchedule().equals(JobFrequency.onece)) {
 			delay = DelayTimes.DELAY_REALTIME;
+			timeExpression = "realtime";
 			reschedule = false;
 			
 		} 
 		
 		BackupJob job = new BackupJob(activeUser, sourceProfiles, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
+		job.setTimeExpression(timeExpression);
 		ValidationNotes vn = getLogic().createBackupJob(job);
 		
 		if(vn.getValidationEntries().size() > 0) {
