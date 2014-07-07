@@ -145,7 +145,11 @@ public class Plugins extends Base {
 		
 		Profile profile = new Profile();
 		profile.setProfileName(pluginProfile.getTitle());
-		profile.setType(Type.Source);
+		if(pluginProfile.getProfileType().equals(PluginType.source)) {
+			profile.setType(Type.Source);
+		} else if(pluginProfile.getProfileType().equals(PluginType.sink)) {
+			profile.setType(Type.Sink);
+		}
 		profile.setUser(activeUser);
 		
 		Properties profileProps = new Properties();
@@ -231,7 +235,8 @@ public class Plugins extends Base {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		// check pluginId
+		// TODO check pluginId
+		// if profile.getPluginId != pluginId -> FORBIDDEN
 		
 		getLogic().deleteProfile(activeUser.getUsername(), Long.parseLong(profileId));
 	}
