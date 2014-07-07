@@ -92,6 +92,7 @@ public class ProfileLogicImpl implements ProfileLogic {
             Profile sourceProfile = queryExistingProfile(sourceEntry.getProfileId());
             //TODO
 //            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
+            profileOptions.add(new ProfileOptions(sourceProfile, new String[0]));
         }
         return profileOptions;
     }
