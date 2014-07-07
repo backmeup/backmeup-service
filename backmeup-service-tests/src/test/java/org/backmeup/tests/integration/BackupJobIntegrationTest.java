@@ -9,7 +9,9 @@ import java.util.Date;
 import java.util.Properties;
 
 import org.backmeup.model.dto.BackupJobCreationDTO;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.Constants;
@@ -91,25 +93,65 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testCreateBackupJobNew() {	
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String sourcePluginId = "org.backmeup.filegenerator";
+		String sourceProfileName = "FilegeneratorProfile";
+		PluginType sourceProfileType = PluginType.source;
+		String sourceProfileId = "";
+		
+		String sinkPluginId   = "org.backmeup.dummy";
+		String profileSinkName   = "DummySinkProfile";
+		PluginType sinkProfileType = PluginType.sink;
+		String sinkProfileId = "";
+		
 		String jobTitle = "BackupJob1";
 		JobFrequency schedule = JobFrequency.weekly;
-		Date start = new Date(1401201920087L);
-		Long sourceProfileId = 2L;
-		Long actionProfileId = 3L;
-		Long sinkProfileId = 4L;
-		
-		BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
-		backupJob.setJobTitle(jobTitle);
-		backupJob.setSchedule(schedule);
-		backupJob.setStart(start);
-		backupJob.setSource(sourceProfileId);
-		backupJob.addAction(actionProfileId);
-		backupJob.setSink(sinkProfileId);
-		
+		Date start = new Date();
+
 		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			PluginProfileDTO sourcePluginProfile = new PluginProfileDTO();
+			sourcePluginProfile.setTitle(sourceProfileName);
+			sourcePluginProfile.setPluginId(sourcePluginId);
+			sourcePluginProfile.setProfileType(sourceProfileType);
+			sourcePluginProfile.addConfigProperties("text", "true");
+			sourcePluginProfile.addConfigProperties("image", "true");
+			sourcePluginProfile.addConfigProperties("pdf", "true");
+			sourcePluginProfile.addConfigProperties("binary", "true");
+			
+			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
+			sourceProfileId = response.extract().path("profileId").toString();
+			
+			PluginProfileDTO sinkPluginProfile = new PluginProfileDTO();
+			sinkPluginProfile.setTitle(profileSinkName);
+			sinkPluginProfile.setPluginId(sinkPluginId);
+			sinkPluginProfile.setProfileType(sinkProfileType);
+			
+			response = BackMeUpUtils.addProfile(accessToken, sinkPluginId, sinkPluginProfile);
+			sinkProfileId = response.extract().path("profileId").toString();
+			
+			BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
+			backupJob.setJobTitle(jobTitle);
+			backupJob.setSchedule(schedule);
+			backupJob.setStart(start);
+			backupJob.setSource(Long.parseLong(sourceProfileId));
+			backupJob.setSink(Long.parseLong(sinkProfileId));
+			
 			given()
 				.log().all()
 				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
 				.body(backupJob, ObjectMapperType.JACKSON_1)
 			.when()
 				.post("/backupjobs")
@@ -117,8 +159,16 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.statusCode(200);
 		} finally {
+			//TODO: 
+			// delete backupjob
+			// delete profiles
+			// delete user
 		}
 	}
+	
+	// ========================================================================
+	// ========================================================================
+	// ========================================================================
 
 	@Test
 	public void testGetBackupJobWrongUser() {
