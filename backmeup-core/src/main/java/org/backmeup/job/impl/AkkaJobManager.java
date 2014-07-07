@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.dal.UserDao;
 import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
@@ -65,7 +64,7 @@ abstract public class AkkaJobManager implements JobManager {
 			String jobTitle, boolean reschedule, String timeExpression) {
 		try {
 			conn.begin();
-			UserDao ud = dal.createUserDao();
+//			UserDao ud = dal.createUserDao();
 //			user = ud.merge(user);
 			// Create BackupJob entity in DB...
 			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile,
