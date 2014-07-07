@@ -61,13 +61,12 @@ abstract public class AkkaJobManager implements JobManager {
 	@Override
 	public BackupJob createBackupJob(BackMeUpUser user,
 			Set<ProfileOptions> sourceProfiles, Profile sinkProfile,
-			List<ActionProfile> requiredActions, Date start, long delayInMs,
-			String keyRing, String jobTitle, boolean reschedule,
-			String timeExpression) {
+			List<ActionProfile> requiredActions, Date start, long delayInMs, 
+			String jobTitle, boolean reschedule, String timeExpression) {
 		try {
 			conn.begin();
 			UserDao ud = dal.createUserDao();
-			user = ud.merge(user);
+//			user = ud.merge(user);
 			// Create BackupJob entity in DB...
 			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile,
 					requiredActions, start, delayInMs, jobTitle, reschedule);
@@ -87,7 +86,7 @@ abstract public class AkkaJobManager implements JobManager {
 
 			// reusable=true means, that we can get the data for the token + a
 			// new token for the next backup
-			Token t = keyserver.getToken(job, keyRing, firstExecutionDate,
+			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate,
 					true, encryptionPwd);
 			job.setToken(t);
 			job = getDao().save(job);
