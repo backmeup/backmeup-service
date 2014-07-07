@@ -3,14 +3,20 @@ package org.backmeup.rest.resources.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
+import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
+import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
@@ -27,6 +33,7 @@ public class MappingTests {
 	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
 	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
+	private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
 
 	@Test
 	public void testUserMapping() {
@@ -163,6 +170,31 @@ public class MappingTests {
 		assertEquals(inputModel.isRequired(), inputDTO.isRequired());
 		assertEquals(inputModel.getOrder(), inputDTO.getOrder());
 		assertEquals(inputModel.getType(), inputDTO.getType());
+	}
+	
+	@Test
+	public void testBackupJobMapping() {
+		BackupJob job = new BackupJob();
+		job.setStatus(BackupJobStatus.queued);
+		job.setId(9L);
+		job.setTimeExpression("daily");
+		Date next = new Date();
+		job.setNextExecutionTime(next);
+		
+		List<String> configList = new ArrayList<String>();
+		configList.add(DOZER_CUSTOM_CONVERTERS);
+		configList.add(DOZER_USER_MAPPING);
+		configList.add(DOZER_PROFILE_MAPPING);
+		configList.add(DOZER_BACKUPJOB_MAPPING);
+		
+		Mapper mapper = getMapper(configList);
+		
+		BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
+		
+		assertEquals(job.getId(), jobDTO.getJobId());
+		assertEquals(JobStatus.queued, jobDTO.getJobStatus());
+		assertEquals(JobFrequency.daily, jobDTO.getSchedule());
+		assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
 	}
 	
 	@SuppressWarnings("serial")
