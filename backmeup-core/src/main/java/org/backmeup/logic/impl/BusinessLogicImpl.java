@@ -37,6 +37,7 @@ import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
+import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
@@ -45,6 +46,8 @@ import org.backmeup.model.spi.SourceSinkDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.api.connectors.Datasource;
+import org.backmeup.plugin.spi.Authorizable;
+import org.backmeup.plugin.spi.OAuthBased;
 import org.elasticsearch.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -491,6 +494,10 @@ public class BusinessLogicImpl implements BusinessLogic {
     public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
+            	
+            	// TODO: onyl for oauth, why?
+            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
+            	plugins.configureAuth(props, pluginId);               
                 
                 Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
                 String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
@@ -581,13 +588,12 @@ public class BusinessLogicImpl implements BusinessLogic {
     // ========================================================================
     
     @Override
-    public ValidationNotes createBackupJob(String username, BackupJob request) {
+    public ValidationNotes createBackupJob(BackupJob request) {
         try {
             conn.begin();
-//            BackMeUpUser user = getAuthorizedUser(username, request.getKeyRing()); 
 
             Set<ProfileOptions> pos = request.getSourceProfiles();
-//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(sourceProfiles);
+//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(request.getSourceProfiles());
             Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
 
             List<ActionProfile> actions = getActionProfilesFor(request);
@@ -595,12 +601,12 @@ public class BusinessLogicImpl implements BusinessLogic {
 //            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
 
             conn.rollback();
-//            BackupJob job = jobManager.createBackupJob(user, pos, sink, actions,
-//                    execTime.getStart(), execTime.getDelay(), request.getKeyRing(), request.getJobTitle(), execTime.isReschedule(), request.getTimeExpression());
-//            ValidationNotes vn = validateBackupJob(username, job.getId(), request.getKeyRing());
-//            vn.setJob(job);
-//            return vn;
-            return null;
+            
+            BackupJob job = jobManager.createBackupJob(request.getUser(), pos, sink, actions, request.getStart(), request.getDelay(), request.getJobTitle(), request.isReschedule(), request.getTimeExpression());
+            ValidationNotes vn = validateBackupJob(request.getUser().getUsername(), job.getId(), request.getUser().getPassword());
+            vn.setJob(job);
+            return vn;
+            
         } finally {
             conn.rollback();
         }

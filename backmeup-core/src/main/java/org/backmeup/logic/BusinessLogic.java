@@ -83,7 +83,7 @@ public interface BusinessLogic {
 	// Should replace method 'getBackupJob' ?
 	BackupJob getBackupJobFull(String username, Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
-	ValidationNotes createBackupJob(String username, BackupJob request);
+	ValidationNotes createBackupJob(BackupJob request);
 	List<BackupJob> getJobs(String username);
 	void deleteJob(String username, Long jobId);
 	List<Status> getStatus(String username, Long jobId);
