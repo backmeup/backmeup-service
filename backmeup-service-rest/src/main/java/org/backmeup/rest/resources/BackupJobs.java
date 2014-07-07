@@ -16,9 +16,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Response.Status;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
@@ -115,7 +117,6 @@ public class BackupJobs extends Base {
 		if(vn.getValidationEntries().size() > 0) {
 //			List<ValidationEntry> entries = vn.getValidationEntries();
 //			throw new WebApplicationException("Validation threw " + entries.size() + " errors", Status.INTERNAL_SERVER_ERROR);
-			
 		} 
 		
 		job = vn.getJob();
@@ -133,7 +134,16 @@ public class BackupJobs extends Base {
 			@QueryParam("expandToken") @DefaultValue("false") boolean expandToken,
 			@QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles,
 			@QueryParam("expandProtocol") @DefaultValue("false") boolean expandProtocol) {
-		return DummyDataManager.getBackupJobDTO(expandUser, expandToken, expandProfiles, expandProtocol);
+//		return DummyDataManager.getBackupJobDTO(expandUser, expandToken, expandProfiles, expandProtocol);
+		
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		BackupJob job = getLogic().getBackupJobFull("", Long.parseLong(jobId));
+		if (job.getUser().getUserId() != activeUser.getUserId()) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		return getMapper().map(job, BackupJobDTO.class);
 	}
 	
 	@RolesAllowed("user")
@@ -142,13 +152,20 @@ public class BackupJobs extends Base {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public BackupJobDTO updateBackupJob(@PathParam("jobId") String pluginId, BackupJobDTO backupjob) {
-		return backupjob;
+		throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RolesAllowed("user")
 	@DELETE
 	@Path("/{jobId}")
 	public void deleteBackupJob(@PathParam("jobId") String jobId) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
+		BackupJob job = getLogic().getBackupJobFull("", Long.parseLong(jobId));
+		if (job.getUser().getUserId() != activeUser.getUserId()) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		getLogic().deleteJob(activeUser.getUsername(), Long.parseLong(jobId));
 	}
 }
