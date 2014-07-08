@@ -122,6 +122,22 @@ public class BusinessLogicImpl implements BusinessLogic {
     
     // ========================================================================
     
+    // Authentication ---------------------------------------------------------
+    
+     @Override
+     public BackMeUpUser authorize(final String username, final String password) {
+    	 return conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
+             @Override public BackMeUpUser call() {
+
+            	 BackMeUpUser user = registration.getUserByUsername(username, true);
+                 authorization.authorize(user, password);
+                 return user;
+             }
+         }); 
+     };
+    
+    // ========================================================================
+    
     // User operations --------------------------------------------------------
     
     @Override

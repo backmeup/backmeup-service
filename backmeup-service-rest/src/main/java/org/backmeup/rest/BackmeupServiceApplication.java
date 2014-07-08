@@ -8,6 +8,7 @@ import javax.ws.rs.core.Application;
 import org.backmeup.rest.filters.SecurityInterceptor;
 import org.backmeup.rest.filters.TimingResourceFilter;
 import org.backmeup.rest.provider.JacksonJsonConfiguration;
+import org.backmeup.rest.resources.Authentication;
 import org.backmeup.rest.resources.BackupJobs;
 import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Users;
@@ -19,6 +20,7 @@ public class BackmeupServiceApplication extends Application {
 
 	public BackmeupServiceApplication() {
 		 singletons.add(new Users());
+		 singletons.add(new Authentication());
 		 singletons.add(new Plugins());
 		 singletons.add(new BackupJobs());
 		

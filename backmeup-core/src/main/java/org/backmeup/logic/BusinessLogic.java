@@ -30,6 +30,9 @@ import org.backmeup.model.spi.SourceSinkDescribable;
  * @author fschoeppl
  */
 public interface BusinessLogic {
+	// authorization ----------------------------------------------------------
+	BackMeUpUser authorize(String username, String password);
+	
 	// user operations --------------------------------------------------------
 	BackMeUpUser getUserByUsername(String username);
 	BackMeUpUser getUserByUserId(String userId);
