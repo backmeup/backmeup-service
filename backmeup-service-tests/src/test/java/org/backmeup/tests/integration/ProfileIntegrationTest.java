@@ -1,23 +1,12 @@
 package org.backmeup.tests.integration;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-
 import org.backmeup.tests.IntegrationTest;
-import org.backmeup.tests.integration.utils.BackMeUpUtils;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.jayway.restassured.response.ValidatableResponse;
-
-/*
- * for examples rest-assured see:
- * https://github.com/jayway/rest-assured/tree/master/examples/rest-assured-itest-java/src/test/java/com/jayway/restassured/itest/java
- */
 
 @Category(IntegrationTest.class)
 public class ProfileIntegrationTest extends IntegrationTestBase {
-
+/*
 	@Test
 	public void testUpdateNonExistingProfile() {
 		String profileId = "100";
@@ -26,7 +15,7 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 		String valueTest = "valueTest";
 		
 		given()
-//			.log().all()
+			.log().all()
 			.contentType("application/x-www-form-urlencoded")
 			.header("Accept", "application/json")
 			.formParam("keyRing", password)
@@ -69,11 +58,12 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/profiles/" + profileId)
 			.then()
-//				.log().all()
+				.log().all()
 				.assertThat().statusCode(204);
 		} finally {
 			BackMeUpUtils.deleteDatasourceProfile(username, profileId);
 			BackMeUpUtils.deleteUser(username);
 		}
 	}	
+*/
 }
