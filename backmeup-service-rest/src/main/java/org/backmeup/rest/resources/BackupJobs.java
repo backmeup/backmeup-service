@@ -19,8 +19,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
@@ -28,12 +28,12 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
-import org.backmeup.rest.DummyDataManager;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 
@@ -52,13 +52,20 @@ public class BackupJobs extends Base {
 		boolean expandProfiles = false;
 		boolean expandProtocol = false;
 		
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		BackupJobStatus status = getMapper().map(jobStatus, BackupJobStatus.class);
+		
+		List<BackupJob> allJobsOfUser = getLogic().getJobs(activeUser.getUsername());
 		List<BackupJobDTO> jobList = new ArrayList<>();
 		
-		BackupJobDTO job =  DummyDataManager.getBackupJobDTO(expandUser, expandToken, expandProfiles, expandProtocol);
-		if ((jobStatus == null) || (jobStatus == job.getJobStatus())) {
-			jobList.add(job);
+		for(BackupJob job : allJobsOfUser) {
+			if ((jobStatus == null) || (status == job.getStatus())) {
+				BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
+				jobList.add(jobDTO);
+			}
 		}
-		
+
 		return jobList;
 	}
 	
