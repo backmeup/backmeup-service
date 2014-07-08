@@ -1,36 +1,29 @@
 package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.RestAssured.when;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Date;
-import java.util.Properties;
 
 import org.backmeup.model.dto.BackupJobCreationDTO;
-import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
-import org.backmeup.tests.integration.utils.Constants;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
 
-/*
- * for examples rest-assured see:
- * https://github.com/jayway/rest-assured/tree/master/examples/rest-assured-itest-java/src/test/java/com/jayway/restassured/itest/java
- */
 
 @Category(IntegrationTest.class)
 public class BackupJobIntegrationTest extends IntegrationTestBase {
 	
+	@Ignore
 	@Test
-	public void testGetBackupJobNew() {	
+	public void testGetBackupJob() {	
 		String jobId = "1";
 		try {
 			given()
@@ -45,8 +38,9 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
-	public void testGetBackupJobNewFull() {	
+	public void testGetBackupJobFull() {	
 		String jobId = "1";
 		try {
 			given()
@@ -61,6 +55,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetBackupJobList() {	
 		try {
@@ -76,6 +71,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetBackupJobListFilter() {	
 		try {
@@ -92,7 +88,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testCreateBackupJobNew() {	
+	public void testCreateBackupJob() {	
 		String username = "john.doe";
 		String firstname = "John";
 		String lastname = "Doe";
@@ -115,6 +111,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		String jobTitle = "BackupJob1";
 		JobFrequency schedule = JobFrequency.weekly;
 		Date start = new Date();
+		String jobId = "";
 
 		try {
 			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
@@ -148,6 +145,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			backupJob.setSource(Long.parseLong(sourceProfileId));
 			backupJob.setSink(Long.parseLong(sinkProfileId));
 			
+			response = 
 			given()
 				.log().all()
 				.header("Accept", "application/json")
@@ -158,25 +156,27 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			.then()
 				.log().all()
 				.statusCode(200);
+			
+			jobId = response.extract().path("jobId").toString();
 		} finally {
-			//TODO: 
-			// delete backupjob
-			// delete profiles
-			// delete user
+			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+			BackMeUpUtils.deleteProfile(accessToken, sourcePluginId, sourceProfileId);
+			BackMeUpUtils.deleteProfile(accessToken, sinkPluginId, sinkProfileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
 	// ========================================================================
 	// ========================================================================
 	// ========================================================================
-
+/*
 	@Test
 	public void testGetBackupJobWrongUser() {
 		String username = "UnknownUser";
 		when()
 			.get("/jobs/" + username)
 		.then()
-//			.log().all()
+			.log().all()
 			.assertThat().statusCode(404)
 			.body("errorMessage", equalTo("Unknown user"))
 			.body("errorType", equalTo("org.backmeup.model.exceptions.UnknownUserException"));
@@ -197,7 +197,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			when()
 				.get("/jobs/" + username)
 			.then()
-//				.log().all()
+				.log().all()
 				.statusCode(200)
 				.body(containsString("backupJobs"));
 		} finally {
@@ -244,7 +244,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 					
 			response = 
 			given()
-//				.log().all()
+				.log().all()
 				.contentType("application/x-www-form-urlencoded")
 				.header("Accept", "application/json")
 				.formParam("keyRing", password)
@@ -255,7 +255,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			.when()
 				.post("/jobs/" + username)
 			.then()
-//				.log().all()
+				.log().all()
 				.statusCode(200)
 				.body(containsString("jobId"));
 			
@@ -451,7 +451,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
-	/*
+	@Ingore
 	@Test
 	public void testValidateBackupJobNoErrors() {
 		String username = "TestUser1";
@@ -515,7 +515,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			BackMeUpUtils.deleteUser(username);
 		}
 	}
-	*/
+	
 	
 	@Test
 	public void testGetBackupJobStatus() {
@@ -713,7 +713,8 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			BackMeUpUtils.deleteUser(username);
 		}
 	}
-	/*
+	
+	@Ingore
 	@Test
 	public void Cleanup() {
 		String username = "TestUser1";

@@ -56,6 +56,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetPluginExpandProfiles() {	
 		String pluginId = "backmeupPlugin1";
@@ -102,6 +103,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetAllDatasourcePlugins() {	
 		String pluginTypes = "source";
@@ -118,6 +120,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetAllDatasinkPlugins() {	
 		String pluginTypes = "sink";
@@ -134,6 +137,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetAllActionPlugins() {	
 		String pluginTypes = "action";
@@ -199,6 +203,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testGetPluginProfileExpandConfig() {	
 		String pluginId = "backmeupPlugin1";

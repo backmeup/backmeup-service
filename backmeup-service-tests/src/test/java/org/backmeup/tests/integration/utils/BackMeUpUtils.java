@@ -1,22 +1,19 @@
 package org.backmeup.tests.integration.utils;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
+import org.backmeup.model.BackupJob;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 
-import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
-import com.jayway.restassured.specification.RequestSpecification;
 
 
 public class BackMeUpUtils {
@@ -72,6 +69,7 @@ public class BackMeUpUtils {
 			.statusCode(204);
 	}
 	
+	@Deprecated
 	public static void verifyEmail(String verificationKey){
 		throw new UnsupportedOperationException();
 	}
@@ -81,18 +79,16 @@ public class BackMeUpUtils {
 	// ------------------------------------------------------------------------
 	public static void deleteProfile(String accessToken, String pluginId, String profileId) {
 		given()
-			.log().all()
+//			.log().all()
 			.header("Authorization", accessToken)
 		.when()
 			.delete("/plugins/" +  pluginId + "/" + profileId)
 		.then()
-			.log().all()
+//			.log().all()
 			.statusCode(204);
 	}
 	
-	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, Properties configProps) {
-
-				
+	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, Properties configProps) {		
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
 		pluginProfile.setTitle(profileName);
 		pluginProfile.setPluginId(pluginId);
@@ -110,7 +106,7 @@ public class BackMeUpUtils {
 	public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
 		ValidatableResponse response = 
 		given()
-			.log().all()
+//			.log().all()
 			.contentType("application/json")
 			.header("Accept", "application/json")
 			.header("Authorization", accessToken)
@@ -118,7 +114,7 @@ public class BackMeUpUtils {
 		.when()
 			.post("/plugins/" + pluginId)
 		.then()
-			.log().all()
+//			.log().all()
 			.statusCode(200);
 		
 		return response;
@@ -129,136 +125,83 @@ public class BackMeUpUtils {
 	//  DATASOURCE OPERATIONS
 	// ------------------------------------------------------------------------
 	
+	@Deprecated
 	public static ValidatableResponse authenticateDatasource(String username, String password, String profileName, String datasourceId) {
-		ValidatableResponse response = 
-			given()
-				.contentType("application/x-www-form-urlencoded")
-				.header("Accept", "application/json")
-				.formParam("profileName", profileName)
-				.formParam("keyRing", password)
-			.when()
-				.post("/datasources/" + username + "/" + datasourceId + "/auth")
-			.then()
-				.statusCode(200)
-				.body(containsString("profileId"))
-				.body(containsString("type"))
-				.body(containsString("sourceProfile"));
-		return response;
+		throw new UnsupportedOperationException();
 	}
 	
+	@Deprecated
 	public static ValidatableResponse postAuthenticateDatasource(String username, String password, String profileId, Properties datasourceParameters) {
-		RequestSpecBuilder reqSpecBuilder = new RequestSpecBuilder();
-		reqSpecBuilder.addHeader("Content-Type", "application/x-www-form-urlencoded");
-		reqSpecBuilder.addHeader("Accept", "application/json");
-		reqSpecBuilder.addParameter("keyRing", password);
-		
-		for(Entry<?,?> entry : datasourceParameters.entrySet()) {
-			String key = (String) entry.getKey();  
-			String value = (String) entry.getValue();  
-			reqSpecBuilder.addParameter(key, value);
-		}
-		
-		RequestSpecification requestSpec = reqSpecBuilder.build();
-		ValidatableResponse response = 
-		given()
-			.spec(requestSpec)
-		.when()
-			.post("/datasources/" + username + "/" + profileId + "/auth/post")
-		.then()
-			.statusCode(200)
-			.body("type", equalTo("success"))
-			.body("messages", hasItem("Source profile has been authorized"));
-		return response;
+		throw new UnsupportedOperationException();
 	}
 	
+	@Deprecated
 	public static void deleteDatasourceProfile(String username, String profileId) {			
-		when()
-			.delete("/datasources/" + username + "/profiles/" + profileId)
-		.then()
-			.statusCode(200);
+		throw new UnsupportedOperationException();
 	}
 	
 	// ========================================================================
 	//  DATASINK OPERATIONS
 	// ------------------------------------------------------------------------
-		
+	
+	@Deprecated
 	public static ValidatableResponse authenticateDatasink(String username, String password, String profileName, String datasinkId) {
-		ValidatableResponse response = 
-		given()
-			.contentType("application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.formParam("keyRing", password)
-		.when()
-			.post("/datasinks/" + username + "/" + datasinkId + "/auth")
-		.then()
-			.statusCode(200)
-			.body(containsString("profileId"))
-			.body(containsString("type"))
-			.body(containsString("sourceProfile"))
-			.body(containsString("redirectURL"));
-		return response;
+		throw new UnsupportedOperationException();
 	}
-		
+	
+	@Deprecated
 	public static void deleteDatasinkProfile(String username, String profileId) {			
-		when()
-			.delete("/datasinks/" + username + "/profiles/" + profileId)
-		.then()
-			.statusCode(200);
+		throw new UnsupportedOperationException();
 	}	
 	
 	// ========================================================================
 	//  PROFILE OPERATIONS
 	// ------------------------------------------------------------------------
 	
+	@Deprecated
 	public static void updateProfile(String profileId, String password, Properties profileProps) {
-		
-		RequestSpecBuilder reqSpecBuilder = new RequestSpecBuilder();
-		reqSpecBuilder.addHeader("Content-Type", "application/x-www-form-urlencoded");
-		reqSpecBuilder.addHeader("Accept", "application/json");
-		reqSpecBuilder.addParameter("keyRing", password);
-		
-		for(Entry<?,?> entry : profileProps.entrySet()) {
-			String key = (String) entry.getKey();  
-			String value = (String) entry.getValue();  
-			reqSpecBuilder.addParameter(key, value);
-		}
-		
-		RequestSpecification requestSpec = reqSpecBuilder.build();
-			
-		given()
-			.spec(requestSpec)
-		.when()
-			.post("/profiles/" + profileId)
-		.then()
-			.assertThat().statusCode(204);
+		throw new UnsupportedOperationException();
 	}
 	
 	// ========================================================================
 	//  BACKUPJOB OPERATIONS
 	// ------------------------------------------------------------------------
-		
-	public static void deleteBackupJob(String username, int jobId) {
-		when()
-			.delete("/jobs/" + username + "/" + jobId)
-		.then()
-			.statusCode(200);
-	}
 	
-	public static ValidatableResponse createBackupJob(String username, String password, String profileSourceId, String profileSinkId, String jobTimeExpression, String jobTitle) {
+	public static ValidatableResponse createBackupJob(String accessToken, BackupJob backupJob) {
 		ValidatableResponse response = 
 		given()
-			.contentType("application/x-www-form-urlencoded")
+//			.log().all()
 			.header("Accept", "application/json")
-			.formParam("keyRing", password)
-			.formParam("sourceProfiles", profileSourceId)
-			.formParam("sinkProfileId", profileSinkId)
-			.formParam("timeExpression", jobTimeExpression)
-			.formParam("jobTitle", jobTitle)
+			.header("Authorization", accessToken)
+			.body(backupJob, ObjectMapperType.JACKSON_1)
 		.when()
-			.post("/jobs/" + username)
+			.post("/backupjobs")
 		.then()
-			.statusCode(200)
-			.body(containsString("jobId"));
+//			.log().all()
+			.body(containsString("jobId"))
+			.statusCode(200);
+			
 		return response;
+	}
+	
+	public static void deleteBackupJob(String accessToken, String jobId) {
+		given()
+//			.log().all()
+			.header("Authorization", accessToken)
+		.when()
+			.delete("/backupjobs/" +  jobId)
+		.then()
+//			.log().all()
+			.statusCode(204);
+	}
+	
+	@Deprecated
+	public static ValidatableResponse createBackupJob(String username, String password, String profileSourceId, String profileSinkId, String jobTimeExpression, String jobTitle) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Deprecated	
+	public static void deleteBackupJob(String username, int jobId) {
+		throw new UnsupportedOperationException();
 	}
 }
