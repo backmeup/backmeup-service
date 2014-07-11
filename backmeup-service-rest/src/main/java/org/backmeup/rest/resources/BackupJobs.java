@@ -182,8 +182,27 @@ public class BackupJobs extends Base {
 	@Path("/{jobId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public BackupJobDTO updateBackupJob(@PathParam("jobId") String pluginId, BackupJobDTO backupjob) {
-		throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+	public BackupJobDTO updateBackupJob(@PathParam("jobId") String jobId, BackupJobDTO backupjob) {
+		if(Long.parseLong(jobId) != backupjob.getJobId()) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		BackupJob job = getLogic().getBackupJobFull("", backupjob.getJobId());
+		if (job.getUser().getUserId() != activeUser.getUserId()) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		job.getToken().setTokenId(backupjob.getToken().getTokenId());
+		job.getToken().setToken(backupjob.getToken().getToken());
+		job.getToken().setBackupdate(backupjob.getToken().getValidity());
+		
+		//job.setStatus(...);
+		
+//		getLogic().updateBackupJob(activeUser.getUsername(), job);
+		
+		return backupjob;
+		
 	}
 	
 	@RolesAllowed("user")
