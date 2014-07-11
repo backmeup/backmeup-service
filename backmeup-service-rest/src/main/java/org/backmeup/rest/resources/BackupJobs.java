@@ -32,6 +32,7 @@ import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.rest.auth.BackmeupPrincipal;
@@ -46,12 +47,7 @@ public class BackupJobs extends Base {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<BackupJobDTO> listBackupJobs(@QueryParam("jobStatus") JobStatus jobStatus) {
-		boolean expandUser = false;
-		boolean expandToken = false;
-		boolean expandProfiles = false;
-		boolean expandProtocol = false;
-		
+	public List<BackupJobDTO> listBackupJobs(@QueryParam("jobStatus") JobStatus jobStatus) {		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJobStatus status = getMapper().map(jobStatus, BackupJobStatus.class);
@@ -74,12 +70,7 @@ public class BackupJobs extends Base {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public BackupJobDTO createBackupJob(BackupJobCreationDTO backupJob) {
-		boolean expandUser = false;
-		boolean expandToken = false;
-		boolean expandProfiles = false;
-		boolean expandProtocol = false;
-		
+	public BackupJobDTO createBackupJob(BackupJobCreationDTO backupJob) {		
 //		return  DummyDataManager.getBackupJobDTO(expandUser, expandToken, expandProfiles, expandProtocol);
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
@@ -150,7 +141,40 @@ public class BackupJobs extends Base {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		return getMapper().map(job, BackupJobDTO.class);
+		BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
+		
+		if(!expandUser) {
+			jobDTO.setUser(null);
+		}
+		
+		if(!expandToken) {
+			jobDTO.setToken(null);
+		}
+		
+		if(expandProfiles) {
+			// get source profile
+			ProfileOptions sourceProfileOptions = job.getSourceProfiles().iterator().next();
+			Profile sourceProfile = getLogic().getPluginProfile(sourceProfileOptions.getProfile().getProfileId());
+			PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
+			sourceProfileDTO.setPluginId(sourceProfile.getDescription());
+			jobDTO.setSource(sourceProfileDTO);
+
+			// get sink profile
+			Profile sinkProfile = getLogic().getPluginProfile(job.getSinkProfile().getProfileId());		
+			PluginProfileDTO sinkProfileDTO = getMapper().map(sinkProfile, PluginProfileDTO.class);
+			sinkProfileDTO.setPluginId(sinkProfile.getDescription());
+			jobDTO.setSink(sinkProfileDTO);
+			
+			// get action profiles
+			for(ActionProfile action : job.getRequiredActions()) {
+				Profile actionProfile = getLogic().getPluginProfile(action.getId());
+				PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
+				actionProfileDTO.setPluginId(actionProfile.getDescription());
+				jobDTO.setSink(actionProfileDTO);
+			}
+		}
+		
+		return jobDTO;
 	}
 	
 	@RolesAllowed("user")
