@@ -1,11 +1,14 @@
 package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Date;
 
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.tests.IntegrationTest;
@@ -21,37 +24,181 @@ import com.jayway.restassured.response.ValidatableResponse;
 @Category(IntegrationTest.class)
 public class BackupJobIntegrationTest extends IntegrationTestBase {
 	
-	@Ignore
 	@Test
-	public void testGetBackupJob() {	
-		String jobId = "1";
+	public void testGetBackupJob() {			
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String sourcePluginId = "org.backmeup.filegenerator";
+		String sourceProfileName = "FilegeneratorProfile";
+		PluginType sourceProfileType = PluginType.source;
+		String sourceProfileId = "";
+		
+		String sinkPluginId   = "org.backmeup.dummy";
+		String profileSinkName   = "DummySinkProfile";
+		PluginType sinkProfileType = PluginType.sink;
+		String sinkProfileId = "";
+		
+		String jobTitle = "BackupJob1";
+		JobFrequency schedule = JobFrequency.weekly;
+		Date start = new Date();
+		String jobId = "";
+
 		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			PluginProfileDTO sourcePluginProfile = new PluginProfileDTO();
+			sourcePluginProfile.setTitle(sourceProfileName);
+			sourcePluginProfile.setPluginId(sourcePluginId);
+			sourcePluginProfile.setProfileType(sourceProfileType);
+			sourcePluginProfile.addConfigProperties("text", "true");
+			sourcePluginProfile.addConfigProperties("image", "true");
+			sourcePluginProfile.addConfigProperties("pdf", "true");
+			sourcePluginProfile.addConfigProperties("binary", "true");
+			
+			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
+			sourceProfileId = response.extract().path("profileId").toString();
+			
+			PluginProfileDTO sinkPluginProfile = new PluginProfileDTO();
+			sinkPluginProfile.setTitle(profileSinkName);
+			sinkPluginProfile.setPluginId(sinkPluginId);
+			sinkPluginProfile.setProfileType(sinkProfileType);
+			
+			response = BackMeUpUtils.addProfile(accessToken, sinkPluginId, sinkPluginProfile);
+			sinkProfileId = response.extract().path("profileId").toString();
+			
+			BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
+			backupJob.setJobTitle(jobTitle);
+			backupJob.setSchedule(schedule);
+			backupJob.setStart(start);
+			backupJob.setSource(Long.parseLong(sourceProfileId));
+			backupJob.setSink(Long.parseLong(sinkProfileId));
+			
+			response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
+			jobId = response.extract().path("jobId").toString();
+			
 			given()
 				.log().all()
 				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
 			.when()
 				.get("/backupjobs/" + jobId)
 			.then()
 				.log().all()
-				.statusCode(200);
+				.statusCode(200)
+				.body("jobId", equalTo(Integer.parseInt(jobId)))
+				.body("jobTitle", equalTo(jobTitle))
+				.body("jobStatus", equalTo(JobStatus.queued.toString()))
+				.body("onHold", equalTo(false))
+				.body("schedule", equalTo(schedule.toString()))
+				.body(containsString("created"))
+				.body(containsString("modified"))
+				.body(containsString("start"))
+				.body(containsString("user"))
+				.body(containsString("token"))
+				.body(containsString("source"))
+				.body(containsString("sink"))
+				.body(containsString("delay"));
 		} finally {
+			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+			BackMeUpUtils.deleteProfile(accessToken, sourcePluginId, sourceProfileId);
+			BackMeUpUtils.deleteProfile(accessToken, sinkPluginId, sinkProfileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
-	@Ignore
 	@Test
-	public void testGetBackupJobFull() {	
-		String jobId = "1";
+	public void testGetBackupJobAllExpanded() {			
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String sourcePluginId = "org.backmeup.filegenerator";
+		String sourceProfileName = "FilegeneratorProfile";
+		PluginType sourceProfileType = PluginType.source;
+		String sourceProfileId = "";
+		
+		String sinkPluginId   = "org.backmeup.dummy";
+		String profileSinkName   = "DummySinkProfile";
+		PluginType sinkProfileType = PluginType.sink;
+		String sinkProfileId = "";
+		
+		String jobTitle = "BackupJob1";
+		JobFrequency schedule = JobFrequency.weekly;
+		Date start = new Date();
+		String jobId = "";
+
 		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			PluginProfileDTO sourcePluginProfile = new PluginProfileDTO();
+			sourcePluginProfile.setTitle(sourceProfileName);
+			sourcePluginProfile.setPluginId(sourcePluginId);
+			sourcePluginProfile.setProfileType(sourceProfileType);
+			sourcePluginProfile.addConfigProperties("text", "true");
+			sourcePluginProfile.addConfigProperties("image", "true");
+			sourcePluginProfile.addConfigProperties("pdf", "true");
+			sourcePluginProfile.addConfigProperties("binary", "true");
+			
+			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
+			sourceProfileId = response.extract().path("profileId").toString();
+			
+			PluginProfileDTO sinkPluginProfile = new PluginProfileDTO();
+			sinkPluginProfile.setTitle(profileSinkName);
+			sinkPluginProfile.setPluginId(sinkPluginId);
+			sinkPluginProfile.setProfileType(sinkProfileType);
+			
+			response = BackMeUpUtils.addProfile(accessToken, sinkPluginId, sinkPluginProfile);
+			sinkProfileId = response.extract().path("profileId").toString();
+			
+			BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
+			backupJob.setJobTitle(jobTitle);
+			backupJob.setSchedule(schedule);
+			backupJob.setStart(start);
+			backupJob.setSource(Long.parseLong(sourceProfileId));
+			backupJob.setSink(Long.parseLong(sinkProfileId));
+			
+			response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
+			jobId = response.extract().path("jobId").toString();
+			
 			given()
 				.log().all()
 				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
 			.when()
 				.get("/backupjobs/" + jobId + "?expandUser=true&expandToken=true&expandProfiles=true&expandProtocol=true")
 			.then()
 				.log().all()
-				.statusCode(200);
+				.statusCode(200)
+				.body("jobId", equalTo(Integer.parseInt(jobId)))
+				.body("jobTitle", equalTo(jobTitle))
+				.body("jobStatus", equalTo(JobStatus.queued.toString()))
+				.body("onHold", equalTo(false))
+				.body("schedule", equalTo(schedule.toString()))
+				.body(containsString("created"))
+				.body(containsString("modified"))
+				.body(containsString("start"))
+				.body(containsString("delay"));
 		} finally {
+			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+			BackMeUpUtils.deleteProfile(accessToken, sourcePluginId, sourceProfileId);
+			BackMeUpUtils.deleteProfile(accessToken, sinkPluginId, sinkProfileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	

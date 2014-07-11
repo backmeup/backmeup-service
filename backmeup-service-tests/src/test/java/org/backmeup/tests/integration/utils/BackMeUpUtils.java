@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.backmeup.model.BackupJob;
+import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
@@ -167,7 +167,7 @@ public class BackMeUpUtils {
 	//  BACKUPJOB OPERATIONS
 	// ------------------------------------------------------------------------
 	
-	public static ValidatableResponse createBackupJob(String accessToken, BackupJob backupJob) {
+	public static ValidatableResponse addBackupJob(String accessToken, BackupJobCreationDTO backupJob) {
 		ValidatableResponse response = 
 		given()
 //			.log().all()
