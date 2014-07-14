@@ -102,10 +102,6 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 				.body(containsString("created"))
 				.body(containsString("modified"))
 				.body(containsString("start"))
-				.body(containsString("user"))
-				.body(containsString("token"))
-				.body(containsString("source"))
-				.body(containsString("sink"))
 				.body(containsString("delay"));
 		} finally {
 			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
@@ -145,7 +141,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
 			userId = response.extract().path("userId").toString();
 			accessToken = userId + ";" + password;
-			
+
 			PluginProfileDTO sourcePluginProfile = new PluginProfileDTO();
 			sourcePluginProfile.setTitle(sourceProfileName);
 			sourcePluginProfile.setPluginId(sourcePluginId);
@@ -157,7 +153,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			
 			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
 			sourceProfileId = response.extract().path("profileId").toString();
-			
+
 			PluginProfileDTO sinkPluginProfile = new PluginProfileDTO();
 			sinkPluginProfile.setTitle(profileSinkName);
 			sinkPluginProfile.setPluginId(sinkPluginId);
@@ -165,7 +161,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			
 			response = BackMeUpUtils.addProfile(accessToken, sinkPluginId, sinkPluginProfile);
 			sinkProfileId = response.extract().path("profileId").toString();
-			
+
 			BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
 			backupJob.setJobTitle(jobTitle);
 			backupJob.setSchedule(schedule);
@@ -175,7 +171,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			
 			response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
 			jobId = response.extract().path("jobId").toString();
-			
+
 			given()
 				.log().all()
 				.header("Accept", "application/json")
@@ -193,7 +189,12 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 				.body(containsString("created"))
 				.body(containsString("modified"))
 				.body(containsString("start"))
-				.body(containsString("delay"));
+				.body(containsString("delay"))
+				.body(containsString("user"))
+				.body(containsString("token"))
+				.body(containsString("source"))
+				.body(containsString("sink"));
+
 		} finally {
 			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
 			BackMeUpUtils.deleteProfile(accessToken, sourcePluginId, sourceProfileId);
