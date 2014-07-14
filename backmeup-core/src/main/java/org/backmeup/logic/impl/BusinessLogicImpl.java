@@ -689,50 +689,22 @@ public class BusinessLogicImpl implements BusinessLogic {
 
  // Note: keyRing won't be overridden
     @Override
-    public ValidationNotes updateBackupJob(final String username, final BackupJob updateRequest) {
-        if (updateRequest == null) {
-            throw new IllegalArgumentException("Update must not be null!");
-        }
-        if (updateRequest.getId() == null) {
+    public BackupJob updateBackupJob(final String username, final BackupJob backupJob) {
+        if (backupJob.getId() == null) {
             throw new IllegalArgumentException("JobId must not be null!");
         }
         
-        final Boolean[] scheduleJob = { false };
-        BackupJob j = conn.txNew(new Callable<BackupJob>() {
+        BackupJob job = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-//                ensureUserIsAuthorized(username, updateRequest.getKeyRing());
-
-                List<ActionProfile> requiredActions = getActionProfilesFor(updateRequest);
-                Set<ProfileOptions> sourceProfiles = updateRequest.getSourceProfiles();
-                Profile sindProfile = updateRequest.getSinkProfile();
-
-                BackupJob job = backupJobs.getExistingUserJob(updateRequest.getId(), username);
-
-                // check if the interval has changed
-                if (job.getTimeExpression().compareToIgnoreCase(updateRequest.getTimeExpression()) != 0) {
-                    scheduleJob[0] = true;
-
-                    // chage start date to now if interval has changed
-                    job.setStart(new Date());
-                }
-
-                backupJobs.updatelJob(job, requiredActions, sourceProfiles, sindProfile, updateRequest);
-                return job;
+                BackupJob persistentJob = backupJobs.getExistingUserJob(backupJob.getId(), username);
+                backupJobs.updateJob(persistentJob, backupJob);
+                return persistentJob;
             
             }
         });
 
-		if (scheduleJob[0]) {
-			// add the updated job to the queue. (All old queue entrys get
-			// invalid and will not be executed)
-			jobManager.runBackUpJob(j);
-		}
-
-//        ValidationNotes vn = validateBackupJob(username, j.getId(), updateRequest.getKeyRing());
-//        vn.setJob(j);
-//        return vn;
-		return null;
+		return job;
     }
     
     @Override

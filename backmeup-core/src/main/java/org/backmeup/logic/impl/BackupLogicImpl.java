@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,8 +21,6 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
-import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
@@ -180,29 +177,14 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
-    		BackupJob updateRequest) {
-        job.getRequiredActions().clear();
-        job.getRequiredActions().addAll(requiredActions);
-
-        job.getSourceProfiles().clear();
-        job.getSourceProfiles().addAll(sourceProfiles);
-
-        job.setJobTitle(updateRequest.getJobTitle());
-        job.setSinkProfile(sindProfile);
-
-        job.setTimeExpression(updateRequest.getTimeExpression());
-        
-//        ExecutionTime et = BackUpJobCreationHelper.getExecutionTimeFor(updateRequest);
-//        job.setDelay(et.getDelay());
-//        job.setReschedule(et.isReschedule());
-
-        if (job.isReschedule()) {
-            Date execTime = new Date(new Date().getTime() + job.getDelay());
-            job.setNextExecutionTime(execTime);
-        } else {
-            job.setNextExecutionTime(null);
-        }
+    public void updateJob(BackupJob persistentJob, BackupJob updatedJob) {
+    	persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
+    	persistentJob.getToken().setToken(updatedJob.getToken().getToken());
+    	persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
+    	
+    	persistentJob.setStatus(updatedJob.getStatus());
+    	
+    	// TODO: update fields
     }
 
     @Override

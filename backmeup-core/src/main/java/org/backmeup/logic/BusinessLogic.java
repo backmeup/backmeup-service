@@ -81,7 +81,7 @@ public interface BusinessLogic {
 	
 	//job & validation operations
 	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
-	ValidationNotes updateBackupJob(String username, BackupJob updateRequest);
+	BackupJob updateBackupJob(String username, BackupJob backupJob);
 	BackupJob getBackupJob(String username, Long jobId);
 	// Should replace method 'getBackupJob' ?
 	BackupJob getBackupJobFull(String username, Long jobId);

@@ -3,13 +3,10 @@ package org.backmeup.logic;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.Status;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -36,8 +33,7 @@ public interface BackupLogic {
 
     BackupJob updateRequestFor(Long jobId);
 
-    void updatelJob(BackupJob job, List<ActionProfile> requiredActions, Set<ProfileOptions> sourceProfiles, Profile sindProfile,
-    		BackupJob updateRequest);
+    void updateJob(BackupJob job, BackupJob updatedJob);
 
     ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to);
 
