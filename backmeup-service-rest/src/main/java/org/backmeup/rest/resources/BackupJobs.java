@@ -36,6 +36,7 @@ import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.rest.auth.BackmeupPrincipal;
+import org.backmeup.rest.filters.SecurityInterceptor;
 
 
 @Path("/backupjobs")
@@ -122,7 +123,7 @@ public class BackupJobs extends Base {
 		
 	}
 	
-	@RolesAllowed("user")
+	@RolesAllowed({"user", "worker"})
 	@GET
 	@Path("/{jobId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -137,7 +138,7 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJob job = getLogic().getBackupJobFull("", Long.parseLong(jobId));
-		if (job.getUser().getUserId() != activeUser.getUserId()) {
+		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -177,7 +178,7 @@ public class BackupJobs extends Base {
 		return jobDTO;
 	}
 	
-	@RolesAllowed("user")
+	@RolesAllowed({"user", "worker"})
 	@PUT
 	@Path("/{jobId}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -189,17 +190,20 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJob job = getLogic().getBackupJobFull("", backupjob.getJobId());
-		if (job.getUser().getUserId() != activeUser.getUserId()) {
+		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		job.getToken().setTokenId(backupjob.getToken().getTokenId());
+//		job.getToken().setTokenId(backupjob.getToken().getTokenId());
 		job.getToken().setToken(backupjob.getToken().getToken());
 		job.getToken().setBackupdate(backupjob.getToken().getValidity());
 		
-		//job.setStatus(...);
+		BackupJobStatus jobStatus = getMapper().map(backupjob.getJobStatus(), BackupJobStatus.class);
+		job.setStatus(jobStatus);
 		
-//		getLogic().updateBackupJob(activeUser.getUsername(), job);
+		// TODO: Job protocol
+		
+		getLogic().updateBackupJob(job.getUser().getUsername(), job);
 		
 		return backupjob;
 		

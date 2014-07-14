@@ -36,6 +36,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	 private static final ServerResponse ACCESS_DENIED = new ServerResponse("Access denied for this resource", 401, new Headers<Object>());;
 	 private static final String AUTHORIZATION_PROPERTY = "Authorization";
 	 
+	 public static final Long BACKMEUP_WORKER_ID = -1L;
+	 public static final String BACKMEUP_WORKER_NAME = "BACKMEUPWORKER";
+	 
 	 private final Logger logger = LoggerFactory.getLogger(getClass());
 	 
 	 @Context
@@ -110,7 +113,13 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	 
 	private BackMeUpUser resolveUser(final String userId, final String password) {
 		try {
-			return getLogic().getUserByUserId(userId);
+			if(userId.equals(BACKMEUP_WORKER_NAME)) {
+				BackMeUpUser worker = new BackMeUpUser(BACKMEUP_WORKER_NAME, "", "", "", password);
+				worker.setUserId(BACKMEUP_WORKER_ID);
+				return worker;
+			} else {
+				return getLogic().getUserByUserId(userId);
+			}
 		} catch (UnknownUserException uue) {
 			return null;
 		} catch (UserNotActivatedException una) {
