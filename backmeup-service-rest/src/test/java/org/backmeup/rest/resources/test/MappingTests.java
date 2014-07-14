@@ -197,6 +197,17 @@ public class MappingTests {
 		assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
 	}
 	
+	@Test
+	public void testBackupJobStatusMapping() {
+		JobStatus jobStatus = JobStatus.queued;
+		BackupJobStatus expectetJobStatus = BackupJobStatus.queued;
+		
+		Mapper mapper = getMapper(DOZER_CUSTOM_CONVERTERS);
+		BackupJobStatus actualJobStatus = mapper.map(jobStatus, BackupJobStatus.class);
+		
+		assertEquals(expectetJobStatus, actualJobStatus);
+	}
+	
 	@SuppressWarnings("serial")
 	private Mapper getMapper(final String mappingFile) {
 		List<String> list = new ArrayList<String>() { 
