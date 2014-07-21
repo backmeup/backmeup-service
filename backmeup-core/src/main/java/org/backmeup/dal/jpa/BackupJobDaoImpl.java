@@ -17,10 +17,10 @@ public class BackupJobDaoImpl extends BaseDaoImpl<BackupJob> implements
   }
 
   @Override
-  public List<BackupJob> findByUsername(String username) {
+  public List<BackupJob> findByUserId(Long userId) {
     //TODO: Change all queries to named parameter (instead of numbered)
-    TypedQuery<BackupJob> q = em.createQuery("SELECT j FROM " + entityClass.getName() +" j WHERE j.user.username = :username", entityClass);
-    q.setParameter("username", username);
+    TypedQuery<BackupJob> q = em.createQuery("SELECT j FROM " + entityClass.getName() +" j WHERE j.user.userid = :userid", entityClass);
+    q.setParameter("userid", userId);
     List<BackupJob> jobs = q.getResultList();   
     return jobs;
   }
@@ -33,10 +33,9 @@ public class BackupJobDaoImpl extends BaseDaoImpl<BackupJob> implements
   }
 
   @Override
-  public BackupJob findLastBackupJob(String username) {
-    TypedQuery<BackupJob> q = em.createQuery("SELECT jp.job FROM " + JobProtocol.class.getName() +" jp WHERE jp.user.username = :username ORDER BY jp.executionTime DESC", entityClass);
-    //TypedQuery<BackupJob> q = em.createQuery("SELECT j FROM " + entityClass.getName() +" j WHERE j.user.username = :username ORDER BY j.created DESC", entityClass);
-    q.setParameter("username", username);
+  public BackupJob findLastBackupJob(Long userid) {
+    TypedQuery<BackupJob> q = em.createQuery("SELECT jp.job FROM " + JobProtocol.class.getName() +" jp WHERE jp.user.userid = :userid ORDER BY jp.executionTime DESC", entityClass);
+    q.setParameter("userid", userid);
     q.setMaxResults(1);
     List<BackupJob> jobs = q.getResultList();
     if (jobs.size() > 0) {

@@ -53,10 +53,10 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void deleteJobsOf(String username) {
+    public void deleteJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
         StatusDao statusDao = getStatusDao();
-        for (BackupJob job : jobDao.findByUsername(username)) {
+        for (BackupJob job : jobDao.findByUserId(userId)) {
             for (Status status : statusDao.findByJobId(job.getId())) {
                 statusDao.delete(status);
             }
@@ -77,11 +77,11 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public BackupJob getExistingUserJob(Long jobId, String username) {
+    public BackupJob getExistingUserJob(Long jobId, Long userId) {
         BackupJob job = getExistingJob(jobId);
-        if (!job.getUser().getUsername().equals(username)) {
+        if (job.getUser().getUserId() != userId) {
             throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
-                    jobId, username));
+                    jobId, userId));
         }
         return job;
     }
@@ -122,8 +122,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void deleteJob(String username, Long jobId) {
-        BackupJob job = getExistingUserJob(jobId, username);
+    public void deleteJob(Long userId, Long jobId) {
+        BackupJob job = getExistingUserJob(jobId, userId);
 
         deleteStatuses(job.getId());
 
@@ -139,12 +139,12 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public List<Status> getStatus(String username, Long jobId) {
+    public List<Status> getStatus(Long userId, Long jobId) {
         BackupJobDao jobDao = getBackupJobDao();
         
         if (jobId == null) {
             List<Status> status = new ArrayList<>();
-            BackupJob job = jobDao.findLastBackupJob(username);
+            BackupJob job = jobDao.findLastBackupJob(userId);
             if (job != null) {
                 status.addAll(getStatusForJob(job));
             }
@@ -154,7 +154,7 @@ public class BackupLogicImpl implements BackupLogic {
             return status;
         }
         
-        BackupJob job = getExistingUserJob(jobId, username);
+        BackupJob job = getExistingUserJob(jobId, userId);
         List<Status> status = new ArrayList<>();
         status.addAll(getStatusForJob(job));
         return status;
@@ -167,8 +167,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public List<BackupJob> getBackupJobsOf(String username) {
-        return getBackupJobDao().findByUsername(username);
+    public List<BackupJob> getBackupJobsOf(Long userId) {
+        return getBackupJobDao().findByUserId(userId);
     }
 
     @Override
@@ -245,8 +245,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void deleteProtocolsOf(String username) {
-        createJobProtocolDao().deleteByUsername(username);
+    public void deleteProtocolsOf(Long userId) {
+        createJobProtocolDao().deleteByUserId(userId);
     }
 
 }

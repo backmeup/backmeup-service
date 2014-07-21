@@ -67,13 +67,13 @@ public class UserRegistrationImpl implements UserRegistration {
     }
     
     @Override
-    public BackMeUpUser getUserByUserId(String userId) {
+    public BackMeUpUser getUserByUserId(Long userId) {
     	return getUserByUserId(userId, false);
     }
     
     @Override
-    public BackMeUpUser getUserByUserId(String userId, boolean ensureActivated) {
-    	BackMeUpUser user = getUserDao().findById(Long.parseLong(userId));
+    public BackMeUpUser getUserByUserId(Long userId, boolean ensureActivated) {
+    	BackMeUpUser user = getUserDao().findById(userId);
         if (user == null) {
             throw new UnknownUserException(userId);
         }

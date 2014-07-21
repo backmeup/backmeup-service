@@ -26,15 +26,15 @@ public class JobProtocolDaoImpl extends BaseDaoImpl<JobProtocol> implements
   }
 
   @Override
-  public void deleteByUsername(String username) {
+  public void deleteByUserId(Long userId) {
     // Following line generates invalid postgres sql code:
     // https://hibernate.onjira.com/browse/HHH-7314
     // Query q = em.createQuery("DELETE FROM " + entityClass.getName() +" p WHERE p.user.username = :username");
     // q.setParameter("username", username);
     // q.executeUpdate();
     // workaround:
-    TypedQuery<JobProtocol> protocol = em.createQuery("SELECT p FROM " + entityClass.getName() + " p WHERE p.user.username = :username", JobProtocol.class);
-    protocol.setParameter("username", username);
+    TypedQuery<JobProtocol> protocol = em.createQuery("SELECT p FROM " + entityClass.getName() + " p WHERE p.user.userid = :userid", JobProtocol.class);
+    protocol.setParameter("userid", userId);
     for(JobProtocol jp : protocol.getResultList()) {
       em.remove(jp);
     }    

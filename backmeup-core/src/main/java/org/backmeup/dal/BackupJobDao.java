@@ -6,9 +6,9 @@ import org.backmeup.model.BackupJob;
 
 public interface BackupJobDao extends BaseDao<BackupJob> {
 
-    List<BackupJob> findByUsername(String username);
+    List<BackupJob> findByUserId(Long userId);
 
-    BackupJob findLastBackupJob(String username);
+    BackupJob findLastBackupJob(Long userId);
 
     List<BackupJob> findAll();
 }

@@ -39,30 +39,30 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void deleteProfilesOf(String username) {
+    public void deleteProfilesOf(Long userId) {
         ProfileDao profileDao = getProfileDao();
-        for (Profile p : profileDao.findProfilesByUsername(username)) {
+        for (Profile p : profileDao.findProfilesByUserId(userId)) {
             profileDao.delete(p);
         }
     }
 
     @Override
-    public List<Profile> getProfilesOf(String username) {
-        return getProfileDao().findDatasourceProfilesByUsername(username);
+    public List<Profile> getProfilesOf(Long userId) {
+        return getProfileDao().findDatasourceProfilesByUserId(userId);
     }
 
     @Override
-    public Profile deleteProfile(Long profileId, String username) {
-        Profile profile = getExistingUserProfile(profileId, username);
+    public Profile deleteProfile(Long profileId, Long userId) {
+        Profile profile = getExistingUserProfile(profileId, userId);
         getProfileDao().delete(profile);
         return profile;
     }
 
     @Override
-    public Profile getExistingUserProfile(Long profileId, String username) {
+    public Profile getExistingUserProfile(Long profileId, Long userId) {
         Profile profile = queryExistingProfile(profileId);
-        if (!profile.getUser().getUsername().equals(username)) {
-            throw new IllegalArgumentException(String.format(textBundle.getString(USER_HAS_NO_PROFILE), username, profileId));
+        if (profile.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException(String.format(textBundle.getString(USER_HAS_NO_PROFILE), userId, profileId));
         }
         return profile;
     }
@@ -77,8 +77,8 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public List<Profile> getDatasinkProfilesOf(String username) {
-        return getProfileDao().findDatasinkProfilesByUsername(username);
+    public List<Profile> getDatasinkProfilesOf(Long userId) {
+        return getProfileDao().findDatasinkProfilesByUserId(userId);
     }
 
     @Override
@@ -135,9 +135,9 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void setIdentification(Profile profile, String userId) {
-        if (userId != null) {
-            profile.setIdentification(userId);
+    public void setIdentification(Profile profile, String identification) {
+        if (identification != null) {
+            profile.setIdentification(identification);
         }
         getProfileDao().save(profile);
     }

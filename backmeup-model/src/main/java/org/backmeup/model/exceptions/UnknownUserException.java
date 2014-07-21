@@ -17,6 +17,11 @@ public class UnknownUserException extends BackMeUpException {
 		this.username = username;
 	}
 	
+	public UnknownUserException(Long userId) {
+		super("Unknown user");
+		this.username = Long.toString(userId);
+	}
+	
 	public String getUsername() {
 	  return this.username;
 	}

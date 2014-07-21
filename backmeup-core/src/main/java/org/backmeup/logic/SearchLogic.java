@@ -23,7 +23,7 @@ public interface SearchLogic {
 
     Set<FileItem> getAllFileItems(Long jobId);
 
-    ProtocolDetails getProtocolDetails(String username, String fileId);
+    ProtocolDetails getProtocolDetails(Long userId, String fileId);
 
     File getThumbnailPathForFile(BackMeUpUser user, String fileId);
 

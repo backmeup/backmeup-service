@@ -9,5 +9,5 @@ public interface JobProtocolDao extends BaseDao<JobProtocol> {
 
     List<JobProtocol> findByUsernameAndDuration(String username, Date from, Date to);
 
-    void deleteByUsername(String username);
+    void deleteByUserId(Long userId);
 }

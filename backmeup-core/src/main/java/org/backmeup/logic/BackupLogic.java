@@ -13,11 +13,11 @@ import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
 
-    void deleteJobsOf(String username);
+    void deleteJobsOf(Long userId);
 
     BackupJob getExistingJob(Long jobId);
 
-    BackupJob getExistingUserJob(Long jobId, String username);
+    BackupJob getExistingUserJob(Long jobId, Long userId);
 
     ActionProfile getJobActionOption(String actionId, Long jobId);
 
@@ -25,11 +25,11 @@ public interface BackupLogic {
 
     BackupJob fullJobFor(Long jobId);
 
-    void deleteJob(String username, Long jobId);
+    void deleteJob(Long userId, Long jobId);
 
-    List<Status> getStatus(String username, Long jobId);
+    List<Status> getStatus(Long userId, Long jobId);
 
-    List<BackupJob> getBackupJobsOf(String username);
+    List<BackupJob> getBackupJobsOf(Long userId);
 
     BackupJob updateRequestFor(Long jobId);
 
@@ -39,6 +39,6 @@ public interface BackupLogic {
 
     void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);
 
-    void deleteProtocolsOf(String username);
+    void deleteProtocolsOf(Long userId);
 
 }

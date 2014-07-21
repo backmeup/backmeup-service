@@ -94,10 +94,10 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public ProtocolDetails getProtocolDetails(String username, String fileId) {
+    public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
         try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(username, fileId);
+            org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(userId, fileId);
 
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
@@ -110,7 +110,7 @@ public class SearchLogicImpl implements SearchLogic {
     public File getThumbnailPathForFile(BackMeUpUser user, String fileId) {
         try (ElasticSearchIndexClient client = getIndexClient()) {
 
-            String thumbnailPath = client.getThumbnailPathForFile(user.getUsername(), fileId);
+            String thumbnailPath = client.getThumbnailPathForFile(user.getUserId(), fileId);
             logger.debug("Got thumbnail path: " + thumbnailPath);
             if (thumbnailPath != null) { // NOSONAR can be null!
                 return new File(thumbnailPath);

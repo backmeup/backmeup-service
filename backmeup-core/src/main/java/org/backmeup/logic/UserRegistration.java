@@ -11,9 +11,9 @@ public interface UserRegistration {
 
     BackMeUpUser getUserByUsername(String username, boolean ensureActivated);
 	
-	BackMeUpUser getUserByUserId(String userId);
+	BackMeUpUser getUserByUserId(Long userId);
     
-    BackMeUpUser getUserByUserId(String userId, boolean ensureActivated);
+    BackMeUpUser getUserByUserId(Long userId, boolean ensureActivated);
     
     BackMeUpUser register(BackMeUpUser user);
     

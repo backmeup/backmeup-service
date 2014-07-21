@@ -24,28 +24,28 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 
 	@Override
     @SuppressWarnings("unchecked")
-	public List<Profile> findDatasourceProfilesByUsername(String username) {		
-		Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username AND p.sourceAndOrSink IN ('Source', 'Both')");
-		q.setParameter("username", username);
+	public List<Profile> findDatasourceProfilesByUserId(Long userId) {		
+		Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userid = :userid AND p.sourceAndOrSink IN ('Source', 'Both')");
+		q.setParameter("userid", userId);
 		List<Profile> profiles = q.getResultList();		
 		return profiles;
 	}
 	
 	@Override
     @SuppressWarnings("unchecked")
-  public List<Profile> findDatasinkProfilesByUsername(String username) {    
-    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username AND p.sourceAndOrSink IN ('Sink', 'Both')");
-    q.setParameter("username", username);
+  public List<Profile> findDatasinkProfilesByUserId(Long userId) {    
+    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userid = :userid AND p.sourceAndOrSink IN ('Sink', 'Both')");
+    q.setParameter("userid", userId);
     List<Profile> profiles = q.getResultList();   
     return profiles;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<Profile> findProfilesByUsernameAndService(String username,
+  public List<Profile> findProfilesByUserIdAndService(Long userId,
       String sourceSinkId) {
-    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username AND p.desc = :id ");
-    q.setParameter("username", username);        
+    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userid = :userid AND p.desc = :id ");
+    q.setParameter("userid", userId);        
     q.setParameter("id", sourceSinkId);
     List<Profile> profiles = q.getResultList(); 
     return profiles;
@@ -53,9 +53,9 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<Profile> findProfilesByUsername(String username) {
-    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.username = :username");
-    q.setParameter("username", username);            
+  public List<Profile> findProfilesByUserId(Long userId) {
+    Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userid = :userid");
+    q.setParameter("userid", userId);            
 	List<Profile> profiles = q.getResultList();
     return profiles;
   }

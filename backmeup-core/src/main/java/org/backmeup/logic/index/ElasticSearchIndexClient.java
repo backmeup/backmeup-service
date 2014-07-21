@@ -108,7 +108,7 @@ public class ElasticSearchIndexClient implements Closeable {
 		return client.prepareSearch(INDEX_NAME).setQuery(qBuilder).execute().actionGet();
 	}
 	
-	public SearchResponse getFileById(String username, String fileId) {
+	public SearchResponse getFileById(Long userId, String fileId) {
 		// IDs in backmeup are "owner:hash:timestamp"
 		String[] bmuId = fileId.split(":");
 		if (bmuId.length != 3) {
@@ -127,8 +127,8 @@ public class ElasticSearchIndexClient implements Closeable {
 			return client.prepareSearch(INDEX_NAME).setQuery(qBuilder).execute().actionGet();
 	}
 	
-	public String getThumbnailPathForFile(String username, String fileId) {
-		SearchResponse response = getFileById(username, fileId);
+	public String getThumbnailPathForFile(Long userId, String fileId) {
+		SearchResponse response = getFileById(userId, fileId);
 		SearchHit hit = response.getHits().getHits()[0];
 		Map<String, Object> source = hit.getSource();
 		return source.get(IndexUtils.FIELD_THUMBNAIL_PATH).toString();

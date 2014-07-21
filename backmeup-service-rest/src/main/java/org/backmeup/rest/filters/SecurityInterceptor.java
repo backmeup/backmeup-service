@@ -86,7 +86,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 
 			 //Split username and password tokens
 			 final StringTokenizer tokenizer = new StringTokenizer(accessToken, ";");
-			 final String userId = tokenizer.nextToken();
+			 final String userId = tokenizer.nextToken(); // userId can be a String or an Long on this place (see resolveUser)
 			 final String password = tokenizer.nextToken();
 
 			 // Verify token
@@ -118,7 +118,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				worker.setUserId(BACKMEUP_WORKER_ID);
 				return worker;
 			} else {
-				return getLogic().getUserByUserId(userId);
+				return getLogic().getUserByUserId(Long.parseLong(userId));
 			}
 		} catch (UnknownUserException uue) {
 			return null;

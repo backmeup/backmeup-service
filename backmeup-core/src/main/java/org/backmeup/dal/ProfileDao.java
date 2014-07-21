@@ -11,11 +11,11 @@ import org.backmeup.model.Profile;
  */
 public interface ProfileDao extends BaseDao<Profile> {
 
-    List<Profile> findProfilesByUsername(String username);
+    List<Profile> findProfilesByUserId(Long userId);
 
-    List<Profile> findDatasourceProfilesByUsername(String username);
+    List<Profile> findDatasourceProfilesByUserId(Long userId);
 
-    List<Profile> findDatasinkProfilesByUsername(String username);
+    List<Profile> findDatasinkProfilesByUserId(Long userId);
 
-    List<Profile> findProfilesByUsernameAndService(String username, String sourceSinkId);
+    List<Profile> findProfilesByUserIdAndService(Long userId, String sourceSinkId);
 }

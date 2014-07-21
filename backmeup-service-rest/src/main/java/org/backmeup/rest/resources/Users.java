@@ -58,9 +58,9 @@ public class Users extends Base {
 	@GET
 	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserDTO getUser(@PathParam("userId") String userId) {
+	public UserDTO getUser(@PathParam("userId") Long userId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		if(activeUser.getUserId() != Long.parseLong(userId)) {
+		if(activeUser.getUserId() != userId) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -73,9 +73,9 @@ public class Users extends Base {
 	@Path("/{userId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserDTO updateUser(@PathParam("userId") String userId, UserDTO user) {
+	public UserDTO updateUser(@PathParam("userId") Long userId, UserDTO user) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		if(activeUser.getUserId() != Long.parseLong(userId)) {
+		if(activeUser.getUserId() != userId) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -92,9 +92,9 @@ public class Users extends Base {
 	@DELETE
 	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deleteUser(@PathParam("userId") String userId) {
+	public void deleteUser(@PathParam("userId") Long userId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		if(activeUser.getUserId() != Long.parseLong(userId)) {
+		if(activeUser.getUserId() != userId) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		

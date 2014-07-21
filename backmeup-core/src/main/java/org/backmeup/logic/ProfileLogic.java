@@ -17,17 +17,17 @@ public interface ProfileLogic {
 
     Profile save(Profile profile);
 
-    void deleteProfilesOf(String username);
+    void deleteProfilesOf(Long userId);
 
-    List<Profile> getProfilesOf(String username);
+    List<Profile> getProfilesOf(Long userId);
 
-    Profile deleteProfile(Long profileId, String username);
+    Profile deleteProfile(Long profileId, Long userId);
 
-    Profile getExistingUserProfile(Long profileId, String username);
+    Profile getExistingUserProfile(Long profileId, Long userId);
 
     Profile queryExistingProfile(Long profileId);
 
-    List<Profile> getDatasinkProfilesOf(String username);
+    List<Profile> getDatasinkProfilesOf(Long userId);
 
     Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
 
@@ -37,6 +37,6 @@ public interface ProfileLogic {
 
     Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, Type type);
 
-    void setIdentification(Profile profile, String userId);
+    void setIdentification(Profile profile, String identification);
 
 }

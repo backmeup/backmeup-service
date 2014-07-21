@@ -35,8 +35,8 @@ public interface BusinessLogic {
 	
 	// user operations --------------------------------------------------------
 	BackMeUpUser getUserByUsername(String username);
-	BackMeUpUser getUserByUserId(String userId);
-	BackMeUpUser deleteUser(String userId);
+	BackMeUpUser getUserByUserId(Long userId);
+	BackMeUpUser deleteUser(Long userId);
 	BackMeUpUser updateUser(BackMeUpUser user);
 	BackMeUpUser addUser(BackMeUpUser user);
 	
@@ -53,15 +53,15 @@ public interface BusinessLogic {
 	
 	//datasource operations
 	List<SourceSinkDescribable> getDatasources();
-	List<Profile> getDatasourceProfiles(String username);
-	Profile deleteProfile(String username, Long profile);
-	List<String> getDatasourceOptions(String username, Long profileId, String keyRingPassword);
-	List<String> getStoredDatasourceOptions(String username, Long profileId, Long jobId);
+	List<Profile> getDatasourceProfiles(Long userId);
+	Profile deleteProfile(Long userId, Long profile);
+	List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
+	List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
 	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
 	
 	//datasink operations
 	List<SourceSinkDescribable> getDatasinks();
-	List<Profile> getDatasinkProfiles(String username);
+	List<Profile> getDatasinkProfiles(Long userId);
 
 	//action operations
 	List<ActionDescribable> getActions();
@@ -69,7 +69,7 @@ public interface BusinessLogic {
 	
 	// Profile/Auth operations
 //	void addProfileEntries(Long profileId, Properties entries, String keyRing);
-	ValidationNotes validateProfile(String username, Long profileId, String keyRing);
+	ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
 //	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;
 //	void postAuth(Long profileId, Properties props, String keyRing) throws PluginException, ValidationException, InvalidCredentialsException;
 	
@@ -80,27 +80,29 @@ public interface BusinessLogic {
 	// backupjob operations ---------------------------------------------------
 	
 	//job & validation operations
-	ValidationNotes validateBackupJob(String username, Long jobId, String keyRing);
-	BackupJob updateBackupJob(String username, BackupJob backupJob);
-	BackupJob getBackupJob(String username, Long jobId);
+	ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
+	BackupJob updateBackupJob(Long userId, BackupJob backupJob);
+	BackupJob getBackupJob(Long jobId);
 	// Should replace method 'getBackupJob' ?
-	BackupJob getBackupJobFull(String username, Long jobId);
+	BackupJob getBackupJobFull(Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
 	ValidationNotes createBackupJob(BackupJob request);
-	List<BackupJob> getJobs(String username);
-	void deleteJob(String username, Long jobId);
-	List<Status> getStatus(String username, Long jobId);
-	ProtocolDetails getProtocolDetails(String username, String fileId);
-	ProtocolOverview getProtocolOverview(String username, String duration);
-	void updateJobProtocol(String username, Long jobId, JobProtocolDTO jobProtocol);
-	void deleteJobProtocols(String username);
+	List<BackupJob> getJobs(Long userId);
+	void deleteJob(Long userId, Long jobId);
+	
+	List<Status> getStatus(Long userId, Long jobId);
+	
+	ProtocolDetails getProtocolDetails(Long userId, String fileId);
+	ProtocolOverview getProtocolOverview(Long userId, String duration);
+	void updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
+	void deleteJobProtocols(Long userId);
 	
 	// search operations ------------------------------------------------------
-	long searchBackup(String username, String keyRingPassword, String query);
+	long searchBackup(Long userId, String keyRingPassword, String query);
 	//SearchResponse queryBackup(String username, long searchId, String filterType, String filterValue);
-	SearchResponse queryBackup(String username, long searchId, Map<String, List<String>> filters);
-	File getThumbnail(String username, String fileId);
-	void deleteIndexForUser(String username);
+	SearchResponse queryBackup(Long userId, long searchId, Map<String, List<String>> filters);
+	File getThumbnail(Long userId, String fileId);
+	void deleteIndexForUser(Long userId);
 	void deleteIndexForJobAndTimestamp(Long jobId, Long timestamp);
 	
 	// log operations ---------------------------------------------------------

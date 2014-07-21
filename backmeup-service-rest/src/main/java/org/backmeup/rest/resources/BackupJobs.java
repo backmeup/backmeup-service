@@ -53,7 +53,7 @@ public class BackupJobs extends Base {
 		
 		BackupJobStatus status = getMapper().map(jobStatus, BackupJobStatus.class);
 		
-		List<BackupJob> allJobsOfUser = getLogic().getJobs(activeUser.getUsername());
+		List<BackupJob> allJobsOfUser = getLogic().getJobs(activeUser.getUserId());
 		List<BackupJobDTO> jobList = new ArrayList<>();
 		
 		for(BackupJob job : allJobsOfUser) {
@@ -137,7 +137,7 @@ public class BackupJobs extends Base {
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull("", Long.parseLong(jobId));
+		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
 		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -189,7 +189,7 @@ public class BackupJobs extends Base {
 		}
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull("", backupjob.getJobId());
+		BackupJob job = getLogic().getBackupJobFull(backupjob.getJobId());
 		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -203,7 +203,7 @@ public class BackupJobs extends Base {
 		
 		// TODO: Job protocol
 		
-		getLogic().updateBackupJob(job.getUser().getUsername(), job);
+		getLogic().updateBackupJob(job.getUser().getUserId(), job);
 		
 		return backupjob;
 		
@@ -215,11 +215,11 @@ public class BackupJobs extends Base {
 	public void deleteBackupJob(@PathParam("jobId") String jobId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull("", Long.parseLong(jobId));
+		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
 		if (job.getUser().getUserId() != activeUser.getUserId()) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		getLogic().deleteJob(activeUser.getUsername(), Long.parseLong(jobId));
+		getLogic().deleteJob(activeUser.getUserId(), Long.parseLong(jobId));
 	}
 }

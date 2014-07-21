@@ -238,6 +238,6 @@ public class Plugins extends Base {
 		// TODO check pluginId
 		// if profile.getPluginId != pluginId -> FORBIDDEN
 		
-		getLogic().deleteProfile(activeUser.getUsername(), Long.parseLong(profileId));
+		getLogic().deleteProfile(activeUser.getUserId(), Long.parseLong(profileId));
 	}
 }
