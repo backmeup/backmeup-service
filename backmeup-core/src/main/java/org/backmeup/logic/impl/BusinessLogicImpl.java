@@ -354,8 +354,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
 //                registration.ensureUserIsActive(username);
                 BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
-                Set<ProfileOptions> sourceProfiles = job.getSourceProfiles();
-                return profiles.getProfileOptions(profileId, sourceProfiles);
+                ProfileOptions sourceProfile = job.getSourceProfiles();
+                return profiles.getProfileOptions(profileId, sourceProfile);
             
             }
         });
@@ -367,7 +367,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 			@Override public void run() {
 
 			    BackupJob backupjob = backupJobs.getExistingJob(jobId);
-				Set<ProfileOptions> sourceProfiles = backupjob.getSourceProfiles();
+				ProfileOptions sourceProfiles = backupjob.getSourceProfiles();
                 profiles.setProfileOptions(profileId, sourceProfiles, sourceOptions);
 				
 			}
@@ -605,7 +605,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.begin();
 
-            Set<ProfileOptions> pos = request.getSourceProfiles();
+            ProfileOptions pos = request.getSourceProfiles();
 //            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(request.getSourceProfiles());
             Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
 
@@ -909,15 +909,13 @@ public class BusinessLogicImpl implements BusinessLogic {
                 return notes;
             }
 
-            private void validateSourceProfiles(Set<ProfileOptions> sourceProfiles, ValidationNotes notes) {
-                for (ProfileOptions po : sourceProfiles) {
+            private void validateSourceProfiles(ProfileOptions sourceProfiles, ValidationNotes notes) {
+            	ProfileOptions po = sourceProfiles;
+                String sourceSinkId = po.getProfile().getDescription();
+                plugins.validateSourceSinkExists(sourceSinkId, notes);
 
-                    String sourceSinkId = po.getProfile().getDescription();
-                    plugins.validateSourceSinkExists(sourceSinkId, notes);
-
-                    Long profileId = po.getProfile().getProfileId();
-                    getValidationEntriesForProfile(profileId, notes);
-                }
+                Long profileId = po.getProfile().getProfileId();
+                getValidationEntriesForProfile(profileId, notes);
             }
 
             private void getValidationEntriesForProfile(Long id, ValidationNotes notes) {

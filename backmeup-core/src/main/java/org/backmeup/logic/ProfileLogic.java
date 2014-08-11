@@ -31,9 +31,9 @@ public interface ProfileLogic {
 
     Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
 
-    List<String> getProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles);
+    List<String> getProfileOptions(Long profileId, ProfileOptions sourceProfile);
 
-    void setProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles, List<String> sourceOptions);
+    void setProfileOptions(Long profileId, ProfileOptions sourceProfiles, List<String> sourceOptions);
 
     Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, Type type);
 

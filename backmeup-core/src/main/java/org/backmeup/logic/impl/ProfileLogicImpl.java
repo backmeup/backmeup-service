@@ -98,11 +98,10 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public List<String> getProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles) {
-        for (ProfileOptions po : sourceProfiles) {
-            if (po.getProfile().getProfileId().equals(profileId)) {
-                return asList(po.getOptions());
-            }
+    public List<String> getProfileOptions(Long profileId, ProfileOptions sourceProfile) {
+        ProfileOptions po = sourceProfile;
+        if (po.getProfile().getProfileId().equals(profileId)) {
+            return asList(po.getOptions());
         }
 
         throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
@@ -116,14 +115,13 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void setProfileOptions(Long profileId, Set<ProfileOptions> sourceProfiles, List<String> sourceOptions) {
+    public void setProfileOptions(Long profileId, ProfileOptions sourceProfiles, List<String> sourceOptions) {
         queryExistingProfile(profileId);
         
-        for (ProfileOptions option : sourceProfiles) {
-            if (option.getProfile().getProfileId().equals(profileId)) {
-                String[] new_options = sourceOptions.toArray(new String[sourceOptions.size()]);
-                option.setOptions(new_options);
-            }
+        ProfileOptions option = sourceProfiles;
+        if (option.getProfile().getProfileId().equals(profileId)) {
+            String[] new_options = sourceOptions.toArray(new String[sourceOptions.size()]);
+            option.setOptions(new_options);
         }
     }
 

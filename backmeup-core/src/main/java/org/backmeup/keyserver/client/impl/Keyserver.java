@@ -458,10 +458,9 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 		List<Long> authenticationInfos = new ArrayList<>();
 		usedServices.add(job.getSinkProfile().getProfileId());
 		authenticationInfos.add(job.getSinkProfile().getProfileId());
-		for (ProfileOptions p : job.getSourceProfiles()) {
-			usedServices.add(p.getProfile().getProfileId());
-			authenticationInfos.add(p.getProfile().getProfileId());
-		}
+		ProfileOptions po = job.getSourceProfiles();
+		usedServices.add(po.getProfile().getProfileId());
+		authenticationInfos.add(po.getProfile().getProfileId());
 		Long[] serviceIds = usedServices.toArray(new Long[] {});
 		Long[] authIds = authenticationInfos.toArray(new Long[] {});
 		Token t = getToken(job.getUser().getUserId(), userPwd, serviceIds,

@@ -59,7 +59,7 @@ abstract public class AkkaJobManager implements JobManager {
 
 	@Override
 	public BackupJob createBackupJob(BackMeUpUser user,
-			Set<ProfileOptions> sourceProfiles, Profile sinkProfile,
+			ProfileOptions sourceProfiles, Profile sinkProfile,
 			List<ActionProfile> requiredActions, Date start, long delayInMs, 
 			String jobTitle, boolean reschedule, String timeExpression) {
 		try {

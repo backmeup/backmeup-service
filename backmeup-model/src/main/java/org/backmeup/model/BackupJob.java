@@ -43,7 +43,7 @@ public class BackupJob {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Set<ProfileOptions> sourceProfiles = new HashSet<>();
+	private ProfileOptions sourceProfiles = null;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
 	private final Set<JobProtocol> jobProtocols = new HashSet<>();
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
@@ -85,7 +85,7 @@ public class BackupJob {
 		super();
 	}
 
-	public BackupJob(BackMeUpUser user, Set<ProfileOptions> sourceProfile,
+	public BackupJob(BackMeUpUser user, ProfileOptions sourceProfile,
 			Profile sinkProfile, List<ActionProfile> requiredActions,
 			Date start, long delay, String jobTitle, boolean reschedule) {
 		this.user = user;
@@ -119,11 +119,11 @@ public class BackupJob {
 		this.user = user;
 	}
 
-	public Set<ProfileOptions> getSourceProfiles() {
+	public ProfileOptions getSourceProfiles() {
 		return sourceProfiles;
 	}
 
-	public void setSourceProfiles(Set<ProfileOptions> sourceProfiles) {
+	public void setSourceProfiles(ProfileOptions sourceProfiles) {
 		this.modified = new Date();
 		this.sourceProfiles = sourceProfiles;
 	}

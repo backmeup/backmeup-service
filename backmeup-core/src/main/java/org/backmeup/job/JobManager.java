@@ -25,7 +25,7 @@ import org.backmeup.model.ProfileOptions;
 public interface JobManager {
 
 	public BackupJob createBackupJob(BackMeUpUser user,
-			Set<ProfileOptions> sourceProfile, Profile sinkProfile,
+			ProfileOptions sourceProfile, Profile sinkProfile,
 			List<ActionProfile> requiredActions, Date start, long delay, String jobTitle,
 			boolean reschedule, String timeExpression);
 

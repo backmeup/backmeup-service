@@ -76,8 +76,7 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		Profile sourceProfile = getLogic().getPluginProfile(backupJob.getSource());
-		Set<ProfileOptions> sourceProfiles = new HashSet<>();
-		sourceProfiles.add(new ProfileOptions(sourceProfile, new String[0]));
+		ProfileOptions sourceProfiles = new ProfileOptions(sourceProfile, new String[0]);
 		
 		Profile sinkProfile = getLogic().getPluginProfile(backupJob.getSink());
 		
@@ -154,7 +153,7 @@ public class BackupJobs extends Base {
 		
 		if(expandProfiles) {
 			// get source profile
-			ProfileOptions sourceProfileOptions = job.getSourceProfiles().iterator().next();
+			ProfileOptions sourceProfileOptions = job.getSourceProfiles();
 			Profile sourceProfile = getLogic().getPluginProfile(sourceProfileOptions.getProfile().getProfileId());
 			PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
 			sourceProfileDTO.setPluginId(sourceProfile.getDescription());
