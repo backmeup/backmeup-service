@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
  * 
@@ -44,18 +44,18 @@ public class Profile {
 	private String identification;
 
 	@Enumerated(EnumType.STRING)
-	private Type sourceAndOrSink;
+	private PluginType sourceAndOrSink;
 
 	public Profile() {
 	}
 
 	public Profile(BackMeUpUser user, String profileName, String desc,
-			Type source) {
+			PluginType source) {
 		this(null, user, profileName, desc, source);
 	}
 
 	public Profile(Long profileId, BackMeUpUser user, String profileName,
-			String desc, Type sourceAndOrSink) {
+			String desc, PluginType sourceAndOrSink) {
 		this.profileId = profileId;
 		this.user = user;
 		this.profileName = profileName;
@@ -101,11 +101,11 @@ public class Profile {
 		this.description = desc;
 	}
 
-	public Type getType() {
+	public PluginType getType() {
 		return sourceAndOrSink;
 	}
 
-	public void setType(Type sourceAndOrSink) {
+	public void setType(PluginType sourceAndOrSink) {
 		this.modified = new Date();
 		this.sourceAndOrSink = sourceAndOrSink;
 	}

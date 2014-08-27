@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.osgi.PluginImpl;
 import org.junit.Before;
@@ -32,12 +32,12 @@ public class PluginImplTest {
     } catch (Exception e) {
       
     }
-    List<SourceSinkDescribable>  sources = pluginLayer.getConnectedDatasources();
+    List<PluginDescribable>  sources = pluginLayer.getDatasources();
     for (int i=0; i < sources.size(); i++) {
       System.out.println(sources.get(i).getId());
     }
     
-    List<SourceSinkDescribable>  sinks = pluginLayer.getConnectedDatasinks();
+    List<PluginDescribable>  sinks = pluginLayer.getDatasinks();
     for (int i=0; i < sinks.size(); i++) {
       System.out.println(sinks.get(i).getId());
     }

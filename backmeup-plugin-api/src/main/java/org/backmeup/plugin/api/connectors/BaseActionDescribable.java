@@ -1,4 +1,4 @@
-package org.backmeup.plugin.api.actions;
+package org.backmeup.plugin.api.connectors;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.backmeup.model.exceptions.PluginException;
-import org.backmeup.model.spi.ActionDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 
-public class BaseActionDescribable implements ActionDescribable {
+public abstract class BaseActionDescribable implements PluginDescribable {
 
 	private Properties descriptionEntries;
 
@@ -71,7 +71,19 @@ public class BaseActionDescribable implements ActionDescribable {
 	}
 
 	@Override
-	public String getActionVisibility() {
-		return getDescriptionEntries().getProperty("actionVisibility");
+	public PluginVisibility getVisibility() {
+		String visibility = getDescriptionEntries().getProperty("actionVisibility");
+		return PluginVisibility.valueOf(visibility);
+	}
+
+	@Override
+	public PluginType getType() {
+		return PluginType.Action;
+	}
+
+	@Override
+	public String getImageURL() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

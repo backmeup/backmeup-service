@@ -8,7 +8,8 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
+
 
 @XmlRootElement
 public class BackupJobDTO {
@@ -146,7 +147,7 @@ public class BackupJobDTO {
 	}
 
 	public void setSource(PluginProfileDTO source) {
-		if((source.getProfileType() != PluginType.source) && (source.getProfileType() != PluginType.sourcesink)) {
+		if((source.getProfileType() != PluginType.Source) && (source.getProfileType() != PluginType.SourceSink)) {
 			throw new IllegalArgumentException("Only profiles from a source plugin can be assigned, but type is: " + source.getProfileType());
 		}
 		this.source = source;
@@ -161,7 +162,7 @@ public class BackupJobDTO {
 	}
 	
 	public void addAction(PluginProfileDTO action) {
-		if (action.getProfileType() != PluginType.action) {
+		if (action.getProfileType() != PluginType.Action) {
 			throw new IllegalArgumentException("Only profiles from action plugins can be assigned, but type is: " + action.getProfileType());
 		}
 		
@@ -176,7 +177,7 @@ public class BackupJobDTO {
 	}
 
 	public void setSink(PluginProfileDTO sink) {
-		if ((sink.getProfileType() != PluginType.sink) && (sink.getProfileType() != PluginType.sourcesink)) {
+		if ((sink.getProfileType() != PluginType.Sink) && (sink.getProfileType() != PluginType.SourceSink)) {
 			throw new IllegalArgumentException("Only profiles from a sink plugin can be assigned, but type is: " + source.getProfileType());
 		}
 		this.sink = sink;

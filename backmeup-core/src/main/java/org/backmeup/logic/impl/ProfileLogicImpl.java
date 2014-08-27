@@ -16,7 +16,7 @@ import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @ApplicationScoped
 public class ProfileLogicImpl implements ProfileLogic {
@@ -126,7 +126,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, Type type) {
+    public Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type) {
         Profile profile = new Profile(user, profileName, uniqueDescIdentifier, type);
         profile = getProfileDao().save(profile);
         return profile;

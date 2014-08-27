@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.backmeup.model.dto.BackupJobCreationDTO;
-import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;

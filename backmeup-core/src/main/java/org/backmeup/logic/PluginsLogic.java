@@ -7,8 +7,7 @@ import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.api.connectors.Datasource;
 
@@ -18,19 +17,19 @@ public interface PluginsLogic {
 
     List<String> getActionOptions(String actionId);
 
-    List<ActionDescribable> getActions();
+    List<PluginDescribable> getActions();
 
-    List<SourceSinkDescribable> getConnectedDatasources();
+    List<PluginDescribable> getDatasources();
 
-    List<SourceSinkDescribable> getConnectedDatasinks();
+    List<PluginDescribable> getDatasinks();
 
-    SourceSinkDescribable getSourceSinkById(String sourceSinkId);
+    PluginDescribable getPluginDescribableById(String pluginId);
 
     Datasource getDatasource(String profileDescription);
 
     Validationable getValidator(String description);
 
-    SourceSinkDescribable getExistingSourceSink(String sourceSinkId);
+    PluginDescribable getExistingSourceSink(String sourceSinkId);
 
     void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
 

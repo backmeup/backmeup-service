@@ -14,7 +14,7 @@ import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.TokenDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
-import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class DummyDataManager {
 	public static UserDTO getUserDTO() {
@@ -28,7 +28,7 @@ public class DummyDataManager {
 		plugin.setTitle("BackMeUp Mail Plug-In");
 		plugin.setDescription("A plug-in that is capable of downloading e-mails");
 		plugin.setImageURL("http://about:blank");
-		plugin.setPluginType(PluginType.source);
+		plugin.setPluginType(PluginType.Source);
 		plugin.addMetadata("META_BACKUP_FREQUENCY", "daily");
 
 		plugin.setConfig(getPluginConfigurationDTO());
@@ -55,7 +55,7 @@ public class DummyDataManager {
 		pluginProfile.setProfileId(1);
 		pluginProfile.setTitle("MailProfile");
 		pluginProfile.setPluginId("org.backmeup.mail");
-		pluginProfile.setProfileType(PluginType.source);
+		pluginProfile.setProfileType(PluginType.Source);
 		pluginProfile.setModified(1401099707142L);
 		
 		if(expandConfig) {
@@ -126,15 +126,15 @@ public class DummyDataManager {
 
 		if (expandProfiles) {
 			PluginProfileDTO source = getPluginProfileDTO(false);
-			source.setProfileType(PluginType.source);
+			source.setProfileType(PluginType.Source);
 			job.setSource(source);
 
 			PluginProfileDTO action = getPluginProfileDTO(false);
-			action.setProfileType(PluginType.action);
+			action.setProfileType(PluginType.Action);
 			job.addAction(action);
 
 			PluginProfileDTO sink = getPluginProfileDTO(false);
-			sink.setProfileType(PluginType.sink);
+			sink.setProfileType(PluginType.Sink);
 			job.setSink(sink);
 		}
 

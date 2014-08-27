@@ -13,7 +13,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.serializer.JsonSerializer;
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,9 +49,9 @@ public class SerializiationTests {
   @Test
   public void testBackupJobSerializiation() {
     BackMeUpUser user = new BackMeUpUser(1L, "john.doe", "John", "Doe", "Sepp@Mail.at", "John123!#");
-    Profile source = new Profile(2L, user, "TestProfile", "org.backmeup.source", Type.Source);
+    Profile source = new Profile(2L, user, "TestProfile", "org.backmeup.source", PluginType.Source);
     ProfileOptions options = new ProfileOptions(source, new String[]{"folder1", "folder2"});
-    Profile sink = new Profile(2L, user, "TestProfile2", "org.backmeup.sink", Type.Sink);
+    Profile sink = new Profile(2L, user, "TestProfile2", "org.backmeup.sink", PluginType.Sink);
     List<ActionProfile> actions = new ArrayList<>();
     BackupJob job = new BackupJob(user, options, sink, actions, new Date(), new Date().getTime() + 1000000L, "TestJob1", false);
     String serializedJob = JsonSerializer.serialize(job);

@@ -4,12 +4,7 @@
 
 	<configuration>
 		<!-- Note, these are always bi-directional -->
-		<custom-converters> 
-			 <converter type="org.backmeup.rest.converters.PluginTypeConverter">
-				<class-a>org.backmeup.model.spi.SourceSinkDescribable.Type</class-a>
-				<class-b>org.backmeup.model.dto.PluginDTO.PluginType</class-b>
-			</converter>
-			
+		<custom-converters> 		
 			<converter type="org.backmeup.rest.converters.BackupJobFrequencyConverter">
 				<class-a>java.lang.String</class-a>
 				<class-b>org.backmeup.model.dto.BackupJobDTO.JobFrequency</class-b>

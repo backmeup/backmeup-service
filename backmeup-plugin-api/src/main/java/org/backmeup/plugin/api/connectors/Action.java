@@ -1,9 +1,8 @@
-package org.backmeup.plugin.api.actions;
+package org.backmeup.plugin.api.connectors;
 
 import java.util.Properties;
 
 import org.backmeup.model.BackupJob;
-import org.backmeup.plugin.api.connectors.Progressable;
 import org.backmeup.plugin.api.storage.Storage;
 
 public interface Action {

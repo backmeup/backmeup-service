@@ -40,8 +40,7 @@ import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.api.connectors.Datasource;
@@ -290,13 +289,13 @@ public class BusinessLogicImpl implements BusinessLogic {
 
 
     @Override
-    public List<SourceSinkDescribable> getDatasources() {
-        return plugins.getConnectedDatasources();
+    public List<PluginDescribable> getDatasources() {
+        return plugins.getDatasources();
     }
     
     @Override
-    public SourceSinkDescribable getPluginDescribable(String pluginId) {
-    	return plugins.getSourceSinkById(pluginId);
+    public PluginDescribable getPluginDescribable(String pluginId) {
+    	return plugins.getPluginDescribableById(pluginId);
     }
 
     @Override
@@ -375,8 +374,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 	}
 
     @Override
-    public List<SourceSinkDescribable> getDatasinks() {
-        return plugins.getConnectedDatasinks();
+    public List<PluginDescribable> getDatasinks() {
+        return plugins.getDatasinks();
     }
 
     @Override
@@ -391,7 +390,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<ActionDescribable> getActions() {
+    public List<PluginDescribable> getActions() {
         return plugins.getActions();
     }
 

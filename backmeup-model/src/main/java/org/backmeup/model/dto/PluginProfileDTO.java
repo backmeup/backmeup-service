@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.dto.PluginDTO.PluginType;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @XmlRootElement
 public class PluginProfileDTO {

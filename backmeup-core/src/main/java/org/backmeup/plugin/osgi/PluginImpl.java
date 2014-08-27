@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,16 +21,14 @@ import org.apache.felix.framework.FrameworkFactory;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.Plugin;
+import org.backmeup.plugin.api.connectors.Action;
 import org.backmeup.plugin.api.connectors.Datasink;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
-import org.backmeup.plugin.spi.InputBased;
-import org.backmeup.plugin.spi.OAuthBased;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
@@ -134,19 +133,6 @@ public class PluginImpl implements Plugin {
 	private void startDeploymentMonitor() {
 		this.deploymentMonitor = new DeployMonitor(bundleContext(), deploymentDirectory);
 		this.deploymentMonitor.start();
-	}
-
-	@Override
-    public List<SourceSinkDescribable> getConnectedDatasources() {
-		Iterable<SourceSinkDescribable> sourceSinkDescs = services(
-				SourceSinkDescribable.class, null);
-		List<SourceSinkDescribable> result = new ArrayList<>();
-		for (SourceSinkDescribable ssd : sourceSinkDescs) {
-			if (ssd.getType() == Type.Source || ssd.getType() == Type.Both) {
-				result.add(ssd);
-			}
-		}
-		return result;
 	}
 
 	public static boolean deleteDir(File dir) {
@@ -357,54 +343,39 @@ public class PluginImpl implements Plugin {
 		}
 	}
 
-	@Override
-    public List<ActionDescribable> getActions() {
-		Iterable<ActionDescribable> actions = services(ActionDescribable.class, null);
-		List<ActionDescribable> actionList = new ArrayList<>();
-		for (ActionDescribable ad : actions) {
-			actionList.add(ad);
-		}
-		return actionList;
-	}
-
-	@Override
-    public ActionDescribable getActionById(String actionId) {
-		return service(ActionDescribable.class, "(name=" + actionId + ")");
-	}
-
-	@Override
-    public List<SourceSinkDescribable> getConnectedDatasinks() {
-		Iterable<SourceSinkDescribable> sourceSinkDescs = services(
-				SourceSinkDescribable.class, null);
-		List<SourceSinkDescribable> result = new ArrayList<>();
-		for (SourceSinkDescribable ssd : sourceSinkDescs) {
-			if (ssd.getType() == Type.Sink || ssd.getType() == Type.Both) {
-				result.add(ssd);
+	protected List<PluginDescribable> getDescribableForType(PluginType...pluginTypes) {
+		List<PluginType> lpluginTypes = Arrays.asList(pluginTypes);
+		Iterable<PluginDescribable> descs = services(
+				PluginDescribable.class, null);
+		List<PluginDescribable> result = new ArrayList<>();
+		for (PluginDescribable d : descs) {
+			if (lpluginTypes.contains(d.getType())) {
+				result.add(d);
 			}
 		}
 		return result;
 	}
-
+	
 	@Override
-    public SourceSinkDescribable getSourceSinkById(String sourceSinkId) {
-		return service(SourceSinkDescribable.class, "(name=" + sourceSinkId + ")");
+    public List<PluginDescribable> getActions() {
+		return this.getDescribableForType(PluginType.Action);
 	}
-
+	
 	@Override
-    public Authorizable getAuthorizable(String sourceSinkId) {
-		return service(Authorizable.class, "(name=" + sourceSinkId + ")");
+    public List<PluginDescribable> getDatasinks() {
+		return this.getDescribableForType(PluginType.Sink, PluginType.SourceSink);
 	}
-
+	
 	@Override
-    public OAuthBased getOAuthBasedAuthorizable(String sourceSinkId) {
-		return service(OAuthBased.class, "(name=" + sourceSinkId + ")");
+    public List<PluginDescribable> getDatasources() {
+		return this.getDescribableForType(PluginType.Source, PluginType.SourceSink);
 	}
-
+	
 	@Override
-    public InputBased getInputBasedAuthorizable(String sourceSinkId) {
-		return service(InputBased.class, "(name=" + sourceSinkId + ")");
+    public PluginDescribable getPluginDescribableById(String sourceSinkId) {
+		return service(PluginDescribable.class, "(name=" + sourceSinkId + ")");
 	}
-
+	
 	@Override
     public Datasource getDatasource(String sourceId) {
 		return service(Datasource.class, "(name=" + sourceId + ")");
@@ -413,6 +384,16 @@ public class PluginImpl implements Plugin {
 	@Override
     public Datasink getDatasink(String sinkId) {
 		return service(Datasink.class, "(name=" + sinkId + ")");
+	}
+	
+	@Override
+    public Action getAction(String actionId) {
+		return service(Action.class, "(name=" + actionId + ")");
+	}
+	
+	@Override
+    public Authorizable getAuthorizable(String sourceSinkId) {
+		return service(Authorizable.class, "(name=" + sourceSinkId + ")");
 	}
 
 	@Override

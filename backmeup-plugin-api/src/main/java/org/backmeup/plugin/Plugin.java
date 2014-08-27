@@ -2,14 +2,12 @@ package org.backmeup.plugin;
 
 import java.util.List;
 
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.Validationable;
+import org.backmeup.plugin.api.connectors.Action;
 import org.backmeup.plugin.api.connectors.Datasink;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
-import org.backmeup.plugin.spi.InputBased;
-import org.backmeup.plugin.spi.OAuthBased;
 
 /**
  * The Plugin interface 
@@ -23,27 +21,28 @@ import org.backmeup.plugin.spi.OAuthBased;
  */
 public interface Plugin {
 
-	List<SourceSinkDescribable> getConnectedDatasources();
+	List<PluginDescribable> getDatasources();
 	
-	List<SourceSinkDescribable> getConnectedDatasinks();
+	List<PluginDescribable> getDatasinks();
 	
-	List<ActionDescribable> getActions();
+	List<PluginDescribable> getActions();
 	
-	ActionDescribable getActionById(String actionId);
+	PluginDescribable getPluginDescribableById(String pluginId);	
+
 	
-	SourceSinkDescribable getSourceSinkById(String sourceSinkId);	
-	
-	Authorizable getAuthorizable(String sourceSinkId);
-	
-	OAuthBased getOAuthBasedAuthorizable(String sourceSinkId);
-	
-	InputBased getInputBasedAuthorizable(String sourceSinkId);
-	
-	Datasource getDatasource(String sourceId);
 	
 	Datasink getDatasink(String sinkId);
 	
+	Datasource getDatasource(String sourceId);
+	
+	Action getAction(String actionId);
+	
+	
+	
+	Authorizable getAuthorizable(String sourceSinkId);
+	
 	Validationable getValidator(String sourceSinkId);
+	
 	
 	void shutdown();
 

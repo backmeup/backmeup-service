@@ -9,8 +9,8 @@ import java.util.Date;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
-import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.junit.Ignore;
@@ -37,12 +37,12 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		
 		String sourcePluginId = "org.backmeup.filegenerator";
 		String sourceProfileName = "FilegeneratorProfile";
-		PluginType sourceProfileType = PluginType.source;
+		PluginType sourceProfileType = PluginType.Source;
 		String sourceProfileId = "";
 		
 		String sinkPluginId   = "org.backmeup.dummy";
 		String profileSinkName   = "DummySinkProfile";
-		PluginType sinkProfileType = PluginType.sink;
+		PluginType sinkProfileType = PluginType.Sink;
 		String sinkProfileId = "";
 		
 		String jobTitle = "BackupJob1";
@@ -124,12 +124,12 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		
 		String sourcePluginId = "org.backmeup.filegenerator";
 		String sourceProfileName = "FilegeneratorProfile";
-		PluginType sourceProfileType = PluginType.source;
+		PluginType sourceProfileType = PluginType.Source;
 		String sourceProfileId = "";
 		
 		String sinkPluginId   = "org.backmeup.dummy";
 		String profileSinkName   = "DummySinkProfile";
-		PluginType sinkProfileType = PluginType.sink;
+		PluginType sinkProfileType = PluginType.Sink;
 		String sinkProfileId = "";
 		
 		String jobTitle = "BackupJob1";
@@ -248,12 +248,12 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 		
 		String sourcePluginId = "org.backmeup.filegenerator";
 		String sourceProfileName = "FilegeneratorProfile";
-		PluginType sourceProfileType = PluginType.source;
+		PluginType sourceProfileType = PluginType.Source;
 		String sourceProfileId = "";
 		
 		String sinkPluginId   = "org.backmeup.dummy";
 		String profileSinkName   = "DummySinkProfile";
-		PluginType sinkProfileType = PluginType.sink;
+		PluginType sinkProfileType = PluginType.Sink;
 		String sinkProfileId = "";
 		
 		String jobTitle = "BackupJob1";

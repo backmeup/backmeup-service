@@ -19,8 +19,7 @@ import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.exceptions.ValidationException;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.Plugin;
@@ -52,7 +51,7 @@ public class PluginsLogicImpl implements PluginsLogic {
         List<ActionProfile> actions = new ArrayList<>();
 
         for (ActionProfile action : request.getRequiredActions()) {
-            ActionDescribable ad = plugins.getActionById(action.getActionId());
+            PluginDescribable ad = plugins.getPluginDescribableById(action.getActionId());
 
             if (ad == null) {
                 throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
@@ -71,28 +70,28 @@ public class PluginsLogicImpl implements PluginsLogic {
 
     @Override
     public List<String> getActionOptions(String actionId) {
-        ActionDescribable action = plugins.getActionById(actionId);
+        PluginDescribable action = plugins.getPluginDescribableById(actionId);
         return action.getAvailableOptions();
     }
 
     @Override
-    public List<ActionDescribable> getActions() {
+    public List<PluginDescribable> getActions() {
         return plugins.getActions();
     }
 
     @Override
-    public List<SourceSinkDescribable> getConnectedDatasources() {
-        return plugins.getConnectedDatasources();
+    public List<PluginDescribable> getDatasources() {
+        return plugins.getDatasources();
     }
 
     @Override
-    public List<SourceSinkDescribable> getConnectedDatasinks() {
-        return plugins.getConnectedDatasinks();
+    public List<PluginDescribable> getDatasinks() {
+        return plugins.getDatasinks();
     }
 
     @Override
-    public SourceSinkDescribable getSourceSinkById(String sourceSinkId) {
-        return plugins.getSourceSinkById(sourceSinkId);
+    public PluginDescribable getPluginDescribableById(String sourceSinkId) {
+        return plugins.getPluginDescribableById(sourceSinkId);
     }
 
     @Override
@@ -106,8 +105,8 @@ public class PluginsLogicImpl implements PluginsLogic {
     }
 
     @Override
-    public SourceSinkDescribable getExistingSourceSink(String sourceSinkId) {
-        SourceSinkDescribable ssd = getSourceSinkById(sourceSinkId);
+    public PluginDescribable getExistingSourceSink(String sourceSinkId) {
+        PluginDescribable ssd = getPluginDescribableById(sourceSinkId);
         if (ssd == null) {
             throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_SOURCE_SINK), sourceSinkId));
         }
@@ -116,7 +115,7 @@ public class PluginsLogicImpl implements PluginsLogic {
 
     @Override
     public void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes) {
-        SourceSinkDescribable ssd = getSourceSinkById(sourceSinkId);
+        PluginDescribable ssd = getPluginDescribableById(sourceSinkId);
         if (ssd == null) {
             notes.addValidationEntry(ValidationExceptionType.PluginUnavailable, sourceSinkId);
         }
@@ -131,13 +130,13 @@ public class PluginsLogicImpl implements PluginsLogic {
         Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier);
         switch (auth.getAuthType()) {
         case OAuth:
-            OAuthBased oauth = plugins.getOAuthBasedAuthorizable(uniqueDescIdentifier);
+        	OAuthBased oauth = (OAuthBased) auth;
             String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
             ar.setRedirectURL(redirectUrl);
             // TODO Store all properties within keyserver & don't store them within the local database!
             break;
         case InputBased:
-            InputBased ibased = plugins.getInputBasedAuthorizable(uniqueDescIdentifier);
+        	InputBased ibased = (InputBased) auth;
             ar.setRequiredInputs(ibased.getRequiredInputFields());
             break;
         default:
@@ -152,7 +151,7 @@ public class PluginsLogicImpl implements PluginsLogic {
         Authorizable auth = plugins.getAuthorizable(sourceSinkId);
 
         if (auth.getAuthType() == AuthorizationType.InputBased) {
-            InputBased inputBasedService = plugins.getInputBasedAuthorizable(sourceSinkId);
+            InputBased inputBasedService = (InputBased) auth;
             if (!inputBasedService.isValid(props)) {
                 throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
             }

@@ -17,8 +17,7 @@ import org.backmeup.model.SearchResponse;
 import org.backmeup.model.Status;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
+import org.backmeup.model.spi.PluginDescribable;
 
 /**
  * The BusinessLogic interface contains all available operations of this project.
@@ -41,7 +40,7 @@ public interface BusinessLogic {
 	BackMeUpUser addUser(BackMeUpUser user);
 	
 	// plugin operations ------------------------------------------------------
-	SourceSinkDescribable getPluginDescribable(String pluginId);
+	PluginDescribable getPluginDescribable(String pluginId);
 	AuthRequest getPluginConfiguration(String pluginId);
 	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
@@ -52,7 +51,7 @@ public interface BusinessLogic {
 	ActionProfile getStoredActionOptions(String actionId, Long jobId);
 	
 	//datasource operations
-	List<SourceSinkDescribable> getDatasources();
+	List<PluginDescribable> getDatasources();
 	List<Profile> getDatasourceProfiles(Long userId);
 	Profile deleteProfile(Long userId, Long profile);
 	List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
@@ -60,11 +59,11 @@ public interface BusinessLogic {
 	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
 	
 	//datasink operations
-	List<SourceSinkDescribable> getDatasinks();
+	List<PluginDescribable> getDatasinks();
 	List<Profile> getDatasinkProfiles(Long userId);
 
 	//action operations
-	List<ActionDescribable> getActions();
+	List<PluginDescribable> getActions();
 	List<String> getActionOptions(String actionId);
 	
 	// Profile/Auth operations

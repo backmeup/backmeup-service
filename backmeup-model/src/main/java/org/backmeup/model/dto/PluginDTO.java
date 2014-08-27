@@ -7,12 +7,10 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.backmeup.model.spi.PluginDescribable.PluginType;
+
 @XmlRootElement
 public class PluginDTO {
-	public enum PluginType {
-		source, sink, sourcesink, action
-	}
-
 	private String pluginId;
 	private String title;
 	private String description;

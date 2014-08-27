@@ -1,4 +1,4 @@
-package org.backmeup.plugin.api.actions;
+package org.backmeup.plugin.api.connectors;
 
 public class ActionException extends Exception {
 

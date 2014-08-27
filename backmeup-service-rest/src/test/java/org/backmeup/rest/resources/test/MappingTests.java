@@ -17,12 +17,11 @@ import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
-import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
-import org.backmeup.model.spi.SourceSinkDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.osgi.PluginImpl;
 import org.dozer.DozerBeanMapper;
@@ -67,7 +66,7 @@ public class MappingTests {
 		String pluginId = "org.backmeup.dropbox";
 		
 		Plugin plugin = setupPluginInfrastructure();
-		SourceSinkDescribable  pluginModel = plugin.getSourceSinkById(pluginId);
+		PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
 		
 		Mapper mapper = getMapper(DOZER_PROFILE_MAPPING);
 		
@@ -96,10 +95,10 @@ public class MappingTests {
 		String profileName = "TestProfile";
 		String description = "Description of test profile";
 		String identification = "identification";
-		Type profileTypeModel = Type.Source;
-		PluginType profileTypeDTO = PluginType.source;
+		PluginType profileTypeModel = PluginType.Source;
+		PluginType profileTypeDTO = PluginType.Source;
 		
-		Profile profile = new Profile(profileId, user, profileName, description, Type.Source);
+		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
 		List<String> configList = new ArrayList<String>();
@@ -143,7 +142,7 @@ public class MappingTests {
 		
 		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 		
-		Profile profile = new Profile(profileId, user, profileName, description, Type.Source);
+		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
 		RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType);

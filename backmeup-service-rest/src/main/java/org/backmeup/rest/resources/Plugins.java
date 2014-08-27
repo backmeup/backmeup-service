@@ -30,11 +30,9 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
-import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
-import org.backmeup.model.spi.ActionDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable;
-import org.backmeup.model.spi.SourceSinkDescribable.Type;
+import org.backmeup.model.spi.PluginDescribable;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 @Path("/plugins")
@@ -59,15 +57,15 @@ public class Plugins extends Base {
 		Set<String> pluginIds = new HashSet<>();
 
 		if ((pluginType == PluginSelectionType.source) || (pluginType == PluginSelectionType.all)) {
-			for (SourceSinkDescribable desc : getLogic().getDatasources()) {
+			for (PluginDescribable desc : getLogic().getDatasources()) {
 				pluginIds.add(desc.getId());
 			}
 		} else if ((pluginType == PluginSelectionType.sink) || (pluginType == PluginSelectionType.all)) {
-			for(SourceSinkDescribable desc : getLogic().getDatasinks()) {
+			for(PluginDescribable desc : getLogic().getDatasinks()) {
 				pluginIds.add(desc.getId());
 			}
 		} else if ((pluginType == PluginSelectionType.action) || (pluginType == PluginSelectionType.all)) {
-			for(ActionDescribable desc : getLogic().getActions()) {
+			for(PluginDescribable desc : getLogic().getActions()) {
 				pluginIds.add(desc.getId());
 			}
 		}
@@ -86,7 +84,7 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public PluginDTO getPlugin(@PathParam("pluginId") String pluginId, @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
 //		return DummyDataManager.getPluginDTO(expandProfiles);
-		SourceSinkDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
+		PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
 		PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
 		
 		// TODO: check why id is not mapped automatically
@@ -94,15 +92,15 @@ public class Plugins extends Base {
 
 		switch (pluginDescribable.getType()) {
 		case Source:
-			pluginDTO.setPluginType(PluginType.source);
+			pluginDTO.setPluginType(PluginType.Source);
 			break;
 			
 		case Sink:
-			pluginDTO.setPluginType(PluginType.sink);
+			pluginDTO.setPluginType(PluginType.Sink);
 			break;
 			
-		case Both:
-			pluginDTO.setPluginType(PluginType.sourcesink);
+		case SourceSink:
+			pluginDTO.setPluginType(PluginType.SourceSink);
 
 		default:
 			break;
@@ -145,10 +143,10 @@ public class Plugins extends Base {
 		
 		Profile profile = new Profile();
 		profile.setProfileName(pluginProfile.getTitle());
-		if(pluginProfile.getProfileType().equals(PluginType.source)) {
-			profile.setType(Type.Source);
-		} else if(pluginProfile.getProfileType().equals(PluginType.sink)) {
-			profile.setType(Type.Sink);
+		if(pluginProfile.getProfileType().equals(PluginType.Source)) {
+			profile.setType(PluginType.Source);
+		} else if(pluginProfile.getProfileType().equals(PluginType.Sink)) {
+			profile.setType(PluginType.Sink);
 		}
 		profile.setUser(activeUser);
 		

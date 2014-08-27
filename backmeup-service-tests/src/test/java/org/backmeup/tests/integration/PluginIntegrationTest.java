@@ -4,8 +4,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.backmeup.model.dto.PluginDTO.PluginType;
 import org.backmeup.model.dto.PluginProfileDTO;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.Constants;
@@ -167,7 +167,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		
 		String pluginId = "org.backmeup.filegenerator";
 		String profileName = "FilegeneratorProfile";
-		PluginType profileType = PluginType.source;
+		PluginType profileType = PluginType.Source;
 		String profileId = "";
 		
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
@@ -235,7 +235,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		
 		String pluginId = "org.backmeup.dropbox";
 		String profileName = "DropboxProfile";
-		PluginType profileType = PluginType.source;
+		PluginType profileType = PluginType.Source;
 		String profileId = "";
 		
 		try {
@@ -284,7 +284,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		
 		String pluginId = "org.backmeup.filegenerator";
 		String profileName = "FilegeneratorProfile";
-		PluginType profileType = PluginType.source;
+		PluginType profileType = PluginType.Source;
 		String profileId = "";
 		
 		try {

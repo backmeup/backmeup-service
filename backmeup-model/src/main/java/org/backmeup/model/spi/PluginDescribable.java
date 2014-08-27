@@ -1,6 +1,8 @@
 package org.backmeup.model.spi;
 
+import java.util.List;
 import java.util.Properties;
+
 
 /**
  * A plugin is eather a source, an action or a sink plugin.
@@ -27,9 +29,42 @@ import java.util.Properties;
  * @author fschoeppl
  *
  */
-public abstract interface Describable {
+
+
+
+/**
+ * Datasources and Datasinks must implement this interface.
+ * The getType method returns if this plugin 
+ * contains a source implementation, a sink implementation or both.
+ * 
+ * The imageURL returns a link to a thumbnail picture of this plugin.
+ * 
+ * @author fschoeppl
+ *
+ */
+public interface PluginDescribable {
+	public enum PluginType {
+		Source,
+		Sink,
+		SourceSink,
+		Action
+	}
+	
+	public enum PluginVisibility {
+		Global,
+		Job,
+		Hidden
+	}
+	
 	public String getId();
 	public String getTitle();
 	public String getDescription();
 	public Properties getMetadata(Properties accessData);
+	
+	public PluginType getType();
+	public String getImageURL();
+	
+	public PluginVisibility getVisibility();
+	public int getPriority();
+	public List<String> getAvailableOptions();
 }
