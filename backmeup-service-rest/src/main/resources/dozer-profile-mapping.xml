@@ -3,7 +3,7 @@
           http://dozer.sourceforge.net/schema/beanmapping.xsd">
 
 	<mapping>
-		<class-a>org.backmeup.model.spi.SourceSinkDescribable</class-a>
+		<class-a>org.backmeup.model.spi.PluginDescribable</class-a>
 		<class-b>org.backmeup.model.dto.PluginDTO</class-b>
 		
 		<field>
