@@ -33,8 +33,8 @@ public class JobProtocolDaoImpl extends BaseDaoImpl<JobProtocol> implements
     // q.setParameter("username", username);
     // q.executeUpdate();
     // workaround:
-    TypedQuery<JobProtocol> protocol = em.createQuery("SELECT p FROM " + entityClass.getName() + " p WHERE p.user.userid = :userid", JobProtocol.class);
-    protocol.setParameter("userid", userId);
+    TypedQuery<JobProtocol> protocol = em.createQuery("SELECT p FROM " + entityClass.getName() + " p WHERE p.user.userId = :userId", JobProtocol.class);
+    protocol.setParameter("userId", userId);
     for(JobProtocol jp : protocol.getResultList()) {
       em.remove(jp);
     }    
