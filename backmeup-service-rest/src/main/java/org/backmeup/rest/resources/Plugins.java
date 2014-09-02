@@ -184,7 +184,7 @@ public class Plugins extends Base {
 		
 		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
 		
-		if(profile.getUser().getUserId() != activeUser.getUserId()) {
+		if(!profile.getUser().getUserId().equals(activeUser.getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -205,7 +205,7 @@ public class Plugins extends Base {
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
-		if((activeUser.getUserId() != profile.getUser().getUserId()) && 
+		if((!activeUser.getUserId().equals(profile.getUser().getUserId())) && 
 		   (pluginProfile.getProfileId() != Long.parseLong(profileId))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -229,7 +229,7 @@ public class Plugins extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
-		if(activeUser.getUserId() != profile.getUser().getUserId()) {
+		if(!activeUser.getUserId().equals(profile.getUser().getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
