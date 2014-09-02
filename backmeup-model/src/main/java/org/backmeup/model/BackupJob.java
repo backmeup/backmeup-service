@@ -42,7 +42,7 @@ public class BackupJob {
 	private Long id;
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private ProfileOptions sourceProfiles = null;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
 	private final Set<JobProtocol> jobProtocols = new HashSet<>();
