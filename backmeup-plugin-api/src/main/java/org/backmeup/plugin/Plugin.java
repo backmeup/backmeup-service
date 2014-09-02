@@ -8,6 +8,7 @@ import org.backmeup.plugin.api.connectors.Action;
 import org.backmeup.plugin.api.connectors.Datasink;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
+import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
 
 /**
  * The Plugin interface 
@@ -40,6 +41,8 @@ public interface Plugin {
 	
 	
 	Authorizable getAuthorizable(String sourceSinkId);
+	
+	Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType);
 	
 	Validationable getValidator(String sourceSinkId);
 	

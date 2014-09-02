@@ -29,6 +29,9 @@ import org.backmeup.plugin.api.connectors.Action;
 import org.backmeup.plugin.api.connectors.Datasink;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
+import org.backmeup.plugin.spi.InputBased;
+import org.backmeup.plugin.spi.OAuthBased;
+import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
@@ -394,6 +397,18 @@ public class PluginImpl implements Plugin {
 	@Override
     public Authorizable getAuthorizable(String sourceSinkId) {
 		return service(Authorizable.class, "(name=" + sourceSinkId + ")");
+	}
+	
+	@Override
+    public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
+		 switch (authType) {
+	        case OAuth:
+	        	return service(OAuthBased.class, "(name=" + sourceSinkId + ")");
+	        case InputBased:
+	        	return service(InputBased.class, "(name=" + sourceSinkId + ")");
+	        default:
+	            throw new IllegalArgumentException("unknown authorization type " + authType);
+		 }
 	}
 
 	@Override

@@ -123,11 +123,15 @@ public class PluginsLogicImpl implements PluginsLogic {
 
     @Override
     public AuthRequest configureAuth(Properties props, String uniqueDescIdentifier) {
-        props.setProperty("callback", callbackUrl);
+    	props.setProperty("callback", callbackUrl);
 
-        AuthRequest ar = new AuthRequest();
-        
-        Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier);
+    	AuthRequest ar = new AuthRequest();
+
+    	Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier); 
+    	// Note that in the call above a java.lang.reflect.Proxy object is returned
+    	// We have to make a second call to get a proxy with the correct interface
+    	auth = plugins.getAuthorizable(uniqueDescIdentifier, auth.getAuthType()); 
+
         switch (auth.getAuthType()) {
         case OAuth:
         	OAuthBased oauth = (OAuthBased) auth;
@@ -149,6 +153,7 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Override
     public String getAuthorizedUserId(String sourceSinkId, Properties props) {
         Authorizable auth = plugins.getAuthorizable(sourceSinkId);
+        auth = plugins.getAuthorizable(sourceSinkId, auth.getAuthType()); 
 
         if (auth.getAuthType() == AuthorizationType.InputBased) {
             InputBased inputBasedService = (InputBased) auth;
