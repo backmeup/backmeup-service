@@ -1,9 +1,7 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -32,9 +30,9 @@ import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.backmeup.rest.filters.SecurityInterceptor;
 
@@ -137,7 +135,7 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
-		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+		if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -189,7 +187,7 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJob job = getLogic().getBackupJobFull(backupjob.getJobId());
-		if ((activeUser.getUserId() != job.getUser().getUserId()) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+		if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
@@ -215,7 +213,7 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
-		if (job.getUser().getUserId() != activeUser.getUserId()) {
+		if (!job.getUser().getUserId().equals(activeUser.getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		

@@ -84,9 +84,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			 // Get token from header
 			 final String accessToken = authorization.get(0);
 
-			 //Split username and password tokens
+			 //Split username/userId and password tokens
 			 final StringTokenizer tokenizer = new StringTokenizer(accessToken, ";");
-			 final String userId = tokenizer.nextToken(); // userId can be a String or an Long on this place (see resolveUser)
+			 final String userId = tokenizer.nextToken(); // userId can be a String or an Long in this place (see resolveUser)
 			 final String password = tokenizer.nextToken();
 
 			 // Verify token
