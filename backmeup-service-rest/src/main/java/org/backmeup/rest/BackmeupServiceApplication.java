@@ -14,28 +14,27 @@ import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Users;
 
 public class BackmeupServiceApplication extends Application {
-	HashSet<Class<?>> set = new HashSet<Class<?>>();
-	HashSet<Object> singletons = new HashSet<Object>();
-	
+    private final Set<Class<?>> set = new HashSet<>();
+    private final Set<Object> singletons = new HashSet<>();
 
-	public BackmeupServiceApplication() {
-		 singletons.add(new Users());
-		 singletons.add(new Authentication());
-		 singletons.add(new Plugins());
-		 singletons.add(new BackupJobs());
-		
-		 set.add(JacksonJsonConfiguration.class);
-		 set.add(TimingResourceFilter.class);
-		 set.add(SecurityInterceptor.class);
-	}
+    public BackmeupServiceApplication() {
+        singletons.add(new Users());
+        singletons.add(new Authentication());
+        singletons.add(new Plugins());
+        singletons.add(new BackupJobs());
 
-	@Override
-	public Set<Class<?>> getClasses() {
-		return set;
-	}
+        set.add(JacksonJsonConfiguration.class);
+        set.add(TimingResourceFilter.class);
+        set.add(SecurityInterceptor.class);
+    }
 
-	@Override
-	public Set<Object> getSingletons() {
-		return singletons;
-	}
+    @Override
+    public Set<Class<?>> getClasses() {
+        return set;
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+        return singletons;
+    }
 }

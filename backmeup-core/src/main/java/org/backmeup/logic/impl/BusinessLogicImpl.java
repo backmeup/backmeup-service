@@ -133,7 +133,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                  return user;
              }
          }); 
-     };
+     }
     
     // ========================================================================
     

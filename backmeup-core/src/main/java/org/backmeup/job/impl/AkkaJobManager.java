@@ -3,7 +3,6 @@ package org.backmeup.job.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 

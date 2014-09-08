@@ -2,7 +2,6 @@ package org.backmeup.job;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
@@ -20,7 +19,6 @@ import org.backmeup.model.ProfileOptions;
  * to run all queued backup jobs.
  * 
  * @author fschoeppl
- *
  */
 public interface JobManager {
 

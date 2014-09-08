@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
-	 private static final ServerResponse ACCESS_FORBIDDEN = new ServerResponse("Access forbidden", 403, new Headers<Object>());
-	 private static final ServerResponse ACCESS_DENIED = new ServerResponse("Access denied for this resource", 401, new Headers<Object>());;
+	 private static final ServerResponse ACCESS_FORBIDDEN = new ServerResponse("Access forbidden", 403, new Headers<>());
+	 private static final ServerResponse ACCESS_DENIED = new ServerResponse("Access denied for this resource", 401, new Headers<>());
 	 private static final String AUTHORIZATION_PROPERTY = "Authorization";
 	 
 	 public static final Long BACKMEUP_WORKER_ID = -1L;
@@ -92,7 +92,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			 // Verify token
 			 if (method.isAnnotationPresent(RolesAllowed.class)) {
 				 RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
-				 Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
+				 Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
 				 
 				 BackMeUpUser user = resolveUser(userId, password);
 				 if(user == null) {
@@ -117,9 +117,8 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				BackMeUpUser worker = new BackMeUpUser(BACKMEUP_WORKER_NAME, "", "", "", password);
 				worker.setUserId(BACKMEUP_WORKER_ID);
 				return worker;
-			} else {
-				return getLogic().getUserByUserId(Long.parseLong(userId));
 			}
+            return getLogic().getUserByUserId(Long.parseLong(userId));
 		} catch (UnknownUserException uue) {
 			return null;
 		} catch (UserNotActivatedException una) {

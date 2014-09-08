@@ -101,7 +101,7 @@ public class MappingTests {
 		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);
@@ -151,7 +151,7 @@ public class MappingTests {
 		
 		AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);
@@ -180,7 +180,7 @@ public class MappingTests {
 		Date next = new Date();
 		job.setNextExecutionTime(next);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);

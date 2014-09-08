@@ -32,9 +32,8 @@ public class Configuration {
 		String value = getProperty(key);
 		if(value != null) {
 			return value;
-		} else {
-			return defaultValue;
 		}
+        return defaultValue;
 	}
 	
 	// Reads a property list from the input byte stream.

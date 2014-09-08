@@ -37,7 +37,7 @@ public class Users extends Base {
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<UserDTO> listUsers(@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
-		List<UserDTO> userList = new ArrayList<UserDTO>();
+		List<UserDTO> userList = new ArrayList<>();
 		userList.add(new UserDTO("john.doe", "John", "Doe", null, "john.doe@example.com"));
 		userList.add(new UserDTO("bob.doe", "Bob", "Doe", null, "bob.doe@example.com"));
 		return userList;

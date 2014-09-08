@@ -79,10 +79,9 @@ public class ConfigurationFactory {
 			logger.debug("No definition found for config parameter '{}'", param.key());
 			if(param.mandatory()){
 				throw new IllegalStateException(MessageFormat.format(mandatoryKeyMissing, new Object[]{param.key()}));
-			} else {
-				logger.debug("Returning default value for mandatory config parameter '{}'", param.key());
-				return param.defaultValue();
 			}
+            logger.debug("Returning default value for mandatory config parameter '{}'", param.key());
+            return param.defaultValue();
 		}
 		logger.info("Configuration: key='{}' value='{}'", param.key(), value);
 		return value;

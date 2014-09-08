@@ -56,9 +56,9 @@ public class ElasticsearchNodeFactory {
 	}
 	
 	// on shutdown stop the node
-	public void closeNode(@Disposes Node node) {
+	public void closeNode(@Disposes Node theNode) {
 		logger.debug("Closing elasticsearch node");
-		node.close();
+		theNode.close();
 	}
 	
 	private Node initializeNode(){
@@ -84,11 +84,10 @@ public class ElasticsearchNodeFactory {
 			// 'local' Node: local discovery and transport, local to JVM
 			// for unit/integration tests
 			return NodeBuilder.nodeBuilder().settings(settings).node();
-		} else {
-			// node just as client
-			return NodeBuilder.nodeBuilder().client(true)
-					.settings(settings).node();
 		}
+        // node just as client
+        return NodeBuilder.nodeBuilder().client(true)
+        		.settings(settings).node();
 	}
 	
 	/*
