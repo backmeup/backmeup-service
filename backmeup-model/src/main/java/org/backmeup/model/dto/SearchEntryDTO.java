@@ -1,15 +1,12 @@
 package org.backmeup.model.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.SearchResponse.SearchEntry;
-
 @XmlRootElement
-public class SearchEntryContainer {
+public class SearchEntryDTO {
 
     private String fileId;
     private Date timeStamp;
@@ -21,21 +18,6 @@ public class SearchEntryContainer {
     private String jobName;
 
     private List<KeyValue> properties;
-
-    public SearchEntryContainer(SearchEntry entry) {
-        this.setFileId(entry.getFileId());
-        this.setTimeStamp(entry.getTimeStamp());
-        this.setTitle(entry.getTitle());
-        this.setType(entry.getType());
-        this.setThumbnailUrl(entry.getThumbnailUrl());
-        this.setDatasource(entry.getDatasource());
-        this.setPreview(entry.getPreviewSnippet());
-        this.setJobName(entry.getJobName());
-        this.properties = new ArrayList<>();
-        for (String key : entry.getPropertyKeys()) {
-            this.properties.add(new KeyValue(key, entry.getProperty(key)));
-        }
-    }
 
     public String getFileId() {
         return fileId;

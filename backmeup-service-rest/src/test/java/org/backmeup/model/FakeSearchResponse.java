@@ -17,8 +17,8 @@ public class FakeSearchResponse {
         searchResponse.setByJob(Arrays.asList(new CountedEntry("first Job", 1), new CountedEntry("next Job", 1)));
         searchResponse.setBySource(Arrays.asList(new CountedEntry("Dropbox", 2), new CountedEntry("Facebook", 2)));
         searchResponse.setByType(Arrays.asList(new CountedEntry("Type", 3)));
-        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", new Date(), "type", "A wonderfil file (title)", "thmbnailUrl",
-                "Dropbpx", "first Job")));
+        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", new Date(), "type", "A wonderful file (title)", "thmbnailUrl",
+                "Dropbox", "first Job")));
         return searchResponse;
     }
 

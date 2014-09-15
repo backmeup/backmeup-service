@@ -25,8 +25,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.SearchResponse;
-import org.backmeup.model.dto.BackupSearchContainer;
-import org.backmeup.model.dto.SearchResponseContainer;
+import org.backmeup.model.dto.BackupSearchDTO;
+import org.backmeup.model.dto.SearchResponseDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 /**
@@ -56,7 +56,7 @@ public class Backups extends Base {
         long searchId = getLogic().searchBackup(userId, query);
 
         URI u = new URI(String.format("%sbackups/%d/%d/query", info.getBaseUri().toString(), userId, searchId));
-        return Response.status(Status.ACCEPTED).location(u).entity(new BackupSearchContainer(searchId)).build();
+        return Response.status(Status.ACCEPTED).location(u).entity(new BackupSearchDTO(searchId)).build();
     }
 
     private void canOnlyWorkWithMyData(Long userId) {
@@ -70,7 +70,7 @@ public class Backups extends Base {
     @GET
     @Path("/{userId}/{searchId}/query")
     @Produces(MediaType.APPLICATION_JSON)
-    public SearchResponseContainer query(//
+    public SearchResponseDTO query(//
             @PathParam("userId") Long userId, //
             @PathParam("searchId") Long searchId, //
             @QueryParam("source") String source, //
@@ -84,9 +84,7 @@ public class Backups extends Base {
 
         sr = getLogic().queryBackup(userId, searchId, filters);
 
-        // TODO use dozer to map, no manual copiing
-        return new SearchResponseContainer(sr);
-        // return getMapper().map(sr, SearchResponseContainer.class);
+        return getMapper().map(sr, SearchResponseDTO.class);
     }
 
     private Map<String, List<String>> createFiltersFor(String source, String type, String job) {

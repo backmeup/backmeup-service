@@ -2,18 +2,11 @@ package org.backmeup.model.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.SearchResponse.CountedEntry;
-
 @XmlRootElement
-public class CountedEntryContainer {
+public class CountedEntryDTO {
 
     private String title;
     private int count;
-
-    public CountedEntryContainer(CountedEntry entry) {
-        this.setTitle(entry.getTitle());
-        this.setCount(entry.getCount());
-    }
 
     public String getTitle() {
         return title;

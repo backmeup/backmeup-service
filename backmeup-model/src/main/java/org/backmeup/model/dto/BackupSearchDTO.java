@@ -3,14 +3,11 @@ package org.backmeup.model.dto;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class BackupSearchContainer {
+public class BackupSearchDTO {
 
     private long searchId;
 
-    public BackupSearchContainer() {
-    }
-
-    public BackupSearchContainer(long searchId) {
+    public BackupSearchDTO(long searchId) {
         this.searchId = searchId;
     }
 

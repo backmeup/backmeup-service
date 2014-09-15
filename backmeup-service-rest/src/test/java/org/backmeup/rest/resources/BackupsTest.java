@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
 
@@ -18,9 +19,11 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.backmeup.logic.BusinessLogic;
-import org.backmeup.model.SearchResponse;
 import org.backmeup.model.FakeSearchResponse;
 import org.backmeup.model.FakeUser;
+import org.backmeup.model.SearchResponse;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,6 +35,7 @@ public class BackupsTest {
     private final int PORT = server.port;
 
     private HttpClient client = new DefaultHttpClient();
+    private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
 
     private static final Long USER = FakeUser.ACTIVE_USER_ID;
     private static final Long ID = FakeSearchResponse.SEARCH_ID;
@@ -44,6 +48,10 @@ public class BackupsTest {
             SearchResponse sr = FakeSearchResponse.oneFile();
             when(logic.queryBackup(USER, ID, null)).thenReturn(sr);
             return logic;
+        }
+        @Override
+        protected Mapper getMapper() {
+            return new DozerBeanMapper(Arrays.asList(DOZER_SEARCH_MAPPING));
         }
     }
 
