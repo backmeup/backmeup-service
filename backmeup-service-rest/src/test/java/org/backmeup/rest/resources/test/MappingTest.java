@@ -3,6 +3,7 @@ package org.backmeup.rest.resources.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -14,10 +15,10 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.PluginConfigurationDTO;
-import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.PluginConfigurationDTO;
+import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
@@ -258,15 +259,11 @@ public class MappingTest {
 		assertEquals(expectetJobStatus, actualJobStatus);
 	}
 	
-	@SuppressWarnings("serial")
-	private Mapper getMapper(final String mappingFile) {
-		List<String> list = new ArrayList<String>() { 
-			{add(mappingFile);}
-		};
-		return getMapper(list);
+	private Mapper getMapper(String mappingFile) {
+        return getMapper(Arrays.asList(mappingFile));
 	}
 	
-	private Mapper getMapper(final List<String> mappingFiles) {
+	private Mapper getMapper(List<String> mappingFiles) {
 		return new DozerBeanMapper(mappingFiles);
 	}
 	
