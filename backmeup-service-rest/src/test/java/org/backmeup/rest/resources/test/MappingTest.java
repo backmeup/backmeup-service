@@ -28,7 +28,7 @@ import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.junit.Test;
 
-public class MappingTests {
+public class MappingTest {
 	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
 	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
@@ -63,7 +63,7 @@ public class MappingTests {
 	
 	@Test
 	public void testPluginMapping() {
-		String pluginId = "org.backmeup.dropbox";
+		String pluginId = "org.backmeup.dummy";
 		
 		Plugin plugin = setupPluginInfrastructure();
 		PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
@@ -221,8 +221,8 @@ public class MappingTests {
 	
 	private Plugin setupPluginInfrastructure() {
 		Plugin plugin = new PluginImpl(
-				"/data/backmeup-service/autodeploy",
-				"/data/backmeup-service/osgi-tmp",
+				"test/autodeploy",
+				"target/test-data/backmeup-service/osgi-tmp",
 				"org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi "
 				+ "org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage "
 				+ "com.google.gson org.backmeup.plugin.api");

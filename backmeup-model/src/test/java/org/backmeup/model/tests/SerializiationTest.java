@@ -15,7 +15,7 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SerializiationTests {
+public class SerializiationTest {
   
   private void testProfiles(Profile p1, Profile p2) {
     
