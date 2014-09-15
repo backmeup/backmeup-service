@@ -84,6 +84,7 @@ public class Backups extends Base {
 
         sr = getLogic().queryBackup(userId, searchId, filters);
 
+        // TODO use dozer to map, no manual copiing
         return new SearchResponseContainer(sr);
         // return getMapper().map(sr, SearchResponseContainer.class);
     }
