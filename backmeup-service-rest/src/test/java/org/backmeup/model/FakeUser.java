@@ -1,10 +1,10 @@
 package org.backmeup.model;
 
-public class TestUser {
+public class FakeUser {
 
     public static final long ACTIVE_USER_ID = 1;
 
-    public static BackMeUpUser createActive() {
+    public static BackMeUpUser active() {
         BackMeUpUser user = new BackMeUpUser();
         user.setActivated(true);
         user.setEmail("me@some.com");
