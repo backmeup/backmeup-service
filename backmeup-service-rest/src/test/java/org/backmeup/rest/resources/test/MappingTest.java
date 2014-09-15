@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
@@ -23,13 +24,16 @@ import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.plugin.Plugin;
+import org.backmeup.plugin.api.Metadata;
+import org.backmeup.plugin.api.connectors.BaseSourceSinkDescribable;
 import org.backmeup.plugin.osgi.PluginImpl;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.junit.Test;
 
 public class MappingTest {
-	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
+
+    private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
 	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
 	private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
@@ -63,10 +67,10 @@ public class MappingTest {
 	
 	@Test
 	public void testPluginMapping() {
-		String pluginId = "org.backmeup.dummy";
-		
-		Plugin plugin = setupPluginInfrastructure();
-		PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
+		String pluginId = "org.backmeup.dropbox";
+		// Plugin plugin = setupPluginInfrastructure();
+		// PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
+	    PluginDescribable  pluginModel = createFakeModelFor(pluginId);
 		
 		Mapper mapper = getMapper(DOZER_PROFILE_MAPPING);
 		
@@ -78,10 +82,57 @@ public class MappingTest {
 		// TODO metadata
 		assertEquals(pluginModel.getImageURL(), pluginDTO.getImageURL());
 		
-		((PluginImpl) plugin).shutdown();
+		// ((PluginImpl) plugin).shutdown();
 	}
 	
-	@Test
+    private PluginDescribable createFakeModelFor(String pluginId) {
+        return new FakePluginDescribable(pluginId);
+    }
+
+    // dozer needs public class to access fields
+    public static class FakePluginDescribable extends BaseSourceSinkDescribable {
+        private final String pluginId;
+
+        private FakePluginDescribable(String pluginId) {
+            this.pluginId = pluginId;
+        }
+
+        @Override
+        public String getId() {
+            return pluginId;
+        }
+
+        @Override
+        public String getTitle() {
+            return "BackMeUp Dropbox Plug-In";
+        }
+
+        @Override
+        public String getDescription() {
+            return "A plug-in that is capable of downloading and uploading from dropbox";
+        }
+
+        @Override
+        public String getImageURL() {
+            return "http://about:blank";
+        }
+
+        @Override
+        public PluginType getType() {
+            return PluginType.SourceSink;
+        }
+
+        @Override
+        public Properties getMetadata(@SuppressWarnings("unused") Properties accessData) {
+            Properties metadata = new Properties();
+            metadata.setProperty(Metadata.BACKUP_FREQUENCY, "daily");
+            metadata.setProperty(Metadata.FILE_SIZE_LIMIT, "150");
+            metadata.setProperty(Metadata.QUOTA_LIMIT, "2048");
+            return metadata;
+        }
+    }
+    
+    @Test
 	public void testPluginProfileMapping() {
 		String username = "johndoe";
 		String firstname = "John";
@@ -221,8 +272,8 @@ public class MappingTest {
 	
 	private Plugin setupPluginInfrastructure() {
 		Plugin plugin = new PluginImpl(
-				"test/autodeploy",
-				"target/test-data/backmeup-service/osgi-tmp",
+				"/data/backmeup-service/autodeploy",
+				"/data/backmeup-service/osgi-tmp",
 				"org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi "
 				+ "org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage "
 				+ "com.google.gson org.backmeup.plugin.api");
