@@ -15,19 +15,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.dto.BackupSearchDTO;
 import org.backmeup.model.dto.SearchResponseDTO;
-import org.backmeup.rest.auth.BackmeupPrincipal;
 
 /**
  * This class contains search specific operations.
@@ -35,10 +31,7 @@ import org.backmeup.rest.auth.BackmeupPrincipal;
  * @author fschoeppl
  */
 @Path("backups")
-public class Backups extends Base {
-
-    @Context
-    private SecurityContext securityContext;
+public class Backups extends SecureBase {
 
     @Context
     private UriInfo info;
@@ -59,13 +52,6 @@ public class Backups extends Base {
         return Response.status(Status.ACCEPTED).location(u).entity(new BackupSearchDTO(searchId)).build();
     }
 
-    private void canOnlyWorkWithMyData(Long userId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) securityContext.getUserPrincipal()).getUser();
-        if (!activeUser.getUserId().equals(userId)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-    }
-
     @RolesAllowed("user")
     @GET
     @Path("/{userId}/{searchId}/query")
@@ -76,13 +62,11 @@ public class Backups extends Base {
             @QueryParam("source") String source, //
             @QueryParam("type") String type, //
             @QueryParam("job") String job) {
+        
         canOnlyWorkWithMyData(userId);
 
-        SearchResponse sr = null;
-
         Map<String, List<String>> filters = createFiltersFor(source, type, job);
-
-        sr = getLogic().queryBackup(userId, searchId, filters);
+        SearchResponse sr = getLogic().queryBackup(userId, searchId, filters);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }
