@@ -1,4 +1,4 @@
-package org.backmeup.rest.resources.test;
+package org.backmeup.rest;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,10 +34,7 @@ import org.junit.Test;
 
 public class MappingTest {
 
-    private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
-	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
-	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
-	private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
+    private MapperProducer mapperProducer = new MapperProducer();
 
 	@Test
 	public void testUserMapping() {
@@ -54,7 +51,7 @@ public class MappingTest {
 		srcUser.setActivated(activated);
 		srcUser.setVerificationKey(verificationKey);
 		
-		Mapper mapper = getMapper(DOZER_USER_MAPPING);
+		Mapper mapper = getMapper();
 		
 		UserDTO destUser = mapper.map(srcUser, UserDTO.class);
 		
@@ -73,7 +70,7 @@ public class MappingTest {
 		// PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
 	    PluginDescribable  pluginModel = createFakeModelFor(pluginId);
 		
-		Mapper mapper = getMapper(DOZER_PROFILE_MAPPING);
+		Mapper mapper = getMapper();
 		
 		PluginDTO pluginDTO = mapper.map(pluginModel, PluginDTO.class);
 		
@@ -153,12 +150,7 @@ public class MappingTest {
 		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
-		List<String> configList = new ArrayList<>();
-		configList.add(DOZER_CUSTOM_CONVERTERS);
-		configList.add(DOZER_USER_MAPPING);
-		configList.add(DOZER_PROFILE_MAPPING);
-		
-		Mapper mapper = getMapper(configList);
+		Mapper mapper = getMapper();
 		
 		PluginProfileDTO profileDTO = mapper.map(profile, PluginProfileDTO.class);
 		
@@ -203,12 +195,7 @@ public class MappingTest {
 		
 		AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
 		
-		List<String> configList = new ArrayList<>();
-		configList.add(DOZER_CUSTOM_CONVERTERS);
-		configList.add(DOZER_USER_MAPPING);
-		configList.add(DOZER_PROFILE_MAPPING);
-		
-		Mapper mapper = getMapper(configList);
+		Mapper mapper = getMapper();
 		
 		PluginConfigurationDTO pluginConfigDTO = mapper.map(authRequest, PluginConfigurationDTO.class);	
 		
@@ -232,13 +219,7 @@ public class MappingTest {
 		Date next = new Date();
 		job.setNextExecutionTime(next);
 		
-		List<String> configList = new ArrayList<>();
-		configList.add(DOZER_CUSTOM_CONVERTERS);
-		configList.add(DOZER_USER_MAPPING);
-		configList.add(DOZER_PROFILE_MAPPING);
-		configList.add(DOZER_BACKUPJOB_MAPPING);
-		
-		Mapper mapper = getMapper(configList);
+		Mapper mapper = getMapper();
 		
 		BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
 		
@@ -253,18 +234,14 @@ public class MappingTest {
 		JobStatus jobStatus = JobStatus.queued;
 		BackupJobStatus expectetJobStatus = BackupJobStatus.queued;
 		
-		Mapper mapper = getMapper(DOZER_CUSTOM_CONVERTERS);
+		Mapper mapper = getMapper();
 		BackupJobStatus actualJobStatus = mapper.map(jobStatus, BackupJobStatus.class);
 		
 		assertEquals(expectetJobStatus, actualJobStatus);
 	}
 	
-	private Mapper getMapper(String mappingFile) {
-        return getMapper(Arrays.asList(mappingFile));
-	}
-	
-	private Mapper getMapper(List<String> mappingFiles) {
-		return new DozerBeanMapper(mappingFiles);
+	private Mapper getMapper() {
+        return mapperProducer.getMapper();
 	}
 	
 	private Plugin setupPluginInfrastructure() {

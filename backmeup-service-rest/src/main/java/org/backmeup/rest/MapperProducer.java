@@ -15,6 +15,7 @@ public class MapperProducer {
     private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
     private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
     private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
+    private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
 
     private Mapper mapper;
 
@@ -26,7 +27,7 @@ public class MapperProducer {
             configList.add(DOZER_USER_MAPPING);
             configList.add(DOZER_PROFILE_MAPPING);
             configList.add(DOZER_BACKUPJOB_MAPPING);
-
+            configList.add(DOZER_SEARCH_MAPPING);
             mapper = new DozerBeanMapper(configList);
         }
         return mapper;
