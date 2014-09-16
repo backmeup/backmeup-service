@@ -101,6 +101,7 @@ public class Plugins extends Base {
 			
 		case SourceSink:
 			pluginDTO.setPluginType(PluginType.SourceSink);
+            break;
 
 		default:
 			break;

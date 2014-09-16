@@ -7,53 +7,54 @@ import org.dozer.MappingException;
 
 public class BackupJobStatusConverter implements CustomConverter {
 
-	@SuppressWarnings("rawtypes")
-	public Object convert(Object destination, Object source, Class destClass, Class sourceClass) {
-		if (source == null) {
-			return null;
-		}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object convert(Object destination, Object source, Class destClass, Class sourceClass) {
+        if (source == null) {
+            return null;
+        }
 
-		if (source instanceof BackupJobStatus) {
-			BackupJobStatus status = (BackupJobStatus) source;
+        if (source instanceof BackupJobStatus) {
+            BackupJobStatus status = (BackupJobStatus) source;
 
-			switch (status) {
-			case queued:
-				return JobStatus.queued;
+            switch (status) {
+            case queued:
+                return JobStatus.queued;
 
-			case running:
-				return JobStatus.running;
+            case running:
+                return JobStatus.running;
 
-			case successful:
-				return JobStatus.successful;
-				
-			case error:
-				return JobStatus.error;
-				
-			default:
-				throw new IllegalStateException();
-			}
+            case successful:
+                return JobStatus.successful;
 
-		} else if (source instanceof JobStatus) {
-			JobStatus status = (JobStatus) source;
-			switch (status) {
-			case queued:
-				return BackupJobStatus.queued;
+            case error:
+                return JobStatus.error;
 
-			case running:
-				return BackupJobStatus.running;
+            default:
+                throw new IllegalStateException();
+            }
 
-			case successful:
-				return BackupJobStatus.successful;
-				
-			case error:
-				return BackupJobStatus.error;
+        } else if (source instanceof JobStatus) {
+            JobStatus status = (JobStatus) source;
+            switch (status) {
+            case queued:
+                return BackupJobStatus.queued;
 
-			default:
-				throw new IllegalStateException();
-			}
-		} else {
-			throw new MappingException("Converter BackupJobStatusConverter used incorrectly. +"
-					+ "Arguments passed in were: " + destination + " and " + source);
-		}
-	}
+            case running:
+                return BackupJobStatus.running;
+
+            case successful:
+                return BackupJobStatus.successful;
+
+            case error:
+                return BackupJobStatus.error;
+
+            default:
+                throw new IllegalStateException();
+            }
+        } else {
+            throw new MappingException("Converter BackupJobStatusConverter used incorrectly. +" + "Arguments passed in were: "
+                    + destination + " and " + source);
+        }
+    }
 }

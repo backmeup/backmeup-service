@@ -6,53 +6,54 @@ import org.dozer.MappingException;
 
 public class BackupJobFrequencyConverter implements CustomConverter {
 
-	@SuppressWarnings("rawtypes")
-	public Object convert(Object destination, Object source, Class destClass, Class sourceClass) {
-		if (source == null) {
-			return null;
-		}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object convert(Object destination, Object source, Class destClass, Class sourceClass) {
+        if (source == null) {
+            return null;
+        }
 
-		if (source instanceof String) {
-			String timeExpression = (String) source;
+        if (source instanceof String) {
+            String timeExpression = (String) source;
 
-			switch (timeExpression) {
-			case "daily":
-				return JobFrequency.daily;
+            switch (timeExpression) {
+            case "daily":
+                return JobFrequency.daily;
 
-			case "weekly":
-				return JobFrequency.weekly;
+            case "weekly":
+                return JobFrequency.weekly;
 
-			case "monthly":
-				return JobFrequency.montly;
-				
-			case "realtime":
-				return JobFrequency.onece;
-			default:
-				throw new IllegalStateException();
-			}
+            case "monthly":
+                return JobFrequency.montly;
 
-		} else if (source instanceof JobFrequency) {
-			JobFrequency jobFrequency = (JobFrequency) source;
-			switch (jobFrequency) {
-			case daily:
-				return "daily";
+            case "realtime":
+                return JobFrequency.onece;
+            default:
+                throw new IllegalStateException();
+            }
 
-			case weekly:
-				return "weekly";
+        } else if (source instanceof JobFrequency) {
+            JobFrequency jobFrequency = (JobFrequency) source;
+            switch (jobFrequency) {
+            case daily:
+                return "daily";
 
-			case montly:
-				return "monthly";
+            case weekly:
+                return "weekly";
 
-			case onece:
-				return "realtime";
+            case montly:
+                return "monthly";
 
-			default:
-				throw new IllegalStateException();
+            case onece:
+                return "realtime";
 
-			}
-		} else {
-			throw new MappingException("Converter BackupJobFrequencyConverter used incorrectly. +"
-					+ "Arguments passed in were: " + destination + " and " + source);
-		}
-	}
+            default:
+                throw new IllegalStateException();
+
+            }
+        } else {
+            throw new MappingException("Converter BackupJobFrequencyConverter used incorrectly. +" + "Arguments passed in were: "
+                    + destination + " and " + source);
+        }
+    }
 }

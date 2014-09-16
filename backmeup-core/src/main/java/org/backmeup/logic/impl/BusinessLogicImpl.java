@@ -133,7 +133,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                  return user;
              }
          }); 
-     };
+     }
     
     // ========================================================================
     
@@ -272,16 +272,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 //          }
 //      });
 //  }
-    
-	private BackMeUpUser getAuthorizedUser(Long userId, String keyRing) {
-		BackMeUpUser user = registration.getUserByUserId(userId, true);
-		authorization.authorize(user, keyRing);
-		return user;
-	}
-
-	private void ensureUserIsAuthorized(Long userId, String keyRing) {
-		getAuthorizedUser(userId, keyRing);
-	}
     
     // ========================================================================
 	
@@ -809,13 +799,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public long searchBackup(final Long userId, final String keyRingPassword, final String query) {
+    public long searchBackup(final Long userId, final String query) {
         try {
 
             return conn.txNew(new Callable<Long>() {
                 @Override public Long call() {
                     
-                    ensureUserIsAuthorized(userId, keyRingPassword);
+                    registration.getUserByUserId(userId, true);
                     SearchResponse searchResp = search.createSearch(query, new String[0]);
                     return searchResp.getId();
                     

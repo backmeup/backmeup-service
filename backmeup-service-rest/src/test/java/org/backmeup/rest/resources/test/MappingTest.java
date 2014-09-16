@@ -3,8 +3,10 @@ package org.backmeup.rest.resources.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
@@ -13,23 +15,26 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.PluginConfigurationDTO;
-import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.PluginConfigurationDTO;
+import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.plugin.Plugin;
+import org.backmeup.plugin.api.Metadata;
+import org.backmeup.plugin.api.connectors.BaseSourceSinkDescribable;
 import org.backmeup.plugin.osgi.PluginImpl;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.junit.Test;
 
-public class MappingTests {
-	private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
+public class MappingTest {
+
+    private static final String DOZER_CUSTOM_CONVERTERS = "dozer-custom-converters.xml";
 	private static final String DOZER_USER_MAPPING = "dozer-user-mapping.xml";
 	private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
 	private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
@@ -64,9 +69,9 @@ public class MappingTests {
 	@Test
 	public void testPluginMapping() {
 		String pluginId = "org.backmeup.dropbox";
-		
-		Plugin plugin = setupPluginInfrastructure();
-		PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
+		// Plugin plugin = setupPluginInfrastructure();
+		// PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
+	    PluginDescribable  pluginModel = createFakeModelFor(pluginId);
 		
 		Mapper mapper = getMapper(DOZER_PROFILE_MAPPING);
 		
@@ -78,10 +83,57 @@ public class MappingTests {
 		// TODO metadata
 		assertEquals(pluginModel.getImageURL(), pluginDTO.getImageURL());
 		
-		((PluginImpl) plugin).shutdown();
+		// ((PluginImpl) plugin).shutdown();
 	}
 	
-	@Test
+    private PluginDescribable createFakeModelFor(String pluginId) {
+        return new FakePluginDescribable(pluginId);
+    }
+
+    // dozer needs public class to access fields
+    public static class FakePluginDescribable extends BaseSourceSinkDescribable {
+        private final String pluginId;
+
+        private FakePluginDescribable(String pluginId) {
+            this.pluginId = pluginId;
+        }
+
+        @Override
+        public String getId() {
+            return pluginId;
+        }
+
+        @Override
+        public String getTitle() {
+            return "BackMeUp Dropbox Plug-In";
+        }
+
+        @Override
+        public String getDescription() {
+            return "A plug-in that is capable of downloading and uploading from dropbox";
+        }
+
+        @Override
+        public String getImageURL() {
+            return "http://about:blank";
+        }
+
+        @Override
+        public PluginType getType() {
+            return PluginType.SourceSink;
+        }
+
+        @Override
+        public Properties getMetadata(@SuppressWarnings("unused") Properties accessData) {
+            Properties metadata = new Properties();
+            metadata.setProperty(Metadata.BACKUP_FREQUENCY, "daily");
+            metadata.setProperty(Metadata.FILE_SIZE_LIMIT, "150");
+            metadata.setProperty(Metadata.QUOTA_LIMIT, "2048");
+            return metadata;
+        }
+    }
+    
+    @Test
 	public void testPluginProfileMapping() {
 		String username = "johndoe";
 		String firstname = "John";
@@ -101,7 +153,7 @@ public class MappingTests {
 		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);
@@ -151,7 +203,7 @@ public class MappingTests {
 		
 		AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);
@@ -180,7 +232,7 @@ public class MappingTests {
 		Date next = new Date();
 		job.setNextExecutionTime(next);
 		
-		List<String> configList = new ArrayList<String>();
+		List<String> configList = new ArrayList<>();
 		configList.add(DOZER_CUSTOM_CONVERTERS);
 		configList.add(DOZER_USER_MAPPING);
 		configList.add(DOZER_PROFILE_MAPPING);
@@ -207,15 +259,11 @@ public class MappingTests {
 		assertEquals(expectetJobStatus, actualJobStatus);
 	}
 	
-	@SuppressWarnings("serial")
-	private Mapper getMapper(final String mappingFile) {
-		List<String> list = new ArrayList<String>() { 
-			{add(mappingFile);}
-		};
-		return getMapper(list);
+	private Mapper getMapper(String mappingFile) {
+        return getMapper(Arrays.asList(mappingFile));
 	}
 	
-	private Mapper getMapper(final List<String> mappingFiles) {
+	private Mapper getMapper(List<String> mappingFiles) {
 		return new DozerBeanMapper(mappingFiles);
 	}
 	

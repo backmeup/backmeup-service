@@ -1,0 +1,15 @@
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <mapping>
+        <class-a>org.backmeup.model.SearchResponse</class-a>
+        <class-b>org.backmeup.model.dto.SearchResponseDTO</class-b>
+
+        <field>
+            <a>query</a>
+            <b>searchQuery</b>
+        </field>
+
+    </mapping>
+</mappings> 

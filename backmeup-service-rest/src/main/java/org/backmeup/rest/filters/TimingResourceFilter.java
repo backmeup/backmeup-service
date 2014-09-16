@@ -1,7 +1,5 @@
 package org.backmeup.rest.filters;
 
-import java.io.IOException;
-
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -22,7 +20,7 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
 	}
 
 	@Override
-	public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+	public void filter(ContainerRequestContext request, ContainerResponseContext response) {
 		try {
 			long reqProcessingTimeInMs = timer.stop();
 			logger.info("Request processing time: " + reqProcessingTimeInMs + "ms");
@@ -32,7 +30,7 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
 	}
 
 	@Override
-	public void filter(ContainerRequestContext request) throws IOException {
+	public void filter(ContainerRequestContext request) {
 		timer.start();
 	}
 

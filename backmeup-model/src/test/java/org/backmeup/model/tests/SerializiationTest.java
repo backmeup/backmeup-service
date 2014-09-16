@@ -2,10 +2,8 @@ package org.backmeup.model.tests;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
@@ -17,7 +15,7 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SerializiationTests {
+public class SerializiationTest {
   
   private void testProfiles(Profile p1, Profile p2) {
     
