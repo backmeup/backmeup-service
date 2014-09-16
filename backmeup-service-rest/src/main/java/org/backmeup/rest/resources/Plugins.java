@@ -38,10 +38,10 @@ import org.backmeup.rest.auth.BackmeupPrincipal;
 @Path("/plugins")
 public class Plugins extends Base {
 	public enum PluginSelectionType {
-	    source,
-	    sink,
-	    action,
-	    all
+	    Source,
+	    Sink,
+	    Action,
+	    All
 	}
 	
 	@Context
@@ -52,19 +52,19 @@ public class Plugins extends Base {
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<PluginDTO> listPlugins(
-			@QueryParam("types") @DefaultValue("all") PluginSelectionType pluginType,
+			@QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType,
 			@QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
 		Set<String> pluginIds = new HashSet<>();
 
-		if ((pluginType == PluginSelectionType.source) || (pluginType == PluginSelectionType.all)) {
+		if ((pluginType == PluginSelectionType.Source) || (pluginType == PluginSelectionType.All)) {
 			for (PluginDescribable desc : getLogic().getDatasources()) {
 				pluginIds.add(desc.getId());
 			}
-		} else if ((pluginType == PluginSelectionType.sink) || (pluginType == PluginSelectionType.all)) {
+		} else if ((pluginType == PluginSelectionType.Sink) || (pluginType == PluginSelectionType.All)) {
 			for(PluginDescribable desc : getLogic().getDatasinks()) {
 				pluginIds.add(desc.getId());
 			}
-		} else if ((pluginType == PluginSelectionType.action) || (pluginType == PluginSelectionType.all)) {
+		} else if ((pluginType == PluginSelectionType.Action) || (pluginType == PluginSelectionType.All)) {
 			for(PluginDescribable desc : getLogic().getActions()) {
 				pluginIds.add(desc.getId());
 			}
