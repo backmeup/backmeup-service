@@ -336,8 +336,7 @@ public class IndexUtils {
 			filterstr.append(") AND ");
 		}
 		
-		// TODO if "ProfileName" includes special chars like (,", ... we will
-		// have a problem with the search?
+		// TODO if "ProfileName" includes special chars like (,", ... we will have a problem with the search?
 		if (filters.containsKey("source")) {
             filterstr.append('(');
 
@@ -467,8 +466,7 @@ public class IndexUtils {
 				// get out the profile "(Profilename)"
 				String profile = filter.substring(filter.indexOf(" ") + 1, filter.length());
 
-				// remove the brackets at begin and end, result will be
-				// "ProfileName"
+				// remove the brackets at begin and end, result will be "ProfileName"
 				profile = profile.substring(1, profile.length() - 1);
 
 				BoolQueryBuilder tempbuilder = new BoolQueryBuilder();
