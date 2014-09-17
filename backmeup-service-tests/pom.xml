@@ -9,7 +9,8 @@
 	
 	<artifactId>backmeup-service-tests</artifactId>
 	<packaging>jar</packaging>
-	<name>BackMeUp Service Tests, runs all tests as integration tests.</name>
+	<name>BackMeUp Service Tests</name>
+	<description>Runs all tests as integration tests.</description>
 	
 	<dependencies>
 		<dependency>
@@ -85,5 +86,5 @@
 			</plugin>
 		</plugins>
 	</build>
-    
+
 </project>
