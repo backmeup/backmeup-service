@@ -12,7 +12,7 @@ import org.junit.rules.ExternalResource;
 public class EmbeddedRestServer extends ExternalResource {
 
     private static final String HOST = "http://localhost:";
-    private static final int PORT = 8089;
+    private static final int PORT = 7654;
 
     public final String host = HOST;
     public final int port = PORT;
