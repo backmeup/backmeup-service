@@ -166,7 +166,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 backupJobs.deleteJobsOf(u.getUserId());
                 profiles.deleteProfilesOf(u.getUserId());
                 registration.delete(u); 
-                search.deleteIndexOf(u);
+                search.deleteIndexOf(u.getUserId());
                 return u;
                 
             }
@@ -727,7 +727,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 if (status.size() > 0) {
                     Long newOrExistingId = status.get(0).getJob().getId();
-                    addFileItemsToStatuses(status, newOrExistingId);
+                    addFileItemsToStatuses(userId, status, newOrExistingId);
                 }
                 
                 return status;
@@ -736,8 +736,8 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    private void addFileItemsToStatuses(List<Status> status, Long jobId) {
-        Set<FileItem> fileItems = search.getAllFileItems(jobId);
+    private void addFileItemsToStatuses(Long userId, List<Status> status, Long jobId) {
+        Set<FileItem> fileItems = search.getAllFileItems(userId, jobId);
         for (Status stat : status) {
             stat.setFiles(fileItems);
         }
@@ -821,20 +821,20 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public void run() {
 
 //                BackMeUpUser user = registration.getActiveUser(username);
-            	BackMeUpUser user = registration.getUserByUserId(userId, true);
-                search.deleteIndexOf(user);
+            	registration.getUserByUserId(userId, true);
+                search.deleteIndexOf(userId);
                 
             }
         });
     }
 
     @Override
-    public void deleteIndexForJobAndTimestamp(final Long jobId, final Long timestamp) {
+    public void deleteIndexForJobAndTimestamp(final Long userId, final Long jobId, final Long timestamp) {
         conn.txNewReadOnly(new Runnable() {
             @Override public void run() {
 
                 BackupJob job = backupJobs.getExistingJob(jobId);
-                search.delete(job.getId(), timestamp);
+                search.delete(userId, job.getId(), timestamp);
                 
             }
         });
@@ -859,8 +859,8 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public File call() {
                 
 //                BackMeUpUser user = registration.getActiveUser(username);
-            	BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.getThumbnailPathForFile(user, fileId);
+            	registration.getUserByUserId(userId, true);
+                return search.getThumbnailPathForFile(userId, fileId);
 
             }
         });

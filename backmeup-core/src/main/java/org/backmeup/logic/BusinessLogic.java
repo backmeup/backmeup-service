@@ -102,7 +102,7 @@ public interface BusinessLogic {
 	SearchResponse queryBackup(Long userId, long searchId, Map<String, List<String>> filters);
 	File getThumbnail(Long userId, String fileId);
 	void deleteIndexForUser(Long userId);
-	void deleteIndexForJobAndTimestamp(Long jobId, Long timestamp);
+	void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
 	
 	// log operations ---------------------------------------------------------
 	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);

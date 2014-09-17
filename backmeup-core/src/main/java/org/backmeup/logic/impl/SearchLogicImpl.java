@@ -38,9 +38,8 @@ public class SearchLogicImpl implements SearchLogic {
         return dal.createSearchResponseDao();
     }
 
-    private ElasticSearchIndexClient getIndexClient() {
-        // TODO PK remove use indexer-client here, port depends on user
-        return new ElasticSearchIndexClient("x", 1);
+    private ElasticSearchIndexClient getIndexClient(Long userId) {
+        return new ElasticSearchIndexClient(userId);
     }
 
     @Override
@@ -52,12 +51,12 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters) {
-        try (ElasticSearchIndexClient client = getIndexClient();) {
+        try (ElasticSearchIndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse search = queryExistingSearch(searchId);
             String query = search.getQuery();
             
-            org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(user.getUserId(), query, filters);
+            org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(query, filters);
             search.setFiles(IndexUtils.convertSearchEntries(esResponse, user.getUsername()));
             search.setBySource(IndexUtils.getBySource(esResponse));
             search.setByType(IndexUtils.getByType(esResponse));
@@ -76,8 +75,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public Set<FileItem> getAllFileItems(Long jobId) {
-        try (ElasticSearchIndexClient client = getIndexClient()) {
+    public Set<FileItem> getAllFileItems(Long userId, Long jobId) {
+        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
             org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(jobId);
             return IndexUtils.convertToFileItems(esResponse);
@@ -87,9 +86,9 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
-        try (ElasticSearchIndexClient client = getIndexClient()) {
+        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
-            org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(userId, fileId);
+            org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(fileId);
 
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
@@ -99,10 +98,10 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public File getThumbnailPathForFile(BackMeUpUser user, String fileId) {
-        try (ElasticSearchIndexClient client = getIndexClient()) {
+    public File getThumbnailPathForFile(Long userId, String fileId) {
+        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
-            String thumbnailPath = client.getThumbnailPathForFile(user.getUserId(), fileId);
+            String thumbnailPath = client.getThumbnailPathForFile(fileId);
             logger.debug("Got thumbnail path: " + thumbnailPath);
             if (thumbnailPath != null) { // NOSONAR can be null!
                 return new File(thumbnailPath);
@@ -113,8 +112,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void delete(Long jobId, Long timestamp) {
-        try (ElasticSearchIndexClient client = getIndexClient()) {
+    public void delete(Long userId, Long jobId, Long timestamp) {
+        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
             client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
 
@@ -122,10 +121,10 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void deleteIndexOf(BackMeUpUser user) {
-        try (ElasticSearchIndexClient client = getIndexClient()) {
+    public void deleteIndexOf(Long userId) {
+        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
-            client.deleteRecordsForUser(user.getUserId());
+            client.deleteRecordsForUser();
 
         }
     }

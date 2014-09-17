@@ -21,14 +21,14 @@ public interface SearchLogic {
 
     SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters);
 
-    Set<FileItem> getAllFileItems(Long jobId);
+    Set<FileItem> getAllFileItems(Long userId, Long jobId);
 
     ProtocolDetails getProtocolDetails(Long userId, String fileId);
 
-    File getThumbnailPathForFile(BackMeUpUser user, String fileId);
+    File getThumbnailPathForFile(Long userId, String fileId);
 
-    void delete(Long jobId, Long timestamp);
+    void delete(Long userId, Long jobId, Long timestamp);
 
-    void deleteIndexOf(BackMeUpUser user);
+    void deleteIndexOf(Long userId);
 
 }
