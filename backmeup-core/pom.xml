@@ -22,6 +22,12 @@
 			<artifactId>backmeup-plugin-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.backmeup</groupId>
+			<artifactId>backmeup-indexer-client</artifactId>
+			<version>${version.backmeup.indexer}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>

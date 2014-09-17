@@ -36,10 +36,12 @@
 		<config.tomcat.manager.url>http://127.0.0.1:8080/manager/text</config.tomcat.manager.url>
 		<config.tomcat.authentication.id>backmeup.service.tomcat</config.tomcat.authentication.id>
 
+        <version.backmeup.indexer>0.0.1-SNAPSHOT</version.backmeup.indexer>
+        
 		<!-- Dependency versions
 			 Please keep alphabetical
 			 Properties should be in form "version.<groupId>", or in case where
-			 multiple artefacts of the same groupId are used  "version.<groupId>.<artifactId>"
+			 multiple artifacts of the same groupId are used  "version.<groupId>.<artifactId>"
 		-->
 		<version.ch.qos.logback>1.1.2</version.ch.qos.logback>
 		<version.com.google.code.gson>2.2.2</version.com.google.code.gson>
