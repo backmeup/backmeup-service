@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
-import org.backmeup.model.BackMeUpUser;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -55,11 +54,11 @@ public class ElasticSearchIndexClient implements Closeable {
 		this.client = client;
 	}
 	
-	public SearchResponse queryBackup(BackMeUpUser user, String query) {
-		return queryBackup(user, query, null);
+	public SearchResponse queryBackup(Long userId, String query) {
+		return queryBackup(userId, query, null);
 	}
 	
-	public SearchResponse queryBackup(BackMeUpUser user, String query, Map<String, List<String>> filters) {		
+	public SearchResponse queryBackup(Long userId, String query, Map<String, List<String>> filters) {		
 		String queryString = null;
 		String[] tokens = query.split(" ");
 		if (tokens.length == 0) {
@@ -87,7 +86,7 @@ public class ElasticSearchIndexClient implements Closeable {
 		QueryBuilder qBuilder = QueryBuilders.queryString(queryString);
 		*/
 		
-		QueryBuilder qBuilder = IndexUtils.buildQuery (user.getUserId (), queryString, filters);
+        QueryBuilder qBuilder = IndexUtils.buildQuery (userId, queryString, filters);
 		
 		logger.debug("#######################################");
 		logger.debug("QueryString:\n" + qBuilder.toString ());

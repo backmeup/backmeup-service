@@ -3,8 +3,8 @@ package org.backmeup.model;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.backmeup.model.SearchResponse.CountedEntry;
-import org.backmeup.model.SearchResponse.SearchEntry;
+import org.backmeup.index.model.CountedEntry;
+import org.backmeup.index.model.SearchEntry;
 
 public class FakeSearchResponse {
 

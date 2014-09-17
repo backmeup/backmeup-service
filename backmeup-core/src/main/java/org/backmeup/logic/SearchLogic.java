@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.backmeup.index.model.FileItem;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
 

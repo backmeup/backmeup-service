@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
+import org.backmeup.index.model.FileItem;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BackupLogic;
@@ -27,7 +28,6 @@ import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.FileItem;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
@@ -44,7 +44,6 @@ import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
 import org.backmeup.plugin.api.connectors.Datasource;
-import org.elasticsearch.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +72,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private Connection conn;
-
-    @Inject
-    private Node esNode;
 
     @Inject
     private UserRegistration registration;
@@ -116,7 +112,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     public void shutdown() {
         logger.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
         jobManager.shutdown();
-        esNode.close();
     }
     
     // ========================================================================

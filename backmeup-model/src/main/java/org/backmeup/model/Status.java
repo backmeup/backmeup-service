@@ -16,6 +16,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.backmeup.index.model.FileItem;
+
 /**
  * The status class contains status information about a certain BackupJob.
  * 

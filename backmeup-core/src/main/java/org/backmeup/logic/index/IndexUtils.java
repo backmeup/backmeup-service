@@ -9,11 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.FileItem;
+import org.backmeup.index.model.CountedEntry;
+import org.backmeup.index.model.FileItem;
+import org.backmeup.index.model.SearchEntry;
 import org.backmeup.model.ProtocolDetails.FileInfo;
-import org.backmeup.model.SearchResponse.CountedEntry;
-import org.backmeup.model.SearchResponse.SearchEntry;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -101,7 +100,7 @@ public class IndexUtils {
 	  return fi;
 	}
 	
-	public static List<SearchEntry> convertSearchEntries(org.elasticsearch.action.search.SearchResponse esResponse, BackMeUpUser user) {	    
+	public static List<SearchEntry> convertSearchEntries(org.elasticsearch.action.search.SearchResponse esResponse, String userName) {	    
 	    List<SearchEntry> entries = new ArrayList<>();
 
 	    LOGGER.debug("converting " + esResponse.getHits().totalHits() + " search results");
@@ -156,7 +155,7 @@ public class IndexUtils {
 	    	entry.setProperty(FIELD_FILE_HASH, hash);
 	    	
 			if (source.get(FIELD_THUMBNAIL_PATH) != null) {
-				entry.setThumbnailUrl(THUMBNAILS_FOLDER + user.getUsername() + "/" + owner + ":" + hash + ":" + timestamp);
+				entry.setThumbnailUrl(THUMBNAILS_FOLDER + userName + "/" + owner + ":" + hash + ":" + timestamp);
 			}
 			
 			// Custom props

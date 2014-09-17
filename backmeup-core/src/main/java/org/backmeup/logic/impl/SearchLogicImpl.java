@@ -10,14 +10,13 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.SearchResponseDao;
+import org.backmeup.index.model.FileItem;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.index.ElasticSearchIndexClient;
 import org.backmeup.logic.index.IndexUtils;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.FileItem;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
 import org.backmeup.model.exceptions.BackMeUpException;
@@ -33,14 +32,6 @@ public class SearchLogicImpl implements SearchLogic {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("SearchLogicImpl");
 
     @Inject
-    @Configuration(key = "backmeup.index.host")
-    private String indexHost;
-
-    @Inject
-    @Configuration(key = "backmeup.index.port")
-    private Integer indexPort;
-
-    @Inject
     private DataAccessLayer dal;
 
     private SearchResponseDao getSearchResponseDao() {
@@ -48,7 +39,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     private ElasticSearchIndexClient getIndexClient() {
-        return new ElasticSearchIndexClient(indexHost, indexPort);
+        // TODO PK remove use indexer-client here, port depends on user
+        return new ElasticSearchIndexClient("x", 1);
     }
 
     @Override
@@ -65,8 +57,8 @@ public class SearchLogicImpl implements SearchLogic {
             SearchResponse search = queryExistingSearch(searchId);
             String query = search.getQuery();
             
-            org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(user, query, filters);
-            search.setFiles(IndexUtils.convertSearchEntries(esResponse, user));
+            org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(user.getUserId(), query, filters);
+            search.setFiles(IndexUtils.convertSearchEntries(esResponse, user.getUsername()));
             search.setBySource(IndexUtils.getBySource(esResponse));
             search.setByType(IndexUtils.getByType(esResponse));
             search.setByJob(IndexUtils.getByJob(esResponse));

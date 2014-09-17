@@ -12,12 +12,17 @@
 	<name>BackMeUp Model</name>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.backmeup</groupId>
+            <artifactId>backmeup-indexer-client</artifactId>
+            <version>${version.backmeup.indexer}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${version.com.google.code.gson}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
