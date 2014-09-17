@@ -12,10 +12,10 @@ import javax.inject.Inject;
 
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.SearchResponseDao;
+import org.backmeup.index.client.ElasticSearchIndexClient;
+import org.backmeup.index.client.IndexUtils;
 import org.backmeup.index.model.FileItem;
 import org.backmeup.logic.SearchLogic;
-import org.backmeup.logic.index.ElasticSearchIndexClient;
-import org.backmeup.logic.index.IndexUtils;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.SearchResponse;
