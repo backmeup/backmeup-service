@@ -19,7 +19,6 @@
 		<class>org.backmeup.model.JobProtocol</class>
 		<class>org.backmeup.model.JobProtocol$JobProtocolMember</class>
 		<class>org.backmeup.model.Token</class>
-		<class>org.backmeup.model.SearchResponse</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/bmucore" />
