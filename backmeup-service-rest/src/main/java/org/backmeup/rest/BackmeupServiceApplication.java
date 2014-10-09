@@ -12,6 +12,7 @@ import org.backmeup.rest.resources.Authentication;
 import org.backmeup.rest.resources.BackupJobs;
 import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Users;
+import org.backmeup.rest.resources.Backups;
 
 public class BackmeupServiceApplication extends Application {
     private final Set<Class<?>> set = new HashSet<>();
@@ -22,6 +23,7 @@ public class BackmeupServiceApplication extends Application {
         singletons.add(new Authentication());
         singletons.add(new Plugins());
         singletons.add(new BackupJobs());
+        singletons.add(new Backups());
 
         set.add(JacksonJsonConfiguration.class);
         set.add(TimingResourceFilter.class);
