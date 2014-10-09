@@ -14,7 +14,7 @@
 	<dependencies>
         <dependency>
             <groupId>org.backmeup</groupId>
-            <artifactId>backmeup-indexer-client</artifactId>
+            <artifactId>backmeup-indexer-model</artifactId>
             <version>${version.backmeup.indexer}</version>
         </dependency>
 
