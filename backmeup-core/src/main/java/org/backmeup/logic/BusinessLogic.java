@@ -97,7 +97,7 @@ public interface BusinessLogic {
 	void deleteJobProtocols(Long userId);
 	
 	// search operations ------------------------------------------------------
-	long searchBackup(Long userId, String keyRingPassword);
+	long searchBackup(Long userId, String query);
 	//SearchResponse queryBackup(String username, long searchId, String filterType, String filterValue);
 	SearchResponse queryBackup(Long userId, long searchId, Map<String, List<String>> filters);
 	File getThumbnail(Long userId, String fileId);

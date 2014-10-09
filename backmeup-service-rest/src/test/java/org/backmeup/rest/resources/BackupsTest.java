@@ -68,7 +68,7 @@ public class BackupsTest {
 
         HttpEntity entity = response.getEntity();
         String body = IOUtils.toString(entity.getContent());
-        assertEquals("{\"searchId\":2}", body);
+        assertEquals("{\"searchId\":" + ID + "}", body);
     }
 
     @Test
