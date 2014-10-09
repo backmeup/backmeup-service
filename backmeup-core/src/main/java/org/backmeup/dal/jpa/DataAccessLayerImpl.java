@@ -7,7 +7,6 @@ import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.ProfileDao;
-import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.dal.ServiceDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
@@ -20,48 +19,43 @@ import org.backmeup.dal.UserDao;
  */
 @ApplicationScoped
 public class DataAccessLayerImpl implements DataAccessLayer {
-  private final ThreadLocal<EntityManager> threaLocalEntityManager = new ThreadLocal<>();
+	private final ThreadLocal<EntityManager> threaLocalEntityManager = new ThreadLocal<>();
 
-  public DataAccessLayerImpl() {
-  }
+	public DataAccessLayerImpl() {
+	}
 
-  @Override
-public UserDao createUserDao() {
-    return new UserDaoImpl(threaLocalEntityManager.get());
-  }
+	@Override
+	public UserDao createUserDao() {
+		return new UserDaoImpl(threaLocalEntityManager.get());
+	}
 
-  @Override
-public ProfileDao createProfileDao() {
-    return new ProfileDaoImpl(threaLocalEntityManager.get());
-  }
+	@Override
+	public ProfileDao createProfileDao() {
+		return new ProfileDaoImpl(threaLocalEntityManager.get());
+	}
 
-  @Override
-public StatusDao createStatusDao() {
-    return new StatusDaoImpl(threaLocalEntityManager.get());
-  }
-  
-  @Override
-public SearchResponseDao createSearchResponseDao() {
-    return new SearchResponseDaoImpl(threaLocalEntityManager.get());
-  }
+	@Override
+	public StatusDao createStatusDao() {
+		return new StatusDaoImpl(threaLocalEntityManager.get());
+	}
 
-  @Override
-public BackupJobDao createBackupJobDao() {
-    return new BackupJobDaoImpl(threaLocalEntityManager.get());
-  }
+	@Override
+	public BackupJobDao createBackupJobDao() {
+		return new BackupJobDaoImpl(threaLocalEntityManager.get());
+	}
 
-  @Override
-public ServiceDao createServiceDao() {    
-    return new ServiceDaoImpl(threaLocalEntityManager.get());
-  }
-  
-  @Override
-  public JobProtocolDao createJobProtocolDao() {
-    return new JobProtocolDaoImpl(threaLocalEntityManager.get());
-  }
+	@Override
+	public ServiceDao createServiceDao() {
+		return new ServiceDaoImpl(threaLocalEntityManager.get());
+	}
 
-  @Override
-public void setConnection(Object connection) {
-    this.threaLocalEntityManager.set((EntityManager) connection);
-  }
+	@Override
+	public JobProtocolDao createJobProtocolDao() {
+		return new JobProtocolDaoImpl(threaLocalEntityManager.get());
+	}
+
+	@Override
+	public void setConnection(Object connection) {
+		this.threaLocalEntityManager.set((EntityManager) connection);
+	}
 }

@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.backmeup.model.SearchResponse;
+import org.backmeup.index.model.SearchResponse;
 import org.backmeup.model.dto.BackupSearchDTO;
 import org.backmeup.model.dto.SearchResponseDTO;
 

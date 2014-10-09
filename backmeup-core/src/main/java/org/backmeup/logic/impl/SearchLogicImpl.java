@@ -8,17 +8,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
-import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.index.client.ElasticSearchIndexClient;
 import org.backmeup.index.model.FileItem;
+import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.ProtocolDetails;
-import org.backmeup.model.SearchResponse;
-import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +26,6 @@ public class SearchLogicImpl implements SearchLogic {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle textBundle = ResourceBundle.getBundle("SearchLogicImpl");
 
-    @Inject
-    private DataAccessLayer dal;
-
-    private SearchResponseDao getSearchResponseDao() {
-        return dal.createSearchResponseDao();
-    }
-
     private ElasticSearchIndexClient getIndexClient(Long userId) {
         return new ElasticSearchIndexClient(userId);
     }
@@ -44,7 +33,8 @@ public class SearchLogicImpl implements SearchLogic {
     @Override
     public SearchResponse createSearch(String query, String[] typeFilters) {
         SearchResponse search = new SearchResponse(query, Arrays.asList(typeFilters));
-        search = getSearchResponseDao().save(search);
+        // TODO:
+//        search = getSearchResponseDao().save(search);
         return search;
     }
 
@@ -60,11 +50,13 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     private SearchResponse queryExistingSearchDefinition(long searchId) {
-        SearchResponse search = getSearchResponseDao().findById(searchId);
-        if (search == null) {
-            throw new BackMeUpException(textBundle.getString(UNKNOWN_SEARCH_ID));
-        }
-        return search;
+    	//TODO:
+//        SearchResponse search = getSearchResponseDao().findById(searchId);
+//        if (search == null) {
+//            throw new BackMeUpException(textBundle.getString(UNKNOWN_SEARCH_ID));
+//        }
+//        return search;
+    	return new SearchResponse();
     }
 
     @Override

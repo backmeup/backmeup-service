@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.backmeup.index.model.CountedEntry;
 import org.backmeup.index.model.SearchEntry;
+import org.backmeup.index.model.SearchResponse;
 
 public class FakeSearchResponse {
 

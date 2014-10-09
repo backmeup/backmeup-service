@@ -20,8 +20,6 @@ public interface DataAccessLayer {
 
     JobProtocolDao createJobProtocolDao();
 
-    SearchResponseDao createSearchResponseDao();
-
     void setConnection(Object connection);
 
 }
