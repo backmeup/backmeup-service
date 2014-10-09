@@ -9,11 +9,8 @@ import org.backmeup.index.model.SearchResponse;
 
 public class FakeSearchResponse {
 
-    public static final long SEARCH_ID = 2L;
-
     public static SearchResponse oneFile() {
         SearchResponse searchResponse = new SearchResponse();
-        searchResponse.setId(SEARCH_ID);
         searchResponse.setQuery("find_me");
         searchResponse.setByJob(Arrays.asList(new CountedEntry("first Job", 1), new CountedEntry("next Job", 1)));
         searchResponse.setBySource(Arrays.asList(new CountedEntry("Dropbox", 2), new CountedEntry("Facebook", 2)));

@@ -12,7 +12,7 @@ import org.backmeup.rest.resources.Authentication;
 import org.backmeup.rest.resources.BackupJobs;
 import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Users;
-import org.backmeup.rest.resources.Backups;
+import org.backmeup.rest.resources.Search;
 
 public class BackmeupServiceApplication extends Application {
     private final Set<Class<?>> set = new HashSet<>();
@@ -24,7 +24,7 @@ public class BackmeupServiceApplication extends Application {
         set.add(Authentication.class);
         set.add(Plugins.class);
         set.add(BackupJobs.class);
-        set.add(Backups.class);
+        set.add(Search.class);
 
         // The default life-cycle for providers (registered directly or via a feature) is singleton.
         set.add(JacksonJsonConfiguration.class); // provider

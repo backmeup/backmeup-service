@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public class BusinessLogicImpl implements BusinessLogic {
 
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
-    private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
@@ -793,27 +792,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public long searchBackup(final Long userId, final String query) {
-        try {
-
-            return conn.txNew(new Callable<Long>() {
-                @Override public Long call() {
-                    
-                    registration.getUserByUserId(userId, true);
-                    SearchResponse searchResp = search.createSearch(query, new String[0]);
-                    return searchResp.getId();
-                    
-                }
-            });
-
-        } catch (RuntimeException t) {
-            if (t instanceof BackMeUpException) {
-                throw (BackMeUpException) t;
-            }
-            throw new BackMeUpException(textBundle.getString(ERROR_OCCURED), t);
-        }
-    }
 
     @Override
     public void deleteIndexForUser(final Long userId) {
@@ -841,13 +819,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public SearchResponse queryBackup(final Long userId, final long searchId, final Map<String, List<String>> filters) {
+    public SearchResponse queryBackup(final Long userId, final String query, final Map<String, List<String>> filters) {
         return conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override public SearchResponse call() {
                 
 //                BackMeUpUser user = registration.getActiveUser(username);
             	BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.runSearch(user, searchId, filters);
+                return search.runSearch(user, query, filters);
 
             }
         });

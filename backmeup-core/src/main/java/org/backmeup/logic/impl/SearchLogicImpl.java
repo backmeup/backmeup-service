@@ -1,10 +1,8 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,42 +19,21 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class SearchLogicImpl implements SearchLogic {
 
-    private static final String UNKNOWN_SEARCH_ID = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SEARCH_ID";
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final ResourceBundle textBundle = ResourceBundle.getBundle("SearchLogicImpl");
 
     private ElasticSearchIndexClient getIndexClient(Long userId) {
         return new ElasticSearchIndexClient(userId);
     }
 
     @Override
-    public SearchResponse createSearch(String query, String[] typeFilters) {
-        SearchResponse search = new SearchResponse(query, Arrays.asList(typeFilters));
-        // TODO:
-//        search = getSearchResponseDao().save(search);
-        return search;
-    }
-
-    @Override
-    public SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters) {
+    public SearchResponse runSearch(BackMeUpUser user, String query, Map<String, List<String>> filters) {
         try (ElasticSearchIndexClient client = getIndexClient(user.getUserId());) {
 
-            SearchResponse result = queryExistingSearchDefinition(searchId);
+            SearchResponse result = new SearchResponse(query);
             client.queryBackup(result.getQuery(), filters, user.getUsername(), result);
             return result;
             
         }
-    }
-
-    private SearchResponse queryExistingSearchDefinition(long searchId) {
-    	//TODO:
-//        SearchResponse search = getSearchResponseDao().findById(searchId);
-//        if (search == null) {
-//            throw new BackMeUpException(textBundle.getString(UNKNOWN_SEARCH_ID));
-//        }
-//        return search;
-    	return new SearchResponse();
     }
 
     @Override

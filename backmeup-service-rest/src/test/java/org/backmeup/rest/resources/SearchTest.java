@@ -8,15 +8,11 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.BusinessLogic;
@@ -27,10 +23,10 @@ import org.dozer.Mapper;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class BackupsTest {
+public class SearchTest {
 
     @Rule
-    public final EmbeddedRestServer server = new EmbeddedRestServer(BackupsWithMockedLogic.class);
+    public final EmbeddedRestServer server = new EmbeddedRestServer(SearchWithMockedLogic.class);
     private final String HOST = server.host;
     private final int PORT = server.port;
 
@@ -38,15 +34,13 @@ public class BackupsTest {
     private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
 
     private static final Long USER = FakeUser.ACTIVE_USER_ID;
-    private static final Long ID = FakeSearchResponse.SEARCH_ID;
 
-    public static class BackupsWithMockedLogic extends Backups {
+    public static class SearchWithMockedLogic extends Search {
         @Override
         protected BusinessLogic getLogic() {
             BusinessLogic logic = mock(BusinessLogic.class);
-            when(logic.searchBackup(USER, "find_me")).thenReturn(ID);
             SearchResponse sr = FakeSearchResponse.oneFile();
-            when(logic.queryBackup(USER, ID, null)).thenReturn(sr);
+            when(logic.queryBackup(USER, "find_me", null)).thenReturn(sr);
             return logic;
         }
         @Override
@@ -56,24 +50,9 @@ public class BackupsTest {
     }
 
     @Test
-    public void shouldCreateSearchBusinessLogicWithUserAndQuery() throws IOException {
-        HttpPut put = new HttpPut(HOST + PORT + "/backups/" + USER + "/search");
-        put.setEntity(new StringEntity("query=find_me", MediaType.APPLICATION_FORM_URLENCODED, null));
-        HttpResponse response = client.execute(put);
+    public void shouldGetSearchResultForUserAndQuery() throws IOException {
+        HttpGet method = new HttpGet(HOST + PORT + "/search/" + USER + "?query=find_me");
 
-        assertStatusCode(202, response);
-
-        String locationHeader = response.getFirstHeader("location").getValue();
-        assertEquals(HOST + PORT + "/backups/" + USER + "/" + ID + "/query", locationHeader);
-
-        HttpEntity entity = response.getEntity();
-        String body = IOUtils.toString(entity.getContent());
-        assertEquals("{\"searchId\":" + ID + "}", body);
-    }
-
-    @Test
-    public void shouldGetSearchResultForCreatedQuery() throws IOException {
-        HttpGet method = new HttpGet(HOST + PORT + "/backups/" + USER + "/" + ID + "/query");
         HttpResponse response = client.execute(method);
 
         assertStatusCode(200, response);
