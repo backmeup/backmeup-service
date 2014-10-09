@@ -19,15 +19,17 @@ public class BackmeupServiceApplication extends Application {
     private final Set<Object> singletons = new HashSet<>();
 
     public BackmeupServiceApplication() {
-        singletons.add(new Users());
-        singletons.add(new Authentication());
-        singletons.add(new Plugins());
-        singletons.add(new BackupJobs());
-        singletons.add(new Backups());
+        // The default life-cycle for resource class instances is per-request. 
+        set.add(Users.class);
+        set.add(Authentication.class);
+        set.add(Plugins.class);
+        set.add(BackupJobs.class);
+        set.add(Backups.class);
 
-        set.add(JacksonJsonConfiguration.class);
-        set.add(TimingResourceFilter.class);
-        set.add(SecurityInterceptor.class);
+        // The default life-cycle for providers (registered directly or via a feature) is singleton.
+        set.add(JacksonJsonConfiguration.class); // provider
+        set.add(TimingResourceFilter.class); // filter = provider
+        set.add(SecurityInterceptor.class); // filter = provider
     }
 
     @Override
