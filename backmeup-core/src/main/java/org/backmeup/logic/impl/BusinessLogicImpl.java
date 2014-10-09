@@ -166,7 +166,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 backupJobs.deleteJobsOf(u.getUserId());
                 profiles.deleteProfilesOf(u.getUserId());
                 registration.delete(u); 
-                search.deleteIndexOf(u.getUserId());
+//                search.deleteIndexOf(u.getUserId());
                 return u;
                 
             }
