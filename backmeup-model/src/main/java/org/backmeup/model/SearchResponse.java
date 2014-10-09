@@ -14,15 +14,15 @@ import javax.persistence.Transient;
 
 import org.backmeup.index.model.CountedEntry;
 import org.backmeup.index.model.SearchEntry;
+import org.backmeup.index.model.SearchResultAccumulator;
 
 /**
- * Contains the result of a search when calling BusinessLogic#queryBackup
+ * Contains the result of a search when calling BusinessLogic#queryBackup.
  * 
  * @author fschoeppl
- *
  */
 @Entity
-public class SearchResponse {
+public class SearchResponse implements SearchResultAccumulator {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -54,16 +54,16 @@ public class SearchResponse {
 	}
 	
 	static String join(Collection<?> s, String delimiter) {
-    StringBuilder builder = new StringBuilder();
-    Iterator<?> iter = s.iterator();
-    while (iter.hasNext()) {
-        builder.append(iter.next());
-        if (!iter.hasNext()) {
-          break;                  
+        StringBuilder builder = new StringBuilder();
+        Iterator<?> iter = s.iterator();
+        while (iter.hasNext()) {
+            builder.append(iter.next());
+            if (!iter.hasNext()) {
+              break;                  
+            }
+            builder.append(delimiter);
         }
-        builder.append(delimiter);
-    }
-    return builder.toString();
+        return builder.toString();
 	}
 	
   public SearchResponse(String query, List<String> filters) {
@@ -101,7 +101,8 @@ public class SearchResponse {
 		return bySource;
 	}
 
-	public void setBySource(List<CountedEntry> bySource) {
+	@Override
+    public void setBySource(List<CountedEntry> bySource) {
 		this.bySource = bySource;
 	}
 
@@ -109,7 +110,8 @@ public class SearchResponse {
 		return byType;
 	}
 
-	public void setByType(List<CountedEntry> byType) {
+	@Override
+    public void setByType(List<CountedEntry> byType) {
 		this.byType = byType;
 	}
 	
@@ -117,7 +119,8 @@ public class SearchResponse {
 		return byJob;
 	}
 
-	public void setByJob(List<CountedEntry> byJob) {
+	@Override
+    public void setByJob(List<CountedEntry> byJob) {
 		this.byJob = byJob;
 	}
 
@@ -142,7 +145,8 @@ public class SearchResponse {
 		return files;
 	}
 
-	public void setFiles(List<SearchEntry> files) {
+	@Override
+    public void setFiles(List<SearchEntry> files) {
 		this.files = files;
 	} 
 	

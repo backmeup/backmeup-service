@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.SearchResponseDao;
 import org.backmeup.index.client.ElasticSearchIndexClient;
-import org.backmeup.index.client.IndexUtils;
 import org.backmeup.index.model.FileItem;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.model.BackMeUpUser;
@@ -53,20 +52,14 @@ public class SearchLogicImpl implements SearchLogic {
     public SearchResponse runSearch(BackMeUpUser user, long searchId, Map<String, List<String>> filters) {
         try (ElasticSearchIndexClient client = getIndexClient(user.getUserId());) {
 
-            SearchResponse search = queryExistingSearch(searchId);
-            String query = search.getQuery();
+            SearchResponse result = queryExistingSearchDefinition(searchId);
+            client.queryBackup(result.getQuery(), filters, user.getUsername(), result);
+            return result;
             
-            org.elasticsearch.action.search.SearchResponse esResponse = client.queryBackup(query, filters);
-            search.setFiles(IndexUtils.convertSearchEntries(esResponse, user.getUsername()));
-            search.setBySource(IndexUtils.getBySource(esResponse));
-            search.setByType(IndexUtils.getByType(esResponse));
-            search.setByJob(IndexUtils.getByJob(esResponse));
-            return search;
-
-        } 
+        }
     }
 
-    private SearchResponse queryExistingSearch(long searchId) {
+    private SearchResponse queryExistingSearchDefinition(long searchId) {
         SearchResponse search = getSearchResponseDao().findById(searchId);
         if (search == null) {
             throw new BackMeUpException(textBundle.getString(UNKNOWN_SEARCH_ID));
@@ -78,22 +71,19 @@ public class SearchLogicImpl implements SearchLogic {
     public Set<FileItem> getAllFileItems(Long userId, Long jobId) {
         try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
-            org.elasticsearch.action.search.SearchResponse esResponse = client.searchByJobId(jobId);
-            return IndexUtils.convertToFileItems(esResponse);
-
-        } 
+            return client.searchAllFileItemsForJob(jobId);
+            
+        }
     }
 
     @Override
     public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
         try (ElasticSearchIndexClient client = getIndexClient(userId)) {
 
-            org.elasticsearch.action.search.SearchResponse esResponse = client.getFileById(fileId);
-
             ProtocolDetails pd = new ProtocolDetails();
-            pd.setFileInfo(IndexUtils.convertToFileInfo(esResponse));
+            pd.setFileInfo(client.getFileInfoForFile(fileId));
             return pd;
-
+            
         }
     }
 
