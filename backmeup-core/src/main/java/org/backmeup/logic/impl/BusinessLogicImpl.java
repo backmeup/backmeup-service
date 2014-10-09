@@ -34,7 +34,7 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -717,15 +717,15 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public List<Status> getStatus(final Long userId, final Long jobIdOrNull) {
-        return conn.txNewReadOnly(new Callable<List<Status>>() {
-            @Override public List<Status> call() {
+    public List<StatusWithFiles> getStatus(final Long userId, final Long jobIdOrNull) {
+        return conn.txNewReadOnly(new Callable<List<StatusWithFiles>>() {
+            @Override public List<StatusWithFiles> call() {
                 
             	registration.getUserByUserId(userId, true);
-                List<Status> status = backupJobs.getStatus(userId, jobIdOrNull);
+                List<StatusWithFiles> status = backupJobs.getStatus(userId, jobIdOrNull);
 
                 if (status.size() > 0) {
-                    Long newOrExistingId = status.get(0).getJob().getId();
+                    Long newOrExistingId = status.get(0).getStatus().getJob().getId();
                     addFileItemsToStatuses(userId, status, newOrExistingId);
                 }
                 
@@ -735,9 +735,9 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    private void addFileItemsToStatuses(Long userId, List<Status> status, Long jobId) {
+    private void addFileItemsToStatuses(Long userId, List<StatusWithFiles> status, Long jobId) {
         Set<FileItem> fileItems = search.getAllFileItems(userId, jobId);
-        for (Status stat : status) {
+        for (StatusWithFiles stat : status) {
             stat.setFiles(fileItems);
         }
     }

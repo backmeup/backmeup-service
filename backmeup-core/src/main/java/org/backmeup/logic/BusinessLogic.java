@@ -14,7 +14,7 @@ import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.spi.PluginDescribable;
@@ -89,7 +89,7 @@ public interface BusinessLogic {
 	List<BackupJob> getJobs(Long userId);
 	void deleteJob(Long userId, Long jobId);
 	
-	List<Status> getStatus(Long userId, Long jobId);
+	List<StatusWithFiles> getStatus(Long userId, Long jobId);
 	
 	ProtocolDetails getProtocolDetails(Long userId, String fileId);
 	ProtocolOverview getProtocolOverview(Long userId, String duration);
