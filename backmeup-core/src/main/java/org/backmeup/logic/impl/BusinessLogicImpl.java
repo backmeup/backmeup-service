@@ -34,7 +34,7 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public class BusinessLogicImpl implements BusinessLogic {
 
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
-    private static final String ERROR_OCCURED = "org.backmeup.logic.impl.BusinessLogicImpl.ERROR_OCCURED";
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
@@ -718,15 +717,15 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public List<Status> getStatus(final Long userId, final Long jobIdOrNull) {
-        return conn.txNewReadOnly(new Callable<List<Status>>() {
-            @Override public List<Status> call() {
+    public List<StatusWithFiles> getStatus(final Long userId, final Long jobIdOrNull) {
+        return conn.txNewReadOnly(new Callable<List<StatusWithFiles>>() {
+            @Override public List<StatusWithFiles> call() {
                 
             	registration.getUserByUserId(userId, true);
-                List<Status> status = backupJobs.getStatus(userId, jobIdOrNull);
+                List<StatusWithFiles> status = backupJobs.getStatus(userId, jobIdOrNull);
 
                 if (status.size() > 0) {
-                    Long newOrExistingId = status.get(0).getJob().getId();
+                    Long newOrExistingId = status.get(0).getStatus().getJob().getId();
                     addFileItemsToStatuses(userId, status, newOrExistingId);
                 }
                 
@@ -736,9 +735,9 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    private void addFileItemsToStatuses(Long userId, List<Status> status, Long jobId) {
+    private void addFileItemsToStatuses(Long userId, List<StatusWithFiles> status, Long jobId) {
         Set<FileItem> fileItems = search.getAllFileItems(userId, jobId);
-        for (Status stat : status) {
+        for (StatusWithFiles stat : status) {
             stat.setFiles(fileItems);
         }
     }
@@ -793,27 +792,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public long searchBackup(final Long userId, final String query) {
-        try {
-
-            return conn.txNew(new Callable<Long>() {
-                @Override public Long call() {
-                    
-                    registration.getUserByUserId(userId, true);
-                    SearchResponse searchResp = search.createSearch(query, new String[0]);
-                    return searchResp.getId();
-                    
-                }
-            });
-
-        } catch (RuntimeException t) {
-            if (t instanceof BackMeUpException) {
-                throw (BackMeUpException) t;
-            }
-            throw new BackMeUpException(textBundle.getString(ERROR_OCCURED), t);
-        }
-    }
 
     @Override
     public void deleteIndexForUser(final Long userId) {
@@ -841,13 +819,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public SearchResponse queryBackup(final Long userId, final long searchId, final Map<String, List<String>> filters) {
+    public SearchResponse queryBackup(final Long userId, final String query, final Map<String, List<String>> filters) {
         return conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override public SearchResponse call() {
                 
 //                BackMeUpUser user = registration.getActiveUser(username);
             	BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.runSearch(user, searchId, filters);
+                return search.runSearch(user, query, filters);
 
             }
         });

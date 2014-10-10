@@ -8,7 +8,7 @@ import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
@@ -27,7 +27,7 @@ public interface BackupLogic {
 
     void deleteJob(Long userId, Long jobId);
 
-    List<Status> getStatus(Long userId, Long jobId);
+    List<StatusWithFiles> getStatus(Long userId, Long jobId);
 
     List<BackupJob> getBackupJobsOf(Long userId);
 

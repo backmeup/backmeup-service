@@ -14,7 +14,7 @@ import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.spi.PluginDescribable;
@@ -89,7 +89,7 @@ public interface BusinessLogic {
 	List<BackupJob> getJobs(Long userId);
 	void deleteJob(Long userId, Long jobId);
 	
-	List<Status> getStatus(Long userId, Long jobId);
+	List<StatusWithFiles> getStatus(Long userId, Long jobId);
 	
 	ProtocolDetails getProtocolDetails(Long userId, String fileId);
 	ProtocolOverview getProtocolOverview(Long userId, String duration);
@@ -97,9 +97,7 @@ public interface BusinessLogic {
 	void deleteJobProtocols(Long userId);
 	
 	// search operations ------------------------------------------------------
-	long searchBackup(Long userId, String query);
-	//SearchResponse queryBackup(String username, long searchId, String filterType, String filterValue);
-	SearchResponse queryBackup(Long userId, long searchId, Map<String, List<String>> filters);
+	SearchResponse queryBackup(Long userId, String query, Map<String, List<String>> filters);
 	File getThumbnail(Long userId, String fileId);
 	void deleteIndexForUser(Long userId);
 	void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);

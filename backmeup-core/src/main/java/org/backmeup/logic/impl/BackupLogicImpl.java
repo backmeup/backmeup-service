@@ -25,6 +25,7 @@ import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.Status;
+import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.JobProtocolDTO;
 
@@ -139,7 +140,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public List<Status> getStatus(Long userId, Long jobId) {
+    public List<StatusWithFiles> getStatus(Long userId, Long jobId) {
         BackupJobDao jobDao = getBackupJobDao();
         
         if (jobId == null) {
@@ -151,13 +152,21 @@ public class BackupLogicImpl implements BackupLogic {
             // for (BackupJob job : jobs) {
             //     status.add(getStatusForJob(job));
             // }
-            return status;
+            return allowFiles(status);
         }
         
         BackupJob job = getExistingUserJob(jobId, userId);
         List<Status> status = new ArrayList<>();
         status.addAll(getStatusForJob(job));
-        return status;
+        return allowFiles(status);
+    }
+
+    private List<StatusWithFiles> allowFiles(List<Status> statuses) {
+        List<StatusWithFiles> list = new ArrayList<>();
+        for (Status status : statuses) {
+            list.add(new StatusWithFiles(status));
+        }
+        return list;
     }
 
     private List<Status> getStatusForJob(final BackupJob job) {

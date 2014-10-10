@@ -12,12 +12,7 @@
 	<name>BackMeUp Model</name>
 
 	<dependencies>
-        <dependency>
-            <groupId>org.backmeup</groupId>
-            <artifactId>backmeup-indexer-client</artifactId>
-            <version>${version.backmeup.indexer}</version>
-        </dependency>
-
+        <!-- MINIMAL dependencies because many plugins depend on this -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

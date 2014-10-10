@@ -1,28 +1,21 @@
 package org.backmeup.rest.resources;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.backmeup.index.model.SearchResponse;
-import org.backmeup.model.dto.BackupSearchDTO;
 import org.backmeup.model.dto.SearchResponseDTO;
 
 /**
@@ -30,43 +23,27 @@ import org.backmeup.model.dto.SearchResponseDTO;
  * 
  * @author fschoeppl
  */
-@Path("backups")
-public class Backups extends SecureBase {
+@Path("search")
+public class Search extends SecureBase {
 
     @Context
     private UriInfo info;
 
     @RolesAllowed("user")
-    @PUT
-    @Path("/{userId}/search")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createSearch( //
-            @PathParam("userId") Long userId, // 
-            @FormParam("query") String query) throws URISyntaxException {
-
-        canOnlyWorkWithMyData(userId);
-
-        long searchId = getLogic().searchBackup(userId, query);
-
-        URI u = new URI(String.format("%sbackups/%d/%d/query", info.getBaseUri().toString(), userId, searchId));
-        return Response.status(Status.ACCEPTED).location(u).entity(new BackupSearchDTO(searchId)).build();
-    }
-
-    @RolesAllowed("user")
     @GET
-    @Path("/{userId}/{searchId}/query")
+    @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public SearchResponseDTO query(//
-            @PathParam("userId") Long userId, //
-            @PathParam("searchId") Long searchId, //
+            @PathParam("userId") Long userId, // 
+            @QueryParam("query") String query, //
             @QueryParam("source") String source, //
             @QueryParam("type") String type, //
             @QueryParam("job") String job) {
-        
+
         canOnlyWorkWithMyData(userId);
 
         Map<String, List<String>> filters = createFiltersFor(source, type, job);
-        SearchResponse sr = getLogic().queryBackup(userId, searchId, filters);
+        SearchResponse sr = getLogic().queryBackup(userId, query, filters);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }

@@ -1,7 +1,6 @@
 package org.backmeup.model;
 
 import java.util.Date;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,15 +13,11 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
-import org.backmeup.index.model.FileItem;
 
 /**
  * The status class contains status information about a certain BackupJob.
  * 
  * @author fschoeppl
- * 
  */
 @Entity
 public class Status {
@@ -43,25 +38,21 @@ public class Status {
 	private String progress;
 	private String category;
 
-	@Transient
-	private Set<FileItem> files;
-
 	public Status() {
 	}
 
 	public Status(BackupJob job, String message, String type, String category,
 			Date timeStamp) {
-		this(job, message, type, category, timeStamp, null, null);
+		this(job, message, type, category, timeStamp, null);
 	}
 
 	public Status(BackupJob job, String message, String type, String category,
-			Date timeStamp, String progress, Set<FileItem> files) {
+			Date timeStamp, String progress) {
 		this.job = job;
 		this.message = message;
 		this.type = type;
 		this.timeStamp = timeStamp;
 		this.progress = progress;
-		this.files = files;
 		this.category = category;
 	}
 
@@ -71,14 +62,6 @@ public class Status {
 
 	public void setProgress(String progress) {
 		this.progress = progress;
-	}
-
-	public Set<FileItem> getFiles() {
-		return files;
-	}
-
-	public void setFiles(Set<FileItem> files) {
-		this.files = files;
 	}
 
 	public BackupJob getJob() {
