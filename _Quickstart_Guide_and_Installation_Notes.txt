@@ -1,0 +1,78 @@
+Quickstart-Guide BackMeUp
+=========================
+updated: 10.10.2014
+The following document contains a 'quickstart' guide for setting up the BackMeUp project
+ - a step-by-step instruction
+ - hints, pitfalls, FAQ
+
+0) Required Software
+====================
+ - Linux / Windows platform. [Tested under Ubuntu 12.04/14.04 (LTS) and Windows 7 64-bit]
+ - Tomcat [Tested under v7.0.56]
+ - Maven [Tested under v3.0.4]
+ - PostgresSQL [Tested under  v9.3 x86]
+ - RabbitMQ and Erlang [Tested under RabbitMQ 3.3.3 and Erlang R16B02]
+ - Apache Webserver [Tested under v2.2.25]
+ - JDK v1.7 [Tested under Oracle JDK 1.7 and openJDK]
+ 
+ For implicitly required software artefacts and version see the project's pom.xml files
+
+1) Software-Modules
+===================
+Checkout the following modules from https://github.com/backmeup/
+These are currently required to build a fully functional BackMeUp instance
+
+ - backmeup-indexer
+ - backmeup-ui
+ - backmeup-plugins
+ - backmeup-service
+ - backmeup-storage
+ - backmeup-worker
+ - backmeup-keyserver
+ 
+2) Setting up BackMeUp
+======================
+A) In %Tomcat_Home%/conf modify tomcat-user.xml settings. Within the <tomcat-users> section add:
+  <role rolename="manager"/>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <role rolename="admin"/>
+  <role rolename="admin-gui"/>
+  <user password="admin" roles="admin,admin-gui,manager,manager-gui,manager-script" username="admin"/>
+  
+
+
+
+
+
+
+
+FAQ
+===
+A) Windows/Linux
+Currently both platforms are supported. Due to dependencies on the underlying file system based encryption mechanisms (LUKS, Truecrypt container creation, etc.), it is possible that Windows support will be dropped/limited in future.
+
+B) Oracle JDK - AES 265 bit encryption
+Oracle JDK is only able to support encryption up to AES 128 bit by law. As the BackMeUp system relies on AES 265 bit symetric key encryption it is required to download and install updated policy files for the JVM. see:
+http://stackoverflow.com/questions/6538485/java-using-aes-256-and-128-symmetric-key-encryption 
+http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+
+C) Enabling remote Tomcat server debugging in Eclipse
+see http://blogs.mulesoft.org/debugging-your-tomcat-webapp-with-eclipse/
+modify the server's start configuration and add
+-Xdebug
+-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+In Eclipse go to Run>Debug Configurations -> Remote Java Application -> New
+Chose the project, add localhost and port 8000 -> apply -> debug
+Now you're able to "debug as -> junit test"
+
+D) Permsize
+The default value for Tomcat7 is set to 64m and is to low. Add the following values to the server's startup configuration and make sure you don't have any blanks at the end of the line
+-XX:PermSize=256m
+-XX:MaxPermSize=512m 
+
+
+
+
+
+
