@@ -32,32 +32,95 @@ These are currently required to build a fully functional BackMeUp instance
  
 2) Setting up BackMeUp
 ======================
-A) In %Tomcat_Home%/conf modify tomcat-user.xml settings. Within the <tomcat-users> section add:
+A) In %tomcat_home%/conf modify tomcat-user.xml settings. Within the <tomcat-users> section add:
   <role rolename="manager"/>
   <role rolename="manager-gui"/>
   <role rolename="manager-script"/>
   <role rolename="admin"/>
   <role rolename="admin-gui"/>
   <user password="admin" roles="admin,admin-gui,manager,manager-gui,manager-script" username="admin"/>
-  
+
+
+B) adjust %maven_home%/conf/settings.xml
+Within /conf/settings.xml make sure to add the following configuration within the 
+BackMeUp's maven configuration autodeploys servlets to Tomcat.
+<server>
+      <id>backmeup.keyserver.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+    </server>
+
+    <server>
+      <id>backmeup.keyserver.postgres</id>
+      <username>dbu_keysrv</username>
+      <password>dbu_keysrv</password>
+    </server>
+
+    <!-- Backmeup Service -->
+    <server>
+      <id>backmeup.service.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+    </server>
+ 
+ <!-- Backmeup Worker -->
+    <server>
+      <id>backmeup.worker.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+</server>
+
+C) create public, private keys
+TODO add link on howto
+
+D) Build the backmeup-keyserver component
+-----------------------------------------
+D1. adjust src/main/resources/keyserver.properties
+and make sure keyserver.publickey und keyserver.privatekey point to the proper location
+created in step [C] as well as that keysrv.log is available.
+
+# KEYSERVER ------------------------------------------------------------------
+keyserver.logfile = C:/Temp/data/backmeup-keyserver/log/keysrv/keysrv.log
+keyserver.publickey = C:/Temp/data/backmeup-keyserver/public.key
+keyserver.privatekey = C:/Temp/data/backmeup-keyserver/private.key
+
+keyserver.queue.host = localhost
+keyserver.queue.name = keysrv
+keyserver.queue.receivers = 0
+
+keyserver.charset = UTF-8
+# -----------------------------------------------------------------------------
+
+D2. connect to postgres on port 5432 and create the keyserver's database & database user
+create a database user called 'dbu_srv' (pw 'dbu_srv')
+create a database called 'db_keysrv' and assign the dbu_srv user as owner
+
+Info:
+Make sure this information is reflected within src>main>webapp>META-INF/context.xml where the JDBC connection details are contained
+
+D3. Copy src/main/sql/db-keyserver-schema.sql content and execute PGScript to setup the database's schema
+
+Note that src/main/sql/db-keyserver-truncate.sql is being called in mavens pre-integration-test phase
 
 
 
-
-
+DX. mvn install
 
 
 FAQ
 ===
 A) Windows/Linux
+----------------
 Currently both platforms are supported. Due to dependencies on the underlying file system based encryption mechanisms (LUKS, Truecrypt container creation, etc.), it is possible that Windows support will be dropped/limited in future.
 
 B) Oracle JDK - AES 265 bit encryption
+----------------
 Oracle JDK is only able to support encryption up to AES 128 bit by law. As the BackMeUp system relies on AES 265 bit symetric key encryption it is required to download and install updated policy files for the JVM. see:
 http://stackoverflow.com/questions/6538485/java-using-aes-256-and-128-symmetric-key-encryption 
 http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
 
 C) Enabling remote Tomcat server debugging in Eclipse
+---------------
 see http://blogs.mulesoft.org/debugging-your-tomcat-webapp-with-eclipse/
 modify the server's start configuration and add
 -Xdebug
@@ -66,10 +129,22 @@ In Eclipse go to Run>Debug Configurations -> Remote Java Application -> New
 Chose the project, add localhost and port 8000 -> apply -> debug
 Now you're able to "debug as -> junit test"
 
-D) Permsize
+D) Adjusting Permsize
+----------------
 The default value for Tomcat7 is set to 64m and is to low. Add the following values to the server's startup configuration and make sure you don't have any blanks at the end of the line
 -XX:PermSize=256m
 -XX:MaxPermSize=512m 
+
+E) wget for Windows
+----------------
+Wget is available for Windows (32bit or 64bit version). It allows to issue GET/PUT/POST/DELETE requests. For example to check if the keyserver is properly working create a user (id 1, password (sd) by running 
+wget.exe -post-data '' http://localhost:8080/backmeup-keyserver/users/1/asd/register
+
+
+
+
+
+
 
 
 
