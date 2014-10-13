@@ -70,8 +70,10 @@ BackMeUp's maven configuration autodeploys servlets to Tomcat.
       <password>admin</password>
 </server>
 
+
 C) create public, private keys
 TODO add link on howto
+
 
 D) Build the backmeup-keyserver component
 -----------------------------------------
@@ -91,7 +93,7 @@ keyserver.queue.receivers = 0
 keyserver.charset = UTF-8
 # -----------------------------------------------------------------------------
 
-D2. connect to postgres on port 5432 and create the keyserver's database & database user
+D2. connect to postgres on port 5432 and create the keyserver's database + db user
 create a database user called 'dbu_srv' (pw 'dbu_srv')
 create a database called 'db_keysrv' and assign the dbu_srv user as owner
 
@@ -100,11 +102,63 @@ Make sure this information is reflected within src>main>webapp>META-INF/context.
 
 D3. Copy src/main/sql/db-keyserver-schema.sql content and execute PGScript to setup the database's schema
 
+Info:
 Note that src/main/sql/db-keyserver-truncate.sql is being called in mavens pre-integration-test phase
 
+D4. make sure tomcat is running. To deploy the keyserver call
+mvn install
+
+Note: Two integration tests still fail
+
+Info:
+To test if the keyserver is properly responsing call
+http://localhost:8080/backmeup-keyserver/users/1
+or check FAQ>E
 
 
-DX. mvn install
+E) Build the backmeup-service component
+-----------------------------------------
+E0. Make sure you've installed RabbitMQ + Erlang dependency, set the %ERLANG_HOME% user variable and started the message queue calling sbin/rabbit-mq-server.bat
+
+E1. connect to postgres on port 5432 and create the component's database + db user
+create a database user called 'dbu_core' (pw 'dbu_core')
+create a database called 'bmucore' and assign the dbu_core user as owner
+
+Info:
+Make sure this information is reflected within src>main>resources>META-INF/persistance.xml
+
+E2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory. All other values default. The database connection properties may stay empty as they are provided within
+src>main>resources>META-INF/persistance.xml
+
+# PLUGINS ---------------------------------------------------------------------
+# Location for the backmeup plugin bundles that will be loaded at startup
+backmeup.osgi.deploymentDirectory = C:/Temp/data/backmeup-service/autodeploy
+# Temporary directory for OSGi container
+backmeup.osgi.temporaryDirectory = C:/Temp/data/backmeup-service/osgi-tmp
+backmeup.osgi.exportedPackages = org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api org.backmeup.plugin.api.actions javax.mail com.sun.imap
+# --------
+
+E3. Within backmeup-service-tests check src/test/resources/integrationtest.properties and adjust to your local tomcat settings if you don't operate on the default ports
+
+E4. To deploy the the component switch into backmeup-service root and call
+mvn -DintegrationTests pre-integration-test
+
+E5. To check if the component is properly working switch to backmeup-service-tests and run the integration tests
+e.g. manually JUnittest in Eclipse
+src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
+
+F) Build the backmeup-worker component
+--------------------------------------
+F1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+
+F2) To deploy the servlet call 
+mvn install
+
+Info: to check the worker's proper deployment and status call
+http://localhost:8080/backmeup-worker-app-servlet/
+
+G) Build the BackMeUp Plugins
+-----------------------------
 
 
 FAQ
