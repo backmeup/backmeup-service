@@ -75,8 +75,8 @@ C) create public, private keys
 TODO add link on howto
 
 
-D) Build the backmeup-keyserver component
------------------------------------------
+D) Building the backmeup-keyserver component
+--------------------------------------------
 D1. adjust src/main/resources/keyserver.properties
 and make sure keyserver.publickey und keyserver.privatekey point to the proper location
 created in step [C] as well as that keysrv.log is available.
@@ -116,8 +116,8 @@ http://localhost:8080/backmeup-keyserver/users/1
 or check FAQ>E
 
 
-E) Build the backmeup-service component
------------------------------------------
+E) Building the backmeup-service component
+------------------------------------------
 E0. Make sure you've installed RabbitMQ + Erlang dependency, set the %ERLANG_HOME% user variable and started the message queue calling sbin/rabbit-mq-server.bat
 
 E1. connect to postgres on port 5432 and create the component's database + db user
@@ -147,8 +147,8 @@ E5. To check if the component is properly working switch to backmeup-service-tes
 e.g. manually JUnittest in Eclipse
 src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
 
-F) Build the backmeup-worker component
---------------------------------------
+F) Building the backmeup-worker component
+-----------------------------------------
 F1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
 
 F2) To deploy the servlet call 
@@ -157,8 +157,61 @@ mvn install
 Info: to check the worker's proper deployment and status call
 http://localhost:8080/backmeup-worker-app-servlet/
 
-G) Build the BackMeUp Plugins
------------------------------
+
+G) Building the backmeup-plugins
+--------------------------------
+To build the plugins call
+mvn install
+within the backmeup-plugins/target directory you'll find the created osgi bundles. Copy the plugins you want to deploy into data/backmeup-service/autodeploy [according to the configuration in section B] 
+
+Info:
+It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment.
+Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
+
+
+H) Building the GUI
+-------------------
+Using the UI locally does not require to have a http server up and running.
+* pre-compiled applications for iOS and Android is located in backmeup-ui/appfiles
+* a version optimmized for a desktop browser is located in  backmeup-ui/app.extern.gtn.themis/www -> copy this directory into into your Apache2.2 htdocs folder when using a http-server
+
+H1. change into the folder www/js/plugins and open the file pluging.WebServiceClient.json to connect to your local backmeup backend
+----------------------------------------------------------------
+"defaultServer":"backmeup",
+	"server":{
+		"backmeup":{
+			...
+			},
+			"first":{
+				"scheme":"http",
+				"scheme_specific_part":"://",
+				"host":"localhost",
+				"port":8080
+----------------------------------------------------------------
+
+H2. change into the folder www/js and change the settings in lapstone.js config:{min: from true to false. This tells te system to use the local files inc. the plugin.WebServicClient.json instead of the prepackaged ones.
+----------------------------------------------------------------
+var app = {
+	config : {
+		name : "app",
+		min : false,
+		useJQueryMobile : true,
+		apacheCordova : null
+	},
+	addObject : function(name, object) {
+		// alert("Add object to app: " + name);
+		app[name] = object;
+	}
+};
+---------------------------------------------------------------
+
+H3. Make sure to kill all open Chrome browser instances and launch Chrome with disabled-web-security as cross-domain requests won't work.
+
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security
+open the file in your browser
+file:///D:/repositories/themis-backmeup/backmeup-ui/app.extern.gtn.themis/www/page/start.html
+
+H4. Within the GUI navigate to Settings > clear appdata to remove all cached entries in the browser's database
 
 
 FAQ
