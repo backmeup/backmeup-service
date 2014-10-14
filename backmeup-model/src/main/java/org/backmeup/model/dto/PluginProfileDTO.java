@@ -16,7 +16,8 @@ public class PluginProfileDTO {
 	private String pluginId;
 	private PluginType profileType;
 	private long modified;
-	private Map<String, String> configProperties;
+	private AuthDataDTO authData;
+	private Map<String, String> properties;
 	private List<String> options;
 	
 	public PluginProfileDTO() {
@@ -63,19 +64,27 @@ public class PluginProfileDTO {
 		this.modified = modified;
 	}
 
-	public Map<String, String> getConfigProperties() {
-		return configProperties;
+	public AuthDataDTO getAuthData() {
+		return authData;
 	}
 
-	public void setConfigProperties(Map<String, String> configProperties) {
-		this.configProperties = configProperties;
+	public void setAuthData(AuthDataDTO authData) {
+		this.authData = authData;
+	}
+
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, String> configProperties) {
+		this.properties = configProperties;
 	}
 	
-	public void addConfigProperties(String key, String value) {
-		if(configProperties == null) {
-			configProperties = new HashMap<>();
+	public void addProperty(String key, String value) {
+		if(properties == null) {
+			properties = new HashMap<>();
 		}
-		configProperties.put(key, value);
+		properties.put(key, value);
 	}
 
 	public List<String> getOptions() {
