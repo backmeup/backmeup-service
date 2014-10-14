@@ -25,13 +25,11 @@ import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
-import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.StatusWithFiles;
@@ -337,7 +335,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
 //                registration.ensureUserIsActive(username);
                 BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
-                ProfileOptions sourceProfile = job.getSourceProfiles();
+                Profile sourceProfile = job.getSourceProfile();
                 return profiles.getProfileOptions(profileId, sourceProfile);
             
             }
@@ -350,7 +348,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 			@Override public void run() {
 
 			    BackupJob backupjob = backupJobs.getExistingJob(jobId);
-				ProfileOptions sourceProfiles = backupjob.getSourceProfiles();
+				Profile sourceProfiles = backupjob.getSourceProfile();
                 profiles.setProfileOptions(profileId, sourceProfiles, sourceOptions);
 				
 			}
@@ -379,9 +377,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public ActionProfile getStoredActionOptions(final String actionId, final Long jobId) {
-        return conn.txJoinReadOnly(new Callable<ActionProfile>() {
-            @Override public ActionProfile call() {
+    public Profile getStoredActionOptions(final String actionId, final Long jobId) {
+        return conn.txJoinReadOnly(new Callable<Profile>() {
+            @Override public Profile call() {
 
                 return backupJobs.getJobActionOption(actionId, jobId);
             
@@ -405,7 +403,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    private List<ActionProfile> getActionProfilesFor(BackupJob request) {
+    private List<Profile> getActionProfilesFor(BackupJob request) {
         return plugins.getActionProfilesFor(request);
     }
     
@@ -495,7 +493,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
             	plugins.configureAuth(props, pluginId);               
                 
-                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
+                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
                 String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
                 profiles.setIdentification(p, identification); // ?
                 authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
@@ -509,9 +507,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     	conn.txNew(new Runnable() {
             @Override public void run() {
                 
-                Profile p = profiles.queryExistingProfile(profile.getProfileId());
+                Profile p = profiles.queryExistingProfile(profile.getId());
                 if(p == null) {
-                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getProfileName(), profile.getType());
+                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
                 }
 
                 String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
@@ -588,17 +586,17 @@ public class BusinessLogicImpl implements BusinessLogic {
         try {
             conn.begin();
 
-            ProfileOptions pos = request.getSourceProfiles();
+            Profile source = request.getSourceProfile();
 //            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(request.getSourceProfiles());
-            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getProfileId());
+            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getId());
 
-            List<ActionProfile> actions = getActionProfilesFor(request);
+            List<Profile> actions = getActionProfilesFor(request);
 
 //            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
 
             conn.rollback();
             
-            BackupJob job = jobManager.createBackupJob(request.getUser(), pos, sink, actions, request.getStart(), request.getDelay(), request.getJobTitle(), request.isReschedule(), request.getTimeExpression());
+            BackupJob job = jobManager.createBackupJob(request.getUser(), source, sink, actions, request.getStart(), request.getDelay(), request.getJobTitle(), request.isReschedule(), request.getTimeExpression());
             ValidationNotes vn = validateBackupJob(request.getUser().getUserId(), job.getId(), request.getUser().getPassword());
             vn.setJob(job);
             return vn;
@@ -860,9 +858,9 @@ public class BusinessLogicImpl implements BusinessLogic {
                 ValidationNotes notes = new ValidationNotes();
                 try {
                     BackupJob job = backupJobs.getExistingUserJob(jobId, userId); 
-                    validateSourceProfiles(job.getSourceProfiles(), notes);
+                    validateSourceProfiles(job.getSourceProfile(), notes);
 
-                    Long sinkProfileId = job.getSinkProfile().getProfileId();
+                    Long sinkProfileId = job.getSinkProfile().getId();
                     getValidationEntriesForProfile(sinkProfileId, notes);
 
                 } catch (BackMeUpException bme) {
@@ -871,12 +869,12 @@ public class BusinessLogicImpl implements BusinessLogic {
                 return notes;
             }
 
-            private void validateSourceProfiles(ProfileOptions sourceProfiles, ValidationNotes notes) {
-            	ProfileOptions po = sourceProfiles;
-                String sourceSinkId = po.getProfile().getDescription();
+            private void validateSourceProfiles(Profile sourceProfile, ValidationNotes notes) {
+            	Profile source = sourceProfile;
+                String sourceSinkId = source.getDescription();
                 plugins.validateSourceSinkExists(sourceSinkId, notes);
 
-                Long profileId = po.getProfile().getProfileId();
+                Long profileId = source.getId();
                 getValidationEntriesForProfile(profileId, notes);
             }
 

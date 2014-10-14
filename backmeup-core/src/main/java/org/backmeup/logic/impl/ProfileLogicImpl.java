@@ -1,7 +1,5 @@
 package org.backmeup.logic.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -15,7 +13,6 @@ import org.backmeup.dal.ProfileDao;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @ApplicationScoped
@@ -82,46 +79,38 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfileEntries) {
+    public Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfileEntries) {
         if (sourceProfileEntries.size() == 0) {
             throw new IllegalArgumentException("There must be at least one source profile to download data from!");
         }
 
-        Set<ProfileOptions> profileOptions = new HashSet<>();
+        Set<Profile> profileOptions = new HashSet<>();
         for (Profile sourceEntry : sourceProfileEntries) {
-            Profile sourceProfile = queryExistingProfile(sourceEntry.getProfileId());
+            Profile sourceProfile = queryExistingProfile(sourceEntry.getId());
             //TODO
 //            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
-            profileOptions.add(new ProfileOptions(sourceProfile, new String[0]));
+            profileOptions.add(sourceProfile);
         }
         return profileOptions;
     }
 
     @Override
-    public List<String> getProfileOptions(Long profileId, ProfileOptions sourceProfile) {
-        ProfileOptions po = sourceProfile;
-        if (po.getProfile().getProfileId().equals(profileId)) {
-            return asList(po.getOptions());
+    public List<String> getProfileOptions(Long profileId, Profile sourceProfile) {
+        Profile po = sourceProfile;
+        if (po.getId().equals(profileId)) {
+            return po.getOptions();
         }
 
         throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
     }
 
-    private List<String> asList(String[] options) {
-        if (options == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(options);
-    }
-
     @Override
-    public void setProfileOptions(Long profileId, ProfileOptions sourceProfiles, List<String> sourceOptions) {
+    public void setProfileOptions(Long profileId, Profile sourceProfile, List<String> sourceOptions) {
         queryExistingProfile(profileId);
         
-        ProfileOptions option = sourceProfiles;
-        if (option.getProfile().getProfileId().equals(profileId)) {
-            String[] new_options = sourceOptions.toArray(new String[sourceOptions.size()]);
-            option.setOptions(new_options);
+        Profile option = sourceProfile;
+        if (option.getId().equals(profileId)) {
+            option.setOptions(sourceOptions);
         }
     }
 

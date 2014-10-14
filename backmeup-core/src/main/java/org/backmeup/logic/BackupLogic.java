@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -19,7 +19,7 @@ public interface BackupLogic {
 
     BackupJob getExistingUserJob(Long jobId, Long userId);
 
-    ActionProfile getJobActionOption(String actionId, Long jobId);
+    Profile getJobActionOption(String actionId, Long jobId);
 
     void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
 

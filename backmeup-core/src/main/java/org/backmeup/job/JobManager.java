@@ -3,11 +3,9 @@ package org.backmeup.job;
 import java.util.Date;
 import java.util.List;
 
-import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 
 /**
  * 
@@ -23,8 +21,8 @@ import org.backmeup.model.ProfileOptions;
 public interface JobManager {
 
 	public BackupJob createBackupJob(BackMeUpUser user,
-			ProfileOptions sourceProfile, Profile sinkProfile,
-			List<ActionProfile> requiredActions, Date start, long delay, String jobTitle,
+			Profile sourceProfile, Profile sinkProfile,
+			List<Profile> requiredActions, Date start, long delay, String jobTitle,
 			boolean reschedule, String timeExpression);
 
 	

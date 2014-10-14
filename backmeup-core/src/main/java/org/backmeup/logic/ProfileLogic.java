@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
@@ -29,11 +28,11 @@ public interface ProfileLogic {
 
     List<Profile> getDatasinkProfilesOf(Long userId);
 
-    Set<ProfileOptions> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
+    Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
 
-    List<String> getProfileOptions(Long profileId, ProfileOptions sourceProfile);
+    List<String> getProfileOptions(Long profileId, Profile sourceProfile);
 
-    void setProfileOptions(Long profileId, ProfileOptions sourceProfiles, List<String> sourceOptions);
+    void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
 
     Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 

@@ -1,7 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -13,10 +12,9 @@ import javax.inject.Named;
 
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.logic.PluginsLogic;
-import org.backmeup.model.ActionProfile;
-import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.Profile;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.PluginDescribable;
@@ -47,24 +45,27 @@ public class PluginsLogicImpl implements PluginsLogic {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("PluginsLogicImpl");
 
     @Override
-    public List<ActionProfile> getActionProfilesFor(BackupJob request) {
-        List<ActionProfile> actions = new ArrayList<>();
+    public List<Profile> getActionProfilesFor(BackupJob request) {
+        List<Profile> actions = new ArrayList<>();
 
-        for (ActionProfile action : request.getRequiredActions()) {
-            PluginDescribable ad = plugins.getPluginDescribableById(action.getActionId());
+        for (Profile action : request.getActionProfiles()) {
+//            PluginDescribable ad = plugins.getPluginDescribableById(action.getActionId());
+//
+//            if (ad == null) {
+//                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
+//            }
 
-            if (ad == null) {
-                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
-            }
-
-            ActionProfile ap = new ActionProfile(ad.getId(), ad.getPriority());
-            for (ActionProperty entry : action.getActionOptions()) {
-                ap.addActionOption(entry.getKey(), entry.getValue());
-            }
-            actions.add(ap);
+//            Profile ap = new Profile(ad.getId(), ad.getPriority());
+//            for (Entry<String, String> entry : action.getProperties().entrySet()) {
+//                ap.addProperty(entry.getKey(), entry.getValue());
+//            }
+//            actions.add(ap);
+        	
+        	//TODO: Verify why code above is necessary 
+        	actions.add(action);
         }
 
-        Collections.sort(actions);
+//        Collections.sort(actions);
         return actions;
     }
 

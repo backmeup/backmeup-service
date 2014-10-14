@@ -44,7 +44,6 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.Token;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
@@ -433,21 +432,21 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 	public void addAuthInfo(Profile profile, String userPwd,
 			Properties keyValuePairs) {
 		addAuthInfo(profile.getUser().getUserId(), userPwd,
-				profile.getProfileId(), profile.getProfileId(), keyValuePairs);
+				profile.getId(), profile.getId(), keyValuePairs);
 	}
 
 	@Override
 	public boolean isAuthInformationAvailable(Profile profile, String userPwd) {
-		return isAuthInformationAvailable(profile.getProfileId(), profile
-				.getUser().getUserId(), profile.getProfileId(), userPwd);
+		return isAuthInformationAvailable(profile.getId(), profile
+				.getUser().getUserId(), profile.getId(), userPwd);
 	}
 
 	@Override
 	public Token getToken(Profile profile, String userPwd, Long backupdate,
 			boolean reusable, String encryptionPwd) {
 		return getToken(profile.getUser().getUserId(), userPwd,
-				new Long[] { profile.getProfileId() },
-				new Long[] { profile.getProfileId() }, backupdate, reusable,
+				new Long[] { profile.getId() },
+				new Long[] { profile.getId() }, backupdate, reusable,
 				encryptionPwd);
 	}
 
@@ -456,11 +455,11 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 			boolean reusable, String encryptionPwd) {
 		List<Long> usedServices = new ArrayList<>();
 		List<Long> authenticationInfos = new ArrayList<>();
-		usedServices.add(job.getSinkProfile().getProfileId());
-		authenticationInfos.add(job.getSinkProfile().getProfileId());
-		ProfileOptions po = job.getSourceProfiles();
-		usedServices.add(po.getProfile().getProfileId());
-		authenticationInfos.add(po.getProfile().getProfileId());
+		usedServices.add(job.getSinkProfile().getId());
+		authenticationInfos.add(job.getSinkProfile().getId());
+		Profile profile = job.getSourceProfile();
+		usedServices.add(profile.getId());
+		authenticationInfos.add(profile.getId());
 		Long[] serviceIds = usedServices.toArray(new Long[] {});
 		Long[] authIds = authenticationInfos.toArray(new Long[] {});
 		Token t = getToken(job.getUser().getUserId(), userPwd, serviceIds,

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.backmeup.index.model.SearchResponse;
-import org.backmeup.model.ActionProfile;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -48,7 +47,7 @@ public interface BusinessLogic {
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
-	ActionProfile getStoredActionOptions(String actionId, Long jobId);
+	Profile getStoredActionOptions(String actionId, Long jobId);
 	
 	//datasource operations
 	List<PluginDescribable> getDatasources();

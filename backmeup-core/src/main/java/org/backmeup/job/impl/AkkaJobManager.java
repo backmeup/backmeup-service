@@ -2,6 +2,7 @@ package org.backmeup.job.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -14,12 +15,9 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
-import org.backmeup.model.ActionProfile;
-import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.Token;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.slf4j.Logger;
@@ -58,8 +56,8 @@ abstract public class AkkaJobManager implements JobManager {
 
 	@Override
 	public BackupJob createBackupJob(BackMeUpUser user,
-			ProfileOptions sourceProfiles, Profile sinkProfile,
-			List<ActionProfile> requiredActions, Date start, long delayInMs, 
+			Profile sourceProfiles, Profile sinkProfile,
+			List<Profile> requiredActions, Date start, long delayInMs, 
 			String jobTitle, boolean reschedule, String timeExpression) {
 		try {
 			conn.begin();
@@ -75,8 +73,8 @@ abstract public class AkkaJobManager implements JobManager {
 
 			String encryptionPwd = null;
 			Properties p = new Properties();
-			for (ActionProfile ap : requiredActions) {
-				for (ActionProperty prop : ap.getActionOptions()) {
+			for (Profile ap : requiredActions) {
+				for (Entry<String, String> prop : ap.getProperties().entrySet()) {
 					p.put(prop.getKey(), prop.getValue());
 				}
 			}
