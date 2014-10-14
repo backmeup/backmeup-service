@@ -59,10 +59,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			sourcePluginProfile.setTitle(sourceProfileName);
 			sourcePluginProfile.setPluginId(sourcePluginId);
 			sourcePluginProfile.setProfileType(sourceProfileType);
-			sourcePluginProfile.addConfigProperties("text", "true");
-			sourcePluginProfile.addConfigProperties("image", "true");
-			sourcePluginProfile.addConfigProperties("pdf", "true");
-			sourcePluginProfile.addConfigProperties("binary", "true");
+			sourcePluginProfile.addProperty("text", "true");
+			sourcePluginProfile.addProperty("image", "true");
+			sourcePluginProfile.addProperty("pdf", "true");
+			sourcePluginProfile.addProperty("binary", "true");
 			
 			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
 			sourceProfileId = response.extract().path("profileId").toString();
@@ -146,10 +146,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			sourcePluginProfile.setTitle(sourceProfileName);
 			sourcePluginProfile.setPluginId(sourcePluginId);
 			sourcePluginProfile.setProfileType(sourceProfileType);
-			sourcePluginProfile.addConfigProperties("text", "true");
-			sourcePluginProfile.addConfigProperties("image", "true");
-			sourcePluginProfile.addConfigProperties("pdf", "true");
-			sourcePluginProfile.addConfigProperties("binary", "true");
+			sourcePluginProfile.addProperty("text", "true");
+			sourcePluginProfile.addProperty("image", "true");
+			sourcePluginProfile.addProperty("pdf", "true");
+			sourcePluginProfile.addProperty("binary", "true");
 			
 			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
 			sourceProfileId = response.extract().path("profileId").toString();
@@ -270,10 +270,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			sourcePluginProfile.setTitle(sourceProfileName);
 			sourcePluginProfile.setPluginId(sourcePluginId);
 			sourcePluginProfile.setProfileType(sourceProfileType);
-			sourcePluginProfile.addConfigProperties("text", "true");
-			sourcePluginProfile.addConfigProperties("image", "true");
-			sourcePluginProfile.addConfigProperties("pdf", "true");
-			sourcePluginProfile.addConfigProperties("binary", "true");
+			sourcePluginProfile.addProperty("text", "true");
+			sourcePluginProfile.addProperty("image", "true");
+			sourcePluginProfile.addProperty("pdf", "true");
+			sourcePluginProfile.addProperty("binary", "true");
 			
 			response = BackMeUpUtils.addProfile(accessToken, sourcePluginId, sourcePluginProfile);
 			sourceProfileId = response.extract().path("profileId").toString();

@@ -175,10 +175,10 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		pluginProfile.setPluginId(pluginId);
 		pluginProfile.setProfileType(profileType);
 		
-		pluginProfile.addConfigProperties("text", "true");
-		pluginProfile.addConfigProperties("image", "true");
-		pluginProfile.addConfigProperties("pdf", "true");
-		pluginProfile.addConfigProperties("binary", "true");
+		pluginProfile.addProperty("text", "true");
+		pluginProfile.addProperty("image", "true");
+		pluginProfile.addProperty("pdf", "true");
+		pluginProfile.addProperty("binary", "true");
 		
 		try {
 			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
@@ -247,8 +247,8 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 			pluginProfile.setTitle(profileName);
 			pluginProfile.setProfileType(profileType);
 			
-			pluginProfile.addConfigProperties(Constants.KEY_SOURCE_TOKEN, Constants.VALUE_SOURCE_TOKEN);
-			pluginProfile.addConfigProperties(Constants.KEY_SOURCE_SECRET, Constants.VALUE_SOURCE_SECRET);
+			pluginProfile.addProperty(Constants.KEY_SOURCE_TOKEN, Constants.VALUE_SOURCE_TOKEN);
+			pluginProfile.addProperty(Constants.KEY_SOURCE_SECRET, Constants.VALUE_SOURCE_SECRET);
 			
 			response = 
 			given()
@@ -297,10 +297,10 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 			pluginProfile.setPluginId(pluginId);
 			pluginProfile.setProfileType(profileType);
 			
-			pluginProfile.addConfigProperties("text", "true");
-			pluginProfile.addConfigProperties("image", "true");
-			pluginProfile.addConfigProperties("pdf", "true");
-			pluginProfile.addConfigProperties("binary", "true");
+			pluginProfile.addProperty("text", "true");
+			pluginProfile.addProperty("image", "true");
+			pluginProfile.addProperty("pdf", "true");
+			pluginProfile.addProperty("binary", "true");
 			
 			response = 
 			given()

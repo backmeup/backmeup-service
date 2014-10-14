@@ -97,7 +97,7 @@ public class BackMeUpUtils {
 		for(Entry<?,?> entry : configProps.entrySet()) {
 			String key = (String) entry.getKey();  
 			String value = (String) entry.getValue();  
-			pluginProfile.addConfigProperties(key, value);
+			pluginProfile.addProperty(key, value);
 		}
 		
 		return addProfile(accessToken, pluginId, pluginProfile);

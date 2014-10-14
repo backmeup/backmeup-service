@@ -59,8 +59,8 @@ public class DummyDataManager {
 		pluginProfile.setModified(1401099707142L);
 		
 		if(expandConfig) {
-			pluginProfile.addConfigProperties("mail.username", "john.doe");
-			pluginProfile.addConfigProperties("mail.password", "JoHn123!");
+			pluginProfile.addProperty("mail.username", "john.doe");
+			pluginProfile.addProperty("mail.password", "JoHn123!");
 			
 			pluginProfile.addOption("Inbox");
 			pluginProfile.addOption("Sent Items");

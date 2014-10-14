@@ -45,7 +45,12 @@
 		<class-b>org.backmeup.model.dto.PluginProfileDTO</class-b>
 		
 		<field>
-  			<a>profileName</a>
+  			<a>id</a>
+  			<b>profileId</b>
+  		</field>
+		
+		<field>
+  			<a>name</a>
   			<b>title</b>
   		</field>
   		

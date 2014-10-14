@@ -107,8 +107,8 @@ public class MappingTest {
 		
 		PluginProfileDTO profileDTO = mapper.map(profile, PluginProfileDTO.class);
 		
-		assertEquals(profile.getProfileId().longValue(), profileDTO.getProfileId());
-		assertEquals(profile.getProfileName(), profileDTO.getTitle());
+		assertEquals(profile.getId().longValue(), profileDTO.getProfileId());
+		assertEquals(profile.getName(), profileDTO.getTitle());
 		assertEquals(profile.getType(), profileTypeModel);
 		assertEquals(profileDTO.getProfileType(), profileTypeDTO);
 	}
