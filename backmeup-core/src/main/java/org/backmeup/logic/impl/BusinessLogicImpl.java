@@ -25,6 +25,7 @@ import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -276,6 +277,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
+    public boolean isPluginAvailable(String pluginId) {
+    	return plugins.isPluginAvailable(pluginId);
+    }
+    
+    @Override
     public PluginDescribable getPluginDescribable(String pluginId) {
     	return plugins.getPluginDescribableById(pluginId);
     }
@@ -487,9 +493,8 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public Profile addPluginProfile(String pluginId, Profile profile) {
     	//TODO: profile properties are not consireded
-    	Properties props = new Properties();
-    	props.putAll(profile.getAuthData().getProperties());
-    	return addPluginProfile(pluginId, profile, props, profile.getOptions());
+    	//TODO: Auth data is referenced by id 
+    	return addPluginProfile(pluginId, profile, new Properties(), profile.getOptions());
     }
     
     @Override
@@ -908,5 +913,45 @@ public class BusinessLogicImpl implements BusinessLogic {
     public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
         return authorization.getLogs(user);
     }
+
+	@Override
+	public AuthData addPluginAuthData(final AuthData authData) {
+		// TODO Auto-generated method stub
+		
+		return conn.txNew(new Callable<AuthData>() {
+            @Override public AuthData call() {
+//            	if(authData.getUser() == null) {
+//            		
+//            	}
+//                
+//                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
+//                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+//                profiles.setIdentification(p, identification); // ?
+//                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+//                return p;
+            	
+            	return null;
+            }
+        });
+
+	}
+
+	@Override
+	public AuthData getPluginAuthData(Long authDataId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AuthData updatePluginAuthData(AuthData authData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deletePluginAuthData(Long authDataId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

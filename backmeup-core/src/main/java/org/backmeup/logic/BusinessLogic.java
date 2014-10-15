@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.backmeup.index.model.SearchResponse;
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -39,13 +40,21 @@ public interface BusinessLogic {
 	BackMeUpUser addUser(BackMeUpUser user);
 	
 	// plugin operations ------------------------------------------------------
+	boolean isPluginAvailable(String pluginId);
 	PluginDescribable getPluginDescribable(String pluginId);
 	AuthRequest getPluginConfiguration(String pluginId);
+	
+	AuthData addPluginAuthData(AuthData authData);
+	AuthData getPluginAuthData(Long authDataId);
+	AuthData updatePluginAuthData(AuthData authData);
+	void     deletePluginAuthData(Long authDataId);
+	
 	Profile addPluginProfile(String pluginId, Profile profile);
 	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile updatePluginProfile(String pluginId, Profile profile);
-	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	void    updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);
+	Profile deleteProfile(Long userId, Long profile);
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
@@ -54,7 +63,6 @@ public interface BusinessLogic {
 	//datasource operations
 	List<PluginDescribable> getDatasources();
 	List<Profile> getDatasourceProfiles(Long userId);
-	Profile deleteProfile(Long userId, Long profile);
 	List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
 	List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
 	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
