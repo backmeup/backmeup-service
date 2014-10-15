@@ -43,6 +43,7 @@ public interface BusinessLogic {
 	AuthRequest getPluginConfiguration(String pluginId);
 	Profile addPluginProfile(String pluginId, Profile profile);
 	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	Profile updatePluginProfile(String pluginId, Profile profile);
 	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);
 

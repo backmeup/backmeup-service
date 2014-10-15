@@ -9,12 +9,12 @@ import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
+import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.TokenDTO;
 import org.backmeup.model.dto.UserDTO;
-import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class DummyDataManager {
@@ -60,8 +60,11 @@ public class DummyDataManager {
 		pluginProfile.setModified(1401099707142L);
 		
 		if(expandConfig) {
-			pluginProfile.addProperty("mail.username", "john.doe");
-			pluginProfile.addProperty("mail.password", "JoHn123!");
+			AuthDataDTO authData = new AuthDataDTO(1L, "Email Work");
+			authData.addProperty("mail.username", "john.doe");
+			authData.addProperty("mail.password", "JoHn123!");
+			
+			pluginProfile.addProperty("includeAttachments", "true");
 			
 			pluginProfile.addOption("Inbox");
 			pluginProfile.addOption("Sent Items");

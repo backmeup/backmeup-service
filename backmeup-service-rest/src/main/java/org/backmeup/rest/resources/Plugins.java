@@ -173,10 +173,10 @@ public class Plugins extends Base {
 		profile = getLogic().addPluginProfile(pluginId, profile);
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
-		profileDTO.setAuthData(new AuthDataDTO(authData.getId()));
-		profileDTO.setProperties(pluginProfile.getProperties());
-		profileDTO.setOptions(pluginProfile.getOptions());
+//		profileDTO.setPluginId(pluginId);
+//		profileDTO.setAuthData(new AuthDataDTO(authData.getId()));
+//		profileDTO.setProperties(pluginProfile.getProperties());
+//		profileDTO.setOptions(pluginProfile.getOptions());
 		
 		return profileDTO;
 	}
@@ -215,19 +215,21 @@ public class Plugins extends Base {
 //		return pluginProfile;
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
-		if((!activeUser.getUserId().equals(profile.getUser().getUserId())) && 
+		Long pId = Long.parseLong(profileId);
+		Profile persistentProfile = getLogic().getPluginProfile(pId);
+		if((!activeUser.getUserId().equals(persistentProfile.getUser().getUserId())) && 
 		   (pluginProfile.getProfileId() != Long.parseLong(profileId))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
-		Properties configProps = new Properties();
-		configProps.putAll(pluginProfile.getProperties());
-		List<String> configOptions = pluginProfile.getOptions();
-		getLogic().updatePluginProfile(pluginId, profile, configProps, configOptions);
 		
-		Profile profileModel = getLogic().getPluginProfile(Long.parseLong(profileId));
-		PluginProfileDTO profileDTO = getMapper().map(profileModel, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
+		if ((!pId.equals(pluginProfile.getProfileId())) && (!pId.equals(persistentProfile.getId()))) {
+			throw new WebApplicationException(Status.CONFLICT);
+		}
+
+		Profile profile = getMapper().map(pluginProfile, Profile.class);
+		profile = getLogic().updatePluginProfile(pluginId, profile);
+		
+		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
 		
 		return profileDTO;
 	}

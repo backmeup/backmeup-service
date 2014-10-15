@@ -527,6 +527,16 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Override
+    public Profile updatePluginProfile(String pluginId, final Profile profile) {
+    	return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
+            	
+                return profiles.queryExistingProfile(profile.getId());
+            }
+        });
+    };
     /*
  // TODO Store profile data within keyserver!
     @Override
