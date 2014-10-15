@@ -34,6 +34,7 @@ import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
+import org.backmeup.rest.DummyDataManager;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 @Path("/plugins")
@@ -245,8 +246,12 @@ public class Plugins extends Base {
 	@POST
 	@Path("/{pluginId}/authdata")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
+	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		authData.setAuthDataId(47L);
+		authData.getProperties().clear();
+		authData.setProperties(null);
+		return authData;
 		
 		// map dto to model class
 		// AuthData authDataModel = getMapper().map(authData, AuthData.class);
@@ -258,5 +263,36 @@ public class Plugins extends Base {
 		// authDataDTO = getMapper().map(authDataModel, AuthDataDTO.class);
 		
 		// return authDataDTO
+	}
+	
+	@RolesAllowed("user")
+	@GET
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AuthDataDTO getAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId){
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		return DummyDataManager.getAuthDataDTO(false);
+	}
+	
+	@RolesAllowed("user")
+	@PUT
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AuthDataDTO updateAuthData(
+			@PathParam("pluginId") String pluginId,
+			@PathParam("authdataId") String authDataId, 
+			AuthDataDTO authData) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		authData.getProperties().clear();
+		authData.setProperties(null);
+		return authData;
+	}
+	
+	@RolesAllowed("user")
+	@DELETE
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void deleteAuthData(@PathParam("pluginId") String pluginId,	@PathParam("authdataId") String authDataId) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 	}
 }

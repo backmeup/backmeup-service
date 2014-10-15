@@ -3,6 +3,7 @@ package org.backmeup.rest;
 import java.util.Date;
 
 import org.backmeup.model.api.RequiredInputField.Type;
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
@@ -67,6 +68,19 @@ public class DummyDataManager {
 		}
 
 		return pluginProfile;
+	}
+	
+	public static AuthDataDTO getAuthDataDTO(boolean expandProperties) {
+		AuthDataDTO authData = new AuthDataDTO();
+		authData.setAuthDataId(54L);
+		authData.setName("Email Work");
+
+		if (expandProperties) {
+			authData.addProperty("mail.username", "u1024");
+			authData.addProperty("mail.username", "s3cr3tPW!");
+		}
+
+		return authData;
 	}
 	
 	public static TokenDTO getTokenDTO() {

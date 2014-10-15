@@ -7,19 +7,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class AuthDataDTO {
-	private long authDataId;
+	private Long authDataId;
 	private String name;
 	private Map<String, String> properties;
 	
 	public AuthDataDTO() {
 		
 	}
+	
+	public AuthDataDTO(long id, String name) {
+		this.authDataId = id;
+		this.name = name;
+	}
 
-	public long getAuthDataId() {
+	public Long getAuthDataId() {
 		return authDataId;
 	}
 
-	public void setAuthDataId(long authDataId) {
+	public void setAuthDataId(Long authDataId) {
 		this.authDataId = authDataId;
 	}
 

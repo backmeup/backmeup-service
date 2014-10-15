@@ -3,7 +3,10 @@ package org.backmeup.tests.integration;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
+import org.backmeup.model.AuthData;
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.tests.IntegrationTest;
@@ -12,6 +15,7 @@ import org.backmeup.tests.integration.utils.Constants;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.internal.matchers.NotNull;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
 import com.jayway.restassured.response.ValidatableResponse;
@@ -319,6 +323,92 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 		
 		} finally {
 			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
+	public void testAddPluginProfileAuthData() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.filegenerator";
+		
+		String authDataName = "AuthData1";
+		
+		String authDataId = "";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			AuthDataDTO authData = new AuthDataDTO();
+			authData.setName(authDataName);
+			authData.addProperty("password", "s3cr3t");
+			
+			response = 
+			given()
+				.log().all()
+				.contentType("application/json")
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+				.body(authData, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/plugins/" + pluginId + "/authdata")
+			.then()
+				.log().all()
+				.statusCode(200)
+				.body("authDataId", notNullValue())
+				.body("name", equalTo(authDataName));
+			
+			authDataId = response.extract().path("authDataId").toString();
+		
+		} finally {
+			// delete authData
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+		
+	@Test
+	public void testGetPluginProfileAuthData() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+			
+		String pluginId = "org.backmeup.filegenerator";
+			
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+				
+			response = 
+			given()
+				.log().all()
+				.contentType("application/json")
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+			.when()
+				.get("/plugins/" + pluginId + "/authdata/4711")
+			.then()
+				.log().all()
+				.statusCode(200)
+				.body("authDataId", notNullValue())
+				.body("name", notNullValue());
+		
+		} finally {
 			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
