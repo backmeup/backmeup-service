@@ -37,4 +37,6 @@ public interface PluginsLogic {
 
     String getAuthorizedUserId(String sourceSinkId, Properties props);
 
+	boolean isPluginAvailable(String pluginId);
+
 }

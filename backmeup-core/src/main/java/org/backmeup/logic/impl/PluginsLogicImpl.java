@@ -68,6 +68,11 @@ public class PluginsLogicImpl implements PluginsLogic {
 //        Collections.sort(actions);
         return actions;
     }
+    
+	@Override
+	public boolean isPluginAvailable(String pluginId) {
+		return plugins.isPluginAvailable(pluginId);
+	}
 
     @Override
     public List<String> getActionOptions(String actionId) {
