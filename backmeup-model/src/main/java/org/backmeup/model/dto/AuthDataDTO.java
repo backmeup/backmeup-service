@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class AuthDataDTO {
-	private Long authDataId;
+	private Long id;
 	private String name;
 	private Map<String, String> properties;
 	
@@ -16,16 +16,16 @@ public class AuthDataDTO {
 	}
 	
 	public AuthDataDTO(long id, String name) {
-		this.authDataId = id;
+		this.id = id;
 		this.name = name;
 	}
 
-	public Long getAuthDataId() {
-		return authDataId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setAuthDataId(Long authDataId) {
-		this.authDataId = authDataId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {

@@ -248,7 +248,7 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		authData.setAuthDataId(47L);
+		authData.setId(47L);
 		authData.getProperties().clear();
 		authData.setProperties(null);
 		return authData;

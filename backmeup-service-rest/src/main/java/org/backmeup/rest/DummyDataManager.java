@@ -72,7 +72,7 @@ public class DummyDataManager {
 	
 	public static AuthDataDTO getAuthDataDTO(boolean expandProperties) {
 		AuthDataDTO authData = new AuthDataDTO();
-		authData.setAuthDataId(54L);
+		authData.setId(54L);
 		authData.setName("Email Work");
 
 		if (expandProperties) {
