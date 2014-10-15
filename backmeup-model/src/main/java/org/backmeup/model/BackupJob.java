@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class BackupJob {
 	private Long id;
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
-//	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	// @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private ProfileOptions sourceProfiles;
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
@@ -277,4 +278,62 @@ public class BackupJob {
 	public void setValidScheduleID(UUID validScheduleID) {
 		this.validScheduleID = validScheduleID;
 	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		if (arg0 instanceof BackupJob) {
+			BackupJob b = (BackupJob) arg0;
+
+			if (this == b) {
+				return true;
+			}
+
+			return testEquals(this, b);
+
+		} else {
+			return false;
+		}
+	}
+
+	private boolean testEquals(BackupJob a, BackupJob b) {
+
+		if (a.getDelay() != b.getDelay()) {
+			return false;
+		}
+
+		if (a.getId() != b.getId()) {
+			return false;
+		}
+
+		if (a.getStart().compareTo(b.getStart()) != 0) {
+			return false;
+		}
+
+		if (!a.getUser().equals(b.getUser())) {
+			return false;
+		}
+
+		for (int i = 0; i < a.getRequiredActions().size(); i++) {
+			Iterator<ActionProfile> apIt1 = a.getRequiredActions().iterator();
+			Iterator<ActionProfile> apIt2 = b.getRequiredActions().iterator();
+			while (apIt1.hasNext()) {
+				// overwritten equals for ActionProfile
+				if (!apIt1.next().equals(apIt2.next())) {
+					return false;
+				}
+			}
+		}
+		// overwritten equals method for Profile
+		if (!a.getSinkProfile().equals(b.getSinkProfile())) {
+			return false;
+		}
+
+		// overwritten equals method for ProfileOptions
+		if (!a.getSourceProfiles().equals(b.getSourceProfiles())) {
+			return false;
+		}
+
+		return true;
+	}
+
 }

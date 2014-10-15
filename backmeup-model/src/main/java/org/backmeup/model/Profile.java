@@ -125,4 +125,37 @@ public class Profile {
 	public void setIdentification(String identification) {
 		this.identification = identification;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		if (obj instanceof Profile) {
+			Profile b = (Profile) obj;
+			if (!this.getDescription().equals(b.getDescription())) {
+				return false;
+			}
+			if (this.getProfileId() != b.getProfileId()) {
+				return false;
+			}
+			if (!this.getProfileName().equals(b.getProfileName())) {
+				return false;
+			}
+			if (!this.getType().equals(b.getType())) {
+				return false;
+			}
+			if (!this.getUser().equals(b.getUser())) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		return true;
+	}
 }

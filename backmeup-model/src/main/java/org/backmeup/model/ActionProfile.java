@@ -15,154 +15,164 @@ import javax.persistence.Table;
 
 @Entity
 public class ActionProfile implements Comparable<ActionProfile> {
-  @Id
-  @GeneratedValue(strategy=GenerationType.IDENTITY)
-  private Long id;
-  private String actionId;
-  private int priority;
-  @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true, mappedBy="profile")
-  private final Set<ActionProperty> actionOptions = new HashSet<>();
-  
-  public ActionProfile() {
-  }
-  
-  public ActionProfile(String actionId, int priority) {
-    this.actionId = actionId;
-    this.setPriority(priority);    
-  }
-  
-  public Long getId() {
-    return id;
-  }
-  
-  public void setId(Long id) {
-    this.id = id;
-  }
-  
-  public String getActionId() {
-    return actionId;
-  }
-  
-  public void setActionId(String actionId) {
-    this.actionId = actionId;
-  }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String actionId;
+	private int priority;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "profile")
+	private final Set<ActionProperty> actionOptions = new HashSet<>();
 
-  @Override
-  public int compareTo(ActionProfile o) {
-    if (o == null) {
-      return -1;    
-    }
-    return o.priority - this.priority;
-  }
-  
-  public Set<ActionProperty> getActionOptions() {
-    return actionOptions;
-  }
+	public ActionProfile() {
+	}
 
-  public void addActionOption(String key, String value) {
-    ActionProperty ap = new ActionProperty(key, value);
-    ap.setProfile(this);
-    this.actionOptions.add(ap);
-  }
+	public ActionProfile(String actionId, int priority) {
+		this.actionId = actionId;
+		this.setPriority(priority);
+	}
 
-  public int getPriority() {
-    return priority;
-  }
+	public Long getId() {
+		return id;
+	}
 
-  public void setPriority(int priority) {
-    this.priority = priority;
-  }
-  
-  @Override
-  public int hashCode() {
-    return priority * 31;
-  }
-    
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-        return true;
-    if (obj == null || getClass() != obj.getClass())
-        return false;
-    ActionProfile other = (ActionProfile) obj;
-    return priority == other.priority;
-  }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-  @Entity
-  @Table(name="ActionProfileProperty")
-  public static class ActionProperty {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-    
-    private String key;
-    private String value;
-    @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
-    private ActionProfile profile;
-           
-    public ActionProperty() {
-    }
+	public String getActionId() {
+		return actionId;
+	}
 
-    public ActionProperty(String key, String value) {
-      this.key = key;
-      this.value = value;
-    }
-    public String getKey() {
-      return key;
-    }
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
+	}
 
-    public void setKey(String key) {
-      this.key = key;
-    }
+	@Override
+	public int compareTo(ActionProfile o) {
+		if (o == null) {
+			return -1;
+		}
+		return o.priority - this.priority;
+	}
 
-    public String getValue() {
-      return value;
-    }
+	public Set<ActionProperty> getActionOptions() {
+		return actionOptions;
+	}
 
-    public void setValue(String value) {
-      this.value = value;
-    }
+	public void addActionOption(String key, String value) {
+		ActionProperty ap = new ActionProperty(key, value);
+		ap.setProfile(this);
+		this.actionOptions.add(ap);
+	}
 
-    public Long getId() {
-      return id;
-    }
+	public int getPriority() {
+		return priority;
+	}
 
-    public ActionProfile getProfile() {
-      return profile;
-    }
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 
-    public void setProfile(ActionProfile profile) {
-      this.profile = profile;
-    }
+	@Override
+	public int hashCode() {
+		return priority * 31;
+	}
 
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + (key == null ? 0 : key.hashCode());
-      return result;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		ActionProfile other = (ActionProfile) obj;
+		if (!(priority == other.priority)) {
+			return false;
+		}
+		if (this.getActionId().equals(other.getActionId())) {
+			return false;
+		}
+		if (this.getId().equals(other.getId())) {
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      ActionProperty other = (ActionProperty) obj;
-      if (key == null) {
-        if (other.key != null) {
-          return false;
-        }
-      } else if (!key.equals(other.key)) {
-        return false;
-      }
-      return true;
-    }
-  }
+	@Entity
+	@Table(name = "ActionProfileProperty")
+	public static class ActionProperty {
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;
+
+		private String key;
+		private String value;
+		@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+		private ActionProfile profile;
+
+		public ActionProperty() {
+		}
+
+		public ActionProperty(String key, String value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		public Long getId() {
+			return id;
+		}
+
+		public ActionProfile getProfile() {
+			return profile;
+		}
+
+		public void setProfile(ActionProfile profile) {
+			this.profile = profile;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (key == null ? 0 : key.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			ActionProperty other = (ActionProperty) obj;
+			if (key == null) {
+				if (other.key != null) {
+					return false;
+				}
+			} else if (!key.equals(other.key)) {
+				return false;
+			}
+			return true;
+		}
+	}
 }

@@ -17,43 +17,76 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class ProfileOptions {
-  @Id
-  @GeneratedValue
-  private Long optionId;
-  
-  @ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
-  private Profile profile;
-  private String[] options;
+	@Id
+	@GeneratedValue
+	private Long optionId;
 
-  public ProfileOptions() {
-  }
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Profile profile;
+	private String[] options;
 
-  public ProfileOptions(Profile profile, String[] options) {
-    this.profile = profile;
-    this.options = options;
-  }
+	public ProfileOptions() {
+	}
 
-  public Profile getProfile() {
-    return profile;
-  }
+	public ProfileOptions(Profile profile, String[] options) {
+		this.profile = profile;
+		this.options = options;
+	}
 
-  public void setProfile(Profile profile) {
-    this.profile = profile;
-  }
+	public Profile getProfile() {
+		return profile;
+	}
 
-  public String[] getOptions() {
-    return options;
-  }
+	public void setProfile(Profile profile) {
+		this.profile = profile;
+	}
 
-  public void setOptions(String[] options) {
-    this.options = options;
-  }
+	public String[] getOptions() {
+		return options;
+	}
 
-  public Long getOptionId() {
-    return optionId;
-  }
+	public void setOptions(String[] options) {
+		this.options = options;
+	}
 
-  public void setOptionId(Long optionId) {
-    this.optionId = optionId;
-  }
+	public Long getOptionId() {
+		return optionId;
+	}
+
+	public void setOptionId(Long optionId) {
+		this.optionId = optionId;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		if (obj instanceof ProfileOptions) {
+			ProfileOptions b = (ProfileOptions) obj;
+			if (this.getOptionId() != b.getOptionId()) {
+				return false;
+			}
+			if (this.getOptions().length != b.getOptions().length) {
+				return false;
+			}
+			for (int i = 0; i < this.getOptions().length; i++) {
+				if (!this.getOptions()[i].equals(b.getOptions()[i])) {
+					return false;
+				}
+			}
+			// overwritten equals Method for Profile
+			if (!this.getProfile().equals(b.getProfile())) {
+				return false;
+			}
+
+		} else {
+			return false;
+		}
+		return true;
+	}
 }
