@@ -108,6 +108,7 @@ public class MappingTest {
 		AuthData authData = new AuthData();
 		authData.setId(authDataId);
 		authData.setName(authDataName);
+		authData.setUser(user);
 		authData.addProperty(authDataKey, authDataValue);
 		
 		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);

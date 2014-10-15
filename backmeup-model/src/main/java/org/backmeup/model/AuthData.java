@@ -4,13 +4,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,6 +35,9 @@ public class AuthData {
 	private String name;
 
 	private String pluginId;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private BackMeUpUser user;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
@@ -50,14 +56,15 @@ public class AuthData {
 		this.modified = this.created;
 	}
 
-	public AuthData(String name, String pluginId) {
-		this(name, pluginId, new HashMap<String, String>());
+	public AuthData(String name, String pluginId, BackMeUpUser user) {
+		this(name, pluginId, user, new HashMap<String, String>());
 	}
 
-	public AuthData(String name, String pluginId, Map<String, String> properties) {
+	public AuthData(String name, String pluginId, BackMeUpUser user, Map<String, String> properties) {
 		super();
 		this.name = name;
 		this.pluginId = pluginId;
+		this.user = user;
 		this.properties = properties;
 		this.created = new Date();
 		this.modified = this.created;
@@ -88,6 +95,14 @@ public class AuthData {
 	public void setPluginId(String pluginId) {
 		this.pluginId = pluginId;
 		this.modified = new Date();
+	}
+
+	public BackMeUpUser getUser() {
+		return user;
+	}
+
+	public void setUser(BackMeUpUser user) {
+		this.user = user;
 	}
 
 	public Date getCreated() {

@@ -151,9 +151,14 @@ public class Profile {
 	}
 
 	public void setAuthData(AuthData authData) {
-//		if(authData.getPluginId().equals(this.pluginId)){
+//		if(!authData.getPluginId().equals(this.pluginId)){
 //			throw new IllegalArgumentException("Auth data is associated with a different plugin");
 //		}
+		
+		if (!authData.getUser().equals(this.getUser())) {
+			throw new IllegalArgumentException("Auth data is associated with a different user");
+		}
+		
 		this.authData = authData;
 	}
 
