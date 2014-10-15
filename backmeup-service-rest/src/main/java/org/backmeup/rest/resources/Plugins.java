@@ -258,21 +258,25 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		authData.setId(47L);
-		authData.getProperties().clear();
-		authData.setProperties(null);
-		return authData;
+//		authData.setId(47L);
+//		authData.getProperties().clear();
+//		authData.setProperties(null);
+//		return authData;
+		
+		if(!getLogic().isPluginAvailable(pluginId)) {
+			LOGGER.error("Plugin not available: " + pluginId);
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
 		
 		// map dto to model class
-		// AuthData authDataModel = getMapper().map(authData, AuthData.class);
+		AuthData authDataModel = getMapper().map(authData, AuthData.class);
+		authDataModel.setUser(activeUser);
+		authDataModel.setPluginId(pluginId);
 		
-		// use bl to save model in db (later keyserver)
-		// authDataModel = getLogic().addPluginAuthData(pluginId, authDataModel);
+		authDataModel = getLogic().addPluginAuthData(authDataModel);
 		
-		// map model to dto
-		// authDataDTO = getMapper().map(authDataModel, AuthDataDTO.class);
-		
-		// return authDataDTO
+		AuthDataDTO authDataDTO = getMapper().map(authDataModel, AuthDataDTO.class);
+		return authDataDTO;
 	}
 	
 	@RolesAllowed("user")
