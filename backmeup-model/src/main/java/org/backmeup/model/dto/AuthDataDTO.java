@@ -15,7 +15,11 @@ public class AuthDataDTO {
 		
 	}
 	
-	public AuthDataDTO(long id, String name) {
+	public AuthDataDTO(Long id) {
+		this.id = id;
+	}
+	
+	public AuthDataDTO(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}

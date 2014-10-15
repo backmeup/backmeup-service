@@ -1,8 +1,10 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -24,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
@@ -146,27 +149,32 @@ public class Plugins extends Base {
 		
 		Profile profile = new Profile();
 		profile.setName(pluginProfile.getTitle());
-		if(pluginProfile.getProfileType().equals(PluginType.Source)) {
-			profile.setType(PluginType.Source);
-		} else if(pluginProfile.getProfileType().equals(PluginType.Sink)) {
-			profile.setType(PluginType.Sink);
-		}
-		profile.setUser(activeUser);
+        profile.setType(pluginProfile.getProfileType());
+        profile.setUser(activeUser);
+        
+        AuthData authData = new AuthData();
+        if(pluginProfile.getAuthData() != null) {
+            authData.setId(pluginProfile.getAuthData().getId());
+        }
+        profile.setAuthData(authData);
 		
-		Properties profileProps = new Properties();
+		Map<String, String> profileProps = new HashMap<>();
 		if (pluginProfile.getProperties() != null) {
 			profileProps.putAll(pluginProfile.getProperties());
 		}
+		profile.setProperties(profileProps);
 		
 		List<String> profileOptions = pluginProfile.getOptions();
 		if(profileOptions == null) {
 			profileOptions = new ArrayList<>();
 		}
+		profile.setOptions(profileOptions);
 		
-		profile = getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
+		profile = getLogic().addPluginProfile(pluginId, profile);
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
 		profileDTO.setPluginId(pluginId);
+		profileDTO.setAuthData(new AuthDataDTO(authData.getId()));
 		profileDTO.setProperties(pluginProfile.getProperties());
 		profileDTO.setOptions(pluginProfile.getOptions());
 		

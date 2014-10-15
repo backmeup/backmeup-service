@@ -41,6 +41,7 @@ public interface BusinessLogic {
 	// plugin operations ------------------------------------------------------
 	PluginDescribable getPluginDescribable(String pluginId);
 	AuthRequest getPluginConfiguration(String pluginId);
+	Profile addPluginProfile(String pluginId, Profile profile);
 	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);

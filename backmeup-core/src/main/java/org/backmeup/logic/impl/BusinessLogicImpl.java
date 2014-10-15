@@ -485,6 +485,14 @@ public class BusinessLogicImpl implements BusinessLogic {
     */
     
     @Override
+    public Profile addPluginProfile(String pluginId, Profile profile) {
+    	//TODO: profile properties are not consireded
+    	Properties props = new Properties();
+    	props.putAll(profile.getAuthData().getProperties());
+    	return addPluginProfile(pluginId, profile, props, profile.getOptions());
+    }
+    
+    @Override
     public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
