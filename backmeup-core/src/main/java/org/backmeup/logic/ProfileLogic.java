@@ -3,6 +3,7 @@ package org.backmeup.logic;
 import java.util.List;
 import java.util.Set;
 
+import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
@@ -37,5 +38,7 @@ public interface ProfileLogic {
     Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 
     void setIdentification(Profile profile, String identification);
+    
+    AuthData addAuthData(AuthData authData);
 
 }

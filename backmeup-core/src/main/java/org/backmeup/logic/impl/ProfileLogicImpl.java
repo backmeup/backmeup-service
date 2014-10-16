@@ -8,9 +8,11 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.backmeup.dal.AuthDataDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.ProfileDao;
 import org.backmeup.logic.ProfileLogic;
+import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
@@ -28,6 +30,10 @@ public class ProfileLogicImpl implements ProfileLogic {
 
     private ProfileDao getProfileDao() {
         return dal.createProfileDao();
+    }
+    
+    private AuthDataDao getAuthDataDao() {
+    	return dal.createAuthDataDao();
     }
 
     @Override
@@ -128,5 +134,10 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
         getProfileDao().save(profile);
     }
+
+	@Override
+	public AuthData addAuthData(AuthData authData) {
+		return getAuthDataDao().save(authData);
+	}
 
 }

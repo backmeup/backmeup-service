@@ -920,17 +920,17 @@ public class BusinessLogicImpl implements BusinessLogic {
 		
 		return conn.txNew(new Callable<AuthData>() {
             @Override public AuthData call() {
-//            	if(authData.getUser() == null) {
-//            		
-//            	}
-//                
-//                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-//                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-//                profiles.setIdentification(p, identification); // ?
-//                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-//                return p;
             	
-            	return null;
+            	if(authData.getUser() == null) {
+            		throw new IllegalArgumentException("User must not be null");
+            	}
+                // Check if authentication data is valid
+            	// The following statement calls the postAuthorize method of the plugin authorizable
+            	Properties authProps = new Properties();
+            	authProps.putAll(authData.getProperties());
+            	String identification = plugins.getAuthorizedUserId(authData.getPluginId(), authProps);
+            	return profiles.addAuthData(authData);
+               
             }
         });
 
