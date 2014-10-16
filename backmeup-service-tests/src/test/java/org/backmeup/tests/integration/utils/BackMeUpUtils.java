@@ -3,10 +3,14 @@ package org.backmeup.tests.integration.utils;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
@@ -161,6 +165,43 @@ public class BackMeUpUtils {
 	@Deprecated
 	public static void updateProfile(String profileId, String password, Properties profileProps) {
 		throw new UnsupportedOperationException();
+	}
+	
+	public static ValidatableResponse addAuthData(String accessToken, String pluginId, String name, Map<String, String> props) {
+		AuthDataDTO authData = new AuthDataDTO();
+		authData.setName(name);
+		authData.setProperties(new HashMap<String, String>());
+		authData.getProperties().putAll(props);
+		
+		ValidatableResponse response = 
+		given()
+//			.log().all()
+			.contentType("application/json")
+			.header("Accept", "application/json")
+			.header("Authorization", accessToken)
+			.body(authData, ObjectMapperType.JACKSON_1)
+		.when()
+			.post("/plugins/" + pluginId + "/authdata")
+		.then()
+//			.log().all()
+			.statusCode(200)
+			.body("id", notNullValue())
+			.body("name", equalTo(name));
+		
+		return response;
+	}
+	
+	public static void deleteAuthData(String accessToken, String pluginId, String authDataId) {
+		given()
+			.log().all()
+			.contentType("application/json")
+			.header("Accept", "application/json")
+			.header("Authorization", accessToken)
+		.when()
+			.delete("/plugins/" + pluginId + "/authdata/" + authDataId)
+		.then()
+			.log().all()
+			.statusCode(204);
 	}
 	
 	// ========================================================================
