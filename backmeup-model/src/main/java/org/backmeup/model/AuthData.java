@@ -45,10 +45,10 @@ public class AuthData {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date modified;
 
-	@ElementCollection
-	@MapKeyColumn(name = "name")
-	@Column(name = "properties")
-	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "example_id"))
+	@ElementCollection(fetch = FetchType.EAGER)
+	@MapKeyColumn(name = "authdata_key")
+	@Column(name = "authdata_value")
+	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
 	private Map<String, String> properties;
 
 	public AuthData() {

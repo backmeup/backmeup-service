@@ -59,4 +59,22 @@
   			<b>profileType</b>
 		</field> 
 	</mapping>
+	
+	<mapping>
+		<class-a>org.backmeup.model.AuthData</class-a>
+		<class-b>org.backmeup.model.dto.AuthDataDTO</class-b>
+		
+		<field>
+  			<a get-method="getId" set-method="setId">id</a>
+  			<b>id</b>
+		</field> 
+		<field>
+  			<a get-method="getName" set-method="setName">name</a>
+  			<b>name</b>
+		</field>
+		<field-exclude type="one-way">
+			<a>properties</a>
+			<b>properties</b>
+		</field-exclude> 
+	</mapping>
 </mappings> 
