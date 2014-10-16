@@ -14,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -37,7 +38,6 @@ import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
-import org.backmeup.rest.DummyDataManager;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 @Path("/plugins")
@@ -258,15 +258,8 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-//		authData.setId(47L);
-//		authData.getProperties().clear();
-//		authData.setProperties(null);
-//		return authData;
 		
-		if(!getLogic().isPluginAvailable(pluginId)) {
-			LOGGER.error("Plugin not available: " + pluginId);
-			throw new WebApplicationException(Status.NOT_FOUND);
-		}
+		throwIfPluginNotAvailable(pluginId);
 		
 		// map dto to model class
 		AuthData authDataModel = getMapper().map(authData, AuthData.class);
@@ -285,7 +278,18 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AuthDataDTO getAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId){
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		return DummyDataManager.getAuthDataDTO(false);
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long aId = Long.parseLong(authDataId);
+		AuthData authDataModel = getLogic().getPluginAuthData(aId);
+		
+		if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		return getMapper().map(authDataModel, AuthDataDTO.class);
+		
 	}
 	
 	@RolesAllowed("user")
@@ -296,10 +300,7 @@ public class Plugins extends Base {
 			@PathParam("pluginId") String pluginId,
 			@PathParam("authdataId") String authDataId, 
 			AuthDataDTO authData) {
-		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		authData.getProperties().clear();
-		authData.setProperties(null);
-		return authData;
+		throw new UnsupportedOperationException();
 	}
 	
 	@RolesAllowed("user")
@@ -308,5 +309,23 @@ public class Plugins extends Base {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void deleteAuthData(@PathParam("pluginId") String pluginId,	@PathParam("authdataId") String authDataId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long aId = Long.parseLong(authDataId);
+		AuthData authDataModel = getLogic().getPluginAuthData(aId);
+		
+		if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		getLogic().deletePluginAuthData(aId);
+	}
+	
+	private void throwIfPluginNotAvailable(String pluginId) {
+		if(!getLogic().isPluginAvailable(pluginId)) {
+			LOGGER.error("Plugin not available: " + pluginId);
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
 	}
 }

@@ -937,20 +937,30 @@ public class BusinessLogicImpl implements BusinessLogic {
 	}
 
 	@Override
-	public AuthData getPluginAuthData(Long authDataId) {
-		// TODO Auto-generated method stub
-		return null;
+	public AuthData getPluginAuthData(final Long authDataId) {
+		return conn.txNewReadOnly(new Callable<AuthData>() {
+            @Override public AuthData call() {
+            	
+            	return profiles.getAuthData(authDataId);
+               
+            }
+        });
 	}
 
 	@Override
-	public AuthData updatePluginAuthData(AuthData authData) {
-		// TODO Auto-generated method stub
-		return null;
+	public AuthData updatePluginAuthData(final AuthData authData) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void deletePluginAuthData(Long authDataId) {
-		// TODO Auto-generated method stub
+	public void deletePluginAuthData(final Long authDataId) {
+		conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+            	profiles.deleteAuthData(authDataId);
+            	
+            }
+        });
 		
 	}
 

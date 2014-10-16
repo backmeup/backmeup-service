@@ -40,5 +40,9 @@ public interface ProfileLogic {
     void setIdentification(Profile profile, String identification);
     
     AuthData addAuthData(AuthData authData);
+    
+    AuthData getAuthData(Long authDataId);
+    
+    void deleteAuthData(Long authDataId);
 
 }

@@ -14,6 +14,7 @@ import org.backmeup.dal.ProfileDao;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
@@ -137,7 +138,28 @@ public class ProfileLogicImpl implements ProfileLogic {
 
 	@Override
 	public AuthData addAuthData(AuthData authData) {
+        if (authData == null) {
+            throw new IllegalArgumentException("AuthData must not be null");
+        }
 		return getAuthDataDao().save(authData);
+	}
+
+	@Override
+	public AuthData getAuthData(Long authDataId) {
+        if (authDataId == null) {
+            throw new IllegalArgumentException("AuthDataId must not be null");
+        }
+        AuthData authData = getAuthDataDao().findById(authDataId);
+        if (authData == null) {
+            throw new IllegalArgumentException("No auth data found with id: " + authDataId);
+        }
+        return authData;
+	}
+
+	@Override
+	public void deleteAuthData(Long authDataId) {
+		AuthData authData = getAuthData(authDataId);
+		getAuthDataDao().delete(authData);
 	}
 
 }
