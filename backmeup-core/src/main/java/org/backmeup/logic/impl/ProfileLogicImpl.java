@@ -155,6 +155,14 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
         return authData;
 	}
+	
+	@Override
+	public List<AuthData> getAuthDataOf(Long userId) {
+		if (userId == null) {
+            throw new IllegalArgumentException("UserId must not be null");
+        }
+		return getAuthDataDao().findAuthDataByUserId(userId);
+	}
 
 	@Override
 	public void deleteAuthData(Long authDataId) {

@@ -946,6 +946,17 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
 	}
+	
+	@Override
+	public List<AuthData> listPluginAuthData(final Long userId) {
+		return conn.txNewReadOnly(new Callable<List<AuthData>>() {
+            @Override public List<AuthData> call() {
+            	
+            	return profiles.getAuthDataOf(userId);
+               
+            }
+        });
+	}
 
 	@Override
 	public AuthData updatePluginAuthData(final AuthData authData) {

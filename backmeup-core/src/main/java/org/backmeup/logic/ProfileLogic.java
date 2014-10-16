@@ -43,6 +43,8 @@ public interface ProfileLogic {
     
     AuthData getAuthData(Long authDataId);
     
+    List<AuthData> getAuthDataOf(Long userId);
+    
     void deleteAuthData(Long authDataId);
 
 }

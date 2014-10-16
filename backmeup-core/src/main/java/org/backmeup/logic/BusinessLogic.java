@@ -46,6 +46,7 @@ public interface BusinessLogic {
 	
 	AuthData addPluginAuthData(AuthData authData);
 	AuthData getPluginAuthData(Long authDataId);
+	List<AuthData> listPluginAuthData(Long userId);
 	AuthData updatePluginAuthData(AuthData authData);
 	void     deletePluginAuthData(Long authDataId);
 	

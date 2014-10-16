@@ -14,7 +14,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -290,6 +289,28 @@ public class Plugins extends Base {
 		
 		return getMapper().map(authDataModel, AuthDataDTO.class);
 		
+	}
+	
+	@RolesAllowed("user")
+	@GET
+	@Path("/{pluginId}/authdata")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AuthDataDTO> listAuthData(@PathParam("pluginId") String pluginId) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		List<AuthData> authDatas = getLogic().listPluginAuthData(activeUser.getUserId());
+		
+		List<AuthDataDTO> authDTOS = new ArrayList<>();
+		for(AuthData auth : authDatas) {
+			if(!auth.getUser().getUserId().equals(activeUser.getUserId())) {
+				throw new WebApplicationException(Status.FORBIDDEN);
+			}
+			AuthDataDTO authDTO = getMapper().map(auth, AuthDataDTO.class);
+			authDTOS.add(authDTO);
+		}
+		return authDTOS;
 	}
 	
 	@RolesAllowed("user")
