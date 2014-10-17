@@ -50,6 +50,13 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
+    public void deleteProfile(Long profileId) {
+        Profile profile = getProfileDao().findById(profileId);
+        getProfileDao().delete(profile);
+    }
+    
+    @Deprecated
+    @Override
     public Profile deleteProfile(Long profileId, Long userId) {
         Profile profile = getExistingUserProfile(profileId, userId);
         getProfileDao().delete(profile);

@@ -55,7 +55,8 @@ public interface BusinessLogic {
 	Profile updatePluginProfile(String pluginId, Profile profile);
 	void    updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);
-	Profile deleteProfile(Long userId, Long profile);
+	void deleteProfile(Long profileId);
+	@Deprecated Profile deleteProfile(Long userId, Long profile);
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);

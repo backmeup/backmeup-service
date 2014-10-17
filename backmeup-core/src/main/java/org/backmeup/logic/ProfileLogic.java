@@ -25,7 +25,9 @@ public interface ProfileLogic {
     
     Profile queryExistingProfile(Long profileId);
     
-    void deleteProfilesOf(Long userId);
+    @Deprecated void deleteProfilesOf(Long userId);
+    
+    void deleteProfile(Long profileId);
 
     Profile deleteProfile(Long profileId, Long userId);
 

@@ -240,15 +240,19 @@ public class Plugins extends Base {
 	public void deletePluginConfiguration(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long pId = Long.parseLong(profileId);
+		Profile profile = getLogic().getPluginProfile(pId);
 		if(!activeUser.getUserId().equals(profile.getUser().getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		// TODO check pluginId
-		// if profile.getPluginId != pluginId -> FORBIDDEN
+		if(!profile.getPluginId().equals(pluginId)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
 		
-		getLogic().deleteProfile(activeUser.getUserId(), Long.parseLong(profileId));
+		getLogic().deleteProfile(pId);
 	}
 	
 	@RolesAllowed("user")

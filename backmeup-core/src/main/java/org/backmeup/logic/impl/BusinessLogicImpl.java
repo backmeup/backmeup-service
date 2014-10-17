@@ -308,12 +308,24 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Deprecated
     @Override
     public Profile deleteProfile(final Long userId, final Long profileId) {
         return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
                 
                 return profiles.deleteProfile(profileId, userId);
+                
+            }
+        });
+    }
+    
+    @Override
+    public void deleteProfile(final Long profileId) {
+    	conn.txJoin(new Runnable() {
+			@Override public void run() {
+                
+                profiles.deleteProfile(profileId);
                 
             }
         });
