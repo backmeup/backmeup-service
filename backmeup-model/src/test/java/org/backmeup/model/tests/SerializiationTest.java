@@ -16,7 +16,7 @@ import org.junit.Test;
 public class SerializiationTest {
   
   private void testProfiles(Profile p1, Profile p2) {
-    Assert.assertEquals(p1.getDescription(), p2.getDescription());
+    Assert.assertEquals(p1.getPluginId(), p2.getPluginId());
     Assert.assertEquals(p1.getId(), p2.getId());
     Assert.assertEquals(p1.getName(), p2.getName());
     Assert.assertEquals(p1.getType(), p2.getType());

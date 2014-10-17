@@ -151,20 +151,20 @@ public class BackupJobs extends Base {
 			// get source profile
 			Profile sourceProfile = getLogic().getPluginProfile(job.getSourceProfile().getId());
 			PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
-			sourceProfileDTO.setPluginId(sourceProfile.getDescription());
+			sourceProfileDTO.setPluginId(sourceProfile.getPluginId());
 			jobDTO.setSource(sourceProfileDTO);
 
 			// get sink profile
 			Profile sinkProfile = getLogic().getPluginProfile(job.getSinkProfile().getId());		
 			PluginProfileDTO sinkProfileDTO = getMapper().map(sinkProfile, PluginProfileDTO.class);
-			sinkProfileDTO.setPluginId(sinkProfile.getDescription());
+			sinkProfileDTO.setPluginId(sinkProfile.getPluginId());
 			jobDTO.setSink(sinkProfileDTO);
 			
 			// get action profiles
 			for(Profile action : job.getActionProfiles()) {
 				Profile actionProfile = getLogic().getPluginProfile(action.getId());
 				PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
-				actionProfileDTO.setPluginId(actionProfile.getDescription());
+				actionProfileDTO.setPluginId(actionProfile.getPluginId());
 				jobDTO.setSink(actionProfileDTO);
 			}
 		}

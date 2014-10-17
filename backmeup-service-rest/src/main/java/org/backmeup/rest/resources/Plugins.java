@@ -140,11 +140,10 @@ public class Plugins extends Base {
 	@Path("/{pluginId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {
-//		pluginProfile.setProfileId(1L);
-//		return pluginProfile;
-		
+	public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {	
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
 		
 		Profile profile = new Profile();
 		profile.setName(pluginProfile.getTitle());

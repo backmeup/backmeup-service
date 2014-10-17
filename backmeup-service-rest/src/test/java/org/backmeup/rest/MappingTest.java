@@ -93,7 +93,7 @@ public class MappingTest {
 		Long profileId = 1L;
 		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 		String profileName = "TestProfile";
-		String description = "Description of test profile";
+		String pluginId = "org.backmeup.dummy";
 		String identification = "identification";
 		PluginType profileTypeModel = PluginType.Source;
 		PluginType profileTypeDTO = PluginType.Source;
@@ -110,9 +110,10 @@ public class MappingTest {
 		authData.setId(authDataId);
 		authData.setName(authDataName);
 		authData.setUser(user);
+		authData.setPluginId(pluginId);
 		authData.addProperty(authDataKey, authDataValue);
 		
-		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
+		Profile profile = new Profile(profileId, user, profileName, pluginId, PluginType.Source);
 		profile.setIdentification(identification);
 		profile.setAuthData(authData);
 		profile.addProperty(propKey, propValue);

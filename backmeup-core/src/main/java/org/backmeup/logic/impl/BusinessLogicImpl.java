@@ -325,8 +325,8 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public List<String> call() {
                 
                 Profile p = profiles.getExistingUserProfile(profileId, userId);
-                String profileDescription = p.getDescription();
-                Datasource source = plugins.getDatasource(profileDescription);
+                String pluginId = p.getPluginId();
+                Datasource source = plugins.getDatasource(pluginId);
                 Properties accessData = authorization.fetchProfileAuthenticationData(p, keyRingPassword);
                 return source.getAvailableOptions(accessData);
                 
@@ -491,12 +491,29 @@ public class BusinessLogicImpl implements BusinessLogic {
     */
     
     @Override
-    public Profile addPluginProfile(String pluginId, Profile profile) {
+    public Profile addPluginProfile(final String pluginId, final Profile profile) {
     	//TODO: profile properties are not consireded
     	//TODO: Auth data is referenced by id 
-    	return addPluginProfile(pluginId, profile, new Properties(), profile.getOptions());
+    	/*
+    	return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
+            	
+            	// TODO: onyl for oauth, why?
+            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
+            	plugins.configureAuth(props, pluginId);               
+                
+                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
+                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, identification); // ?
+                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+                return p;
+            }
+        });
+        */
+    	return null;
     }
     
+    @Deprecated
     @Override
     public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
     	return conn.txNew(new Callable<Profile>() {
@@ -563,22 +580,22 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
             @Override public ValidationNotes call() {
 
-                String pluginName = null;
+                String pluginId = null;
                 try {
                     
                     Profile p = profiles.getExistingUserProfile(profileId, userId);
-                    pluginName = p.getDescription();
-                    Validationable validator = plugins.getValidator(p.getDescription());
+                    pluginId = p.getPluginId();
+                    Validationable validator = plugins.getValidator(pluginId);
                     Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
                     return validator.validate(accessData);
                     
                 } catch (PluginUnavailableException pue) {
                     ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginName, pue);
+                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginId, pue);
                     return notes;
                 } catch (Exception pe) {
                     ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.Error, pluginName, pe);
+                    notes.addValidationEntry(ValidationExceptionType.Error, pluginId, pe);
                     return notes;
                 }
             
@@ -894,7 +911,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
             private void validateSourceProfiles(Profile sourceProfile, ValidationNotes notes) {
             	Profile source = sourceProfile;
-                String sourceSinkId = source.getDescription();
+                String sourceSinkId = source.getPluginId();
                 plugins.validateSourceSinkExists(sourceSinkId, notes);
 
                 Long profileId = source.getId();

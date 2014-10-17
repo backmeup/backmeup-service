@@ -41,8 +41,6 @@ public class Profile {
 
 	private String name;
 
-	private String description;
-
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
@@ -52,6 +50,8 @@ public class Profile {
 	// The username that has been used for a certain profile, e.g. the dropbox
 	// username or facebook username
 	private String identification;
+	
+	private String pluginId;
 
 	@Enumerated(EnumType.STRING)
 	private PluginType pluginType;
@@ -69,18 +69,17 @@ public class Profile {
 
 	}
 
-	public Profile(BackMeUpUser user, String profileName, String desc,
-			PluginType source) {
-		this(null, user, profileName, desc, source);
+	public Profile(BackMeUpUser user, String profileName, String pluginId,
+			PluginType pluginType) {
+		this(null, user, profileName, pluginId, pluginType);
 	}
 
-	public Profile(Long id, BackMeUpUser user, String profileName, String desc,
-			PluginType pluginType) {
+	public Profile(Long id, BackMeUpUser user, String profileName, String pluginId, PluginType pluginType) {
 		this.id = id;
 		this.user = user;
 		this.name = profileName;
+		this.pluginId = pluginId;
 		this.pluginType = pluginType;
-		this.description = desc;
 		this.created = new Date();
 		this.modified = this.created;
 	}
@@ -112,13 +111,13 @@ public class Profile {
 		this.modified = new Date();
 	}
 
-	public String getDescription() {
-		return description;
+	public String getPluginId() {
+		return pluginId;
 	}
 
-	public void setDescription(String desc) {
-		this.description = desc;
+	public void setPluginId(String pluginId) {
 		this.modified = new Date();
+		this.pluginId = pluginId;
 	}
 
 	public PluginType getType() {
@@ -151,9 +150,9 @@ public class Profile {
 	}
 
 	public void setAuthData(AuthData authData) {
-//		if(!authData.getPluginId().equals(this.pluginId)){
-//			throw new IllegalArgumentException("Auth data is associated with a different plugin");
-//		}
+		if(!authData.getPluginId().equals(this.pluginId)){
+			throw new IllegalArgumentException("Auth data is associated with a different plugin");
+		}
 		
 		if (!authData.getUser().equals(this.getUser())) {
 			throw new IllegalArgumentException("Auth data is associated with a different user");
