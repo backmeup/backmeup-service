@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.backmeup.model.dto.AuthDataDTO;
@@ -92,17 +92,14 @@ public class BackMeUpUtils {
 			.statusCode(204);
 	}
 	
-	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, Properties configProps) {		
+	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, AuthDataDTO authData, Map<String, String> props, List<String> options) {		
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
 		pluginProfile.setTitle(profileName);
 		pluginProfile.setPluginId(pluginId);
 		pluginProfile.setProfileType(profileType);
-		
-		for(Entry<?,?> entry : configProps.entrySet()) {
-			String key = (String) entry.getKey();  
-			String value = (String) entry.getValue();  
-			pluginProfile.addProperty(key, value);
-		}
+		pluginProfile.setAuthData(authData);
+		pluginProfile.setProperties(props);
+		pluginProfile.setOptions(options);
 		
 		return addProfile(accessToken, pluginId, pluginProfile);
 	}
@@ -110,7 +107,7 @@ public class BackMeUpUtils {
 	public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
 		ValidatableResponse response = 
 		given()
-//			.log().all()
+			.log().all()
 			.contentType("application/json")
 			.header("Accept", "application/json")
 			.header("Authorization", accessToken)
@@ -118,7 +115,7 @@ public class BackMeUpUtils {
 		.when()
 			.post("/plugins/" + pluginId)
 		.then()
-//			.log().all()
+			.log().all()
 			.statusCode(200);
 		
 		return response;
