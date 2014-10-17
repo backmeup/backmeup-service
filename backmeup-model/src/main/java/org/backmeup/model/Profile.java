@@ -47,8 +47,8 @@ public class Profile {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date modified;
 
-	// The username that has been used for a certain profile, e.g. the dropbox
-	// username or facebook username
+	// The username that has been used for a certain profile, 
+	// e.g. the dropbox username or facebook username
 	private String identification;
 	
 	private String pluginId;
@@ -56,7 +56,7 @@ public class Profile {
 	@Enumerated(EnumType.STRING)
 	private PluginType pluginType;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
 	private AuthData authData;
 
 	@ElementCollection
@@ -150,6 +150,9 @@ public class Profile {
 	}
 
 	public void setAuthData(AuthData authData) {
+		if(this.pluginId == null) {
+			throw new IllegalStateException("Cannot set auth data. Profile has to be associated with a plugin");
+		}
 		if(!authData.getPluginId().equals(this.pluginId)){
 			throw new IllegalArgumentException("Auth data is associated with a different plugin");
 		}

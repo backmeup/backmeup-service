@@ -494,23 +494,35 @@ public class BusinessLogicImpl implements BusinessLogic {
     public Profile addPluginProfile(final String pluginId, final Profile profile) {
     	//TODO: profile properties are not consireded
     	//TODO: Auth data is referenced by id 
-    	/*
+    	
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
+            	if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
+            		AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+            		profile.setAuthData(authData);
+            		
+            		String identification = plugins.authorizePlugin(profile.getAuthData());
+                    profile.setIdentification(identification);
+            	}
             	
-            	// TODO: onyl for oauth, why?
-            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
-            	plugins.configureAuth(props, pluginId);               
+            	if(profile.getProperties() != null) {
+            	//  plugins.validatePlugin(profile);
+            	}
+            	
+            	if(profile.getOptions() != null) {
+            	//  plugins.validatePlugin(profile);
+            	}
+            	
+                // TODO: Store (auth) data in keyserver
+            	// probably this should be done within profiles.save
+                // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
                 
-                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, identification); // ?
-                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+                Profile p = profiles.save(profile);
+
                 return p;
             }
         });
-        */
-    	return null;
+        
     }
     
     @Deprecated
@@ -945,6 +957,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             	// The following statement calls the postAuthorize method of the plugin authorizable
             	Properties authProps = new Properties();
             	authProps.putAll(authData.getProperties());
+            	//plugins.configurAuth() necessary?
             	String identification = plugins.getAuthorizedUserId(authData.getPluginId(), authProps);
             	return profiles.addAuthData(authData);
                

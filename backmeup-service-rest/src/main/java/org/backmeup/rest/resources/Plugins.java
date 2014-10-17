@@ -147,26 +147,27 @@ public class Plugins extends Base {
 		
 		Profile profile = new Profile();
 		profile.setName(pluginProfile.getTitle());
+		profile.setPluginId(pluginId);
         profile.setType(pluginProfile.getProfileType());
         profile.setUser(activeUser);
         
-        AuthData authData = new AuthData();
         if(pluginProfile.getAuthData() != null) {
+        	AuthData authData = new AuthData();
             authData.setId(pluginProfile.getAuthData().getId());
+            authData.setPluginId(pluginId);
+            profile.setAuthData(authData);
         }
-        profile.setAuthData(authData);
-		
-		Map<String, String> profileProps = new HashMap<>();
+        
 		if (pluginProfile.getProperties() != null) {
+			Map<String, String> profileProps = new HashMap<>();
 			profileProps.putAll(pluginProfile.getProperties());
+			profile.setProperties(profileProps);
 		}
-		profile.setProperties(profileProps);
 		
-		List<String> profileOptions = pluginProfile.getOptions();
-		if(profileOptions == null) {
-			profileOptions = new ArrayList<>();
+		if(pluginProfile.getOptions() != null) {
+			List<String> profileOptions = new ArrayList<>(pluginProfile.getOptions());
+			profile.setOptions(profileOptions);
 		}
-		profile.setOptions(profileOptions);
 		
 		profile = getLogic().addPluginProfile(pluginId, profile);
 		

@@ -16,16 +16,18 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 public interface ProfileLogic {
 
     Profile save(Profile profile);
-
-    void deleteProfilesOf(Long userId);
+    
+    @Deprecated Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 
     List<Profile> getProfilesOf(Long userId);
+    
+    Profile getExistingUserProfile(Long profileId, Long userId);
+    
+    Profile queryExistingProfile(Long profileId);
+    
+    void deleteProfilesOf(Long userId);
 
     Profile deleteProfile(Long profileId, Long userId);
-
-    Profile getExistingUserProfile(Long profileId, Long userId);
-
-    Profile queryExistingProfile(Long profileId);
 
     List<Profile> getDatasinkProfilesOf(Long userId);
 
@@ -34,8 +36,6 @@ public interface ProfileLogic {
     List<String> getProfileOptions(Long profileId, Profile sourceProfile);
 
     void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
-
-    Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 
     void setIdentification(Profile profile, String identification);
     

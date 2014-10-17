@@ -14,7 +14,6 @@ import org.backmeup.dal.ProfileDao;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
@@ -35,11 +34,6 @@ public class ProfileLogicImpl implements ProfileLogic {
     
     private AuthDataDao getAuthDataDao() {
     	return dal.createAuthDataDao();
-    }
-
-    @Override
-    public Profile save(Profile profile) {
-        return getProfileDao().save(profile);
     }
 
     @Override
@@ -120,7 +114,13 @@ public class ProfileLogicImpl implements ProfileLogic {
             option.setOptions(sourceOptions);
         }
     }
+    
+    @Override
+    public Profile save(Profile profile) {
+        return getProfileDao().save(profile);
+    }
 
+    @Deprecated
     @Override
     public Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type) {
         Profile profile = new Profile(user, profileName, uniqueDescIdentifier, type);

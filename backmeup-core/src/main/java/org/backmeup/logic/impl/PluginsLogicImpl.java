@@ -12,6 +12,7 @@ import javax.inject.Named;
 
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.logic.PluginsLogic;
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
@@ -169,6 +170,25 @@ public class PluginsLogicImpl implements PluginsLogic {
         }
 
         return auth.postAuthorize(props);
+    }
+    
+    @Override
+    public String authorizePlugin(AuthData authData) {
+        Authorizable auth = plugins.getAuthorizable(authData.getPluginId());
+        auth = plugins.getAuthorizable(authData.getPluginId(), auth.getAuthType()); 
+        
+        // TODO: avoid Properties
+        Properties authProps = new Properties();
+        authProps.putAll(authData.getProperties());
+
+        if (auth.getAuthType() == AuthorizationType.InputBased) {
+            InputBased inputBasedService = (InputBased) auth;
+            if (!inputBasedService.isValid(authProps)) {
+                throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
+            }
+        }
+
+        return auth.postAuthorize(authProps);
     }
 
     @PreDestroy
