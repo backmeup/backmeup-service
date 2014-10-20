@@ -504,32 +504,18 @@ public class BusinessLogicImpl implements BusinessLogic {
     
     @Override
     public Profile addPluginProfile(final String pluginId, final Profile profile) {
-    	//TODO: profile properties are not consireded
+    	//TODO: profile properties and options are not considered
     	//TODO: Auth data is referenced by id 
     	
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
-            	if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-            		AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
-            		profile.setAuthData(authData);
-            		
-            		String identification = plugins.authorizePlugin(profile.getAuthData());
-                    profile.setIdentification(identification);
-            	}
-            	
-            	if(profile.getProperties() != null) {
-            	//  plugins.validatePlugin(profile);
-            	}
-            	
-            	if(profile.getOptions() != null) {
-            	//  plugins.validatePlugin(profile);
-            	}
-            	
+            	Profile p = validateProfile(profile);
+
                 // TODO: Store (auth) data in keyserver
-            	// probably this should be done within profiles.save
+            	// probably this should be done within profiles.save!
                 // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
                 
-                Profile p = profiles.save(profile);
+                p = profiles.save(p);
 
                 return p;
             }
@@ -537,67 +523,30 @@ public class BusinessLogicImpl implements BusinessLogic {
         
     }
     
-    @Deprecated
-    @Override
-    public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    private Profile validateProfile(final Profile profile) {
     	return conn.txNew(new Callable<Profile>() {
-            @Override public Profile call() {
-            	
-            	// TODO: onyl for oauth, why?
-            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
-            	plugins.configureAuth(props, pluginId);               
-                
-                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, identification); // ?
-                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-                return p;
-            }
-        });
-    }
-    
-    @Override
-    public void updatePluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
-    	conn.txNew(new Runnable() {
-            @Override public void run() {
-                
-                Profile p = profiles.queryExistingProfile(profile.getId());
-                if(p == null) {
-                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-                }
+    		@Override public Profile call() {
+    			final Profile p = profile;
+				if ((p.getAuthData() != null) && (p.getAuthData().getId() != null)) {
+					AuthData authData = profiles.getAuthData(p.getAuthData().getId());
+					p.setAuthData(authData);
 
-                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, identification); // ?
-                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+					String identification = plugins.authorizePlugin(p.getAuthData());
+					p.setIdentification(identification);
+				}
 
-            }
-        });
+				if (p.getProperties() != null) {
+					// plugins.validatePlugin(profile);
+				}
+
+				if (p.getOptions() != null) {
+					// plugins.validatePlugin(profile);
+				}
+        	
+				return p;
+			}
+    	});
     }
-    
-    @Override
-    public Profile updatePluginProfile(String pluginId, final Profile profile) {
-    	return conn.txNew(new Callable<Profile>() {
-            @Override public Profile call() {
-            	
-                return profiles.queryExistingProfile(profile.getId());
-            }
-        });
-    };
-    /*
- // TODO Store profile data within keyserver!
-    @Override
-    public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-                
-                Profile profile = profiles.queryExistingProfile(profileId);
-                authorization.appendProfileAuthInformation(profile, entries, keyRing);
-                profiles.save(profile); // TODO why save? has not been changed
-                
-            }
-        });
-    }
-    */
     
     @Override
     public ValidationNotes validateProfile(final Long userId, final Long profileId, final String keyRing) {
@@ -626,6 +575,72 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Deprecated
+    @Override
+    public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    	return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
+            	
+            	// TODO: onyl for oauth, why?
+            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
+            	plugins.configureAuth(props, pluginId);               
+                
+                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
+                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, identification); // ?
+                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+                return p;
+            }
+        });
+    }
+    
+    @Deprecated
+    @Override
+    public void updatePluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
+    	conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile p = profiles.queryExistingProfile(profile.getId());
+                if(p == null) {
+                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
+                }
+
+                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
+                profiles.setIdentification(p, identification); // ?
+                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+
+            }
+        });
+    }
+    
+    @Override
+    public Profile updatePluginProfile(String pluginId, final Profile profile) {
+    	return conn.txNew(new Callable<Profile>() {
+            @Override public Profile call() {
+            	
+            	Profile p = validateProfile(profile);
+                p =  profiles.updateProfile(p);
+                return p;
+                
+            }
+        });
+    };
+    /*
+ // TODO Store profile data within keyserver!
+    @Override
+    public void addProfileEntries(final Long profileId, final Properties entries, final String keyRing) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+                
+                Profile profile = profiles.queryExistingProfile(profileId);
+                authorization.appendProfileAuthInformation(profile, entries, keyRing);
+                profiles.save(profile); // TODO why save? has not been changed
+                
+            }
+        });
+    }
+    */
     
     /*
     @Override

@@ -126,6 +126,12 @@ public class ProfileLogicImpl implements ProfileLogic {
     public Profile save(Profile profile) {
         return getProfileDao().save(profile);
     }
+    
+    @Override
+    public Profile updateProfile(Profile profile) {
+    	Profile p = queryExistingProfile(profile.getId());
+    	return getProfileDao().merge(p);
+    }
 
     @Deprecated
     @Override
@@ -135,6 +141,7 @@ public class ProfileLogicImpl implements ProfileLogic {
         return profile;
     }
 
+    @Deprecated
     @Override
     public void setIdentification(Profile profile, String identification) {
         if (identification != null) {

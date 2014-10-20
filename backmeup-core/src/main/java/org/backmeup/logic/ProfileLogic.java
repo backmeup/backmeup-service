@@ -17,6 +17,8 @@ public interface ProfileLogic {
 
     Profile save(Profile profile);
     
+	Profile updateProfile(Profile profile);
+    
     @Deprecated Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 
     List<Profile> getProfilesOf(Long userId);
@@ -39,7 +41,7 @@ public interface ProfileLogic {
 
     void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
 
-    void setIdentification(Profile profile, String identification);
+    @Deprecated void setIdentification(Profile profile, String identification);
     
     AuthData addAuthData(AuthData authData);
     

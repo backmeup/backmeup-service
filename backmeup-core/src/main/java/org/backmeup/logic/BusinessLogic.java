@@ -53,7 +53,7 @@ public interface BusinessLogic {
 	Profile addPluginProfile(String pluginId, Profile profile);
 	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile updatePluginProfile(String pluginId, Profile profile);
-	void    updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);
 	void deleteProfile(Long profileId);
 	@Deprecated Profile deleteProfile(Long userId, Long profile);
