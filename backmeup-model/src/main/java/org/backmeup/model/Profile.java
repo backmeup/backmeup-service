@@ -15,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -59,10 +60,12 @@ public class Profile {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
 	private AuthData authData;
 
-	@ElementCollection
+	@ElementCollection(fetch=FetchType.EAGER)
+	@OrderColumn(name = "properties_index")
 	private Map<String, String> properties;
 
-	@ElementCollection
+	@ElementCollection(fetch=FetchType.EAGER)
+	@OrderColumn(name = "options_index")
 	private List<String> options;
 
 	public Profile() {
