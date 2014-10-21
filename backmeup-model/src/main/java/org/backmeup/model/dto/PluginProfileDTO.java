@@ -17,7 +17,11 @@ public class PluginProfileDTO {
 	private PluginType profileType;
 	private long modified;
 	private AuthDataDTO authData;
-	private Map<String, String> properties;
+	// Init with HashMap is necessary as long as the props are 
+	// stored within the service db (jpa mapping). Otherwise, 
+	// dozer maps the persistentmap from the domain model
+	// which results in a lazyinitexception in dozer. 
+	private Map<String, String> properties = new HashMap<>();
 	private List<String> options;
 	
 	public PluginProfileDTO() {
