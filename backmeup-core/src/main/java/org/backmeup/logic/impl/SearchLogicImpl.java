@@ -31,7 +31,7 @@ public class SearchLogicImpl implements SearchLogic {
         try (IndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse result = new SearchResponse(query);
-            client.queryBackup(result.getQuery(), filters, user.getUsername(), result);
+            result.setDetails(client.queryBackup(result.getQuery(), filters, user.getUsername()));
             return result;
             
         }
