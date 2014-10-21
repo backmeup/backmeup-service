@@ -17,6 +17,7 @@ import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
 
 
@@ -119,6 +120,26 @@ public class BackMeUpUtils {
 			.statusCode(200);
 		
 		return response;
+	}
+	
+	public static PluginProfileDTO getProfile(String accessToken, String pluginId, String profileId) {
+		return getProfile(accessToken, pluginId, Long.parseLong(profileId));
+	}
+	
+	public static PluginProfileDTO getProfile(String accessToken, String pluginId, Long profileId) {
+		Response response = 
+				given()
+					.log().all()
+					.contentType("application/json")
+					.header("Accept", "application/json")
+					.header("Authorization", accessToken)
+				.when()
+					.get("/plugins/" + pluginId + "/" + profileId);
+		return parseResponse(PluginProfileDTO.class, response);
+	}
+	
+	private static <T> T parseResponse(Class<T> type, Response response) {
+		return response.getBody().as(type);
 	}
 	
 	

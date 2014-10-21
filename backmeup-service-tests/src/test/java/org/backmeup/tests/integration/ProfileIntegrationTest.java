@@ -264,6 +264,111 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
+	public void testGetProfileSourceDummy() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.dummy";
+		String profileName = "DummyProfile";
+		PluginType profileType = PluginType.Source;
+		String profileId = "";
+				
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			PluginProfileDTO pluginProfile = new PluginProfileDTO();
+			pluginProfile.setTitle(profileName);
+			pluginProfile.setPluginId(pluginId);
+			pluginProfile.setProfileType(profileType);
+			
+			response = BackMeUpUtils.addProfile(accessToken, pluginId, pluginProfile);
+			profileId = response.extract().path("profileId").toString();
+									
+			response = 
+			given()
+				.log().all()
+				.contentType("application/json")
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+			.when()
+				.get("/plugins/" + pluginId + "/" + profileId)
+			.then()
+				.log().all()
+				.statusCode(200)
+				.body("profileId", equalTo(Integer.parseInt(profileId)))
+				.body("title", equalTo(profileName))
+				.body("pluginId", equalTo(pluginId))
+				.body("profileType", equalTo(profileType.toString()));
+		
+		} finally {
+			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Ignore
+	@Test
+	public void testUpdateProfileSourceDummy() {
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.dummy";
+		String profileName = "DummyProfile";
+		PluginType profileType = PluginType.Source;
+		String profileId = "";
+		
+		String newProfileName = "NewDummyProfile";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			PluginProfileDTO pluginProfile = new PluginProfileDTO();
+			pluginProfile.setTitle(profileName);
+			pluginProfile.setPluginId(pluginId);
+			pluginProfile.setProfileType(profileType);
+			
+			response = BackMeUpUtils.addProfile(accessToken, pluginId, pluginProfile);
+			profileId = response.extract().path("profileId").toString();
+			
+			pluginProfile = BackMeUpUtils.getProfile(accessToken, pluginId, profileId);			
+			pluginProfile.setTitle(newProfileName);
+						
+			response = 
+			given()
+				.log().all()
+				.contentType("application/json")
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+				.body(pluginProfile, ObjectMapperType.JACKSON_1)
+			.when()
+				.put("/plugins/" + pluginId + "/" + profileId)
+			.then()
+				.log().all()
+				.statusCode(200);
+		
+		} finally {
+//			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
+//			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
 	public void testDeleteProfile() {
 		String username = "john.doe";
 		String firstname = "John";
