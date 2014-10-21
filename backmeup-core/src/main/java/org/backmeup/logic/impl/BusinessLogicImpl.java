@@ -507,47 +507,36 @@ public class BusinessLogicImpl implements BusinessLogic {
     	//TODO: profile properties and options are not considered
     	//TODO: Auth data is referenced by id 
     	
-    	return conn.txNew(new Callable<Profile>() {
+        return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
-            	Profile p = validateProfile(profile);
+                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
+                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                    profile.setAuthData(authData);
+                    
+                    String identification = plugins.authorizePlugin(profile.getAuthData());
+                    profile.setIdentification(identification);
+                }
+                
+                if(profile.getProperties() != null) {
+                //  plugins.validatePlugin(profile);
+                }
+                
+                if(profile.getOptions() != null) {
+                //  plugins.validatePlugin(profile);
+                }
 
                 // TODO: Store (auth) data in keyserver
-            	// probably this should be done within profiles.save!
+                // probably this should be done within profiles.save!
                 // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
                 
-                p = profiles.save(p);
+                Profile p = profiles.save(profile);
 
                 return p;
             }
         });
         
     }
-    
-    private Profile validateProfile(final Profile profile) {
-    	return conn.txNew(new Callable<Profile>() {
-    		@Override public Profile call() {
-    			final Profile p = profile;
-				if ((p.getAuthData() != null) && (p.getAuthData().getId() != null)) {
-					AuthData authData = profiles.getAuthData(p.getAuthData().getId());
-					p.setAuthData(authData);
-
-					String identification = plugins.authorizePlugin(p.getAuthData());
-					p.setIdentification(identification);
-				}
-
-				if (p.getProperties() != null) {
-					// plugins.validatePlugin(profile);
-				}
-
-				if (p.getOptions() != null) {
-					// plugins.validatePlugin(profile);
-				}
-        	
-				return p;
-			}
-    	});
-    }
-    
+        
     @Override
     public ValidationNotes validateProfile(final Long userId, final Long profileId, final String keyRing) {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
@@ -618,9 +607,27 @@ public class BusinessLogicImpl implements BusinessLogic {
     public Profile updatePluginProfile(String pluginId, final Profile profile) {
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
-            	
-            	Profile p = validateProfile(profile);
-                p =  profiles.updateProfile(p);
+            	// TODO: Refactor (see addPluginProfile method); put validation logic in own method
+                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
+                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                    profile.setAuthData(authData);
+                    
+                    String identification = plugins.authorizePlugin(profile.getAuthData());
+                    profile.setIdentification(identification);
+                }
+                
+                if(profile.getProperties() != null) {
+                //  plugins.validatePlugin(profile);
+                }
+                
+                if(profile.getOptions() != null) {
+                //  plugins.validatePlugin(profile);
+                }
+
+                // TODO: Store (auth) data in keyserver
+                // probably this should be done within profiles.save!
+                // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+                Profile p =  profiles.updateProfile(profile);
                 return p;
                 
             }

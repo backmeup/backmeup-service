@@ -188,7 +188,6 @@ public class Plugins extends Base {
 			@PathParam("pluginId") String pluginId, 
 			@PathParam("profileId") String profileId, 
 			@QueryParam("expandConfig") @DefaultValue("false") boolean expandConfig) {
-//		return DummyDataManager.getPluginProfileDTO(expandConfig);
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
@@ -199,7 +198,6 @@ public class Plugins extends Base {
 		}
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
 		
 		return profileDTO;
 	}
