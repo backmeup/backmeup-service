@@ -129,8 +129,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     
     @Override
     public Profile updateProfile(Profile profile) {
-    	Profile p = queryExistingProfile(profile.getId());
-    	return getProfileDao().merge(p);
+    	return getProfileDao().merge(profile);
     }
 
     @Deprecated

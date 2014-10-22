@@ -172,10 +172,6 @@ public class Plugins extends Base {
 		profile = getLogic().addPluginProfile(pluginId, profile);
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-//		profileDTO.setPluginId(pluginId);
-//		profileDTO.setAuthData(new AuthDataDTO(authData.getId()));
-//		profileDTO.setProperties(pluginProfile.getProperties());
-//		profileDTO.setOptions(pluginProfile.getOptions());
 		
 		return profileDTO;
 	}
@@ -207,10 +203,13 @@ public class Plugins extends Base {
 	@Path("/{pluginId}/{profileId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginProfileDTO updatePluginConfiguration(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId, PluginProfileDTO pluginProfile) {
-//		pluginProfile.setProfileId(1L);
-//		return pluginProfile;
-		
+	public PluginProfileDTO updatePluginConfiguration(
+			@PathParam("pluginId") String pluginId, 
+			@PathParam("profileId") String profileId, 
+			@QueryParam("updateAuthData") @DefaultValue("false") boolean updateAuthData,
+			@QueryParam("updateProperties") @DefaultValue("false") boolean updateProperties,
+			@QueryParam("updateOptions") @DefaultValue("false") boolean updateOptions,
+			PluginProfileDTO pluginProfile) {	
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		Long pId = Long.parseLong(profileId);
 		Profile persistentProfile = getLogic().getPluginProfile(pId);
@@ -223,10 +222,28 @@ public class Plugins extends Base {
 			throw new WebApplicationException(Status.CONFLICT);
 		}
 
-		Profile profile = getMapper().map(pluginProfile, Profile.class);
-		profile = getLogic().updatePluginProfile(pluginId, profile);
+		persistentProfile.setName(pluginProfile.getTitle());
+		persistentProfile.setPluginId(pluginProfile.getPluginId());
+		persistentProfile.setType(pluginProfile.getProfileType());
 		
-		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
+		if (updateAuthData) {
+			AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
+			persistentProfile.setAuthData(authData);
+		}
+
+		if (updateProperties) {
+			persistentProfile.getProperties().clear();
+			persistentProfile.getProperties().putAll(pluginProfile.getProperties());
+		}
+
+		if (updateOptions) {
+			persistentProfile.getOptions().clear();
+			persistentProfile.getOptions().addAll(pluginProfile.getOptions());
+		}
+		
+		persistentProfile = getLogic().updatePluginProfile(persistentProfile);
+
+		PluginProfileDTO profileDTO = getMapper().map(persistentProfile, PluginProfileDTO.class);
 		
 		return profileDTO;
 	}

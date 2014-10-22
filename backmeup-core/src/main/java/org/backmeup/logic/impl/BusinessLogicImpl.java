@@ -604,14 +604,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public Profile updatePluginProfile(String pluginId, final Profile profile) {
+    public Profile updatePluginProfile(final Profile profile) {
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
             	// TODO: Refactor (see addPluginProfile method); put validation logic in own method
-                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
-                    profile.setAuthData(authData);
-                    
+                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {                    
                     String identification = plugins.authorizePlugin(profile.getAuthData());
                     profile.setIdentification(identification);
                 }
@@ -623,12 +620,8 @@ public class BusinessLogicImpl implements BusinessLogic {
                 if(profile.getOptions() != null) {
                 //  plugins.validatePlugin(profile);
                 }
-
-                // TODO: Store (auth) data in keyserver
-                // probably this should be done within profiles.save!
-                // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-                Profile p =  profiles.updateProfile(profile);
-                return p;
+                
+                return profiles.updateProfile(profile);
                 
             }
         });
