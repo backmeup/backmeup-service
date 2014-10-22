@@ -45,10 +45,10 @@ public class BackupJob {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Profile sourceProfile;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private List<Profile> actionProfiles = new ArrayList<>();
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
