@@ -316,6 +316,55 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 	
 	@Ignore
 	@Test
+	public void testGetProfileSourceFilegenerator() {	
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.filegenerator";
+		String profileName = "FilegeneratorProfile";
+		PluginType profileType = PluginType.Source;
+		String profileId = "";
+		
+		PluginProfileDTO pluginProfile = new PluginProfileDTO();
+		pluginProfile.setTitle(profileName);
+		pluginProfile.setPluginId(pluginId);
+		pluginProfile.setProfileType(profileType);
+		
+		pluginProfile.addProperty("text", "true");
+		pluginProfile.addProperty("image", "true");
+		pluginProfile.addProperty("pdf", "true");
+		pluginProfile.addProperty("binary", "true");
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			response = BackMeUpUtils.addProfile(accessToken, pluginId, pluginProfile);
+			profileId = response.extract().path("profileId").toString();
+			
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+			.when()
+				.get("/plugins/" + pluginId + "/" + profileId)
+			.then()
+				.log().all()
+				.statusCode(200);
+		} finally {
+			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
 	public void testUpdateProfileSourceDummy() {
 		String username = "john.doe";
 		String firstname = "John";
@@ -360,11 +409,15 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 				.put("/plugins/" + pluginId + "/" + profileId)
 			.then()
 				.log().all()
-				.statusCode(200);
+				.statusCode(200)
+				.body("profileId", equalTo(Integer.parseInt(profileId)))
+				.body("title", equalTo(newProfileName))
+				.body("pluginId", equalTo(pluginId))
+				.body("profileType", equalTo(profileType.toString()));
 		
 		} finally {
-//			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
-//			BackMeUpUtils.deleteUser(accessToken, userId);
+			BackMeUpUtils.deleteProfile(accessToken, pluginId, profileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
 	
