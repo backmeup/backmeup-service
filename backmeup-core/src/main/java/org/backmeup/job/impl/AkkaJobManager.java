@@ -2,8 +2,6 @@ package org.backmeup.job.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +48,7 @@ abstract public class AkkaJobManager implements JobManager {
 	
 	private final Logger logger = LoggerFactory.getLogger(AkkaJobManager.class);
 
-	private BackupJobDao getDao() {
+	private BackupJobDao getBackupJobDao() {
 		return dal.createBackupJobDao();
 	}
 
@@ -61,34 +59,37 @@ abstract public class AkkaJobManager implements JobManager {
 			String jobTitle, boolean reschedule, String timeExpression) {
 		try {
 			conn.begin();
-//			UserDao ud = dal.createUserDao();
-//			user = ud.merge(user);
+
 			// Create BackupJob entity in DB...
-			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile,
-					requiredActions, start, delayInMs, jobTitle, reschedule);
+			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile, requiredActions, start, delayInMs, jobTitle, reschedule);
 			job.setTimeExpression(timeExpression);
 			job.setStatus(BackupJobStatus.queued);
 
 			Long firstExecutionDate = start.getTime() + delayInMs;
 
-			String encryptionPwd = null;
-			Properties p = new Properties();
-			for (Profile ap : requiredActions) {
-				for (Entry<String, String> prop : ap.getProperties().entrySet()) {
-					p.put(prop.getKey(), prop.getValue());
-				}
-			}
-			encryptionPwd = (String) p.get("org.backmeup.encryption.password");
+//			String encryptionPwd = null;
+//			Properties p = new Properties();
+//			for (Profile ap : requiredActions) {
+//				for (Entry<String, String> prop : ap.getProperties().entrySet()) {
+//					p.put(prop.getKey(), prop.getValue());
+//				}
+//			}
+//			encryptionPwd = (String) p.get("org.backmeup.encryption.password");
 
 			// reusable=true means, that we can get the data for the token + a
 			// new token for the next backup
-			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate,
-					true, encryptionPwd);
-			job.setToken(t);
-			job = getDao().save(job);
+//			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate, true, encryptionPwd);
+//			job.setToken(t);
+			Token dummyToken = new Token("1111-222-333", 1l, firstExecutionDate);
+			job.setToken(dummyToken);
+			
+			job = getBackupJobDao().save(job);
+			
 			conn.commit();
-			// ... and queue immediately
-			queueJob(job);
+			
+			// Queue new job immediately
+			// TODO: currently disabled due to major refactoring
+//			queueJob(job);
 			return job;
 		} finally {
 			conn.rollback();
@@ -97,7 +98,7 @@ abstract public class AkkaJobManager implements JobManager {
 	}
 	
 	private BackupJob getBackUpJob(Long jobId) {
-		return getDao().findById(jobId);
+		return getBackupJobDao().findById(jobId);
 	}
 
 	@Override
@@ -106,7 +107,7 @@ abstract public class AkkaJobManager implements JobManager {
 		// excessive length)
 		try {
 			conn.begin();
-			List<BackupJob> storedJobs = getDao().findAll();
+			List<BackupJob> storedJobs = getBackupJobDao().findAll();
 			conn.rollback();
 			for (BackupJob storedJob : storedJobs) {
 				queueJob(storedJob);
