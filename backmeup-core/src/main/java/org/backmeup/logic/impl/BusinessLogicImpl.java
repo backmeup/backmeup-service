@@ -421,6 +421,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Deprecated
     private List<Profile> getActionProfilesFor(BackupJob request) {
         return plugins.getActionProfilesFor(request);
     }
@@ -661,22 +662,25 @@ public class BusinessLogicImpl implements BusinessLogic {
     // ========================================================================
     
     @Override
-    public ValidationNotes createBackupJob(BackupJob request) {
+    public ValidationNotes createBackupJob(BackupJob backupJob) {
         try {
             conn.begin();
+            
+            BackMeUpUser user = backupJob.getUser();
+            Date startDate = backupJob.getStart();
+            long delayTime = backupJob.getDelay();
+            String jobTitle = backupJob.getJobTitle();
+            boolean reschedule = backupJob.isReschedule();
+            String timeExpression = backupJob.getTimeExpression();
 
-            Profile source = request.getSourceProfile();
-//            Set<ProfileOptions> pos = profiles.getSourceProfilesOptionsFor(request.getSourceProfiles());
-            Profile sink = profiles.queryExistingProfile(request.getSinkProfile().getId());
-
-            List<Profile> actions = getActionProfilesFor(request);
-
-//            ExecutionTime execTime = BackUpJobCreationHelper.getExecutionTimeFor(request);
+            Profile source = backupJob.getSourceProfile();
+            Profile sink = backupJob.getSinkProfile();
+            List<Profile> actions = backupJob.getActionProfiles();
 
             conn.rollback();
             
-            BackupJob job = jobManager.createBackupJob(request.getUser(), source, sink, actions, request.getStart(), request.getDelay(), request.getJobTitle(), request.isReschedule(), request.getTimeExpression());
-            ValidationNotes vn = validateBackupJob(request.getUser().getUserId(), job.getId(), request.getUser().getPassword());
+            BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
+            ValidationNotes vn = validateBackupJob(backupJob.getUser().getUserId(), job.getId(), backupJob.getUser().getPassword());
             vn.setJob(job);
             return vn;
             

@@ -45,6 +45,7 @@ public class PluginsLogicImpl implements PluginsLogic {
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("PluginsLogicImpl");
 
+    @Deprecated
     @Override
     public List<Profile> getActionProfilesFor(BackupJob request) {
         List<Profile> actions = new ArrayList<>();

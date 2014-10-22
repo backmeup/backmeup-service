@@ -14,7 +14,7 @@ import org.backmeup.plugin.api.connectors.Datasource;
 
 public interface PluginsLogic {
 
-    List<Profile> getActionProfilesFor(BackupJob request);
+    @Deprecated List<Profile> getActionProfilesFor(BackupJob request);
 
     List<String> getActionOptions(String actionId);
 
