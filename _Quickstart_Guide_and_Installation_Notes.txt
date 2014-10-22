@@ -1,0 +1,260 @@
+Quickstart-Guide BackMeUp
+=========================
+updated: 10.10.2014
+The following document contains a 'quickstart' guide for setting up the BackMeUp project
+ - a step-by-step instruction
+ - hints, pitfalls, FAQ
+
+0) Required Software
+====================
+ - Linux / Windows platform. [Tested under Ubuntu 12.04/14.04 (LTS) and Windows 7 64-bit]
+ - Tomcat [Tested under v7.0.56]
+ - Maven [Tested under v3.0.4]
+ - PostgresSQL [Tested under  v9.3 x86]
+ - RabbitMQ and Erlang [Tested under RabbitMQ 3.3.3 and Erlang R16B02]
+ - Apache Webserver [Tested under v2.2.25]
+ - JDK v1.7 [Tested under Oracle JDK 1.7 and openJDK]
+ 
+ For implicitly required software artefacts and version see the project's pom.xml files
+
+1) Software-Modules
+===================
+Checkout the following modules from https://github.com/backmeup/
+These are currently required to build a fully functional BackMeUp instance
+
+ - backmeup-indexer
+ - backmeup-ui
+ - backmeup-plugins
+ - backmeup-service
+ - backmeup-storage
+ - backmeup-worker
+ - backmeup-keyserver
+ 
+2) Setting up BackMeUp
+======================
+A) In %tomcat_home%/conf modify tomcat-user.xml settings. Within the <tomcat-users> section add:
+  <role rolename="manager"/>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <role rolename="admin"/>
+  <role rolename="admin-gui"/>
+  <user password="admin" roles="admin,admin-gui,manager,manager-gui,manager-script" username="admin"/>
+
+
+B) adjust %maven_home%/conf/settings.xml
+Within /conf/settings.xml make sure to add the following configuration within the 
+BackMeUp's maven configuration autodeploys servlets to Tomcat.
+<server>
+      <id>backmeup.keyserver.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+    </server>
+
+    <server>
+      <id>backmeup.keyserver.postgres</id>
+      <username>dbu_keysrv</username>
+      <password>dbu_keysrv</password>
+    </server>
+
+    <!-- Backmeup Service -->
+    <server>
+      <id>backmeup.service.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+    </server>
+ 
+ <!-- Backmeup Worker -->
+    <server>
+      <id>backmeup.worker.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+</server>
+
+
+C) create public, private keys
+TODO add link on howto
+
+
+D) Building the backmeup-keyserver component
+--------------------------------------------
+D1. adjust src/main/resources/keyserver.properties
+and make sure keyserver.publickey und keyserver.privatekey point to the proper location
+created in step [C] as well as that keysrv.log is available.
+
+# KEYSERVER ------------------------------------------------------------------
+keyserver.logfile = C:/Temp/data/backmeup-keyserver/log/keysrv/keysrv.log
+keyserver.publickey = C:/Temp/data/backmeup-keyserver/public.key
+keyserver.privatekey = C:/Temp/data/backmeup-keyserver/private.key
+
+keyserver.queue.host = localhost
+keyserver.queue.name = keysrv
+keyserver.queue.receivers = 0
+
+keyserver.charset = UTF-8
+# -----------------------------------------------------------------------------
+
+D2. connect to postgres on port 5432 and create the keyserver's database + db user
+create a database user called 'dbu_srv' (pw 'dbu_srv')
+create a database called 'db_keysrv' and assign the dbu_srv user as owner
+
+Info:
+Make sure this information is reflected within src>main>webapp>META-INF/context.xml where the JDBC connection details are contained
+
+D3. Copy src/main/sql/db-keyserver-schema.sql content and execute PGScript to setup the database's schema
+
+Info:
+Note that src/main/sql/db-keyserver-truncate.sql is being called in mavens pre-integration-test phase
+
+D4. make sure tomcat is running. To deploy the keyserver call
+mvn install
+
+Note: Two integration tests still fail
+
+Info:
+To test if the keyserver is properly responsing call
+http://localhost:8080/backmeup-keyserver/users/1
+or check FAQ>E
+
+
+E) Building the backmeup-service component
+------------------------------------------
+E0. Make sure you've installed RabbitMQ + Erlang dependency, set the %ERLANG_HOME% user variable and started the message queue calling sbin/rabbit-mq-server.bat
+
+E1. connect to postgres on port 5432 and create the component's database + db user
+create a database user called 'dbu_core' (pw 'dbu_core')
+create a database called 'bmucore' and assign the dbu_core user as owner
+
+Info:
+Make sure this information is reflected within src>main>resources>META-INF/persistance.xml
+
+E2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory. All other values default. The database connection properties may stay empty as they are provided within
+src>main>resources>META-INF/persistance.xml
+
+# PLUGINS ---------------------------------------------------------------------
+# Location for the backmeup plugin bundles that will be loaded at startup
+backmeup.osgi.deploymentDirectory = C:/Temp/data/backmeup-service/autodeploy
+# Temporary directory for OSGi container
+backmeup.osgi.temporaryDirectory = C:/Temp/data/backmeup-service/osgi-tmp
+backmeup.osgi.exportedPackages = org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api org.backmeup.plugin.api.actions javax.mail com.sun.imap
+# --------
+
+E3. Within backmeup-service-tests check src/test/resources/integrationtest.properties and adjust to your local tomcat settings if you don't operate on the default ports
+
+E4. To deploy the the component switch into backmeup-service root and call
+mvn -DintegrationTests pre-integration-test
+
+E5. To check if the component is properly working switch to backmeup-service-tests and run the integration tests
+e.g. manually JUnittest in Eclipse
+src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
+
+F) Building the backmeup-worker component
+-----------------------------------------
+F1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+
+F2) To deploy the servlet call 
+mvn install
+
+Info: to check the worker's proper deployment and status call
+http://localhost:8080/backmeup-worker-app-servlet/
+
+
+G) Building the backmeup-plugins
+--------------------------------
+To build the plugins call
+mvn install
+within the backmeup-plugins/target directory you'll find the created osgi bundles. Copy the plugins you want to deploy into data/backmeup-service/autodeploy [according to the configuration in section B] 
+
+Info:
+It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment.
+Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
+
+
+H) Building the GUI
+-------------------
+Using the UI locally does not require to have a http server up and running.
+* pre-compiled applications for iOS and Android is located in backmeup-ui/appfiles
+* a version optimmized for a desktop browser is located in  backmeup-ui/app.extern.gtn.themis/www -> copy this directory into into your Apache2.2 htdocs folder when using a http-server
+
+H1. change into the folder www/js/plugins and open the file pluging.WebServiceClient.json to connect to your local backmeup backend
+----------------------------------------------------------------
+"defaultServer":"backmeup",
+	"server":{
+		"backmeup":{
+			...
+			},
+			"first":{
+				"scheme":"http",
+				"scheme_specific_part":"://",
+				"host":"localhost",
+				"port":8080
+----------------------------------------------------------------
+
+H2. change into the folder www/js and change the settings in lapstone.js config:{min: from true to false. This tells te system to use the local files inc. the plugin.WebServicClient.json instead of the prepackaged ones.
+----------------------------------------------------------------
+var app = {
+	config : {
+		name : "app",
+		min : false,
+		useJQueryMobile : true,
+		apacheCordova : null
+	},
+	addObject : function(name, object) {
+		// alert("Add object to app: " + name);
+		app[name] = object;
+	}
+};
+---------------------------------------------------------------
+
+H3. Make sure to kill all open Chrome browser instances and launch Chrome with disabled-web-security as cross-domain requests won't work.
+
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security
+open the file in your browser
+file:///D:/repositories/themis-backmeup/backmeup-ui/app.extern.gtn.themis/www/page/start.html
+
+H4. Within the GUI navigate to Settings > clear appdata to remove all cached entries in the browser's database
+
+
+FAQ
+===
+A) Windows/Linux
+----------------
+Currently both platforms are supported. Due to dependencies on the underlying file system based encryption mechanisms (LUKS, Truecrypt container creation, etc.), it is possible that Windows support will be dropped/limited in future.
+
+B) Oracle JDK - AES 265 bit encryption
+----------------
+Oracle JDK is only able to support encryption up to AES 128 bit by law. As the BackMeUp system relies on AES 265 bit symetric key encryption it is required to download and install updated policy files for the JVM. see:
+http://stackoverflow.com/questions/6538485/java-using-aes-256-and-128-symmetric-key-encryption 
+http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+
+C) Enabling remote Tomcat server debugging in Eclipse
+---------------
+see http://blogs.mulesoft.org/debugging-your-tomcat-webapp-with-eclipse/
+modify the server's start configuration and add
+-Xdebug
+-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+In Eclipse go to Run>Debug Configurations -> Remote Java Application -> New
+Chose the project, add localhost and port 8000 -> apply -> debug
+Now you're able to "debug as -> junit test"
+
+D) Adjusting Permsize
+----------------
+The default value for Tomcat7 is set to 64m and is to low. Add the following values to the server's startup configuration and make sure you don't have any blanks at the end of the line
+-XX:PermSize=256m
+-XX:MaxPermSize=512m 
+
+E) wget for Windows
+----------------
+Wget is available for Windows (32bit or 64bit version). It allows to issue GET/PUT/POST/DELETE requests. For example to check if the keyserver is properly working create a user (id 1, password (sd) by running 
+wget.exe -post-data '' http://localhost:8080/backmeup-keyserver/users/1/asd/register
+
+
+
+
+
+
+
+
+
+
+
+
