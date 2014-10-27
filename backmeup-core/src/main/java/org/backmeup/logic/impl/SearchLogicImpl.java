@@ -6,9 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-import org.backmeup.index.client.ElasticSearchIndexClient;
 import org.backmeup.index.client.IndexClient;
+import org.backmeup.index.client.IndexClientFactory;
 import org.backmeup.index.model.FileItem;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.SearchLogic;
@@ -22,8 +23,11 @@ public class SearchLogicImpl implements SearchLogic {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Inject
+    private IndexClientFactory indexClientFactory;
+    
     private IndexClient getIndexClient(Long userId) {
-        return new ElasticSearchIndexClient(userId);
+        return indexClientFactory.getIndexClient(userId);
     }
 
     @Override
