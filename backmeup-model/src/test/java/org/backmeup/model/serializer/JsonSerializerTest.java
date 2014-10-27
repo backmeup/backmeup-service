@@ -1,4 +1,4 @@
-package org.backmeup.model.tests;
+package org.backmeup.model.serializer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,12 +8,11 @@ import java.util.List;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.serializer.JsonSerializer;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SerializiationTest {
+public class JsonSerializerTest {
   
   private void testProfiles(Profile p1, Profile p2) {
     Assert.assertEquals(p1.getPluginId(), p2.getPluginId());
