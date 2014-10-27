@@ -900,13 +900,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public SearchResponse queryBackup(final Long userId, final String query, final Map<String, List<String>> filters) {
+    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type, final String job) {
         return conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override public SearchResponse call() {
                 
 //                BackMeUpUser user = registration.getActiveUser(username);
             	BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.runSearch(user, query, filters);
+                return search.runSearch(user, query, source, type, job);
 
             }
         });

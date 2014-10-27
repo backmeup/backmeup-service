@@ -108,7 +108,7 @@ public interface BusinessLogic {
 	void deleteJobProtocols(Long userId);
 	
 	// search operations ------------------------------------------------------
-	SearchResponse queryBackup(Long userId, String query, Map<String, List<String>> filters);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
 	File getThumbnail(Long userId, String fileId);
 	void deleteIndexForUser(Long userId);
 	void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
@@ -118,4 +118,5 @@ public interface BusinessLogic {
 	
 	// lifecycle operations ---------------------------------------------------
 	void shutdown();
+
 }

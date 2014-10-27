@@ -1,8 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -31,11 +29,11 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public SearchResponse runSearch(BackMeUpUser user, String query, Map<String, List<String>> filters) {
+    public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job) {
         try (IndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse result = new SearchResponse(query);
-            result.setDetails(client.queryBackup(result.getQuery(), filters, user.getUsername()));
+            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, user.getUsername()));
             return result;
             
         }
