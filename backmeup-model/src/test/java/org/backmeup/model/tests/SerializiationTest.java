@@ -65,7 +65,7 @@ public class SerializiationTest {
 		String serializedJob = JsonSerializer.serialize(job);
 		BackupJob restored = JsonSerializer.deserialize(serializedJob,
 				BackupJob.class);
-		restored.toString();
+
 		Assert.assertEquals(job.getDelay(), restored.getDelay());
 		Assert.assertEquals(job.getId(), restored.getId());
 		Assert.assertEquals(job.getStart(), restored.getStart());
