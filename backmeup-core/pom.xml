@@ -72,12 +72,6 @@
     	</dependency>
 		
 		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>${version.org.elasticsearch}</version>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.im4java</groupId>
 			<artifactId>im4java</artifactId>
 			<version>${version.org.im4java}</version>

@@ -29,13 +29,13 @@
 			<version>${version.ch.qos.logback}</version>
 		</dependency> 
 		
+        <!-- Servlet environment provided -->        
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
 			<version>${version.javax.el}</version>
 			<scope>provided</scope>
 		</dependency>
-				
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

@@ -91,8 +91,8 @@ public class AuthorizationImpl implements AuthorizationLogic {
 
     @Override
     public void initProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
-        if (!keyserverClient.isServiceRegistered(profile.getProfileId())) {
-            keyserverClient.addService(profile.getProfileId());
+        if (!keyserverClient.isServiceRegistered(profile.getId())) {
+            keyserverClient.addService(profile.getId());
         }
 
         keyserverClient.addAuthInfo(profile, keyRing, entries);
@@ -100,12 +100,12 @@ public class AuthorizationImpl implements AuthorizationLogic {
 
     @Override
     public void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
-        if (!keyserverClient.isServiceRegistered(profile.getProfileId())) {
-            keyserverClient.addService(profile.getProfileId());
+        if (!keyserverClient.isServiceRegistered(profile.getId())) {
+            keyserverClient.addService(profile.getId());
         }
         
         if (keyserverClient.isAuthInformationAvailable(profile, keyRing)) {
-            keyserverClient.deleteAuthInfo(profile.getProfileId());
+            keyserverClient.deleteAuthInfo(profile.getId());
         }
 
         keyserverClient.addAuthInfo(profile, keyRing, entries);
@@ -133,7 +133,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
     @Override
     public Properties fetchProfileAuthenticationData(Profile profile, String keyRingPassword) {
         AuthDataResult authData = getAuthDataFor(profile, keyRingPassword);
-        return authData.getByProfileId(profile.getProfileId());
+        return authData.getByProfileId(profile.getId());
     }
 
     private AuthDataResult getAuthDataFor(Profile profile, String password) {

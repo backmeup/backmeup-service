@@ -3,16 +3,21 @@ package org.backmeup.tests.integration.utils;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 import com.jayway.restassured.internal.mapper.ObjectMapperType;
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
 
 
@@ -88,17 +93,14 @@ public class BackMeUpUtils {
 			.statusCode(204);
 	}
 	
-	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, Properties configProps) {		
+	public static ValidatableResponse addProfile(String accessToken, String pluginId, String profileName, PluginType profileType, AuthDataDTO authData, Map<String, String> props, List<String> options) {		
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
 		pluginProfile.setTitle(profileName);
 		pluginProfile.setPluginId(pluginId);
 		pluginProfile.setProfileType(profileType);
-		
-		for(Entry<?,?> entry : configProps.entrySet()) {
-			String key = (String) entry.getKey();  
-			String value = (String) entry.getValue();  
-			pluginProfile.addConfigProperties(key, value);
-		}
+		pluginProfile.setAuthData(authData);
+		pluginProfile.setProperties(props);
+		pluginProfile.setOptions(options);
 		
 		return addProfile(accessToken, pluginId, pluginProfile);
 	}
@@ -106,7 +108,7 @@ public class BackMeUpUtils {
 	public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
 		ValidatableResponse response = 
 		given()
-//			.log().all()
+			.log().all()
 			.contentType("application/json")
 			.header("Accept", "application/json")
 			.header("Authorization", accessToken)
@@ -114,10 +116,30 @@ public class BackMeUpUtils {
 		.when()
 			.post("/plugins/" + pluginId)
 		.then()
-//			.log().all()
+			.log().all()
 			.statusCode(200);
 		
 		return response;
+	}
+	
+	public static PluginProfileDTO getProfile(String accessToken, String pluginId, String profileId) {
+		return getProfile(accessToken, pluginId, Long.parseLong(profileId));
+	}
+	
+	public static PluginProfileDTO getProfile(String accessToken, String pluginId, Long profileId) {
+		Response response = 
+				given()
+					.log().all()
+					.contentType("application/json")
+					.header("Accept", "application/json")
+					.header("Authorization", accessToken)
+				.when()
+					.get("/plugins/" + pluginId + "/" + profileId);
+		return parseResponse(PluginProfileDTO.class, response);
+	}
+	
+	private static <T> T parseResponse(Class<T> type, Response response) {
+		return response.getBody().as(type);
 	}
 	
 	
@@ -161,6 +183,43 @@ public class BackMeUpUtils {
 	@Deprecated
 	public static void updateProfile(String profileId, String password, Properties profileProps) {
 		throw new UnsupportedOperationException();
+	}
+	
+	public static ValidatableResponse addAuthData(String accessToken, String pluginId, String name, Map<String, String> props) {
+		AuthDataDTO authData = new AuthDataDTO();
+		authData.setName(name);
+		authData.setProperties(new HashMap<String, String>());
+		authData.getProperties().putAll(props);
+		
+		ValidatableResponse response = 
+		given()
+//			.log().all()
+			.contentType("application/json")
+			.header("Accept", "application/json")
+			.header("Authorization", accessToken)
+			.body(authData, ObjectMapperType.JACKSON_1)
+		.when()
+			.post("/plugins/" + pluginId + "/authdata")
+		.then()
+//			.log().all()
+			.statusCode(200)
+			.body("id", notNullValue())
+			.body("name", equalTo(name));
+		
+		return response;
+	}
+	
+	public static void deleteAuthData(String accessToken, String pluginId, String authDataId) {
+		given()
+			.log().all()
+			.contentType("application/json")
+			.header("Accept", "application/json")
+			.header("Authorization", accessToken)
+		.when()
+			.delete("/plugins/" + pluginId + "/authdata/" + authDataId)
+		.then()
+			.log().all()
+			.statusCode(204);
 	}
 	
 	// ========================================================================

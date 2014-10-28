@@ -189,28 +189,4 @@ public class BackMeUpUser {
 	public String toString() {
 		return username;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null || getClass() != obj.getClass()) {
-			return false;
-		}
-
-		if (obj instanceof BackMeUpUser) {
-			BackMeUpUser b = (BackMeUpUser) obj;
-			if (this.getUserId() != b.getUserId()) {
-				return false;
-			}
-			if (!this.getEmail().equals(b.getEmail())) {
-				return false;
-			}
-		} else {
-			return false;
-		}
-
-		return true;
-	}
 }

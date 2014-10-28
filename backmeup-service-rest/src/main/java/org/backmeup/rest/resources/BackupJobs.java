@@ -20,11 +20,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
-import org.backmeup.model.ActionProfile;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
@@ -74,12 +72,12 @@ public class BackupJobs extends Base {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		Profile sourceProfile = getLogic().getPluginProfile(backupJob.getSource());
-		ProfileOptions sourceProfiles = new ProfileOptions(sourceProfile, new String[0]);
+		sourceProfile.setOptions(new ArrayList<String>());
 		
 		Profile sinkProfile = getLogic().getPluginProfile(backupJob.getSink());
 		
 		// TODO: actions ignored
-		List<ActionProfile> actionProfiles = new ArrayList<>();
+		List<Profile> actionProfiles = new ArrayList<>();
 		
 		long delay = DelayTimes.DELAY_MONTHLY;
 		boolean reschedule = false;
@@ -106,7 +104,7 @@ public class BackupJobs extends Base {
 			
 		} 
 		
-		BackupJob job = new BackupJob(activeUser, sourceProfiles, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
+		BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
 		job.setTimeExpression(timeExpression);
 		ValidationNotes vn = getLogic().createBackupJob(job);
 		
@@ -151,23 +149,22 @@ public class BackupJobs extends Base {
 		
 		if(expandProfiles) {
 			// get source profile
-			ProfileOptions sourceProfileOptions = job.getSourceProfiles();
-			Profile sourceProfile = getLogic().getPluginProfile(sourceProfileOptions.getProfile().getProfileId());
+			Profile sourceProfile = getLogic().getPluginProfile(job.getSourceProfile().getId());
 			PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
-			sourceProfileDTO.setPluginId(sourceProfile.getDescription());
+			sourceProfileDTO.setPluginId(sourceProfile.getPluginId());
 			jobDTO.setSource(sourceProfileDTO);
 
 			// get sink profile
-			Profile sinkProfile = getLogic().getPluginProfile(job.getSinkProfile().getProfileId());		
+			Profile sinkProfile = getLogic().getPluginProfile(job.getSinkProfile().getId());		
 			PluginProfileDTO sinkProfileDTO = getMapper().map(sinkProfile, PluginProfileDTO.class);
-			sinkProfileDTO.setPluginId(sinkProfile.getDescription());
+			sinkProfileDTO.setPluginId(sinkProfile.getPluginId());
 			jobDTO.setSink(sinkProfileDTO);
 			
 			// get action profiles
-			for(ActionProfile action : job.getRequiredActions()) {
+			for(Profile action : job.getActionProfiles()) {
 				Profile actionProfile = getLogic().getPluginProfile(action.getId());
 				PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
-				actionProfileDTO.setPluginId(actionProfile.getDescription());
+				actionProfileDTO.setPluginId(actionProfile.getPluginId());
 				jobDTO.setSink(actionProfileDTO);
 			}
 		}

@@ -1,8 +1,10 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -24,9 +26,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
@@ -136,37 +140,38 @@ public class Plugins extends Base {
 	@Path("/{pluginId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginProfileDTO addPluginProfile(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {
-//		pluginProfile.setProfileId(1L);
-//		return pluginProfile;
-		
+	public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {	
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
+		throwIfPluginNotAvailable(pluginId);
+		
 		Profile profile = new Profile();
-		profile.setProfileName(pluginProfile.getTitle());
-		if(pluginProfile.getProfileType().equals(PluginType.Source)) {
-			profile.setType(PluginType.Source);
-		} else if(pluginProfile.getProfileType().equals(PluginType.Sink)) {
-			profile.setType(PluginType.Sink);
+		profile.setName(pluginProfile.getTitle());
+		profile.setPluginId(pluginId);
+        profile.setType(pluginProfile.getProfileType());
+        profile.setUser(activeUser);
+        
+        if(pluginProfile.getAuthData() != null) {
+        	AuthData authData = new AuthData();
+            authData.setId(pluginProfile.getAuthData().getId());
+            authData.setPluginId(pluginId);
+            profile.setAuthData(authData);
+        }
+        
+		if (pluginProfile.getProperties() != null) {
+			Map<String, String> profileProps = new HashMap<>();
+			profileProps.putAll(pluginProfile.getProperties());
+			profile.setProperties(profileProps);
 		}
-		profile.setUser(activeUser);
 		
-		Properties profileProps = new Properties();
-		if (pluginProfile.getConfigProperties() != null) {
-			profileProps.putAll(pluginProfile.getConfigProperties());
+		if(pluginProfile.getOptions() != null) {
+			List<String> profileOptions = new ArrayList<>(pluginProfile.getOptions());
+			profile.setOptions(profileOptions);
 		}
 		
-		List<String> profileOptions = pluginProfile.getOptions();
-		if(profileOptions == null) {
-			profileOptions = new ArrayList<>();
-		}
-		
-		profile = getLogic().addPluginProfile(pluginId, profile, profileProps, profileOptions);
+		profile = getLogic().addPluginProfile(pluginId, profile);
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
-		profileDTO.setConfigProperties(pluginProfile.getConfigProperties());
-		profileDTO.setOptions(pluginProfile.getOptions());
 		
 		return profileDTO;
 	}
@@ -175,11 +180,10 @@ public class Plugins extends Base {
 	@GET
 	@Path("/{pluginId}/{profileId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginProfileDTO getPluginProfile(
+	public PluginProfileDTO getPluginConfiguration(
 			@PathParam("pluginId") String pluginId, 
 			@PathParam("profileId") String profileId, 
 			@QueryParam("expandConfig") @DefaultValue("false") boolean expandConfig) {
-//		return DummyDataManager.getPluginProfileDTO(expandConfig);
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
@@ -190,7 +194,6 @@ public class Plugins extends Base {
 		}
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
 		
 		return profileDTO;
 	}
@@ -200,24 +203,47 @@ public class Plugins extends Base {
 	@Path("/{pluginId}/{profileId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginProfileDTO updatePluginProfile(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId, PluginProfileDTO pluginProfile) {
-//		pluginProfile.setProfileId(1L);
-//		return pluginProfile;
-		
+	public PluginProfileDTO updatePluginConfiguration(
+			@PathParam("pluginId") String pluginId, 
+			@PathParam("profileId") String profileId, 
+			@QueryParam("updateAuthData") @DefaultValue("false") boolean updateAuthData,
+			@QueryParam("updateProperties") @DefaultValue("false") boolean updateProperties,
+			@QueryParam("updateOptions") @DefaultValue("false") boolean updateOptions,
+			PluginProfileDTO pluginProfile) {	
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
-		if((!activeUser.getUserId().equals(profile.getUser().getUserId())) && 
+		Long pId = Long.parseLong(profileId);
+		Profile persistentProfile = getLogic().getPluginProfile(pId);
+		if((!activeUser.getUserId().equals(persistentProfile.getUser().getUserId())) && 
 		   (pluginProfile.getProfileId() != Long.parseLong(profileId))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
-		Properties configProps = new Properties();
-		configProps.putAll(pluginProfile.getConfigProperties());
-		List<String> configOptions = pluginProfile.getOptions();
-		getLogic().updatePluginProfile(pluginId, profile, configProps, configOptions);
 		
-		Profile profileModel = getLogic().getPluginProfile(Long.parseLong(profileId));
-		PluginProfileDTO profileDTO = getMapper().map(profileModel, PluginProfileDTO.class);
-		profileDTO.setPluginId(pluginId);
+		if ((!pId.equals(pluginProfile.getProfileId())) && (!pId.equals(persistentProfile.getId()))) {
+			throw new WebApplicationException(Status.CONFLICT);
+		}
+
+		persistentProfile.setName(pluginProfile.getTitle());
+		persistentProfile.setPluginId(pluginProfile.getPluginId());
+		persistentProfile.setType(pluginProfile.getProfileType());
+		
+		if (updateAuthData) {
+			AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
+			persistentProfile.setAuthData(authData);
+		}
+
+		if (updateProperties) {
+			persistentProfile.getProperties().clear();
+			persistentProfile.getProperties().putAll(pluginProfile.getProperties());
+		}
+
+		if (updateOptions) {
+			persistentProfile.getOptions().clear();
+			persistentProfile.getOptions().addAll(pluginProfile.getOptions());
+		}
+		
+		persistentProfile = getLogic().updatePluginProfile(persistentProfile);
+
+		PluginProfileDTO profileDTO = getMapper().map(persistentProfile, PluginProfileDTO.class);
 		
 		return profileDTO;
 	}
@@ -226,17 +252,120 @@ public class Plugins extends Base {
 	@DELETE
 	@Path("/{pluginId}/{profileId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deletePluginProfile(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId) {
+	public void deletePluginConfiguration(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long pId = Long.parseLong(profileId);
+		Profile profile = getLogic().getPluginProfile(pId);
 		if(!activeUser.getUserId().equals(profile.getUser().getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		// TODO check pluginId
-		// if profile.getPluginId != pluginId -> FORBIDDEN
+		if(!profile.getPluginId().equals(pluginId)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
 		
-		getLogic().deleteProfile(activeUser.getUserId(), Long.parseLong(profileId));
+		getLogic().deleteProfile(pId);
+	}
+	
+	@RolesAllowed("user")
+	@POST
+	@Path("/{pluginId}/authdata")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		// map dto to model class
+		AuthData authDataModel = getMapper().map(authData, AuthData.class);
+		authDataModel.setUser(activeUser);
+		authDataModel.setPluginId(pluginId);
+		
+		authDataModel = getLogic().addPluginAuthData(authDataModel);
+		
+		AuthDataDTO authDataDTO = getMapper().map(authDataModel, AuthDataDTO.class);
+		return authDataDTO;
+	}
+	
+	@RolesAllowed("user")
+	@GET
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AuthDataDTO getAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId){
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long aId = Long.parseLong(authDataId);
+		AuthData authDataModel = getLogic().getPluginAuthData(aId);
+		
+		if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		return getMapper().map(authDataModel, AuthDataDTO.class);
+		
+	}
+	
+	@RolesAllowed("user")
+	@GET
+	@Path("/{pluginId}/authdata")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AuthDataDTO> listAuthData(@PathParam("pluginId") String pluginId) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		List<AuthData> authDatas = getLogic().listPluginAuthData(activeUser.getUserId());
+		
+		List<AuthDataDTO> authDTOS = new ArrayList<>();
+		for(AuthData auth : authDatas) {
+			if(!auth.getUser().getUserId().equals(activeUser.getUserId())) {
+				throw new WebApplicationException(Status.FORBIDDEN);
+			}
+			AuthDataDTO authDTO = getMapper().map(auth, AuthDataDTO.class);
+			authDTOS.add(authDTO);
+		}
+		return authDTOS;
+	}
+	
+	@RolesAllowed("user")
+	@PUT
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AuthDataDTO updateAuthData(
+			@PathParam("pluginId") String pluginId,
+			@PathParam("authdataId") String authDataId, 
+			AuthDataDTO authData) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@RolesAllowed("user")
+	@DELETE
+	@Path("/{pluginId}/authdata/{authdataId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void deleteAuthData(@PathParam("pluginId") String pluginId,	@PathParam("authdataId") String authDataId) {
+		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+		
+		throwIfPluginNotAvailable(pluginId);
+		
+		Long aId = Long.parseLong(authDataId);
+		AuthData authDataModel = getLogic().getPluginAuthData(aId);
+		
+		if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
+		getLogic().deletePluginAuthData(aId);
+	}
+	
+	private void throwIfPluginNotAvailable(String pluginId) {
+		if(!getLogic().isPluginAvailable(pluginId)) {
+			LOGGER.error("Plugin not available: " + pluginId);
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
 	}
 }

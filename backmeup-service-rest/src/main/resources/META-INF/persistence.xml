@@ -7,18 +7,15 @@
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>org.backmeup.model.BackMeUpUser</class>
-		<class>org.backmeup.model.ProfileEntry</class>
 		<class>org.backmeup.model.Profile</class>
 		<class>org.backmeup.model.Status</class>
 		<class>org.backmeup.model.BackupJob</class>
-		<class>org.backmeup.model.ProfileOptions</class>
-		<class>org.backmeup.model.ActionProfile</class>
-		<class>org.backmeup.model.ActionProfile$ActionProperty</class>
 		<class>org.backmeup.model.UserProperty</class>
 		<class>org.backmeup.model.Service</class>
 		<class>org.backmeup.model.JobProtocol</class>
 		<class>org.backmeup.model.JobProtocol$JobProtocolMember</class>
 		<class>org.backmeup.model.Token</class>
+		<class>org.backmeup.model.AuthData</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/bmucore" />

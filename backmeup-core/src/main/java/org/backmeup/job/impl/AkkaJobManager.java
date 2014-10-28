@@ -2,7 +2,6 @@ package org.backmeup.job.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -14,12 +13,9 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
-import org.backmeup.model.ActionProfile;
-import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProfileOptions;
 import org.backmeup.model.Token;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.slf4j.Logger;
@@ -52,45 +48,48 @@ abstract public class AkkaJobManager implements JobManager {
 	
 	private final Logger logger = LoggerFactory.getLogger(AkkaJobManager.class);
 
-	private BackupJobDao getDao() {
+	private BackupJobDao getBackupJobDao() {
 		return dal.createBackupJobDao();
 	}
 
 	@Override
 	public BackupJob createBackupJob(BackMeUpUser user,
-			ProfileOptions sourceProfiles, Profile sinkProfile,
-			List<ActionProfile> requiredActions, Date start, long delayInMs, 
+			Profile sourceProfiles, Profile sinkProfile,
+			List<Profile> requiredActions, Date start, long delayInMs, 
 			String jobTitle, boolean reschedule, String timeExpression) {
 		try {
 			conn.begin();
-//			UserDao ud = dal.createUserDao();
-//			user = ud.merge(user);
+
 			// Create BackupJob entity in DB...
-			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile,
-					requiredActions, start, delayInMs, jobTitle, reschedule);
+			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile, requiredActions, start, delayInMs, jobTitle, reschedule);
 			job.setTimeExpression(timeExpression);
 			job.setStatus(BackupJobStatus.queued);
 
 			Long firstExecutionDate = start.getTime() + delayInMs;
 
-			String encryptionPwd = null;
-			Properties p = new Properties();
-			for (ActionProfile ap : requiredActions) {
-				for (ActionProperty prop : ap.getActionOptions()) {
-					p.put(prop.getKey(), prop.getValue());
-				}
-			}
-			encryptionPwd = (String) p.get("org.backmeup.encryption.password");
+//			String encryptionPwd = null;
+//			Properties p = new Properties();
+//			for (Profile ap : requiredActions) {
+//				for (Entry<String, String> prop : ap.getProperties().entrySet()) {
+//					p.put(prop.getKey(), prop.getValue());
+//				}
+//			}
+//			encryptionPwd = (String) p.get("org.backmeup.encryption.password");
 
 			// reusable=true means, that we can get the data for the token + a
 			// new token for the next backup
-			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate,
-					true, encryptionPwd);
-			job.setToken(t);
-			job = getDao().save(job);
+//			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate, true, encryptionPwd);
+//			job.setToken(t);
+			Token dummyToken = new Token("1111-222-333", 1l, firstExecutionDate);
+			job.setToken(dummyToken);
+			
+			job = getBackupJobDao().save(job);
+			
 			conn.commit();
-			// ... and queue immediately
-			queueJob(job);
+			
+			// Queue new job immediately
+			// TODO: currently disabled due to major refactoring
+//			queueJob(job);
 			return job;
 		} finally {
 			conn.rollback();
@@ -99,7 +98,7 @@ abstract public class AkkaJobManager implements JobManager {
 	}
 	
 	private BackupJob getBackUpJob(Long jobId) {
-		return getDao().findById(jobId);
+		return getBackupJobDao().findById(jobId);
 	}
 
 	@Override
@@ -108,7 +107,7 @@ abstract public class AkkaJobManager implements JobManager {
 		// excessive length)
 		try {
 			conn.begin();
-			List<BackupJob> storedJobs = getDao().findAll();
+			List<BackupJob> storedJobs = getBackupJobDao().findAll();
 			conn.rollback();
 			for (BackupJob storedJob : storedJobs) {
 				queueJob(storedJob);

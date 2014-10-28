@@ -19,6 +19,8 @@ public interface DataAccessLayer {
     ServiceDao createServiceDao();
 
     JobProtocolDao createJobProtocolDao();
+    
+    AuthDataDao createAuthDataDao();
 
     void setConnection(Object connection);
 

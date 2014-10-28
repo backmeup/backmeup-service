@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.backmeup.index.model.SearchResponse;
-import org.backmeup.model.ActionProfile;
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -40,20 +40,31 @@ public interface BusinessLogic {
 	BackMeUpUser addUser(BackMeUpUser user);
 	
 	// plugin operations ------------------------------------------------------
+	boolean isPluginAvailable(String pluginId);
 	PluginDescribable getPluginDescribable(String pluginId);
 	AuthRequest getPluginConfiguration(String pluginId);
-	Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
-	void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	
+	AuthData addPluginAuthData(AuthData authData);
+	AuthData getPluginAuthData(Long authDataId);
+	List<AuthData> listPluginAuthData(Long userId);
+	AuthData updatePluginAuthData(AuthData authData);
+	void     deletePluginAuthData(Long authDataId);
+	
+	Profile addPluginProfile(String pluginId, Profile profile);
+	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	Profile updatePluginProfile(Profile profile);
+	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile getPluginProfile(Long profileId);
+	void deleteProfile(Long profileId);
+	@Deprecated Profile deleteProfile(Long userId, Long profile);
 
 	// action operations
 	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
-	ActionProfile getStoredActionOptions(String actionId, Long jobId);
+	Profile getStoredActionOptions(String actionId, Long jobId);
 	
 	//datasource operations
 	List<PluginDescribable> getDatasources();
 	List<Profile> getDatasourceProfiles(Long userId);
-	Profile deleteProfile(Long userId, Long profile);
 	List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
 	List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
 	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
@@ -85,7 +96,7 @@ public interface BusinessLogic {
 	// Should replace method 'getBackupJob' ?
 	BackupJob getBackupJobFull(Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
-	ValidationNotes createBackupJob(BackupJob request);
+	ValidationNotes createBackupJob(BackupJob backupJob);
 	List<BackupJob> getJobs(Long userId);
 	void deleteJob(Long userId, Long jobId);
 	
@@ -97,7 +108,7 @@ public interface BusinessLogic {
 	void deleteJobProtocols(Long userId);
 	
 	// search operations ------------------------------------------------------
-	SearchResponse queryBackup(Long userId, String query, Map<String, List<String>> filters);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
 	File getThumbnail(Long userId, String fileId);
 	void deleteIndexForUser(Long userId);
 	void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
@@ -107,4 +118,5 @@ public interface BusinessLogic {
 	
 	// lifecycle operations ---------------------------------------------------
 	void shutdown();
+
 }

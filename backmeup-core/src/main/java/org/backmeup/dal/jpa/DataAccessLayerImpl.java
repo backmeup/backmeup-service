@@ -3,6 +3,7 @@ package org.backmeup.dal.jpa;
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 
+import org.backmeup.dal.AuthDataDao;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
@@ -52,6 +53,11 @@ public class DataAccessLayerImpl implements DataAccessLayer {
 	@Override
 	public JobProtocolDao createJobProtocolDao() {
 		return new JobProtocolDaoImpl(threaLocalEntityManager.get());
+	}
+	
+	@Override
+	public AuthDataDao createAuthDataDao() {
+		return new AuthDataDaoImpl(threaLocalEntityManager.get());
 	}
 
 	@Override

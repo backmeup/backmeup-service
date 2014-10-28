@@ -21,6 +21,12 @@ import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
  *
  */
 public interface Plugin {
+	
+	boolean isPluginAvailable(String pluginId);
+	
+	PluginDescribable getPluginDescribableById(String pluginId);	
+	
+	
 
 	List<PluginDescribable> getDatasources();
 	
@@ -28,8 +34,6 @@ public interface Plugin {
 	
 	List<PluginDescribable> getActions();
 	
-	PluginDescribable getPluginDescribableById(String pluginId);	
-
 	
 	
 	Datasink getDatasink(String sinkId);

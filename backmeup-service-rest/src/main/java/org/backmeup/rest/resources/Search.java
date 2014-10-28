@@ -1,10 +1,5 @@
 package org.backmeup.rest.resources;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,37 +37,9 @@ public class Search extends SecureBase {
 
         canOnlyWorkWithMyData(userId);
 
-        Map<String, List<String>> filters = createFiltersFor(source, type, job);
-        SearchResponse sr = getLogic().queryBackup(userId, query, filters);
+        SearchResponse sr = getLogic().queryBackup(userId, query, source, type, job);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }
 
-    private Map<String, List<String>> createFiltersFor(String source, String type, String job) {
-        Map<String, List<String>> filters = null;
-
-        if (source != null || type != null || job != null) {
-            filters = new HashMap<>();
-        }
-
-        if (source != null) {
-            List<String> filtervalue = new LinkedList<>();
-            filtervalue.add(source);
-            filters.put("source", filtervalue);
-        }
-
-        if (type != null) {
-            List<String> filtervalue = new LinkedList<>();
-            filtervalue.add(type);
-            filters.put("type", filtervalue);
-        }
-
-        if (job != null) {
-            List<String> filtervalue = new LinkedList<>();
-            filtervalue.add(job);
-            filters.put("job", filtervalue);
-        }
-
-        return filters;
-    }
 }

@@ -1,11 +1,8 @@
 package org.backmeup.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
  * The BackupJob class contains all necessary data to perform the backup job. It
@@ -41,33 +39,37 @@ public class BackupJob {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private Long id;
+
+	private String jobTitle;
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
-	// @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private ProfileOptions sourceProfiles;
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
-	private final Set<JobProtocol> jobProtocols = new HashSet<>();
+
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Profile sourceProfile;
+
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private List<Profile> actionProfiles = new ArrayList<>();
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Profile sinkProfile;
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<ActionProfile> requiredActions = new ArrayList<>();
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date start;
-	private long delay;
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private Token token;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date created;
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modified;
-	private String jobTitle;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
+	private final Set<JobProtocol> jobProtocols = new HashSet<>();
 
 	private String timeExpression;
 
+	private long delay;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date start;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date nextExecutionTime;
+
 	private boolean reschedule;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -83,17 +85,24 @@ public class BackupJob {
 
 	private UUID validScheduleID = null;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modified;
+
 	public BackupJob() {
 		super();
 	}
 
-	public BackupJob(BackMeUpUser user, ProfileOptions sourceProfile,
-			Profile sinkProfile, List<ActionProfile> requiredActions,
-			Date start, long delay, String jobTitle, boolean reschedule) {
+	public BackupJob(BackMeUpUser user, Profile sourceProfile,
+			Profile sinkProfile, List<Profile> actionProfiles, Date start,
+			long delay, String jobTitle, boolean reschedule) {
 		this.user = user;
-		this.sourceProfiles = sourceProfile;
-		this.sinkProfile = sinkProfile;
-		this.requiredActions = requiredActions;
+		setSourceProfile(sourceProfile);
+		setSinkProfile(sinkProfile);
+		setActionProfiles(actionProfiles);
+		this.actionProfiles = actionProfiles;
 		this.start = start;
 		this.delay = delay;
 
@@ -112,6 +121,15 @@ public class BackupJob {
 		this.id = id;
 	}
 
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	public void setJobTitle(String jobTitle) {
+		this.modified = new Date();
+		this.jobTitle = jobTitle;
+	}
+
 	public BackMeUpUser getUser() {
 		return user;
 	}
@@ -121,13 +139,18 @@ public class BackupJob {
 		this.user = user;
 	}
 
-	public ProfileOptions getSourceProfiles() {
-		return sourceProfiles;
+	public Profile getSourceProfile() {
+		return sourceProfile;
 	}
 
-	public void setSourceProfiles(ProfileOptions sourceProfiles) {
+	public void setSourceProfile(Profile sourceProfile) {
+		if (sourceProfile.getType() != PluginType.Source) {
+			throw new IllegalArgumentException(
+					"Source profile must be of type Source, but is of type "
+							+ sourceProfile.getType());
+		}
+		this.sourceProfile = sourceProfile;
 		this.modified = new Date();
-		this.sourceProfiles = sourceProfiles;
 	}
 
 	public Profile getSinkProfile() {
@@ -135,29 +158,35 @@ public class BackupJob {
 	}
 
 	public void setSinkProfile(Profile sinkProfile) {
-		this.modified = new Date();
+		if (sinkProfile.getType() != PluginType.Sink) {
+			throw new IllegalArgumentException(
+					"Sink profile must be of type Sink, but is of type "
+							+ sinkProfile.getType());
+		}
 		this.sinkProfile = sinkProfile;
-	}
-
-	public List<ActionProfile> getRequiredActions() {
-		return requiredActions;
-	}
-
-	public List<ActionProfile> getSortedRequiredActions() {
-		List<ActionProfile> ap = new ArrayList<>();
-		ap.addAll(requiredActions);
-		Collections.sort(ap, new Comparator<ActionProfile>() {
-			@Override
-			public int compare(ActionProfile o1, ActionProfile o2) {
-				return o1.compareTo(o2);
-			}
-		});
-		return ap;
-	}
-
-	public void setRequiredActions(List<ActionProfile> requiredActions) {
 		this.modified = new Date();
-		this.requiredActions = requiredActions;
+	}
+
+	public List<Profile> getActionProfiles() {
+		return this.actionProfiles;
+	}
+
+	@Deprecated
+	public List<Profile> getSortedRequiredActions() {
+		return this.actionProfiles;
+	}
+
+	public void setActionProfiles(List<Profile> actionProfiles) {
+		for (Profile actionProfile : actionProfiles) {
+			if (actionProfile.getType() != PluginType.Sink) {
+				throw new IllegalArgumentException("Action profile ("
+						+ actionProfile.getName()
+						+ ") must be of type Sink, but is of type "
+						+ sinkProfile.getType());
+			}
+		}
+		this.actionProfiles = actionProfiles;
+		this.modified = new Date();
 	}
 
 	public Date getStart() {
@@ -193,15 +222,6 @@ public class BackupJob {
 
 	public Date getModified() {
 		return modified;
-	}
-
-	public String getJobTitle() {
-		return jobTitle;
-	}
-
-	public void setJobTitle(String jobTitle) {
-		this.modified = new Date();
-		this.jobTitle = jobTitle;
 	}
 
 	public JobProtocol lastProtocol() {
@@ -278,62 +298,4 @@ public class BackupJob {
 	public void setValidScheduleID(UUID validScheduleID) {
 		this.validScheduleID = validScheduleID;
 	}
-
-	@Override
-	public boolean equals(Object arg0) {
-		if (arg0 instanceof BackupJob) {
-			BackupJob b = (BackupJob) arg0;
-
-			if (this == b) {
-				return true;
-			}
-
-			return testEquals(this, b);
-
-		} else {
-			return false;
-		}
-	}
-
-	private boolean testEquals(BackupJob a, BackupJob b) {
-
-		if (a.getDelay() != b.getDelay()) {
-			return false;
-		}
-
-		if (a.getId() != b.getId()) {
-			return false;
-		}
-
-		if (a.getStart().compareTo(b.getStart()) != 0) {
-			return false;
-		}
-
-		if (!a.getUser().equals(b.getUser())) {
-			return false;
-		}
-
-		for (int i = 0; i < a.getRequiredActions().size(); i++) {
-			Iterator<ActionProfile> apIt1 = a.getRequiredActions().iterator();
-			Iterator<ActionProfile> apIt2 = b.getRequiredActions().iterator();
-			while (apIt1.hasNext()) {
-				// overwritten equals for ActionProfile
-				if (!apIt1.next().equals(apIt2.next())) {
-					return false;
-				}
-			}
-		}
-		// overwritten equals method for Profile
-		if (!a.getSinkProfile().equals(b.getSinkProfile())) {
-			return false;
-		}
-
-		// overwritten equals method for ProfileOptions
-		if (!a.getSourceProfiles().equals(b.getSourceProfiles())) {
-			return false;
-		}
-
-		return true;
-	}
-
 }

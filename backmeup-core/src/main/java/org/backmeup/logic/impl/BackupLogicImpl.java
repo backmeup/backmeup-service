@@ -15,12 +15,11 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.StatusDao;
 import org.backmeup.logic.BackupLogic;
-import org.backmeup.model.ActionProfile;
-import org.backmeup.model.ActionProfile.ActionProperty;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
+import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
@@ -88,11 +87,11 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public ActionProfile getJobActionOption(String actionId, Long jobId) {
+    public Profile getJobActionOption(String actionId, Long jobId) {
         BackupJob job = getExistingJob(jobId);
-        for (ActionProfile ap : job.getRequiredActions()) {
-            if (ap.getActionId().equals(actionId)) {
-                return ap;
+        for (Profile action : job.getActionProfiles()) {
+            if (action.getId().equals(actionId)) {
+                return action;
             }
         }
         throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
@@ -101,20 +100,16 @@ public class BackupLogicImpl implements BackupLogic {
     @Override
     public void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions) {
         BackupJob job = getExistingJob(jobId);
-        for (ActionProfile ap : job.getRequiredActions()) {
-            if (ap.getActionId().equals(actionId)) {
-                ap.getActionOptions().clear();
+        for (Profile ap : job.getActionProfiles()) {
+            if (ap.getId().equals(actionId)) {
+                ap.getProperties().clear();
                 addActionProperties(ap, actionOptions);
             }
         }
     }
 
-    private void addActionProperties(ActionProfile ap, Map<String, String> keyValues) {
-        for (Map.Entry<String, String> e : keyValues.entrySet()) {
-            ActionProperty aprop = new ActionProperty(e.getKey(), e.getValue());
-            aprop.setProfile(ap);
-            ap.getActionOptions().add(aprop);
-        }
+    private void addActionProperties(Profile ap, Map<String, String> keyValues) {
+            ap.getProperties().putAll(keyValues);
     }
 
     @Override

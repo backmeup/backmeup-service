@@ -360,6 +360,12 @@ public class PluginImpl implements Plugin {
 	}
 	
 	@Override
+	public boolean isPluginAvailable(String pluginId) {
+		ServiceReference ref = getReference(PluginDescribable.class, "(name=" + pluginId + ")");
+		return ref != null;
+	}
+	
+	@Override
     public List<PluginDescribable> getActions() {
 		return this.getDescribableForType(PluginType.Action);
 	}
@@ -415,5 +421,4 @@ public class PluginImpl implements Plugin {
 	public Validationable getValidator(String sourceSinkId) {
 		return service(Validationable.class, "(name=" + sourceSinkId + ")");
 	}
-
 }

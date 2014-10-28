@@ -1,8 +1,6 @@
 package org.backmeup.logic;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.backmeup.index.model.FileItem;
@@ -17,7 +15,7 @@ import org.backmeup.model.ProtocolDetails;
  */
 public interface SearchLogic {
 
-    SearchResponse runSearch(BackMeUpUser user, String query, Map<String, List<String>> filters);
+    SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job);
 
     Set<FileItem> getAllFileItems(Long userId, Long jobId);
 

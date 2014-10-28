@@ -1,13 +1,13 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-import org.backmeup.index.client.ElasticSearchIndexClient;
+import org.backmeup.index.client.IndexClient;
+import org.backmeup.index.client.IndexClientFactory;
 import org.backmeup.index.model.FileItem;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.SearchLogic;
@@ -21,16 +21,19 @@ public class SearchLogicImpl implements SearchLogic {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ElasticSearchIndexClient getIndexClient(Long userId) {
-        return new ElasticSearchIndexClient(userId);
+    @Inject
+    private IndexClientFactory indexClientFactory;
+    
+    private IndexClient getIndexClient(Long userId) {
+        return indexClientFactory.getIndexClient(userId);
     }
 
     @Override
-    public SearchResponse runSearch(BackMeUpUser user, String query, Map<String, List<String>> filters) {
-        try (ElasticSearchIndexClient client = getIndexClient(user.getUserId());) {
+    public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job) {
+        try (IndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse result = new SearchResponse(query);
-            client.queryBackup(result.getQuery(), filters, user.getUsername(), result);
+            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, user.getUsername()));
             return result;
             
         }
@@ -38,7 +41,7 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public Set<FileItem> getAllFileItems(Long userId, Long jobId) {
-        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
+        try (IndexClient client = getIndexClient(userId)) {
 
             return client.searchAllFileItemsForJob(jobId);
             
@@ -47,7 +50,7 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
-        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
+        try (IndexClient client = getIndexClient(userId)) {
 
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(client.getFileInfoForFile(fileId));
@@ -58,7 +61,7 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public File getThumbnailPathForFile(Long userId, String fileId) {
-        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
+        try (IndexClient client = getIndexClient(userId)) {
 
             String thumbnailPath = client.getThumbnailPathForFile(fileId);
             logger.debug("Got thumbnail path: " + thumbnailPath);
@@ -72,7 +75,7 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public void delete(Long userId, Long jobId, Long timestamp) {
-        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
+        try (IndexClient client = getIndexClient(userId)) {
 
             client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
 
@@ -81,7 +84,7 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public void deleteIndexOf(Long userId) {
-        try (ElasticSearchIndexClient client = getIndexClient(userId)) {
+        try (IndexClient client = getIndexClient(userId)) {
 
             client.deleteRecordsForUser();
 

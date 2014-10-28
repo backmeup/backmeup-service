@@ -1,11 +1,15 @@
 package org.backmeup.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -23,8 +27,6 @@ import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.FakePluginDescribable;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
-import org.backmeup.plugin.Plugin;
-import org.backmeup.plugin.osgi.PluginImpl;
 import org.dozer.Mapper;
 import org.junit.Test;
 
@@ -62,8 +64,6 @@ public class MappingTest {
 	@Test
 	public void testPluginMapping() {
 		String pluginId = "org.backmeup.dropbox";
-		// Plugin plugin = setupPluginInfrastructure();
-		// PluginDescribable  pluginModel = plugin.getPluginDescribableById(pluginId);
 	    PluginDescribable  pluginModel = createFakeModelFor(pluginId);
 		
 		Mapper mapper = getMapper();
@@ -75,8 +75,6 @@ public class MappingTest {
 		assertEquals(pluginModel.getDescription(), pluginDTO.getDescription());
 		// TODO metadata
 		assertEquals(pluginModel.getImageURL(), pluginDTO.getImageURL());
-		
-		// ((PluginImpl) plugin).shutdown();
 	}
 	
     private PluginDescribable createFakeModelFor(String pluginId) {
@@ -95,22 +93,58 @@ public class MappingTest {
 		Long profileId = 1L;
 		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 		String profileName = "TestProfile";
-		String description = "Description of test profile";
+		String pluginId = "org.backmeup.dummy";
 		String identification = "identification";
 		PluginType profileTypeModel = PluginType.Source;
 		PluginType profileTypeDTO = PluginType.Source;
+		String option = "-option1";
+		String propKey = "includeAll";
+		String propValue = "true";
 		
-		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
+		Long authDataId = 1L;
+		String authDataName = "TestAuthData";
+		String authDataKey = "password";
+		String authDataValue = "s3cr3t";
+		
+		AuthData authData = new AuthData();
+		authData.setId(authDataId);
+		authData.setName(authDataName);
+		authData.setUser(user);
+		authData.setPluginId(pluginId);
+		authData.addProperty(authDataKey, authDataValue);
+		
+		Profile profile = new Profile(profileId, user, profileName, pluginId, PluginType.Source);
 		profile.setIdentification(identification);
+		profile.setAuthData(authData);
+		profile.addProperty(propKey, propValue);
+		profile.addOption(option);
+		
 		
 		Mapper mapper = getMapper();
 		
 		PluginProfileDTO profileDTO = mapper.map(profile, PluginProfileDTO.class);
+		// auth data properties are excluded (jpa lazy init problem with mapping)
+		profileDTO.getAuthData().setProperties(new HashMap<String, String>());
+		profileDTO.getAuthData().getProperties().putAll(profile.getAuthData().getProperties());
 		
-		assertEquals(profile.getProfileId().longValue(), profileDTO.getProfileId());
-		assertEquals(profile.getProfileName(), profileDTO.getTitle());
+		assertEquals(profile.getId().longValue(), profileDTO.getProfileId());
+		assertEquals(profile.getName(), profileDTO.getTitle());
 		assertEquals(profile.getType(), profileTypeModel);
 		assertEquals(profileDTO.getProfileType(), profileTypeDTO);
+		
+		assertNotNull(profileDTO.getAuthData());
+		assertEquals(profile.getAuthData().getId(), profileDTO.getAuthData().getId());
+		assertEquals(profile.getAuthData().getId(), profileDTO.getAuthData().getId());
+		assertEquals(profile.getAuthData().getName(), profileDTO.getAuthData().getName());
+		assertTrue(profileDTO.getAuthData().getProperties().containsKey(authDataKey));
+		assertTrue(profileDTO.getAuthData().getProperties().containsValue(authDataValue));
+		
+		assertEquals(profile.getOptions().size(), profileDTO.getOptions().size());
+		assertEquals(profile.getOptions().get(0), profileDTO.getOptions().get(0));
+		
+		assertEquals(profile.getProperties().size(), profileDTO.getProperties().size());
+		assertTrue(profileDTO.getProperties().containsKey(propKey));
+		assertTrue(profileDTO.getProperties().containsValue(propValue));
 	}
 	
 	@Test
@@ -195,24 +229,5 @@ public class MappingTest {
 	
 	private Mapper getMapper() {
         return mapperProducer.getMapper();
-	}
-	
-	private Plugin setupPluginInfrastructure() {
-		Plugin plugin = new PluginImpl(
-				"/data/backmeup-service/autodeploy",
-				"/data/backmeup-service/osgi-tmp",
-				"org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi "
-				+ "org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage "
-				+ "com.google.gson org.backmeup.plugin.api");
-
-		plugin.startup();
-		((PluginImpl) plugin).waitForInitialStartup();
-
-		try {
-			Thread.sleep(2000);
-		} catch (Exception e) {
-
-		}
-		return plugin;
 	}
 }

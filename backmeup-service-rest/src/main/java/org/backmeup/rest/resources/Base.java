@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * Note: The derived classes always delegate the incoming REST call to the business logic.
  */
 public class Base {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private BusinessLogic logic;
     
@@ -50,7 +50,7 @@ public class Base {
             JNDIBeanManager jndiManager = JNDIBeanManager.getInstance();
             return jndiManager.getBean(classType);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return null;
         }
     }
