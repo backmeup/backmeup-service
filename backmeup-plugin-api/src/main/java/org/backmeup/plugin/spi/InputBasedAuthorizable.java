@@ -7,12 +7,12 @@ import java.util.Properties;
 import org.backmeup.model.api.RequiredInputField;
 import org.backmeup.model.api.RequiredInputField.Type;
 
-public interface InputBased extends Authorizable {
-	
+public interface InputBasedAuthorizable extends Authorizable {
+
 	public List<RequiredInputField> getRequiredInputFields();
-	
+
 	public Map<String, Type> getTypeMapping();
-	
+
 	public boolean isValid(Properties inputs);
-	
+
 }

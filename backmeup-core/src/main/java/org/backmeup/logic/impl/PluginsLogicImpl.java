@@ -25,8 +25,8 @@ import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.api.connectors.Datasource;
 import org.backmeup.plugin.spi.Authorizable;
 import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
-import org.backmeup.plugin.spi.InputBased;
-import org.backmeup.plugin.spi.OAuthBased;
+import org.backmeup.plugin.spi.InputBasedAuthorizable;
+import org.backmeup.plugin.spi.OAuthBasedAuthorizable;
 
 @ApplicationScoped
 public class PluginsLogicImpl implements PluginsLogic {
@@ -142,13 +142,13 @@ public class PluginsLogicImpl implements PluginsLogic {
 
         switch (auth.getAuthType()) {
         case OAuth:
-        	OAuthBased oauth = (OAuthBased) auth;
+        	OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
             String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
             ar.setRedirectURL(redirectUrl);
             // TODO Store all properties within keyserver & don't store them within the local database!
             break;
         case InputBased:
-        	InputBased ibased = (InputBased) auth;
+        	InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
             ar.setRequiredInputs(ibased.getRequiredInputFields());
             break;
         default:
@@ -164,13 +164,13 @@ public class PluginsLogicImpl implements PluginsLogic {
         auth = plugins.getAuthorizable(sourceSinkId, auth.getAuthType()); 
 
         if (auth.getAuthType() == AuthorizationType.InputBased) {
-            InputBased inputBasedService = (InputBased) auth;
+            InputBasedAuthorizable inputBasedService = (InputBasedAuthorizable) auth;
             if (!inputBasedService.isValid(props)) {
                 throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
             }
         }
 
-        return auth.postAuthorize(props);
+        return auth.authorize(props);
     }
     
     @Override
@@ -183,13 +183,13 @@ public class PluginsLogicImpl implements PluginsLogic {
         authProps.putAll(authData.getProperties());
 
         if (auth.getAuthType() == AuthorizationType.InputBased) {
-            InputBased inputBasedService = (InputBased) auth;
+            InputBasedAuthorizable inputBasedService = (InputBasedAuthorizable) auth;
             if (!inputBasedService.isValid(authProps)) {
                 throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
             }
         }
 
-        return auth.postAuthorize(authProps);
+        return auth.authorize(authProps);
     }
 
     @PreDestroy
