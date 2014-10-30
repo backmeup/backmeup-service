@@ -2,8 +2,6 @@ package org.backmeup.plugin.api.connectors;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 import org.backmeup.model.exceptions.PluginException;
@@ -63,11 +61,6 @@ public abstract class BaseActionDescribable implements PluginDescribable {
 	@Override
 	public Properties getMetadata(Properties accessData) {
 		return new Properties();
-	}
-
-	@Override
-	public List<String> getAvailableOptions() {
-		return new LinkedList<>();
 	}
 
 	@Override
