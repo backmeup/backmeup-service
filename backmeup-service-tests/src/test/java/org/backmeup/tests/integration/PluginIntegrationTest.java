@@ -17,7 +17,7 @@ import com.jayway.restassured.response.ValidatableResponse;
 public class PluginIntegrationTest extends IntegrationTestBase {
 
 	@Test
-	public void testGetPlugin() {	
+	public void testGetPluginFilegenerator() {	
 		String username = "john.doe";
 		String firstname = "John";
 		String lastname = "Doe";
@@ -47,6 +47,46 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 				.body(containsString("description"))
 				.body(containsString("imageURL"))
 				.body(containsString("pluginType"))
+				.body(containsString("propertiesDescription"))
+				.statusCode(200);
+		} finally {
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
+	public void testGetPluginDummy() {	
+		String username = "john.doe";
+		String firstname = "John";
+		String lastname = "Doe";
+		String password = "password1";
+		String email = "john.doe@example.com";
+		
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.dummy";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			userId = response.extract().path("userId").toString();
+			accessToken = userId + ";" + password;
+			
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+			.when()
+				.get("/plugins/" + pluginId)
+			.then()
+				.log().all()
+				.body("pluginId", equalTo(pluginId))
+				.body(containsString("title"))
+				.body(containsString("description"))
+				.body(containsString("imageURL"))
+				.body(containsString("pluginType"))
+				.body(containsString("metadata"))
+				.body(containsString("authDataDescription"))
 				.statusCode(200);
 		} finally {
 			BackMeUpUtils.deleteUser(accessToken, userId);

@@ -32,7 +32,7 @@ public class DummyDataManager {
 		plugin.setPluginType(PluginType.Source);
 		plugin.addMetadata("META_BACKUP_FREQUENCY", "daily");
 
-		plugin.setConfig(getPluginConfigurationDTO());
+		plugin.setAuthDataDescription(getPluginConfigurationDTO());
 		
 		if (expandProfiles) {
 			plugin.addProfile(getPluginProfileDTO(false));

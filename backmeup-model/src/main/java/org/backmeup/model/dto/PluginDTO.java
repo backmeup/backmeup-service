@@ -17,7 +17,8 @@ public class PluginDTO {
 	private String imageURL;
 	private PluginType pluginType;
 	private Map<String, String> metadata;
-	private PluginConfigurationDTO config;
+	private PluginConfigurationDTO authDataDescription;
+	private List<PluginInputFieldDTO> propertiesDescription;
 	private List<PluginProfileDTO> profiles;
 
 	public PluginDTO() {
@@ -79,12 +80,28 @@ public class PluginDTO {
 		this.metadata.put(key, value);
 	}
 
-	public PluginConfigurationDTO getConfig() {
-		return config;
+	public PluginConfigurationDTO getAuthDataDescription() {
+		return authDataDescription;
 	}
 
-	public void setConfig(PluginConfigurationDTO config) {
-		this.config = config;
+	public void setAuthDataDescription(PluginConfigurationDTO authDataDescription) {
+		this.authDataDescription = authDataDescription;
+	}
+	
+	public List<PluginInputFieldDTO> getPropertiesDescription() {
+		return propertiesDescription;
+	}
+
+	public void setPropertiesDescription(
+			List<PluginInputFieldDTO> propertiesDescription) {
+		this.propertiesDescription = propertiesDescription;
+	}
+
+	public void addPropertiesDescription(PluginInputFieldDTO desc) {
+		if(propertiesDescription == null) {
+			this.propertiesDescription = new ArrayList<>();
+		}
+		this.propertiesDescription.add(desc);
 	}
 
 	public List<PluginProfileDTO> getProfiles() {

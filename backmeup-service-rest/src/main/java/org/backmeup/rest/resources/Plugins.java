@@ -29,6 +29,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
@@ -87,7 +88,6 @@ public class Plugins extends Base {
 	@Path("/{pluginId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public PluginDTO getPlugin(@PathParam("pluginId") String pluginId, @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
-//		return DummyDataManager.getPluginDTO(expandProfiles);
 		PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
 		PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
 		
@@ -117,16 +117,21 @@ public class Plugins extends Base {
 			String value = (String) e.getValue();
 			pluginDTO.addMetadata(key, value);
 		} 
-		
-		AuthRequest authInfo = getLogic().getPluginConfiguration(pluginId);
-		PluginConfigurationDTO pluginConfig = getMapper().map(authInfo, PluginConfigurationDTO.class);
-		if ((authInfo.getRedirectURL() != null) && (authInfo.getRedirectURL() != "")) {
-			pluginConfig.setConfigType(PluginConfigurationType.oauth);
-		} else {
-			pluginConfig.setConfigType(PluginConfigurationType.input);
+				
+		PluginConfigInfo pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, "");
+		if(pluginConfigInfo.hasAuthData()) {
+			PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
+			if ((pluginConfigInfo.getRedirectURL() != null) && (pluginConfigInfo.getRedirectURL() != "")) {
+				pluginConfigDTO.setConfigType(PluginConfigurationType.oauth);
+			} else {
+				pluginConfigDTO.setConfigType(PluginConfigurationType.input);
+			}
+			pluginDTO.setAuthDataDescription(pluginConfigDTO);
 		}
-		pluginDTO.setConfig(pluginConfig);
 		
+		if(pluginConfigInfo.hasConfigData()) {
+			getMapper().map(pluginConfigInfo, pluginDTO);
+		}
 		
 		if(expandProfiles){
 			

@@ -13,6 +13,7 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
 import org.backmeup.model.constants.BackupJobStatus;
@@ -28,6 +29,7 @@ import org.backmeup.model.spi.FakePluginDescribable;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.dozer.Mapper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MappingTest {
@@ -195,6 +197,69 @@ public class MappingTest {
 		assertEquals(inputModel.isRequired(), inputDTO.isRequired());
 		assertEquals(inputModel.getOrder(), inputDTO.getOrder());
 		assertEquals(inputModel.getType(), inputDTO.getType());
+	}
+	
+	@Test
+	public void testPluginConfigurationInfoMapping() {		
+		String authInputName = "username";
+		String authInputLabel = "Username";
+		String authInputDesc = "Username for the service";
+		boolean authInputRequired = true;
+		int authInputOrder = 0;
+		RequiredInputField.Type authInputType = RequiredInputField.Type.String;
+		
+		String authRedirectUrl = "http://redirecturl";
+		
+		String propInputName = "activateOption";
+		String propInputLabel = "Activate Option";
+		String propInputDesc = "Descripton for Option ...";
+		boolean propInputRequired = true;
+		int propInputOrder = 0;
+		RequiredInputField.Type propInputType = RequiredInputField.Type.String;
+		
+		String option1 = "-Option1";
+				
+		
+		RequiredInputField authInputModel = new RequiredInputField(authInputName, authInputLabel, authInputDesc, authInputRequired, authInputOrder, authInputType);
+		List<RequiredInputField> authInputFields = new ArrayList<>();
+		authInputFields.add(authInputModel);
+		
+		RequiredInputField propInputModel = new RequiredInputField(propInputName, propInputLabel, propInputDesc, propInputRequired, propInputOrder, propInputType);
+		List<RequiredInputField> propInputFields = new ArrayList<>();
+		propInputFields.add(propInputModel);
+		
+		List<String> availOption = new ArrayList<>();
+		availOption.add(option1);
+		
+		PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
+		pluginConfigInfo.setRedirectURL(authRedirectUrl);
+		pluginConfigInfo.setRequiredInputs(authInputFields);
+		pluginConfigInfo.setPropertiesDescription(propInputFields);
+		pluginConfigInfo.setAvailableOptions(availOption);
+		
+		Mapper mapper = getMapper();
+		
+		PluginDTO pluginDTO = mapper.map(pluginConfigInfo, PluginDTO.class);
+		PluginConfigurationDTO pluginConfigDTO = mapper.map(pluginConfigInfo, PluginConfigurationDTO.class);
+		pluginDTO.setAuthDataDescription(pluginConfigDTO);
+		
+		assertEquals(pluginConfigInfo.getRedirectURL(), pluginDTO.getAuthDataDescription().getRedirectURL());
+		
+		PluginInputFieldDTO authInputDTO = pluginDTO.getAuthDataDescription().getRequiredInputs().get(0);
+		assertEquals(authInputModel.getLabel(), authInputDTO.getLabel());
+		assertEquals(authInputModel.getName(), authInputDTO.getName());
+		assertEquals(authInputModel.getDescription(), authInputDTO.getDescription());
+		assertEquals(authInputModel.isRequired(), authInputDTO.isRequired());
+		assertEquals(authInputModel.getOrder(), authInputDTO.getOrder());
+		assertEquals(authInputModel.getType(), authInputDTO.getType());
+		
+		PluginInputFieldDTO propsInputDTO = pluginDTO.getPropertiesDescription().get(0);
+		assertEquals(propInputModel.getLabel(), propsInputDTO.getLabel());
+		assertEquals(propInputModel.getName(), propsInputDTO.getName());
+		assertEquals(propInputModel.getDescription(), propsInputDTO.getDescription());
+		assertEquals(propInputModel.isRequired(), propsInputDTO.isRequired());
+		assertEquals(propInputModel.getOrder(), propsInputDTO.getOrder());
+		assertEquals(propInputModel.getType(), propsInputDTO.getType());
 	}
 	
 	@Test
