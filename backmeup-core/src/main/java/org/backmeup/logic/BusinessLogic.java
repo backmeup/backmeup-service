@@ -11,6 +11,7 @@ import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
@@ -42,7 +43,8 @@ public interface BusinessLogic {
 	// plugin operations ------------------------------------------------------
 	boolean isPluginAvailable(String pluginId);
 	PluginDescribable getPluginDescribable(String pluginId);
-	AuthRequest getPluginConfiguration(String pluginId);
+	@Deprecated AuthRequest getPluginConfiguration(String pluginId);
+	PluginConfigInfo getPluginConfiguration(String pluginId, String dummy);
 	
 	AuthData addPluginAuthData(AuthData authData);
 	AuthData getPluginAuthData(Long authDataId);

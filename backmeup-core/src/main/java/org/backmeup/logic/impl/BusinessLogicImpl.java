@@ -2,6 +2,7 @@ package org.backmeup.logic.impl;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,6 +31,7 @@ import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.KeyserverLog;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
@@ -453,12 +455,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     
     */
     
+    @Deprecated
     @Override
     public AuthRequest getPluginConfiguration(final String pluginId) {
     	return conn.txNew(new Callable<AuthRequest>() {
             @Override public AuthRequest call() {
-
-//                BackMeUpUser user = getAuthorizedUser(username, keyRing);
 
                 Properties p = new Properties();
                 AuthRequest ar = plugins.configureAuth(p, pluginId);
@@ -469,6 +470,18 @@ public class BusinessLogicImpl implements BusinessLogic {
                 
 //                ar.setProfile(profile);
                 return ar;
+
+            }
+        });
+    }
+    
+    @Override
+    public PluginConfigInfo getPluginConfiguration(final String pluginId, String dummy) {
+    	return conn.txNew(new Callable<PluginConfigInfo>() {
+    		
+            @Override public PluginConfigInfo call() {
+            	PluginConfigInfo pluginConfigInfo = plugins.getPluginConfigInfo(pluginId);
+                return pluginConfigInfo;
 
             }
         });
@@ -550,7 +563,10 @@ public class BusinessLogicImpl implements BusinessLogic {
                     pluginId = p.getPluginId();
                     Validationable validator = plugins.getValidator(pluginId);
                     Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
-                    return validator.validate(accessData);
+                    Map<String, String> authProps = new HashMap<String, String>();
+                    for (final String name: accessData.stringPropertyNames())
+                        authProps.put(name, accessData.getProperty(name));
+                    return validator.validateProperties(authProps);
                     
                 } catch (PluginUnavailableException pue) {
                     ValidationNotes notes = new ValidationNotes();
