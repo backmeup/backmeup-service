@@ -8,6 +8,9 @@ public enum ValidationExceptionType {
   AuthException,
   // if the api is broken / doesn't work as expected, add the APIException type
   APIException,
+  // if the configuration does not match the requirements, add the ConfigException type
+  ConfigException,
+  
   /** 
    * Core-specific validation errors
    */

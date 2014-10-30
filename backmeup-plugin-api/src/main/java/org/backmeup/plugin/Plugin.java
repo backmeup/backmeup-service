@@ -43,10 +43,14 @@ public interface Plugin {
 	Action getAction(String actionId);
 	
 	
+	boolean hasAuthorizable(String pluginId);
 	
 	Authorizable getAuthorizable(String sourceSinkId);
 	
 	Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType);
+	
+	
+	boolean hasValidator(String pluginId);
 	
 	Validationable getValidator(String sourceSinkId);
 	

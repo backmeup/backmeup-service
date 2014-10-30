@@ -59,12 +59,13 @@ public interface PluginDescribable {
 	public String getId();
 	public String getTitle();
 	public String getDescription();
-	public Properties getMetadata(Properties accessData);
 	
 	public PluginType getType();
-	public String getImageURL();
-	
-	public PluginVisibility getVisibility();
 	public int getPriority();
-	public List<String> getAvailableOptions();
+	public PluginVisibility getVisibility();
+	
+	public String getImageURL();
+	public Properties getMetadata(Properties accessData);
+	
+//	public List<String> getAvailableOptions();
 }
