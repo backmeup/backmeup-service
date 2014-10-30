@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.spi.PluginDescribable;
@@ -35,6 +36,8 @@ public interface PluginsLogic {
     void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
 
     AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
+    
+    PluginConfigInfo getPluginConfigInfo (String pluginId);
     
     String authorizePlugin(AuthData authData);
 

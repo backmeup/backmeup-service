@@ -366,6 +366,18 @@ public class PluginImpl implements Plugin {
 	}
 	
 	@Override
+	public boolean hasAuthorizable(String pluginId) {
+		ServiceReference ref = getReference(Authorizable.class, "(name=" + pluginId + ")");
+		return ref != null;
+	}
+	
+	@Override
+	public boolean hasValidator(String pluginId) {
+		ServiceReference ref = getReference(Validationable.class, "(name=" + pluginId + ")");
+		return ref != null;
+	}
+	
+	@Override
     public List<PluginDescribable> getActions() {
 		return this.getDescribableForType(PluginType.Action);
 	}

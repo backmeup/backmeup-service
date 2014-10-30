@@ -15,6 +15,7 @@ import org.backmeup.logic.PluginsLogic;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.exceptions.ValidationException;
@@ -79,7 +80,8 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Override
     public List<String> getActionOptions(String actionId) {
         PluginDescribable action = plugins.getPluginDescribableById(actionId);
-        return action.getAvailableOptions();
+//        return action.getAvailableOptions();
+        return new ArrayList<>();
     }
 
     @Override
@@ -156,6 +158,46 @@ public class PluginsLogicImpl implements PluginsLogic {
         }
         
         return ar;
+    }
+    
+    
+    public PluginConfigInfo getPluginConfigInfo (String pluginId) {
+    	PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
+    	
+    	if(plugins.hasAuthorizable(pluginId)) {
+    		Authorizable auth = plugins.getAuthorizable(pluginId); 
+    		// Note that in the call above a java.lang.reflect.Proxy object is returned
+    		// We have to make a second call to get a proxy with the correct interface
+    		auth = plugins.getAuthorizable(pluginId, auth.getAuthType()); 
+
+    		switch (auth.getAuthType()) {
+    		case OAuth:
+    			OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
+    			Properties props = new Properties();
+    			String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
+    			pluginConfigInfo.setRedirectURL(redirectUrl);
+    			break;
+    		case InputBased:
+    			InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
+    			pluginConfigInfo.setRequiredInputs(ibased.getRequiredInputFields());
+    			break;
+    		default:
+    			throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
+    		}
+    	}
+    	
+    	if(plugins.hasValidator(pluginId)) {
+    		Validationable validator = plugins.getValidator(pluginId);
+    		if(validator.hasRequiredProperties()) {
+    			pluginConfigInfo.setPropertiesDescription(validator.getRequiredProperties());
+    		}
+    		
+    		if(validator.hasAvailableOptions()) {
+    			pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions());
+    		}
+    	}
+        
+        return pluginConfigInfo;
     }
 
     @Override
