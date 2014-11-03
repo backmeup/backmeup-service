@@ -52,7 +52,7 @@ public interface BusinessLogic {
 	AuthData updatePluginAuthData(AuthData authData);
 	void     deletePluginAuthData(Long authDataId);
 	
-	Profile addPluginProfile(String pluginId, Profile profile);
+	Profile addPluginProfile(Profile profile);
 	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
 	Profile updatePluginProfile(Profile profile);
 	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
@@ -61,23 +61,23 @@ public interface BusinessLogic {
 	@Deprecated Profile deleteProfile(Long userId, Long profile);
 
 	// action operations
-	void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
-	Profile getStoredActionOptions(String actionId, Long jobId);
+	@Deprecated void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
+	@Deprecated Profile getStoredActionOptions(String actionId, Long jobId);
 	
 	//datasource operations
 	List<PluginDescribable> getDatasources();
-	List<Profile> getDatasourceProfiles(Long userId);
-	List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
-	List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
-	void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
+	@Deprecated List<Profile> getDatasourceProfiles(Long userId);
+	@Deprecated List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
+	@Deprecated List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
+	@Deprecated void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
 	
 	//datasink operations
 	List<PluginDescribable> getDatasinks();
-	List<Profile> getDatasinkProfiles(Long userId);
+	@Deprecated List<Profile> getDatasinkProfiles(Long userId);
 
 	//action operations
 	List<PluginDescribable> getActions();
-	List<String> getActionOptions(String actionId);
+	@Deprecated List<String> getActionOptions(String actionId);
 	
 	// Profile/Auth operations
 //	void addProfileEntries(Long profileId, Properties entries, String keyRing);
@@ -94,7 +94,7 @@ public interface BusinessLogic {
 	//job & validation operations
 	ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
 	BackupJob updateBackupJob(Long userId, BackupJob backupJob);
-	BackupJob getBackupJob(Long jobId);
+	@Deprecated BackupJob getBackupJob(Long jobId);
 	// Should replace method 'getBackupJob' ?
 	BackupJob getBackupJobFull(Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
@@ -111,12 +111,12 @@ public interface BusinessLogic {
 	
 	// search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
-	File getThumbnail(Long userId, String fileId);
-	void deleteIndexForUser(Long userId);
-	void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
+	@Deprecated File getThumbnail(Long userId, String fileId);
+	@Deprecated void deleteIndexForUser(Long userId);
+	@Deprecated void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
 	
 	// log operations ---------------------------------------------------------
-	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
+//	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
 	
 	// lifecycle operations ---------------------------------------------------
 	void shutdown();

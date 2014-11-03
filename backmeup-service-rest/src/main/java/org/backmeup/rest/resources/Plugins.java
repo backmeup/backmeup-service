@@ -174,7 +174,7 @@ public class Plugins extends Base {
 			profile.setOptions(profileOptions);
 		}
 		
-		profile = getLogic().addPluginProfile(pluginId, profile);
+		profile = getLogic().addPluginProfile(profile);
 		
 		PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
 		

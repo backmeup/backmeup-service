@@ -124,6 +124,9 @@ public class ProfileLogicImpl implements ProfileLogic {
     
     @Override
     public Profile save(Profile profile) {
+    	// TODO: Store (auth) data in keyserver
+        // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
+    	
         return getProfileDao().save(profile);
     }
     

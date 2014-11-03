@@ -1,6 +1,7 @@
 package org.backmeup.logic;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.backmeup.model.AuthData;
@@ -31,16 +32,22 @@ public interface PluginsLogic {
 
     Validationable getValidator(String description);
 
-    PluginDescribable getExistingSourceSink(String sourceSinkId);
+    @Deprecated PluginDescribable getExistingSourceSink(String sourceSinkId);
 
     void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
 
-    AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
+    @Deprecated AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
     
     PluginConfigInfo getPluginConfigInfo (String pluginId);
     
+    boolean requiresAuthorization(String pluginId);
+    
     String authorizePlugin(AuthData authData);
-
+    
+    boolean requiresValidation(String pluginId);
+    
+    ValidationNotes validatePlugin(String pluginId, Map<String, String> properties, List<String> options);
+    
     @Deprecated String getAuthorizedUserId(String sourceSinkId, Properties props);
 
 	boolean isPluginAvailable(String pluginId);

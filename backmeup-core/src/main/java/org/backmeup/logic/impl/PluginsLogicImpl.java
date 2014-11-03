@@ -18,6 +18,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
@@ -34,7 +35,7 @@ public class PluginsLogicImpl implements PluginsLogic {
 
     private static final String UNKNOWN_SOURCE_SINK = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SOURCE_SINK";
     private static final String VALIDATION_OF_ACCESS_DATA_FAILED = "org.backmeup.logic.impl.BusinessLogicImpl.VALIDATION_OF_ACCESS_DATA_FAILED";
-    private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
+//    private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
 
     @Inject
     @Configuration(key="backmeup.callbackUrl")
@@ -77,9 +78,10 @@ public class PluginsLogicImpl implements PluginsLogic {
 		return plugins.isPluginAvailable(pluginId);
 	}
 
+	@Deprecated
     @Override
     public List<String> getActionOptions(String actionId) {
-        PluginDescribable action = plugins.getPluginDescribableById(actionId);
+//        PluginDescribable action = plugins.getPluginDescribableById(actionId);
 //        return action.getAvailableOptions();
         return new ArrayList<>();
     }
@@ -131,6 +133,7 @@ public class PluginsLogicImpl implements PluginsLogic {
         }
     }
 
+    @Deprecated
     @Override
     public AuthRequest configureAuth(Properties props, String uniqueDescIdentifier) {
     	props.setProperty("callback", callbackUrl);
@@ -200,6 +203,7 @@ public class PluginsLogicImpl implements PluginsLogic {
         return pluginConfigInfo;
     }
 
+    @Deprecated
     @Override
     public String getAuthorizedUserId(String sourceSinkId, Properties props) {
         Authorizable auth = plugins.getAuthorizable(sourceSinkId);
@@ -216,7 +220,16 @@ public class PluginsLogicImpl implements PluginsLogic {
     }
     
     @Override
+    public boolean requiresAuthorization(String pluginId) {
+    	return plugins.hasAuthorizable(pluginId);
+    };
+    
+    @Override
     public String authorizePlugin(AuthData authData) {
+    	if(!plugins.hasAuthorizable(authData.getPluginId())) {
+    		throw new PluginException(authData.getPluginId(), "Plugin doesn't provide an Authorizable");
+    	}
+    	
         Authorizable auth = plugins.getAuthorizable(authData.getPluginId());
         auth = plugins.getAuthorizable(authData.getPluginId(), auth.getAuthType()); 
         
@@ -233,6 +246,35 @@ public class PluginsLogicImpl implements PluginsLogic {
 
         return auth.authorize(authProps);
     }
+    
+    @Override
+    public boolean requiresValidation(String pluginId) {
+    	return plugins.hasValidator(pluginId);
+    };
+    
+    @Override
+    public ValidationNotes validatePlugin(String pluginId, java.util.Map<String,String> properties, java.util.List<String> options) {
+		if(!plugins.hasValidator(pluginId)) {
+    		throw new PluginException(pluginId, "Plugin doesn't provide a Validator");
+    	}
+		
+		Validationable validator = plugins.getValidator(pluginId);
+		ValidationNotes notes = new ValidationNotes();
+		
+		if(validator.hasRequiredProperties()){
+			notes.addAll(validator.validateProperties(properties));
+		}
+		
+		if(validator.hasAvailableOptions()) {
+			notes.addAll(validator.validateOptions(options));
+		}
+		
+		if(!notes.getValidationEntries().isEmpty()) {
+			throw new ValidationException(ValidationExceptionType.ConfigException, "Validation of config data failed");
+		}
+		
+		return notes;
+    };
 
     @PreDestroy
     public void shutdown() {

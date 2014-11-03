@@ -40,6 +40,7 @@ import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
+import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
@@ -407,11 +408,13 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Deprecated
 	@Override
 	public List<String> getActionOptions(String actionId) {
 	    return plugins.getActionOptions(actionId);
 	}
 
+    @Deprecated
     @Override
     public void changeActionOptions(final String actionId, final Long jobId, final Map<String, String> actionOptions) {
         conn.txJoin(new Runnable() {
@@ -517,35 +520,28 @@ public class BusinessLogicImpl implements BusinessLogic {
     */
     
     @Override
-    public Profile addPluginProfile(final String pluginId, final Profile profile) {
-    	//TODO: profile properties and options are not considered
-    	//TODO: Auth data is referenced by id 
+    public Profile addPluginProfile(final Profile profile) {
     	
         return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
+            	// Check if plugin authorization data is required and still valid
                 if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
                     AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
                     profile.setAuthData(authData);
                     
                     String identification = plugins.authorizePlugin(profile.getAuthData());
                     profile.setIdentification(identification);
-                }
-                
-                if(profile.getProperties() != null) {
-                //  plugins.validatePlugin(profile);
-                }
-                
-                if(profile.getOptions() != null) {
-                //  plugins.validatePlugin(profile);
-                }
+                }			
+				
+                // Check if plugin validation is required and properties and options are valid
+				if (plugins.requiresValidation(profile.getPluginId())) {
+					plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+				}
 
-                // TODO: Store (auth) data in keyserver
-                // probably this should be done within profiles.save!
-                // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-                
-                Profile p = profiles.save(profile);
+				// Everything is in place and valid, now we can store the new profile
+				Profile p = profiles.save(profile);
 
-                return p;
+				return p;
             }
         });
         
@@ -625,18 +621,19 @@ public class BusinessLogicImpl implements BusinessLogic {
     	return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
             	// TODO: Refactor (see addPluginProfile method); put validation logic in own method
-                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {                    
+            	// Check if plugin authorization data is required and still valid
+                if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
+                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                    profile.setAuthData(authData);
+                    
                     String identification = plugins.authorizePlugin(profile.getAuthData());
                     profile.setIdentification(identification);
-                }
-                
-                if(profile.getProperties() != null) {
-                //  plugins.validatePlugin(profile);
-                }
-                
-                if(profile.getOptions() != null) {
-                //  plugins.validatePlugin(profile);
-                }
+                }			
+				
+                // Check if plugin validation is required and properties and options are valid
+				if (plugins.requiresValidation(profile.getPluginId())) {
+					plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+				}
                 
                 return profiles.updateProfile(profile);
                 
@@ -985,10 +982,10 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-    @Override
-    public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
-        return authorization.getLogs(user);
-    }
+//    @Override
+//    public List<KeyserverLog> getKeysrvLogs(BackMeUpUser user) {
+//        return authorization.getLogs(user);
+//    }
 
 	@Override
 	public AuthData addPluginAuthData(final AuthData authData) {
@@ -997,15 +994,20 @@ public class BusinessLogicImpl implements BusinessLogic {
 		return conn.txNew(new Callable<AuthData>() {
             @Override public AuthData call() {
             	
-            	if(authData.getUser() == null) {
-            		throw new IllegalArgumentException("User must not be null");
-            	}
-                // Check if authentication data is valid
-            	// The following statement calls the postAuthorize method of the plugin authorizable
+				if (authData.getUser() == null) {
+					throw new IllegalArgumentException("User must not be null");
+				}
+
+				if (!plugins.requiresAuthorization(authData.getPluginId())) {
+					throw new PluginException(authData.getPluginId(), "AuthData is not required for this plugin");
+				}
+            	
             	Properties authProps = new Properties();
             	authProps.putAll(authData.getProperties());
-            	//plugins.configurAuth() necessary?
-            	String identification = plugins.getAuthorizedUserId(authData.getPluginId(), authProps);
+            	
+            	// The following statement calls the authorize method of the plugin authorizable
+            	// It checks if the authentication data is required and valid
+            	String identification = plugins.authorizePlugin(authData);
             	return profiles.addAuthData(authData);
                
             }
