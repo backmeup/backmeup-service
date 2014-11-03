@@ -13,6 +13,7 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
+import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
@@ -42,6 +43,9 @@ abstract public class AkkaJobManager implements JobManager {
 	
 	@Inject
 	protected DataAccessLayer dal;
+	
+	@Inject
+	protected BackupLogic backupLogic;
 	
 	@Inject
 	private Keyserver keyserver;
@@ -90,6 +94,22 @@ abstract public class AkkaJobManager implements JobManager {
 			// Queue new job immediately
 			// TODO: currently disabled due to major refactoring
 //			queueJob(job);
+			return job;
+		} finally {
+			conn.rollback();
+		}
+
+	}
+	
+	@Override
+	public BackupJob createBackupJob(BackupJob backupJob) {
+		try {
+			conn.begin();
+			BackupJob job = backupLogic.createJob(backupJob);
+			conn.commit();
+			
+			// Queue new job immediately
+			queueJob(job);
 			return job;
 		} finally {
 			conn.rollback();

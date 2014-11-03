@@ -20,10 +20,11 @@ import org.backmeup.model.Profile;
  */
 public interface JobManager {
 
-	public BackupJob createBackupJob(BackMeUpUser user,
+	@Deprecated public BackupJob createBackupJob(BackMeUpUser user,
 			Profile sourceProfile, Profile sinkProfile,
 			List<Profile> requiredActions, Date start, long delay, String jobTitle,
 			boolean reschedule, String timeExpression);
+	public BackupJob createBackupJob(BackupJob backupJob);
 
 	
 	public void runBackUpJob(BackupJob job);
