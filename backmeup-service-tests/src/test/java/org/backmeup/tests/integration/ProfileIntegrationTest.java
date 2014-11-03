@@ -336,10 +336,10 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 		Map<String, String> authProps = new HashMap<>();
 		authProps.put("Username", "");
 		authProps.put("Password", "");
-		authProps.put("Type", "IMAP");
+		authProps.put("Type", "imap"); // "imap"
 		authProps.put("Host", "");
 		authProps.put("Port", "");
-		authProps.put("SSL", "");
+		authProps.put("SSL", "false");
 		AuthDataDTO authData = new AuthDataDTO();
 		
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
