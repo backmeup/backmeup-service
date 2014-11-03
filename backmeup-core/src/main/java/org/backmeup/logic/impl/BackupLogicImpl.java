@@ -18,6 +18,7 @@ import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
+import org.backmeup.model.Token;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
@@ -178,6 +179,22 @@ public class BackupLogicImpl implements BackupLogic {
     @Override
     public BackupJob updateRequestFor(Long jobId) {
         return getExistingJob(jobId);
+    }
+    
+    @Override
+    public BackupJob createJob(BackupJob job) {
+		job.setStatus(BackupJobStatus.queued);
+
+		Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
+
+		// reusable=true means, that we can get the data for the token + a new token for the next backup
+//		Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate, true, encryptionPwd);
+//		job.setToken(t);
+		Token dummyToken = new Token("1111-222-333", 1l, firstExecutionDate);
+		job.setToken(dummyToken);
+		
+		return getBackupJobDao().save(job);
+		
     }
 
     @Override

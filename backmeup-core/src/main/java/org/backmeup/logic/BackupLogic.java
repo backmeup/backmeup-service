@@ -32,6 +32,8 @@ public interface BackupLogic {
     List<BackupJob> getBackupJobsOf(Long userId);
 
     BackupJob updateRequestFor(Long jobId);
+    
+    BackupJob createJob(BackupJob job);
 
     void updateJob(BackupJob job, BackupJob updatedJob);
 
