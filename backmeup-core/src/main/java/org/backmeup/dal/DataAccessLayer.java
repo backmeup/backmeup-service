@@ -16,8 +16,6 @@ public interface DataAccessLayer {
 
     BackupJobDao createBackupJobDao();
 
-    ServiceDao createServiceDao();
-
     JobProtocolDao createJobProtocolDao();
     
     AuthDataDao createAuthDataDao();

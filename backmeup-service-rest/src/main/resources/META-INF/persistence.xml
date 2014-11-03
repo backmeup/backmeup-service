@@ -11,7 +11,6 @@
 		<class>org.backmeup.model.Status</class>
 		<class>org.backmeup.model.BackupJob</class>
 		<class>org.backmeup.model.UserProperty</class>
-		<class>org.backmeup.model.Service</class>
 		<class>org.backmeup.model.JobProtocol</class>
 		<class>org.backmeup.model.JobProtocol$JobProtocolMember</class>
 		<class>org.backmeup.model.Token</class>
