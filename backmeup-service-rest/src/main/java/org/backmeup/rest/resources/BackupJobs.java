@@ -46,13 +46,16 @@ public class BackupJobs extends Base {
 	public List<BackupJobDTO> listBackupJobs(@QueryParam("jobStatus") JobStatus jobStatus) {		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJobStatus status = getMapper().map(jobStatus, BackupJobStatus.class);
+		BackupJobStatus status = null;
+		if (jobStatus != null) {
+			status = getMapper().map(jobStatus, BackupJobStatus.class);
+		}
 		
 		List<BackupJob> allJobsOfUser = getLogic().getJobs(activeUser.getUserId());
 		List<BackupJobDTO> jobList = new ArrayList<>();
 		
 		for(BackupJob job : allJobsOfUser) {
-			if ((jobStatus == null) || (status == job.getStatus())) {
+			if ((status == null) || (status == job.getStatus())) {
 				BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
 				jobList.add(jobDTO);
 			}
