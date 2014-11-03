@@ -10,7 +10,6 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
@@ -92,13 +91,15 @@ public interface BusinessLogic {
 	// backupjob operations ---------------------------------------------------
 	
 	//job & validation operations
-	ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
+	@Deprecated ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
+	ValidationNotes validateBackupJob(BackupJob backupJob);
 	BackupJob updateBackupJob(Long userId, BackupJob backupJob);
 	@Deprecated BackupJob getBackupJob(Long jobId);
 	// Should replace method 'getBackupJob' ?
 	BackupJob getBackupJobFull(Long jobId);
 //	Job updateBackupJobFull(String username, Job backupJob);  
-	ValidationNotes createBackupJob(BackupJob backupJob);
+	@Deprecated ValidationNotes createBackupJob(BackupJob backupJob);
+	BackupJob createBackupJob(BackupJob backupJob, String dummy);
 	List<BackupJob> getJobs(Long userId);
 	void deleteJob(Long userId, Long jobId);
 	

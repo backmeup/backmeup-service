@@ -23,7 +23,6 @@ import javax.ws.rs.core.SecurityContext;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.BackupJobCreationDTO;
@@ -76,8 +75,13 @@ public class BackupJobs extends Base {
 		
 		Profile sinkProfile = getLogic().getPluginProfile(backupJob.getSink());
 		
-		// TODO: actions ignored
 		List<Profile> actionProfiles = new ArrayList<>();
+		if (backupJob.getActions() != null) {
+			for (Long actionId : backupJob.getActions()) {
+				Profile actionProfile = getLogic().getPluginProfile(actionId);
+				actionProfiles.add(actionProfile);
+			}
+		}
 		
 		long delay = DelayTimes.DELAY_MONTHLY;
 		boolean reschedule = false;
@@ -106,14 +110,14 @@ public class BackupJobs extends Base {
 		
 		BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
 		job.setTimeExpression(timeExpression);
-		ValidationNotes vn = getLogic().createBackupJob(job);
+		job = getLogic().createBackupJob(job, "");
 		
-		if(vn.getValidationEntries().size() > 0) {
+//		if(vn.getValidationEntries().size() > 0) {
 //			List<ValidationEntry> entries = vn.getValidationEntries();
 //			throw new WebApplicationException("Validation threw " + entries.size() + " errors", Status.INTERNAL_SERVER_ERROR);
-		} 
+//		} 
 		
-		job = vn.getJob();
+//		job = vn.getJob();
 		return getMapper().map(job, BackupJobDTO.class);
 		
 	}

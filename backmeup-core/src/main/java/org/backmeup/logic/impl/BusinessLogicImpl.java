@@ -30,7 +30,6 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
@@ -578,6 +577,38 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
+    public ValidationNotes validateProfile(final Profile profile) {
+        return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
+        	
+            @Override public ValidationNotes call() {
+            	ValidationNotes notes = new ValidationNotes();
+            	
+                try {
+                	// Check if plugin authorization data is required and still valid
+                    if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
+                        AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                        profile.setAuthData(authData);
+                        
+                        String identification = plugins.authorizePlugin(profile.getAuthData());
+                        profile.setIdentification(identification);
+                    }			
+    				
+                    // Check if plugin validation is required and properties and options are valid
+    				if (plugins.requiresValidation(profile.getPluginId())) {
+    					ValidationNotes vn = plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+    					notes.addAll(vn);
+    				}
+    				return notes;
+                    
+                } catch (Exception e) {
+                    notes.addValidationEntry(ValidationExceptionType.Error, profile.getPluginId(), e);
+                    return notes;
+                }
+            }
+            
+        });
+    }
+    
     @Deprecated
     @Override
     public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
@@ -674,6 +705,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     */
     // ========================================================================
     
+    @Deprecated
     @Override
     public ValidationNotes createBackupJob(BackupJob backupJob) {
         try {
@@ -699,6 +731,20 @@ public class BusinessLogicImpl implements BusinessLogic {
             
         } finally {
             conn.rollback();
+        }
+    }
+    
+    @Override
+    public BackupJob createBackupJob(BackupJob backupJob, String dummy) {
+        try {
+        	ValidationNotes notes = validateBackupJob(backupJob);
+        	if(!notes.getValidationEntries().isEmpty()){
+        		//TODO: throw exception?
+        	}
+            BackupJob job = jobManager.createBackupJob(backupJob);
+            return job;
+        } finally {
+//            conn.rollback();
         }
     }
 
@@ -925,6 +971,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Deprecated
     @Override
     public File getThumbnail(final Long userId, final String fileId) {
         return conn.txNewReadOnly(new Callable<File>() {
@@ -977,6 +1024,36 @@ public class BusinessLogicImpl implements BusinessLogic {
             private void getValidationEntriesForProfile(Long id, ValidationNotes notes) {
                 notes.getValidationEntries().addAll(
                         validateProfile(userId, id, keyRing)
+                        .getValidationEntries());
+            }
+        });
+    }
+    
+    @Override
+    public ValidationNotes validateBackupJob(final BackupJob backupJob) {
+        return conn.txNewReadOnly(new Callable<ValidationNotes>() {
+            @Override public ValidationNotes call() {
+
+            	ValidationNotes notes = new ValidationNotes();
+                try {
+                    getValidationEntriesForProfile(backupJob.getSourceProfile(), notes);
+
+                    getValidationEntriesForProfile(backupJob.getSinkProfile(), notes);
+                    
+                    for(Profile actionProfile : backupJob.getActionProfiles()) {
+                    	getValidationEntriesForProfile(actionProfile, notes);
+                    }
+
+                } catch (BackMeUpException bme) {
+                    notes.addValidationEntry(ValidationExceptionType.Error, bme);
+                }
+                return notes;
+
+            }
+            
+            private void getValidationEntriesForProfile(Profile profile, ValidationNotes notes) {
+                notes.getValidationEntries().addAll(
+                        validateProfile(profile)
                         .getValidationEntries());
             }
         });
