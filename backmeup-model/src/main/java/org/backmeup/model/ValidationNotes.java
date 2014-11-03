@@ -43,6 +43,10 @@ public class ValidationNotes {
     this.addValidationEntry(type, pluginId, null);
   }
   
+  public void addAll(ValidationNotes notes) {
+	  this.validationNotes.addAll(notes.getValidationEntries());
+  }
+  
   public List<ValidationEntry> getValidationEntries() {
     return this.validationNotes;
   }

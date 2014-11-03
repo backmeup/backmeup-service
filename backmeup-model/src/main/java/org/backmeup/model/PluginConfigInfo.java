@@ -3,8 +3,6 @@ package org.backmeup.model;
 import java.util.List;
 
 import org.backmeup.model.api.RequiredInputField;
-import org.backmeup.model.dto.PluginInputFieldDTO;
-import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 
 /**
  * The PluginConfigInfo class is used to transport the required information 
