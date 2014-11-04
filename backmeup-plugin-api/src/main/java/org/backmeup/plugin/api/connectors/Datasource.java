@@ -17,7 +17,7 @@ public interface Datasource {
 	 * data storage.
 	 * @param storage the datastorage
 	 */
-	public abstract void downloadAll(Properties accessData, List<String> options, Storage storage, Progressable progressor) throws DatasourceException, StorageException;
+	public abstract void downloadAll(Properties accessData, Properties properties, List<String> options, Storage storage, Progressable progressor) throws DatasourceException, StorageException;
 	
 	/**
 	 * Returns any type of overview information/statistics that can be
