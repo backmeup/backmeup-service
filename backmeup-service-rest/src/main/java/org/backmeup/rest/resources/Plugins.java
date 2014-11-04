@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.AuthData;
-import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;

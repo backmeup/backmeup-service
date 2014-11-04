@@ -19,9 +19,9 @@ public interface BackupLogic {
 
     BackupJob getExistingUserJob(Long jobId, Long userId);
 
-    Profile getJobActionOption(String actionId, Long jobId);
+    @Deprecated Profile getJobActionOption(String actionId, Long jobId);
 
-    void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
+    @Deprecated void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
 
     BackupJob fullJobFor(Long jobId);
 
@@ -31,7 +31,7 @@ public interface BackupLogic {
 
     List<BackupJob> getBackupJobsOf(Long userId);
 
-    BackupJob updateRequestFor(Long jobId);
+    @Deprecated BackupJob updateRequestFor(Long jobId);
     
     BackupJob createJob(BackupJob job);
 

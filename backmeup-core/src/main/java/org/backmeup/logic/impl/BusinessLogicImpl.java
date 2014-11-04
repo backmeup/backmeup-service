@@ -753,7 +753,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                return backupJobs.updateRequestFor(jobId);
+                return backupJobs.getExistingJob(jobId);
                 
             }
         });

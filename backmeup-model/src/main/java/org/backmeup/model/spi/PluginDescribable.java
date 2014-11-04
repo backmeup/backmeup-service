@@ -1,6 +1,5 @@
 package org.backmeup.model.spi;
 
-import java.util.List;
 import java.util.Properties;
 
 

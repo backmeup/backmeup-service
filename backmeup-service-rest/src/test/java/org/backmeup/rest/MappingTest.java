@@ -29,7 +29,6 @@ import org.backmeup.model.spi.FakePluginDescribable;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.dozer.Mapper;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MappingTest {
