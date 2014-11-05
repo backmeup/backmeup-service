@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,6 +15,7 @@ import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.StatusDao;
+import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -38,6 +40,9 @@ public class BackupLogicImpl implements BackupLogic {
     
     @Inject
     private DataAccessLayer dal;
+    
+    @Inject
+    private Keyserver keyserverClient;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BackupLogicImpl");
     
@@ -52,7 +57,7 @@ public class BackupLogicImpl implements BackupLogic {
     private JobProtocolDao createJobProtocolDao() {
         return dal.createJobProtocolDao();
     }
-
+    
     @Override
     public void deleteJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
@@ -186,12 +191,12 @@ public class BackupLogicImpl implements BackupLogic {
 		job.setStatus(BackupJobStatus.queued);
 
 		Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
+		
+		storePluginConfigOnKeyserver(job);
 
 		// reusable=true means, that we can get the data for the token + a new token for the next backup
-//		Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate, true, encryptionPwd);
-//		job.setToken(t);
-		Token dummyToken = new Token("1111-222-333", 1l, firstExecutionDate);
-		job.setToken(dummyToken);
+		Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
+		job.setToken(t);
 		
 		return getBackupJobDao().save(job);
 		
@@ -269,5 +274,39 @@ public class BackupLogicImpl implements BackupLogic {
     public void deleteProtocolsOf(Long userId) {
         createJobProtocolDao().deleteByUserId(userId);
     }
+    
+    private void storePluginConfigOnKeyserver(BackupJob job) {
+    	// Active user (password is set) is stored in job.getUser()
+    	// profile users (job.getXProfile().getUser() password is null!
+    	updateProfileOnKeyserver(job.getSourceProfile(), job.getUser().getPassword());
+    	updateProfileOnKeyserver(job.getSinkProfile(), job.getUser().getPassword());
+		for (Profile actionProfile : job.getActionProfiles()) {
+			updateProfileOnKeyserver(actionProfile, job.getUser().getPassword());
+		}
+    }
+    
+    private void updateProfileOnKeyserver(Profile profile, String password) {    
+    	if(keyserverClient.isServiceRegistered(profile.getId())){
+    		keyserverClient.deleteService(profile.getId());
+    	}
+    	
+        if (keyserverClient.isAuthInformationAvailable(profile, password)) {
+            keyserverClient.deleteAuthInfo(profile.getId());
+        }
+        
+        // For now, store auth data and props together
+        Properties props = new Properties();
+        // Otherwise, we cannot retrieve the token later on.
+        // If no property is available the keyserver throws internally an IndexOutOfBoundsException
+        props.put("dummy", "dummy"); 
+		if (profile.getAuthData() != null && profile.getAuthData().getProperties() != null) {
+			props.putAll(profile.getAuthData().getProperties());
+		}
+		if (profile.getProperties() != null) {
+			props.putAll(profile.getProperties());
+		}
 
+		keyserverClient.addService(profile.getId());
+		keyserverClient.addAuthInfo(profile, password, props);
+    }
 }

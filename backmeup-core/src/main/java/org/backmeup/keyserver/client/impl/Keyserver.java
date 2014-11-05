@@ -451,19 +451,20 @@ public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 	}
 
 	@Override
-	public Token getToken(BackupJob job, String userPwd, Long backupdate,
-			boolean reusable, String encryptionPwd) {
+	public Token getToken(BackupJob job, String userPwd, Long backupdate, boolean reusable, String encryptionPwd) {
 		List<Long> usedServices = new ArrayList<>();
 		List<Long> authenticationInfos = new ArrayList<>();
+		
 		usedServices.add(job.getSinkProfile().getId());
 		authenticationInfos.add(job.getSinkProfile().getId());
-		Profile profile = job.getSourceProfile();
-		usedServices.add(profile.getId());
-		authenticationInfos.add(profile.getId());
+
+		usedServices.add(job.getSourceProfile().getId());
+		authenticationInfos.add(job.getSourceProfile().getId());
+		
 		Long[] serviceIds = usedServices.toArray(new Long[] {});
 		Long[] authIds = authenticationInfos.toArray(new Long[] {});
-		Token t = getToken(job.getUser().getUserId(), userPwd, serviceIds,
-				authIds, new Date().getTime(), reusable, encryptionPwd);
+		
+		Token t = getToken(job.getUser().getUserId(), userPwd, serviceIds, authIds, new Date().getTime(), reusable, encryptionPwd);
 		return t;
 	}
 
