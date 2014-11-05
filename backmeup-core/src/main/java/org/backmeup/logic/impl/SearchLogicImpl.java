@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.backmeup.index.client.IndexClient;
 import org.backmeup.index.client.IndexClientFactory;
@@ -21,8 +20,9 @@ public class SearchLogicImpl implements SearchLogic {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Inject
-    private IndexClientFactory indexClientFactory;
+//    @Inject
+    // no beans.xml in backmeup-indexer-client project
+    private IndexClientFactory indexClientFactory = new IndexClientFactory();
     
     private IndexClient getIndexClient(Long userId) {
         return indexClientFactory.getIndexClient(userId);
