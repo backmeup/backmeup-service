@@ -24,14 +24,14 @@ public interface AuthorizationLogic {
 
     Properties getProfileAuthInformation(Profile profile, String keyRing);
 
-    void initProfileAuthInformation(Profile profile, Properties entries, String keyRing);
+    @Deprecated void initProfileAuthInformation(Profile profile, Properties entries, String keyRing);
 
     void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing);
 
-    void appendProfileAuthInformation(Profile profile, Properties entries, String keyRing);
+    @Deprecated void appendProfileAuthInformation(Profile profile, Properties entries, String keyRing);
 
     Properties fetchProfileAuthenticationData(Profile profile, String keyRingPassword);
 
-    List<KeyserverLog> getLogs(BackMeUpUser user);
+    @Deprecated List<KeyserverLog> getLogs(BackMeUpUser user);
 
 }

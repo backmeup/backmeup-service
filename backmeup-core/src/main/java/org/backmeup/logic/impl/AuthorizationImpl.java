@@ -61,22 +61,6 @@ public class AuthorizationImpl implements AuthorizationLogic {
         }
     }
 
-    /*
-    @Override
-    public void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRing, String newKeyRing) {
-        if (newPassword != null) {
-            throwIfPasswordInvalid(newPassword);
-            keyserverClient.changeUserPassword(user.getUserId(), oldPassword, newPassword);
-        }
-
-        // TODO Remove keyring from change user options
-        if (newKeyRing != null && oldKeyRing != null && !oldKeyRing.equals(newKeyRing)) {
-            throwIfPasswordInvalid(newKeyRing);
-            keyserverClient.changeUserKeyRing(user.getUserId(), oldKeyRing, newKeyRing);
-        }
-    }
-    */
-
     @Override
     public Properties getProfileAuthInformation(Profile profile, String keyRing) {
         if (keyRing == null) {
