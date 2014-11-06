@@ -4,9 +4,11 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
+import org.backmeup.tests.integration.utils.TestDataManager;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -18,21 +20,16 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPluginFilegenerator() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		String pluginId = "org.backmeup.filegenerator";
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
@@ -56,21 +53,16 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetPluginDummy() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		String pluginId = "org.backmeup.dummy";
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
@@ -112,19 +104,14 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetAllPlugins() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
@@ -142,21 +129,16 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetAllDatasourcePlugins() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		PluginType pluginType = PluginType.Source;
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
@@ -174,21 +156,16 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetAllDatasinkPlugins() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		PluginType pluginType = PluginType.Sink;
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
@@ -206,21 +183,16 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetAllActionPlugins() {	
-		String username = "john.doe";
-		String firstname = "John";
-		String lastname = "Doe";
-		String password = "password1";
-		String email = "john.doe@example.com";
-		
+		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
 		
 		PluginType pluginType = PluginType.Action;
 		
 		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(username, firstname, lastname, password, email);
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
-			accessToken = userId + ";" + password;
+			accessToken = BackMeUpUtils.authenticateUser(user);
 			
 			given()
 				.log().all()
