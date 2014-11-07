@@ -58,18 +58,29 @@ public class BackupLogicImpl implements BackupLogic {
         return dal.createJobProtocolDao();
     }
     
+    // BackupLogic methods ----------------------------------------------------
+    
     @Override
-    public void deleteJobsOf(Long userId) {
-        BackupJobDao jobDao = getBackupJobDao();
-        StatusDao statusDao = getStatusDao();
-        for (BackupJob job : jobDao.findByUserId(userId)) {
-            for (Status status : statusDao.findByJobId(job.getId())) {
-                statusDao.delete(status);
-            }
-            jobDao.delete(job);
-        }
-    }
+    public BackupJob createJob(BackupJob job) {
+		job.setStatus(BackupJobStatus.queued);
 
+		Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
+		
+		storePluginConfigOnKeyserver(job);
+
+		// reusable=true means, that we can get the data for the token + a new token for the next backup
+		Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
+		job.setToken(t);
+		
+		return getBackupJobDao().save(job);
+		
+    }
+    
+    @Override
+    public List<BackupJob> getBackupJobsOf(Long userId) {
+        return getBackupJobDao().findByUserId(userId);
+    }
+    
     @Override
     public BackupJob getExistingJob(Long jobId) {
         if (jobId == null) {
@@ -91,36 +102,16 @@ public class BackupLogicImpl implements BackupLogic {
         }
         return job;
     }
-
+    
     @Override
-    public Profile getJobActionOption(String actionId, Long jobId) {
-        BackupJob job = getExistingJob(jobId);
-        for (Profile action : job.getActionProfiles()) {
-            if (action.getId().equals(actionId)) {
-                return action;
-            }
-        }
-        throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
-    }
-
-    @Override
-    public void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions) {
-        BackupJob job = getExistingJob(jobId);
-        for (Profile ap : job.getActionProfiles()) {
-            if (ap.getId().equals(actionId)) {
-                ap.getProperties().clear();
-                addActionProperties(ap, actionOptions);
-            }
-        }
-    }
-
-    private void addActionProperties(Profile ap, Map<String, String> keyValues) {
-            ap.getProperties().putAll(keyValues);
-    }
-
-    @Override
-    public BackupJob fullJobFor(Long jobId) {
-        return getExistingJob(jobId);
+    public void updateJob(BackupJob persistentJob, BackupJob updatedJob) {
+    	persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
+    	persistentJob.getToken().setToken(updatedJob.getToken().getToken());
+    	persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
+    	
+    	persistentJob.setStatus(updatedJob.getStatus());
+    	
+    	// TODO: update fields
     }
 
     @Override
@@ -131,86 +122,41 @@ public class BackupLogicImpl implements BackupLogic {
 
         getBackupJobDao().delete(job);
     }
-
-    private void deleteStatuses(Long jobId) {
-        // Delete Job status records first
-        StatusDao statusDao = getStatusDao();
-        for (Status status : statusDao.findByJobId(jobId)) {
-            statusDao.delete(status);
-        }
-    }
-
+    
     @Override
-    public List<StatusWithFiles> getStatus(Long userId, Long jobId) {
+    public void deleteJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
-        
-        if (jobId == null) {
-            List<Status> status = new ArrayList<>();
-            BackupJob job = jobDao.findLastBackupJob(userId);
-            if (job != null) {
-                status.addAll(getStatusForJob(job));
+        StatusDao statusDao = getStatusDao();
+        for (BackupJob job : jobDao.findByUserId(userId)) {
+            for (Status status : statusDao.findByJobId(job.getId())) {
+                statusDao.delete(status);
             }
-            // for (BackupJob job : jobs) {
-            //     status.add(getStatusForJob(job));
-            // }
-            return allowFiles(status);
+            jobDao.delete(job);
         }
-        
-        BackupJob job = getExistingUserJob(jobId, userId);
-        List<Status> status = new ArrayList<>();
-        status.addAll(getStatusForJob(job));
-        return allowFiles(status);
-    }
-
-    private List<StatusWithFiles> allowFiles(List<Status> statuses) {
-        List<StatusWithFiles> list = new ArrayList<>();
-        for (Status status : statuses) {
-            list.add(new StatusWithFiles(status));
-        }
-        return list;
-    }
-
-    private List<Status> getStatusForJob(final BackupJob job) {
-        StatusDao sd = dal.createStatusDao();
-        List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
-        return status;
-    }
-
-    @Override
-    public List<BackupJob> getBackupJobsOf(Long userId) {
-        return getBackupJobDao().findByUserId(userId);
-    }
-
-    @Override
-    public BackupJob updateRequestFor(Long jobId) {
-        return getExistingJob(jobId);
     }
     
     @Override
-    public BackupJob createJob(BackupJob job) {
-		job.setStatus(BackupJobStatus.queued);
-
-		Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
-		
-		storePluginConfigOnKeyserver(job);
-
-		// reusable=true means, that we can get the data for the token + a new token for the next backup
-		Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
-		job.setToken(t);
-		
-		return getBackupJobDao().save(job);
-		
-    }
-
-    @Override
-    public void updateJob(BackupJob persistentJob, BackupJob updatedJob) {
-    	persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
-    	persistentJob.getToken().setToken(updatedJob.getToken().getToken());
-    	persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
-    	
-    	persistentJob.setStatus(updatedJob.getStatus());
-    	
-    	// TODO: update fields
+    public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
+        JobProtocolDao jpd = createJobProtocolDao();
+        
+        JobProtocol protocol = new JobProtocol();
+        protocol.setUser(user);
+        protocol.setJob(job);
+        protocol.setSuccessful(jobProtocol.isSuccessful());
+        
+//        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+//        }
+        
+        if (protocol.isSuccessful()) {
+            job.setLastSuccessful(protocol.getExecutionTime());
+            job.setStatus(BackupJobStatus.successful);
+        } else {
+            job.setLastFailed(protocol.getExecutionTime());
+            job.setStatus(BackupJobStatus.error);
+        }
+        
+        jpd.save(protocol);
     }
 
     @Override
@@ -247,32 +193,18 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
-        JobProtocolDao jpd = createJobProtocolDao();
-        
-        JobProtocol protocol = new JobProtocol();
-        protocol.setUser(user);
-        protocol.setJob(job);
-        protocol.setSuccessful(jobProtocol.isSuccessful());
-        
-//        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
-//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
-//        }
-        
-        if (protocol.isSuccessful()) {
-            job.setLastSuccessful(protocol.getExecutionTime());
-            job.setStatus(BackupJobStatus.successful);
-        } else {
-            job.setLastFailed(protocol.getExecutionTime());
-            job.setStatus(BackupJobStatus.error);
-        }
-        
-        jpd.save(protocol);
-    }
-
-    @Override
     public void deleteProtocolsOf(Long userId) {
         createJobProtocolDao().deleteByUserId(userId);
+    }
+    
+    // Helper methods ---------------------------------------------------------
+    
+    private void deleteStatuses(Long jobId) {
+        // Delete Job status records first
+        StatusDao statusDao = getStatusDao();
+        for (Status status : statusDao.findByJobId(jobId)) {
+            statusDao.delete(status);
+        }
     }
     
     private void storePluginConfigOnKeyserver(BackupJob job) {
@@ -308,5 +240,81 @@ public class BackupLogicImpl implements BackupLogic {
 
 		keyserverClient.addService(profile.getId());
 		keyserverClient.addAuthInfo(profile, password, props);
+    }
+    
+    // Deprecated methods -----------------------------------------------------
+    
+    @Deprecated
+    @Override
+    public Profile getJobActionOption(String actionId, Long jobId) {
+        BackupJob job = getExistingJob(jobId);
+        for (Profile action : job.getActionProfiles()) {
+            if (action.getId().equals(actionId)) {
+                return action;
+            }
+        }
+        throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
+    }
+
+    @Deprecated
+    @Override
+    public void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions) {
+        BackupJob job = getExistingJob(jobId);
+        for (Profile ap : job.getActionProfiles()) {
+            if (ap.getId().equals(actionId)) {
+                ap.getProperties().clear();
+                addActionProperties(ap, actionOptions);
+            }
+        }
+    }
+
+    @Deprecated
+    private void addActionProperties(Profile ap, Map<String, String> keyValues) {
+            ap.getProperties().putAll(keyValues);
+    }
+    
+    @Deprecated
+    @Override
+    public BackupJob updateRequestFor(Long jobId) {
+        return getExistingJob(jobId);
+    }
+
+    @Deprecated
+    @Override
+    public List<StatusWithFiles> getStatus(Long userId, Long jobId) {
+        BackupJobDao jobDao = getBackupJobDao();
+        
+        if (jobId == null) {
+            List<Status> status = new ArrayList<>();
+            BackupJob job = jobDao.findLastBackupJob(userId);
+            if (job != null) {
+                status.addAll(getStatusForJob(job));
+            }
+            // for (BackupJob job : jobs) {
+            //     status.add(getStatusForJob(job));
+            // }
+            return allowFiles(status);
+        }
+        
+        BackupJob job = getExistingUserJob(jobId, userId);
+        List<Status> status = new ArrayList<>();
+        status.addAll(getStatusForJob(job));
+        return allowFiles(status);
+    }
+
+    @Deprecated
+    private List<StatusWithFiles> allowFiles(List<Status> statuses) {
+        List<StatusWithFiles> list = new ArrayList<>();
+        for (Status status : statuses) {
+            list.add(new StatusWithFiles(status));
+        }
+        return list;
+    }
+
+    @Deprecated
+    private List<Status> getStatusForJob(final BackupJob job) {
+        StatusDao sd = dal.createStatusDao();
+        List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
+        return status;
     }
 }
