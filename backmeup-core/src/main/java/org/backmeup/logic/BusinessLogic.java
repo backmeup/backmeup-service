@@ -33,93 +33,80 @@ public interface BusinessLogic {
 	BackMeUpUser authorize(String username, String password);
 	
 	// user operations --------------------------------------------------------
+	BackMeUpUser addUser(BackMeUpUser user);
 	BackMeUpUser getUserByUsername(String username);
 	BackMeUpUser getUserByUserId(Long userId);
-	BackMeUpUser deleteUser(Long userId);
 	BackMeUpUser updateUser(BackMeUpUser user);
-	BackMeUpUser addUser(BackMeUpUser user);
+	BackMeUpUser deleteUser(Long userId);
 	
 	// plugin operations ------------------------------------------------------
-	boolean isPluginAvailable(String pluginId);
-	PluginDescribable getPluginDescribable(String pluginId);
-	@Deprecated AuthRequest getPluginConfiguration(String pluginId);
-	PluginConfigInfo getPluginConfiguration(String pluginId, String dummy);
-	
-	AuthData addPluginAuthData(AuthData authData);
-	AuthData getPluginAuthData(Long authDataId);
-	List<AuthData> listPluginAuthData(Long userId);
-	AuthData updatePluginAuthData(AuthData authData);
-	void     deletePluginAuthData(Long authDataId);
-	
-	Profile addPluginProfile(Profile profile);
-	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
-	Profile updatePluginProfile(Profile profile);
-	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
-	Profile getPluginProfile(Long profileId);
-	void deleteProfile(Long profileId);
-	@Deprecated Profile deleteProfile(Long userId, Long profile);
+	boolean                 isPluginAvailable(String pluginId);
+	List<PluginDescribable> getDatasources();
+	List<PluginDescribable> getDatasinks();
+	List<PluginDescribable> getActions();
+	PluginDescribable       getPluginDescribable(String pluginId);
+	PluginConfigInfo        getPluginConfiguration(String pluginId, String dummy);
 
-	// action operations
+	// profile operations ------------------------------------------------------
+	AuthData       addPluginAuthData(AuthData authData);
+	AuthData       getPluginAuthData(Long authDataId);
+	List<AuthData> listPluginAuthData(Long userId);
+	AuthData       updatePluginAuthData(AuthData authData);
+	void           deletePluginAuthData(Long authDataId);
+	
+	Profile         addPluginProfile(Profile profile);
+	Profile         getPluginProfile(Long profileId);
+	Profile         updatePluginProfile(Profile profile);
+	ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
+	void            deleteProfile(Long profileId);
+
+	// backupjob operations ---------------------------------------------------
+	BackupJob       createBackupJob(BackupJob backupJob, String dummy);
+	List<BackupJob> getJobs(Long userId);
+	BackupJob       getBackupJobFull(Long jobId);
+	ValidationNotes validateBackupJob(BackupJob backupJob);
+	BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
+	void            deleteJob(Long userId, Long jobId);
+
+	ProtocolDetails  getProtocolDetails(Long userId, String fileId);
+	ProtocolOverview getProtocolOverview(Long userId, String duration);
+	void             updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
+	void             deleteJobProtocols(Long userId);
+	
+	// search operations ------------------------------------------------------
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
+	
+	// lifecycle operations ---------------------------------------------------
+	void shutdown();
+	
+
+	// deprecated methods ----------------------------------------------------
+	@Deprecated AuthRequest getPluginConfiguration(String pluginId);
+	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
+	@Deprecated Profile deleteProfile(Long userId, Long profile);
+	
 	@Deprecated void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
 	@Deprecated Profile getStoredActionOptions(String actionId, Long jobId);
 	
-	//datasource operations
-	List<PluginDescribable> getDatasources();
 	@Deprecated List<Profile> getDatasourceProfiles(Long userId);
 	@Deprecated List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
 	@Deprecated List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
 	@Deprecated void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
 	
-	//datasink operations
-	List<PluginDescribable> getDatasinks();
 	@Deprecated List<Profile> getDatasinkProfiles(Long userId);
-
-	//action operations
-	List<PluginDescribable> getActions();
+	
 	@Deprecated List<String> getActionOptions(String actionId);
 	
-	// Profile/Auth operations
-//	void addProfileEntries(Long profileId, Properties entries, String keyRing);
-	ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
-//	AuthRequest preAuth(String username, String sourceSinkId, String profileName, String keyRing) throws PluginException, InvalidCredentialsException;
-//	void postAuth(Long profileId, Properties props, String keyRing) throws PluginException, ValidationException, InvalidCredentialsException;
-	
-	//metadata operations 
-//    Properties getMetadata(String username, Long profileId, String keyRing);
-		
-	
-	// backupjob operations ---------------------------------------------------
-	
-	//job & validation operations
 	@Deprecated ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
-	ValidationNotes validateBackupJob(BackupJob backupJob);
-	BackupJob updateBackupJob(Long userId, BackupJob backupJob);
+	
 	@Deprecated BackupJob getBackupJob(Long jobId);
-	// Should replace method 'getBackupJob' ?
-	BackupJob getBackupJobFull(Long jobId);
-//	Job updateBackupJobFull(String username, Job backupJob);  
 	@Deprecated ValidationNotes createBackupJob(BackupJob backupJob);
-	BackupJob createBackupJob(BackupJob backupJob, String dummy);
-	List<BackupJob> getJobs(Long userId);
-	void deleteJob(Long userId, Long jobId);
 	
-	List<StatusWithFiles> getStatus(Long userId, Long jobId);
+	@Deprecated List<StatusWithFiles> getStatus(Long userId, Long jobId);
 	
-	ProtocolDetails getProtocolDetails(Long userId, String fileId);
-	ProtocolOverview getProtocolOverview(Long userId, String duration);
-	void updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
-	void deleteJobProtocols(Long userId);
-	
-	// search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
 	@Deprecated File getThumbnail(Long userId, String fileId);
 	@Deprecated void deleteIndexForUser(Long userId);
 	@Deprecated void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
 	
-	// log operations ---------------------------------------------------------
-//	List<KeyserverLog> getKeysrvLogs (BackMeUpUser user);
-	
-	// lifecycle operations ---------------------------------------------------
-	void shutdown();
-
 }
