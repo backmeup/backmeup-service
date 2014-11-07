@@ -14,11 +14,8 @@ import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
-import org.backmeup.model.constants.BackupJobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +35,8 @@ abstract public class AkkaJobManager implements JobManager {
 	
 	private static final ActorSystem system = ActorSystem.create();
 	
+	private final Logger LOGGER = LoggerFactory.getLogger(AkkaJobManager.class);
+	
 	@Inject
 	protected Connection conn;
 	
@@ -50,55 +49,12 @@ abstract public class AkkaJobManager implements JobManager {
 	@Inject
 	private Keyserver keyserver;
 	
-	private final Logger logger = LoggerFactory.getLogger(AkkaJobManager.class);
-
 	private BackupJobDao getBackupJobDao() {
 		return dal.createBackupJobDao();
 	}
-
-	@Override
-	public BackupJob createBackupJob(BackMeUpUser user,
-			Profile sourceProfiles, Profile sinkProfile,
-			List<Profile> requiredActions, Date start, long delayInMs, 
-			String jobTitle, boolean reschedule, String timeExpression) {
-		try {
-			conn.begin();
-
-			// Create BackupJob entity in DB...
-			BackupJob job = new BackupJob(user, sourceProfiles, sinkProfile, requiredActions, start, delayInMs, jobTitle, reschedule);
-			job.setTimeExpression(timeExpression);
-			job.setStatus(BackupJobStatus.queued);
-
-			Long firstExecutionDate = start.getTime() + delayInMs;
-
-//			String encryptionPwd = null;
-//			Properties p = new Properties();
-//			for (Profile ap : requiredActions) {
-//				for (Entry<String, String> prop : ap.getProperties().entrySet()) {
-//					p.put(prop.getKey(), prop.getValue());
-//				}
-//			}
-//			encryptionPwd = (String) p.get("org.backmeup.encryption.password");
-
-			// reusable=true means, that we can get the data for the token + a
-			// new token for the next backup
-//			Token t = keyserver.getToken(job, user.getPassword(), firstExecutionDate, true, encryptionPwd);
-//			job.setToken(t);
-			Token dummyToken = new Token("1111-222-333", 1l, firstExecutionDate);
-			job.setToken(dummyToken);
-			
-			job = getBackupJobDao().save(job);
-			
-			conn.commit();
-			
-			// Queue new job immediately
-			// TODO: currently disabled due to major refactoring
-//			queueJob(job);
-			return job;
-		} finally {
-			conn.rollback();
-		}
-
+	
+	private BackupJob getBackUpJob(Long jobId) {
+		return getBackupJobDao().findById(jobId);
 	}
 	
 	@Override
@@ -114,13 +70,8 @@ abstract public class AkkaJobManager implements JobManager {
 		} finally {
 			conn.rollback();
 		}
-
 	}
 	
-	private BackupJob getBackUpJob(Long jobId) {
-		return getBackupJobDao().findById(jobId);
-	}
-
 	@Override
 	public void start() {
 		// TODO only take N next recent ones (at least if allJobs has an
@@ -136,6 +87,11 @@ abstract public class AkkaJobManager implements JobManager {
 			conn.rollback();
 		}
 	}
+	
+	@Override
+    public void runBackUpJob(BackupJob job) {
+		queueJob(job);
+	}
 
 	@Override
 	public void shutdown() {
@@ -146,11 +102,6 @@ abstract public class AkkaJobManager implements JobManager {
 
 	protected abstract void runJob(BackupJob job);
 
-	@Override
-    public void runBackUpJob(BackupJob job) {
-		queueJob(job);
-	}
-	
 	// Don't call this method within a database transaction!
 	private void queueJob(BackupJob job) {
 		try {
@@ -201,7 +152,7 @@ abstract public class AkkaJobManager implements JobManager {
 
 		} catch (Exception e) {
 			// TODO there must be error handling defined in the JobManager!^
-			logger.error("Error during startup", e);
+			LOGGER.error("Error during startup", e);
 			// throw new BackMeUpException(e);
 		} finally {
 			conn.rollback();

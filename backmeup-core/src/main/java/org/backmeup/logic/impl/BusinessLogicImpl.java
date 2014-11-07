@@ -843,7 +843,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
             conn.rollback();
             
-            BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
+//            BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
+            BackupJob job = null;
             ValidationNotes vn = validateBackupJob(backupJob.getUser().getUserId(), job.getId(), backupJob.getUser().getPassword());
             vn.setJob(job);
             return vn;
