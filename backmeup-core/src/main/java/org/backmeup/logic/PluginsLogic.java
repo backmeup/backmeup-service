@@ -16,9 +16,8 @@ import org.backmeup.plugin.api.connectors.Datasource;
 
 public interface PluginsLogic {
 
-    @Deprecated List<Profile> getActionProfilesFor(BackupJob request);
+	boolean isPluginAvailable(String pluginId);
 
-    List<String> getActionOptions(String actionId);
 
     List<PluginDescribable> getActions();
 
@@ -27,29 +26,31 @@ public interface PluginsLogic {
     List<PluginDescribable> getDatasinks();
 
     PluginDescribable getPluginDescribableById(String pluginId);
-
-    Datasource getDatasource(String profileDescription);
-
-    Validationable getValidator(String description);
-
-    @Deprecated PluginDescribable getExistingSourceSink(String sourceSinkId);
-
-    void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
-
-    @Deprecated AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
     
     PluginConfigInfo getPluginConfigInfo (String pluginId);
+
     
+    boolean requiresValidation(String pluginId);
+    
+    Validationable getValidator(String description);
+    
+    ValidationNotes validatePlugin(String pluginId, Map<String, String> properties, List<String> options);
+
+
     boolean requiresAuthorization(String pluginId);
     
     String authorizePlugin(AuthData authData);
     
-    boolean requiresValidation(String pluginId);
+	
+	// deprecated methods -----------------------------------------------------
     
-    ValidationNotes validatePlugin(String pluginId, Map<String, String> properties, List<String> options);
-    
-    @Deprecated String getAuthorizedUserId(String sourceSinkId, Properties props);
-
-	boolean isPluginAvailable(String pluginId);
+	@Deprecated Datasource getDatasource(String profileDescription);
+	@Deprecated void validateSourceSinkExists(String sourceSinkId, ValidationNotes notes);
+    @Deprecated List<String> getActionOptions(String actionId);
+    @Deprecated List<Profile> getActionProfilesFor(BackupJob request);
+    @Deprecated PluginDescribable getExistingSourceSink(String sourceSinkId);
+	@Deprecated AuthRequest configureAuth(Properties props, String uniqueDescIdentifier);
+	@Deprecated String getAuthorizedUserId(String sourceSinkId, Properties props);
+	
 
 }
