@@ -239,7 +239,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     	return conn.txNewReadOnly(new Callable<Profile>() {
             @Override public Profile call() {
                 
-                return profiles.queryExistingProfile(profileId);
+                return profiles.getProfile(profileId);
                 
             }
         });
@@ -779,7 +779,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     	conn.txNew(new Runnable() {
             @Override public void run() {
                 
-                Profile p = profiles.queryExistingProfile(profile.getId());
+                Profile p = profiles.getProfile(profile.getId());
                 if(p == null) {
                 	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
                 }
