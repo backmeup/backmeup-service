@@ -7,19 +7,21 @@ public class RequiredInputField {
 	private boolean required;
 	private int order;
 	private Type type;
+	private String defaultValue;
 
 	public enum Type {
-		String, Number, Password, Bool
+		String, Number, Password, Bool, Enum
 	}
 
 	public RequiredInputField(String name, String label, String description,
-			boolean required, int order, Type type) {
+			boolean required, int order, Type type, String defaultValue) {
 		this.name = name;
 		this.label = label;
 		this.description = description;
 		this.required = required;
 		this.order = order;
 		this.type = type;
+		this.defaultValue = defaultValue;
 	}
 
 	public String getName() {
@@ -68,5 +70,13 @@ public class RequiredInputField {
 
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 }

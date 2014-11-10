@@ -168,6 +168,7 @@ public class MappingTest {
 		boolean inputRequired = true;
 		int inputOrder = 0;
 		RequiredInputField.Type inputType = RequiredInputField.Type.String;
+		String inputDefaultValue = "";
 		
 		
 		String redirectUrl = "http://redirecturl";
@@ -177,7 +178,7 @@ public class MappingTest {
 		Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
 		profile.setIdentification(identification);
 		
-		RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType);
+		RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType, inputDefaultValue);
 		List<RequiredInputField> inputFields = new ArrayList<>();
 		inputFields.add(inputModel);
 		
@@ -206,6 +207,7 @@ public class MappingTest {
 		boolean authInputRequired = true;
 		int authInputOrder = 0;
 		RequiredInputField.Type authInputType = RequiredInputField.Type.String;
+		String authInputDefaultValue = "";
 		
 		String authRedirectUrl = "http://redirecturl";
 		
@@ -215,15 +217,16 @@ public class MappingTest {
 		boolean propInputRequired = true;
 		int propInputOrder = 0;
 		RequiredInputField.Type propInputType = RequiredInputField.Type.String;
+		String proptInputDefaultValue = "true";
 		
 		String option1 = "-Option1";
 				
 		
-		RequiredInputField authInputModel = new RequiredInputField(authInputName, authInputLabel, authInputDesc, authInputRequired, authInputOrder, authInputType);
+		RequiredInputField authInputModel = new RequiredInputField(authInputName, authInputLabel, authInputDesc, authInputRequired, authInputOrder, authInputType, authInputDefaultValue);
 		List<RequiredInputField> authInputFields = new ArrayList<>();
 		authInputFields.add(authInputModel);
 		
-		RequiredInputField propInputModel = new RequiredInputField(propInputName, propInputLabel, propInputDesc, propInputRequired, propInputOrder, propInputType);
+		RequiredInputField propInputModel = new RequiredInputField(propInputName, propInputLabel, propInputDesc, propInputRequired, propInputOrder, propInputType, proptInputDefaultValue);
 		List<RequiredInputField> propInputFields = new ArrayList<>();
 		propInputFields.add(propInputModel);
 		
