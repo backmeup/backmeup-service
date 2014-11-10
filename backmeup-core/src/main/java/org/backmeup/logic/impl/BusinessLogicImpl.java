@@ -304,7 +304,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 String pluginId = null;
                 try {
                     
-                    Profile p = profiles.getExistingUserProfile(profileId, userId);
+                    Profile p = profiles.getProfile(profileId);
                     pluginId = p.getPluginId();
                     Validationable validator = plugins.getValidator(pluginId);
                     Properties accessData = authorization.getProfileAuthInformation(p, keyRing);

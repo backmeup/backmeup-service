@@ -20,8 +20,6 @@ public interface AuthorizationLogic {
 
     void authorize(BackMeUpUser user, String password);
 
-//    void updatePasswords(BackMeUpUser user, String oldPassword, String newPassword, String oldKeyRingPassword, String newKeyRingPassword);
-
     Properties getProfileAuthInformation(Profile profile, String keyRing);
 
     @Deprecated void initProfileAuthInformation(Profile profile, Properties entries, String keyRing);
