@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.backmeup.index.client.IndexClient;
 import org.backmeup.index.client.IndexClientFactory;
@@ -20,12 +21,11 @@ public class SearchLogicImpl implements SearchLogic {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-//    @Inject
-    // no beans.xml in backmeup-indexer-client project
-    private IndexClientFactory indexClientFactory = new IndexClientFactory();
+    @Inject
+    private IndexClientFactory indexClientFactory;
     
     private IndexClient getIndexClient(Long userId) {
-        return indexClientFactory.getIndexClient(userId);
+        return this.indexClientFactory.getIndexClient(userId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SearchLogicImpl implements SearchLogic {
         try (IndexClient client = getIndexClient(userId)) {
 
             String thumbnailPath = client.getThumbnailPathForFile(fileId);
-            logger.debug("Got thumbnail path: " + thumbnailPath);
+            this.logger.debug("Got thumbnail path: " + thumbnailPath);
             if (thumbnailPath != null) { // NOSONAR can be null!
                 return new File(thumbnailPath);
             }
