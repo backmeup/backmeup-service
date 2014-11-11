@@ -16,33 +16,18 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 public interface ProfileLogic {
 
     Profile save(Profile profile);
-    
-	Profile updateProfile(Profile profile);
-    
-    @Deprecated Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
 
     List<Profile> getProfilesOf(Long userId);
+        
+    Profile getProfile(Long profileId);
     
-    Profile getExistingUserProfile(Long profileId, Long userId);
-    
-    Profile queryExistingProfile(Long profileId);
+	Profile updateProfile(Profile profile);
     
     void deleteProfilesOf(Long userId);
     
     void deleteProfile(Long profileId);
 
-    Profile deleteProfile(Long profileId, Long userId);
 
-    List<Profile> getDatasinkProfilesOf(Long userId);
-
-    Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
-
-    List<String> getProfileOptions(Long profileId, Profile sourceProfile);
-
-    void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
-
-    @Deprecated void setIdentification(Profile profile, String identification);
-    
     AuthData addAuthData(AuthData authData);
     
     AuthData getAuthData(Long authDataId);
@@ -50,5 +35,14 @@ public interface ProfileLogic {
     List<AuthData> getAuthDataOf(Long userId);
     
     void deleteAuthData(Long authDataId);
-
+    
+    // Deprecated methods -----------------------------------------------------
+    @Deprecated Profile getExistingUserProfile(Long profileId, Long userId);
+    @Deprecated Profile deleteProfile(Long profileId, Long userId);
+    @Deprecated List<Profile> getDatasinkProfilesOf(Long userId);
+    @Deprecated Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
+    @Deprecated List<String> getProfileOptions(Long profileId, Profile sourceProfile);
+    @Deprecated void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
+    @Deprecated Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
+    @Deprecated void setIdentification(Profile profile, String identification);
 }

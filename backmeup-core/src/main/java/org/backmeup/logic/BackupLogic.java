@@ -13,34 +13,32 @@ import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
 
-    void deleteJobsOf(Long userId);
-
+    BackupJob createJob(BackupJob job);
+    
+    List<BackupJob> getBackupJobsOf(Long userId);
+    
     BackupJob getExistingJob(Long jobId);
 
     BackupJob getExistingUserJob(Long jobId, Long userId);
 
-    @Deprecated Profile getJobActionOption(String actionId, Long jobId);
-
-    @Deprecated void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
-
-    BackupJob fullJobFor(Long jobId);
-
-    void deleteJob(Long userId, Long jobId);
-
-    List<StatusWithFiles> getStatus(Long userId, Long jobId);
-
-    List<BackupJob> getBackupJobsOf(Long userId);
-
-    @Deprecated BackupJob updateRequestFor(Long jobId);
-    
-    BackupJob createJob(BackupJob job);
-
     void updateJob(BackupJob job, BackupJob updatedJob);
+    
+    void deleteJob(Long userId, Long jobId);
+    
+    void deleteJobsOf(Long userId);
 
+    
+    void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);
+    
     ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to);
 
-    void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);
-
     void deleteProtocolsOf(Long userId);
+    
+    // Deprecated methods -----------------------------------------------------
+    @Deprecated BackupJob updateRequestFor(Long jobId);
+    @Deprecated Profile getJobActionOption(String actionId, Long jobId);
+    @Deprecated void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
+    @Deprecated List<StatusWithFiles> getStatus(Long userId, Long jobId);
+    
 
 }

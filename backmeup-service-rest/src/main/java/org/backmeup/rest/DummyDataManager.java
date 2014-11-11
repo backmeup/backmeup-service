@@ -44,8 +44,8 @@ public class DummyDataManager {
 	public static PluginConfigurationDTO getPluginConfigurationDTO() {
 		PluginConfigurationDTO pluginConfig = new PluginConfigurationDTO(PluginConfigurationType.input);
 
-		pluginConfig.addRequiredInput(new PluginInputFieldDTO("mail.username", "Username", "Username of your email account", true, 0, Type.String));
-		pluginConfig.addRequiredInput(new PluginInputFieldDTO("mail.password", "Password", "Password of your email account", true, 1, Type.Password));
+		pluginConfig.addRequiredInput(new PluginInputFieldDTO("mail.username", "Username", "Username of your email account", true, 0, Type.String, ""));
+		pluginConfig.addRequiredInput(new PluginInputFieldDTO("mail.password", "Password", "Password of your email account", true, 1, Type.Password, ""));
 
 		return pluginConfig;
 	}

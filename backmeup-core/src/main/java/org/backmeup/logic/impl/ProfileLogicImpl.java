@@ -54,72 +54,14 @@ public class ProfileLogicImpl implements ProfileLogic {
         Profile profile = getProfileDao().findById(profileId);
         getProfileDao().delete(profile);
     }
-    
-    @Deprecated
-    @Override
-    public Profile deleteProfile(Long profileId, Long userId) {
-        Profile profile = getExistingUserProfile(profileId, userId);
-        getProfileDao().delete(profile);
-        return profile;
-    }
 
     @Override
-    public Profile getExistingUserProfile(Long profileId, Long userId) {
-        Profile profile = queryExistingProfile(profileId);
-        if (profile.getUser().getUserId() != userId) {
-            throw new IllegalArgumentException(String.format(textBundle.getString(USER_HAS_NO_PROFILE), userId, profileId));
-        }
-        return profile;
-    }
-
-    @Override
-    public Profile queryExistingProfile(Long profileId) {
+    public Profile getProfile(Long profileId) {
         Profile profile = getProfileDao().findById(profileId);
         if (profile == null) {
             throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
         }
         return profile;
-    }
-
-    @Override
-    public List<Profile> getDatasinkProfilesOf(Long userId) {
-        return getProfileDao().findDatasinkProfilesByUserId(userId);
-    }
-
-    @Override
-    public Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfileEntries) {
-        if (sourceProfileEntries.size() == 0) {
-            throw new IllegalArgumentException("There must be at least one source profile to download data from!");
-        }
-
-        Set<Profile> profileOptions = new HashSet<>();
-        for (Profile sourceEntry : sourceProfileEntries) {
-            Profile sourceProfile = queryExistingProfile(sourceEntry.getId());
-            //TODO
-//            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
-            profileOptions.add(sourceProfile);
-        }
-        return profileOptions;
-    }
-
-    @Override
-    public List<String> getProfileOptions(Long profileId, Profile sourceProfile) {
-        Profile po = sourceProfile;
-        if (po.getId().equals(profileId)) {
-            return po.getOptions();
-        }
-
-        throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
-    }
-
-    @Override
-    public void setProfileOptions(Long profileId, Profile sourceProfile, List<String> sourceOptions) {
-        queryExistingProfile(profileId);
-        
-        Profile option = sourceProfile;
-        if (option.getId().equals(profileId)) {
-            option.setOptions(sourceOptions);
-        }
     }
     
     @Override
@@ -133,23 +75,6 @@ public class ProfileLogicImpl implements ProfileLogic {
     @Override
     public Profile updateProfile(Profile profile) {
     	return getProfileDao().merge(profile);
-    }
-
-    @Deprecated
-    @Override
-    public Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type) {
-        Profile profile = new Profile(user, profileName, uniqueDescIdentifier, type);
-        profile = getProfileDao().save(profile);
-        return profile;
-    }
-
-    @Deprecated
-    @Override
-    public void setIdentification(Profile profile, String identification) {
-        if (identification != null) {
-            profile.setIdentification(identification);
-        }
-        getProfileDao().save(profile);
     }
 
 	@Override
@@ -185,5 +110,86 @@ public class ProfileLogicImpl implements ProfileLogic {
 		AuthData authData = getAuthData(authDataId);
 		getAuthDataDao().delete(authData);
 	}
+	
+	// Deprecated methods -----------------------------------------------------
+	
+    @Deprecated
+    @Override
+    public Profile deleteProfile(Long profileId, Long userId) {
+        Profile profile = getExistingUserProfile(profileId, userId);
+        getProfileDao().delete(profile);
+        return profile;
+    }
 
+    @Deprecated
+    @Override
+    public Profile getExistingUserProfile(Long profileId, Long userId) {
+        Profile profile = getProfile(profileId);
+        if (profile.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException(String.format(textBundle.getString(USER_HAS_NO_PROFILE), userId, profileId));
+        }
+        return profile;
+    }
+    
+    @Deprecated
+    @Override
+    public List<Profile> getDatasinkProfilesOf(Long userId) {
+        return getProfileDao().findDatasinkProfilesByUserId(userId);
+    }
+
+    @Deprecated
+    @Override
+    public Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfileEntries) {
+        if (sourceProfileEntries.size() == 0) {
+            throw new IllegalArgumentException("There must be at least one source profile to download data from!");
+        }
+
+        Set<Profile> profileOptions = new HashSet<>();
+        for (Profile sourceEntry : sourceProfileEntries) {
+            Profile sourceProfile = getProfile(sourceEntry.getId());
+            //TODO
+//            profileOptions.add(new ProfileOptions(sourceProfile, sourceEntry.getOptions().keySet().toArray(new String[0])));
+            profileOptions.add(sourceProfile);
+        }
+        return profileOptions;
+    }
+    
+    @Deprecated
+    @Override
+    public List<String> getProfileOptions(Long profileId, Profile sourceProfile) {
+        Profile po = sourceProfile;
+        if (po.getId().equals(profileId)) {
+            return po.getOptions();
+        }
+
+        throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
+    }
+
+    @Deprecated
+    @Override
+    public void setProfileOptions(Long profileId, Profile sourceProfile, List<String> sourceOptions) {
+        getProfile(profileId);
+        
+        Profile option = sourceProfile;
+        if (option.getId().equals(profileId)) {
+            option.setOptions(sourceOptions);
+        }
+    }
+	
+    @Deprecated
+    @Override
+    public Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type) {
+        Profile profile = new Profile(user, profileName, uniqueDescIdentifier, type);
+        profile = getProfileDao().save(profile);
+        return profile;
+    }
+
+    @Deprecated
+    @Override
+    public void setIdentification(Profile profile, String identification) {
+        if (identification != null) {
+            profile.setIdentification(identification);
+        }
+        getProfileDao().save(profile);
+    }
 }
