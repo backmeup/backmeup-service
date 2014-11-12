@@ -156,9 +156,10 @@ public class Plugins extends Base {
         profile.setUser(activeUser);
         
         if(pluginProfile.getAuthData() != null) {
-        	AuthData authData = new AuthData();
-            authData.setId(pluginProfile.getAuthData().getId());
-            authData.setPluginId(pluginId);
+//        	AuthData authData = new AuthData();
+//          authData.setId(pluginProfile.getAuthData().getId());
+//          authData.setPluginId(pluginId);
+        	AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
             profile.setAuthData(authData);
         }
         
