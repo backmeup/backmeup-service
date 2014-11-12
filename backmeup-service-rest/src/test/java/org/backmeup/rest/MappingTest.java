@@ -84,15 +84,17 @@ public class MappingTest {
 
     @Test
 	public void testPluginProfileMapping() {
+    	Long userId = 1L;
 		String username = "johndoe";
 		String firstname = "John";
 		String lastname = "Doe";
 		String email = "johndoe@example.com";
 		String password = "john123!#";
 		
+		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
+		user.setUserId(userId);
 		
 		Long profileId = 1L;
-		BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 		String profileName = "TestProfile";
 		String pluginId = "org.backmeup.dummy";
 		String identification = "identification";

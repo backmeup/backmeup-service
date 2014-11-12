@@ -160,7 +160,7 @@ public class Profile {
 			throw new IllegalArgumentException("Auth data is associated with a different plugin");
 		}
 		
-		if (!authData.getUser().equals(this.getUser())) {
+		if (!authData.getUser().getUserId().equals(this.getUser().getUserId())) {
 			throw new IllegalArgumentException("Auth data is associated with a different user");
 		}
 		
