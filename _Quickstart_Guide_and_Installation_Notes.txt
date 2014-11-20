@@ -115,19 +115,24 @@ To test if the keyserver is properly responsing call
 http://localhost:8080/backmeup-keyserver/users/1
 or check FAQ>E
 
-
-E) Building the backmeup-service component
+E) Building the backmeup-indexer component
 ------------------------------------------
-E0. Make sure you've installed RabbitMQ + Erlang dependency, set the %ERLANG_HOME% user variable and started the message queue calling sbin/rabbit-mq-server.bat
+Follow the installation and deployment guide which is provided in
+backmeup-indexer>readme.rm
 
-E1. connect to postgres on port 5432 and create the component's database + db user
+
+F) Building the backmeup-service component
+------------------------------------------
+F0. Make sure you've installed RabbitMQ + Erlang dependency, set the %ERLANG_HOME% user variable and started the message queue calling sbin/rabbit-mq-server.bat
+
+F1. connect to postgres on port 5432 and create the component's database + db user
 create a database user called 'dbu_core' (pw 'dbu_core')
 create a database called 'bmucore' and assign the dbu_core user as owner
 
 Info:
 Make sure this information is reflected within src>main>resources>META-INF/persistance.xml
 
-E2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory. All other values default. The database connection properties may stay empty as they are provided within
+F2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory. All other values default. The database connection properties may stay empty as they are provided within
 src>main>resources>META-INF/persistance.xml
 
 # PLUGINS ---------------------------------------------------------------------
@@ -138,27 +143,27 @@ backmeup.osgi.temporaryDirectory = C:/Temp/data/backmeup-service/osgi-tmp
 backmeup.osgi.exportedPackages = org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api org.backmeup.plugin.api.actions javax.mail com.sun.imap
 # --------
 
-E3. Within backmeup-service-tests check src/test/resources/integrationtest.properties and adjust to your local tomcat settings if you don't operate on the default ports
+F3. Within backmeup-service-tests check src/test/resources/integrationtest.properties and adjust to your local tomcat settings if you don't operate on the default ports
 
-E4. To deploy the the component switch into backmeup-service root and call
+F4. To deploy the the component switch into backmeup-service root and call
 mvn -DintegrationTests pre-integration-test
 
-E5. To check if the component is properly working switch to backmeup-service-tests and run the integration tests
+F5. To check if the component is properly working switch to backmeup-service-tests and run the integration tests
 e.g. manually JUnittest in Eclipse
 src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
 
-F) Building the backmeup-worker component
+G) Building the backmeup-worker component
 -----------------------------------------
-F1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+G1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
 
-F2) To deploy the servlet call 
+G2) To deploy the servlet call 
 mvn install
 
 Info: to check the worker's proper deployment and status call
 http://localhost:8080/backmeup-worker-app-servlet/
 
 
-G) Building the backmeup-plugins
+H) Building the backmeup-plugins
 --------------------------------
 To build the plugins call
 mvn install
@@ -169,13 +174,15 @@ It is possible that certain backmeup plugins have osgi bundle dependencies which
 Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
 
 
-H) Building the GUI
+I) Building the GUI
 -------------------
 Using the UI locally does not require to have a http server up and running.
 * pre-compiled applications for iOS and Android is located in backmeup-ui/appfiles
-* a version optimmized for a desktop browser is located in  backmeup-ui/app.extern.gtn.themis/www -> copy this directory into into your Apache2.2 htdocs folder when using a http-server
+* a version optimmized for a desktop browser is located in  backmeup-ui/app.extern.gtn.themis/www
 
-H1. change into the folder www/js/plugins and open the file pluging.WebServiceClient.json to connect to your local backmeup backend
+Configure the UI and select against which Themis backend you want to run it
+
+I1. change into the folder www/js/plugins and open the file pluging.WebServiceClient.json to connect to your local backmeup backend
 ----------------------------------------------------------------
 "defaultServer":"backmeup",
 	"server":{
@@ -189,7 +196,7 @@ H1. change into the folder www/js/plugins and open the file pluging.WebServiceCl
 				"port":8080
 ----------------------------------------------------------------
 
-H2. change into the folder www/js and change the settings in lapstone.js config:{min: from true to false. This tells te system to use the local files inc. the plugin.WebServicClient.json instead of the prepackaged ones.
+I2. change into the folder www/js and change the settings in lapstone.js config:{min: from true to false. This tells te system to use the local files inc. the plugin.WebServicClient.json instead of the prepackaged ones.
 ----------------------------------------------------------------
 var app = {
 	config : {
@@ -205,13 +212,20 @@ var app = {
 };
 ---------------------------------------------------------------
 
-H3. Make sure to kill all open Chrome browser instances and launch Chrome with disabled-web-security as cross-domain requests won't work.
+
+I3 To deploy the Themis UI into the / root of your tomcat server simply switch to backmeup-ui and call
+mvn install –dIntegratinTests 
+
+OR
+
+I3.2 copy this directory into your Apache2.2 htdocs folder when using a http-server
+But then make sure to kill all open Chrome browser instances and launch Chrome with disabled-web-security as cross-domain requests won't work.
 
 "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security
 open the file in your browser
 file:///D:/repositories/themis-backmeup/backmeup-ui/app.extern.gtn.themis/www/page/start.html
 
-H4. Within the GUI navigate to Settings > clear appdata to remove all cached entries in the browser's database
+I4. Within the GUI navigate to Settings > clear appdata to remove all cached entries in the browser's database
 
 
 FAQ
