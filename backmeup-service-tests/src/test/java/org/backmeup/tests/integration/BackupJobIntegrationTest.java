@@ -11,6 +11,7 @@ import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.TestDataManager;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -254,7 +255,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testCreateBackupJobDummy() {	
+	public void testCreateBackupJobDummyToDummy() {	
 		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
@@ -302,7 +303,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testCreateBackupJobFilegenerator() {	
+	public void testCreateBackupJobFilegeneratorToDummy() {	
 		UserDTO user = TestDataManager.getUser();
 		String userId = "";
 		String accessToken = "";
@@ -345,6 +346,60 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
 			BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
 			BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
+	public void testCreateBackupJobFilegeneratorToBackmeupStorage() {	
+		UserDTO user = TestDataManager.getUser();
+		String userId = "";
+		String accessToken = "";
+		
+		PluginProfileDTO sourcePluginProfile = TestDataManager.getProfileFilegenerator();
+		String sourceProfileId = "";
+				
+		PluginProfileDTO sinkPluginProfile = TestDataManager.getProfileBackmeupStorageSink();
+		String sinkProfileId = "";
+		String sinkAuthDataId = "";
+		
+		String jobId = "";
+
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
+			userId = response.extract().path("userId").toString();
+			accessToken = BackMeUpUtils.authenticateUser(user);
+			
+			response = BackMeUpUtils.addProfile(accessToken, sourcePluginProfile.getPluginId(), sourcePluginProfile);
+			sourceProfileId = response.extract().path("profileId").toString();
+			
+			response = BackMeUpUtils.addAuthData(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile.getAuthData());
+			sinkAuthDataId = response.extract().path("id").toString();
+			sinkPluginProfile.getAuthData().setId(Long.parseLong(sinkAuthDataId));
+						
+			response = BackMeUpUtils.addProfile(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile);
+			sinkProfileId = response.extract().path("profileId").toString();
+			
+			BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
+			
+			response = 
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+				.body(backupJob, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/backupjobs")
+			.then()
+				.log().all()
+				.statusCode(200);
+			
+			jobId = response.extract().path("jobId").toString();
+		} finally {
+			BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+			BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
+			BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
+			BackMeUpUtils.deleteAuthData(accessToken, sinkPluginProfile.getPluginId(), sinkAuthDataId);
 			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}

@@ -52,6 +52,39 @@ public class PluginIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
+	public void testGetPluginBackmeupStorage() {	
+		UserDTO user = TestDataManager.getUser();
+		String userId = "";
+		String accessToken = "";
+		
+		String pluginId = "org.backmeup.storage";
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
+			userId = response.extract().path("userId").toString();
+			accessToken = BackMeUpUtils.authenticateUser(user);
+			
+			given()
+				.log().all()
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+			.when()
+				.get("/plugins/" + pluginId)
+			.then()
+				.log().all()
+				.body("pluginId", equalTo(pluginId))
+				.body(containsString("title"))
+				.body(containsString("description"))
+				.body(containsString("imageURL"))
+				.body(containsString("pluginType"))
+				.body(containsString("authDataDescription"))
+				.statusCode(200);
+		} finally {
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
+	@Test
 	public void testGetPluginDummy() {	
 		UserDTO user = TestDataManager.getUser();
 		String userId = "";

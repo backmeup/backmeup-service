@@ -248,6 +248,47 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 		}
 	}
 	
+
+	@Test
+	public void testAddProfileSinkBackmeupStorage() {	
+		UserDTO user = TestDataManager.getUser();
+		String userId = "";
+		String accessToken = "";
+		
+		PluginProfileDTO pluginProfile = TestDataManager.getProfileBackmeupStorageSink();
+		String authDataId = "";
+		String profileId = "";	
+		
+		try {
+			ValidatableResponse response = BackMeUpUtils.addUser(user);
+			userId = response.extract().path("userId").toString();
+			accessToken = BackMeUpUtils.authenticateUser(user);
+			
+			response = BackMeUpUtils.addAuthData(accessToken, pluginProfile.getPluginId(), pluginProfile.getAuthData());
+			authDataId = response.extract().path("id").toString();
+			pluginProfile.getAuthData().setId(Long.parseLong(authDataId));
+		
+			response = 
+			given()
+				.log().all()
+				.contentType("application/json")
+				.header("Accept", "application/json")
+				.header("Authorization", accessToken)
+				.body(pluginProfile, ObjectMapperType.JACKSON_1)
+			.when()
+				.post("/plugins/" + pluginProfile.getPluginId())
+			.then()
+				.log().all()
+				.statusCode(200);
+			
+			profileId = response.extract().path("profileId").toString();
+		} finally {
+			BackMeUpUtils.deleteProfile(accessToken, pluginProfile.getPluginId(), profileId);
+			BackMeUpUtils.deleteAuthData(accessToken, pluginProfile.getPluginId(), authDataId);
+			BackMeUpUtils.deleteUser(accessToken, userId);
+		}
+	}
+	
 	@Ignore
 	@Test
 	public void testAddProfileSourceEmail() {	

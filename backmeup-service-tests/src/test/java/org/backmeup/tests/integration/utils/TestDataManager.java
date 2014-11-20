@@ -30,6 +30,16 @@ public class TestDataManager {
 		return authData;
 	}
 	
+	public static AuthDataDTO getAuthDataBackmeupStorage() {
+		String authName = "BackmeupStorage";
+		
+		AuthDataDTO authData = new AuthDataDTO();
+		authData.setName(authName);
+		authData.addProperty("connectionString", "1");
+
+		return authData;
+	}
+	
 	public static AuthDataDTO getAuthDataEmail() {
 		String authName = "EmailWork";
 		
@@ -59,6 +69,21 @@ public class TestDataManager {
 		pluginProfile.addProperty("image", "true");
 		pluginProfile.addProperty("pdf", "true");
 		pluginProfile.addProperty("binary", "true");
+		
+		return pluginProfile;
+	}
+	
+	public static PluginProfileDTO getProfileBackmeupStorageSink() {
+		String pluginId = "org.backmeup.storage";
+		String profileName = "BackmeupStorageSinkProfile";
+		PluginType profileType = PluginType.Sink;
+		AuthDataDTO authData = getAuthDataBackmeupStorage();
+		
+		PluginProfileDTO pluginProfile = new PluginProfileDTO();
+		pluginProfile.setTitle(profileName);
+		pluginProfile.setPluginId(pluginId);
+		pluginProfile.setProfileType(profileType);
+		pluginProfile.setAuthData(authData);
 		
 		return pluginProfile;
 	}
