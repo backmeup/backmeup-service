@@ -325,6 +325,7 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 			profileId = response.extract().path("profileId").toString();
 		} finally {
 			BackMeUpUtils.deleteProfile(accessToken, pluginProfile.getPluginId(), profileId);
+			BackMeUpUtils.deleteAuthData(accessToken, pluginProfile.getPluginId(), authDataId);
 			BackMeUpUtils.deleteUser(accessToken, userId);
 		}
 	}
