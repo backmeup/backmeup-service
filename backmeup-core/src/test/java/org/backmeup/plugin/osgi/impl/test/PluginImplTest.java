@@ -16,7 +16,7 @@ public class PluginImplTest {
   @Before
   public void setUp() {
     pluginLayer = new PluginImpl("../autodeploy", 
-        "/data/backmeup-service/osgi-tmp", 
+        "/data/backmeup-service/cache", 
         "org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api"
         );
     
