@@ -94,11 +94,7 @@ public class PluginImpl implements Plugin {
 
 	private DeployMonitor deploymentMonitor;
 
-	/*
-	 * public PluginImpl() { this(
-	 * "C:\\Program Files (Dev)\\apache-tomcat-7.0.42\\data\\rest\\autodeploy",
-	 * "osgiTemp" + Long.toString(System.nanoTime()), EXPORTED_PACKAGES ); }
-	 */
+	
 	public PluginImpl() {
 		
 	}
@@ -117,7 +113,7 @@ public class PluginImpl implements Plugin {
 	public void startup() {
 		if (!started) {
 			logger.debug("Starting up PluginImpl!");
-			this.tempDirPath = this.tempDirPath + Long.toString(System.nanoTime());
+			this.tempDirPath = this.tempDirPath + "/" + Long.toString(System.nanoTime());
 					
 			this.deploymentDirectory = new File(deploymentDirPath);
 			this.temporaryDirectory = new File(tempDirPath);

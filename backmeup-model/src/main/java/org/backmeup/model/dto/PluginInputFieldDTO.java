@@ -6,10 +6,6 @@ import org.backmeup.model.api.RequiredInputField.Type;
 
 @XmlRootElement
 public class PluginInputFieldDTO {
-	public enum PluginInputFieldType {
-		string, number, password, bool
-	}
-	
 	private String name;
 	private String label;
 	private String description;
