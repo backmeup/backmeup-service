@@ -6,9 +6,9 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.backmeup.index.client.IndexClient;
 import org.backmeup.index.client.IndexClientFactory;
 import org.backmeup.index.model.FileItem;
+import org.backmeup.index.model.IndexClient;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.model.BackMeUpUser;
