@@ -308,7 +308,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     pluginId = p.getPluginId();
                     Validationable validator = plugins.getValidator(pluginId);
                     Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
-                    Map<String, String> authProps = new HashMap<String, String>();
+                    Map<String, String> authProps = new HashMap<>();
                     for (final String name: accessData.stringPropertyNames())
                         authProps.put(name, accessData.getProperty(name));
                     return validator.validateProperties(authProps);
@@ -383,7 +383,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 
             }
         });
-    };
+    }
 
     // ========================================================================
     
@@ -564,7 +564,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             	
             	// The following statement calls the authorize method of the plugin authorizable
             	// It checks if the authentication data is required and valid
-            	String identification = plugins.authorizePlugin(authData);
+            	plugins.authorizePlugin(authData);
             	return profiles.addAuthData(authData);
                
             }
@@ -730,11 +730,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Deprecated
-    private List<Profile> getActionProfilesFor(BackupJob request) {
-        return plugins.getActionProfilesFor(request);
-    }
-    
-    @Deprecated
     @Override
     public AuthRequest getPluginConfiguration(final String pluginId) {
     	return conn.txNew(new Callable<AuthRequest>() {
@@ -827,6 +822,10 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Deprecated
     @Override
     public ValidationNotes createBackupJob(BackupJob backupJob) {
+        if (true) {
+            throw new UnsupportedOperationException("BackupJob job = null - code likely needs migration");
+        }
+
         try {
             conn.begin();
             
@@ -842,8 +841,8 @@ public class BusinessLogicImpl implements BusinessLogic {
             List<Profile> actions = backupJob.getActionProfiles();
 
             conn.rollback();
-            
-//            BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
+
+            // BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
             BackupJob job = null;
             ValidationNotes vn = validateBackupJob(backupJob.getUser().getUserId(), job.getId(), backupJob.getUser().getPassword());
             vn.setJob(job);

@@ -129,7 +129,7 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Override
     public boolean requiresAuthorization(String pluginId) {
     	return plugins.hasAuthorizable(pluginId);
-    };
+    }
     
     @Override
     public String authorizePlugin(AuthData authData) {
@@ -157,7 +157,7 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Override
     public boolean requiresValidation(String pluginId) {
     	return plugins.hasValidator(pluginId);
-    };
+    }
     
     @Override
     public ValidationNotes validatePlugin(String pluginId, java.util.Map<String,String> properties, java.util.List<String> options) {
@@ -181,7 +181,7 @@ public class PluginsLogicImpl implements PluginsLogic {
 		}
 		
 		return notes;
-    };
+    }
     
     // Deprecated methods -----------------------------------------------------
     

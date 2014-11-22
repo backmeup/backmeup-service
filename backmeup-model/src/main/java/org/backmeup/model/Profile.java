@@ -177,7 +177,7 @@ public class Profile {
 	
 	public void addProperty(String key, String value) {
 		if(this.properties == null) {
-			this.properties = new HashMap<String, String>();
+			this.properties = new HashMap<>();
 		}
 		this.properties.put(key, value);
 	}
