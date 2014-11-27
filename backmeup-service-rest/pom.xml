@@ -42,6 +42,7 @@
             <version>${version.org.slf4j}</version>
         </dependency>
 		
+        <!-- used as log implementation, not referenced in source -->        
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -61,7 +62,6 @@
 			<version>${version.javax.el}</version>
 			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
