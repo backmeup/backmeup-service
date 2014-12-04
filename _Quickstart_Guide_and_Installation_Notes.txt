@@ -152,26 +152,37 @@ F5. To check if the component is properly working switch to backmeup-service-tes
 e.g. manually JUnittest in Eclipse
 src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
 
-G) Building the backmeup-worker component
------------------------------------------
-G1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+* within backmeup-service/autodeploy directory you'll find the created osgi bundles + their dependencies which are required to run the plugin-framework. This includes the osgi blueprint bundles, etc.. 
+Copy all bundle jars into data/backmeup-service/autodeploy [according to the configuration in section B] 
 
-G2) To deploy the servlet call 
+
+G) Building the backmeup-plugins
+--------------------------------
+To build the plugins call
 mvn install
+
+* within the backmeup-plugins/autodeploy directory you'll find the created osgi bundles + their dependencies. Copy the plugins you want to deploy into data/backmeup-service/autodeploy [according to the configuration in section B] 
+
+Info:
+It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment, as some dependencies are exposed for all bundles and some are embedded for the individual plugins.
+Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
+
+
+H) Building the backmeup-worker component
+-----------------------------------------
+H1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+
+H2) To deploy the servlet call 
+mvn install -DintegrationTests
 
 Info: to check the worker's proper deployment and status call
 http://localhost:8080/backmeup-worker-app-servlet/
 
+* As abackmeup-worker may run on a seperate machine, it needs to have all plugins + bundles available. 
+Take all jar-files from data/backmeup-service/autodeploy [according to the configuration in section B] and copy them to 
+data/backmeup-worker/plugins which is the autodeploy directory (according to the connfiguration in H1] of the backmeup-worker. 
 
-H) Building the backmeup-plugins
---------------------------------
-To build the plugins call
-mvn install
-within the backmeup-plugins/target directory you'll find the created osgi bundles. Copy the plugins you want to deploy into data/backmeup-service/autodeploy [according to the configuration in section B] 
-
-Info:
-It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment.
-Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
+-> check hint F for debugging.
 
 
 I) Building the GUI
@@ -261,6 +272,13 @@ E) wget for Windows
 Wget is available for Windows (32bit or 64bit version). It allows to issue GET/PUT/POST/DELETE requests. For example to check if the keyserver is properly working create a user (id 1, password (sd) by running 
 wget.exe -post-data '' http://localhost:8080/backmeup-keyserver/users/1/asd/register
 
+F) check the rabbitmq message queue
+----------------------------------
+To start the rabbitmq_server in management mode got to rabbitmq setup dir/sbin and call
+'rabbitmq-plugins.bat enablemq_management'
+when this is completed restart the queue with rabbitmq-server.bat
+to check on the status of the queue go to http://localhost:15672/ username/pw: guest/guest
+when running the first backup you should find a 'keyserv' and 'backmeup' message queue.
 
 
 
