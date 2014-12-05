@@ -35,6 +35,7 @@
 			<groupId>org.backmeup</groupId>
 			<artifactId>backmeup-indexer-model</artifactId>
 			<version>${version.backmeup.indexer}</version>
+            <type>jar</type>
 		</dependency>
 		
 		<dependency>
