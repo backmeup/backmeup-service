@@ -1,5 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.backmeup</groupId>
@@ -9,7 +11,7 @@
 	
 	<artifactId>backmeup-service-rest</artifactId>
 	<packaging>war</packaging>
-	<name>BackMeUp Service</name>
+	<name>BackMeUp Service Rest Web Application</name>
 	
 	<dependencies>
 		<dependency>
@@ -17,13 +19,11 @@
 			<artifactId>backmeup-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.backmeup</groupId>
 			<artifactId>backmeup-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.backmeup</groupId>
 			<artifactId>backmeup-plugin-api</artifactId>
@@ -41,14 +41,8 @@
             <artifactId>slf4j-api</artifactId>
             <version>${version.org.slf4j}</version>
         </dependency>
-		
-        <!-- used as log implementation, not referenced in source -->        
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${version.ch.qos.logback}</version>
-		</dependency> 
-		
+
+        <!-- TODO why this dependency? -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
@@ -68,6 +62,13 @@
 			<version>${version.javax.servlet}</version>
 			<scope>provided</scope>
 		</dependency>
+
+        <!-- used as log implementation, not referenced in source -->        
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${version.ch.qos.logback}</version>
+		</dependency> 
 		
         <!-- used as CDI implementation, not referenced in source -->        
 		<dependency>
@@ -75,8 +76,14 @@
 			<artifactId>weld-servlet</artifactId>
 			<version>${version.org.jboss.weld.servlet}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-cdi</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+        </dependency>
 
-        <!-- used as JAX-RS implementation, not referenced in source -->		
+        <!-- used as JAX-RS implementation, not referenced in source,
+             see http://docs.jboss.org/resteasy/docs/3.0.7.Final/userguide/html_single/ -->
 		<dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-servlet-initializer</artifactId>
@@ -95,7 +102,11 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${version.org.hibernate.hibernate-entitymanager}</version>
 		</dependency>
-		
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${version.org.hibernate.hibernate-validator}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -114,13 +125,19 @@
     		</exclusions>
 		</dependency>
 
+        <!-- Test -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>tjws</artifactId>
             <version>${version.org.jboss.resteasy}</version>
             <scope>test</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.11.1.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -156,6 +173,14 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <!-- 3.5 runs in Kepler (Eclipse 4.3) -->
+                    <wtpversion>3.5</wtpversion>
+                    <jeeversion>6</jeeversion>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
