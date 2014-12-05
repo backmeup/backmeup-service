@@ -62,6 +62,8 @@ import com.google.gson.reflect.TypeToken;
 public class Keyserver implements org.backmeup.keyserver.client.Keyserver {
 	private final Logger logger = LoggerFactory.getLogger(Keyserver.class);
 
+	// TODO PK move GSON code into serializer, rename it JSON and remove explicit dependency on gson from this module 
+	
 	private static class Result {
 		public HttpResponse response;
 		public String content;
