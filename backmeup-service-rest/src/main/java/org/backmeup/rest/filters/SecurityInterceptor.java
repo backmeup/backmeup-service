@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -21,14 +22,10 @@ import org.backmeup.logic.BusinessLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.model.exceptions.UserNotActivatedException;
-import org.backmeup.rest.BusinessLogicContextHolder;
 import org.backmeup.rest.auth.BackmeupSecurityContext;
-import org.backmeup.rest.cdi.JNDIBeanManager;
 import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
@@ -39,25 +36,11 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	 public static final Long BACKMEUP_WORKER_ID = -1L;
 	 public static final String BACKMEUP_WORKER_NAME = "BACKMEUPWORKER";
 	 
-	 private final Logger logger = LoggerFactory.getLogger(getClass());
-	 
 	 @Context
 	 private ServletContext context;
 	 
+	 @Inject
 	 private BusinessLogic logic;
-
-	 private BusinessLogic getLogic() {
-		 BusinessLogicContextHolder contextHolder = new BusinessLogicContextHolder(context);
-
-		 logic = contextHolder.get();
-
-		 if (logic == null) {
-			 logic = fetchInstanceFromJndi(BusinessLogic.class);
-			 contextHolder.set(logic);
-		 }
-
-		 return logic;
-	 }
 
 	 @Override
 	 public void filter(ContainerRequestContext requestContext) {
@@ -118,7 +101,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				worker.setUserId(BACKMEUP_WORKER_ID);
 				return worker;
 			}
-            return getLogic().getUserByUserId(Long.parseLong(userId));
+            return logic.getUserByUserId(Long.parseLong(userId));
 		} catch (UnknownUserException uue) {
 			return null;
 		} catch (UserNotActivatedException una) {
@@ -137,13 +120,4 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		 return isAllowed;
 	 }
 	 
-	 private <T> T fetchInstanceFromJndi(Class<T> classType) {
-	        try {
-	            JNDIBeanManager jndiManager = JNDIBeanManager.getInstance();
-	            return jndiManager.getBean(classType);
-	        } catch (Exception e) {
-	            logger.error("", e);
-	            return null;
-	        }
-	    }
 }
