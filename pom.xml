@@ -49,7 +49,7 @@
 		<version.com.rabbitmq>2.8.6</version.com.rabbitmq>
 		<version.com.typesafe.akka>2.0.3</version.com.typesafe.akka>
 		<version.commons-codec>1.4</version.commons-codec>
-		<version.commons-io>2.1</version.commons-io>
+		<version.commons-io>2.3</version.commons-io>
 		<version.commons-lang>2.6</version.commons-lang>
 		<version.javax.el>2.2</version.javax.el>
 		<version.javax.enterprise.cdi-api>1.1</version.javax.enterprise.cdi-api>
@@ -70,7 +70,6 @@
 		<version.org.im4java>1.2.0</version.org.im4java>
 		<version.org.jboss.resteasy>3.0.7.Final</version.org.jboss.resteasy>
 		<version.org.jboss.weld.servlet>2.1.0.Final</version.org.jboss.weld.servlet>
-		<version.org.mockito>1.9.5</version.org.mockito>
 		<version.org.postgresql>9.3-1100-jdbc41</version.org.postgresql>
 		<version.org.slf4j>1.7.6</version.org.slf4j>
 
@@ -78,6 +77,7 @@
 		<version.org.apache.felix.maven-bundle-plugin>2.4.0</version.org.apache.felix.maven-bundle-plugin>
 		<version.org.apache.maven.plugins.maven-compiler-plugin>3.1</version.org.apache.maven.plugins.maven-compiler-plugin>
 		<version.org.apache.maven.plugins.maven-dependency-plugin>2.8</version.org.apache.maven.plugins.maven-dependency-plugin>
+        <version.org.apache.maven.plugins.maven-eclipse-plugin>2.9</version.org.apache.maven.plugins.maven-eclipse-plugin>
 		<version.org.apache.maven.plugins.maven-failsafe-plugin>2.16</version.org.apache.maven.plugins.maven-failsafe-plugin>
 		<version.org.apache.maven.plugins.maven-resources-plugin>2.6</version.org.apache.maven.plugins.maven-resources-plugin>
 		<version.org.apache.maven.plugins.maven-source-plugin>2.2</version.org.apache.maven.plugins.maven-source-plugin>
@@ -154,6 +154,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
