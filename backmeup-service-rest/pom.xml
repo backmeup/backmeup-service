@@ -43,13 +43,6 @@
             <version>${version.org.slf4j}</version>
         </dependency>
 
-        <!-- TODO why this dependency? -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${version.org.apache.httpcomponents}</version>
-		</dependency>
-		
         <!-- Servlet environment provided -->        
 		<dependency>
 			<groupId>javax.el</groupId>
@@ -126,6 +119,11 @@
             <artifactId>tjws</artifactId>
             <version>${version.org.jboss.resteasy}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${version.commons-io}</version>
         </dependency>
 	</dependencies>
 
