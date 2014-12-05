@@ -20,6 +20,7 @@ public class MapperProducer {
     private Mapper mapper;
 
     @Produces
+    @ApplicationScoped
     public Mapper getMapper() {
         if (mapper == null) {
             List<String> configList = new ArrayList<>();
