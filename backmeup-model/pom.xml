@@ -1,15 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 	
 	<parent>
 		<groupId>org.backmeup</groupId>
 		<artifactId>backmeup-service</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
+        <relativePath>..\pom.xml</relativePath>
 	</parent>
 	
 	<artifactId>backmeup-model</artifactId>
 	<packaging>bundle</packaging>
-	<name>BackMeUp Model</name>
+	<name>BackMeUp Service Model</name>
 
 	<dependencies>
         <!-- MINIMAL dependencies because many plugins depend on this -->
@@ -73,9 +76,9 @@
 									<type>${project.packaging}</type>
 								</artifactItem>
 								<artifactItem>
-									<groupId>javax.persistence</groupId>
-    								<artifactId>com.springsource.javax.persistence</artifactId>
-    								<version>2.0.0.Beta1</version>
+									<groupId>org.hibernate.javax.persistence</groupId>
+									<artifactId>hibernate-jpa-2.0-api</artifactId>
+									<version>${version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api}</version>
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>
