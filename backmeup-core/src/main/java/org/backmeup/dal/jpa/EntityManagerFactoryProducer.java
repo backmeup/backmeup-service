@@ -1,4 +1,4 @@
-package org.backmeup.rest.cdi;
+package org.backmeup.dal.jpa;
 
 import java.util.Properties;
 

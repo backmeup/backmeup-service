@@ -98,19 +98,43 @@
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 			<version>${version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api}</version>
 		</dependency>
-    	
+
     	<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>com.springsource.javax.mail</artifactId>
 			<version>${version.javax.mail.com.springsource.javax.mail}</version>
 		</dependency> 
-		        
+
+        <!-- used as JPA implementation, not referenced in source -->        
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${version.org.hibernate.hibernate-entitymanager}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${version.org.hibernate.hibernate-validator}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${version.org.postgresql}</version>
+        </dependency>
+        
+        <!-- Test -->
 		<dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>
 			<version>${version.net.htmlparser.jericho}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.11.1.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
