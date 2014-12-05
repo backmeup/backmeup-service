@@ -76,10 +76,6 @@ public interface BusinessLogic {
 	// search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
 	
-	// lifecycle operations ---------------------------------------------------
-	void shutdown();
-	
-
 	// deprecated methods ----------------------------------------------------
 	@Deprecated AuthRequest getPluginConfiguration(String pluginId);
 	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);

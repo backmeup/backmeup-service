@@ -3,6 +3,8 @@ package org.backmeup.job.impl.rabbitmq;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -37,6 +39,7 @@ public class RabbitMQJobManager extends AkkaJobManager {
 	
 	private Channel mqChannel;
 	
+    @PostConstruct
 	@Override
 	public void start() {
 		super.start();
@@ -57,6 +60,7 @@ public class RabbitMQJobManager extends AkkaJobManager {
 		mqChannel.queueDeclare(mqName, false, false, false, null);		
 	}
 
+    @PreDestroy
 	@Override
 	public void shutdown() {
 		super.shutdown();

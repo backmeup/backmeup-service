@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.backmeup.dal.BackupJobDao;
@@ -72,7 +74,7 @@ abstract public class AkkaJobManager implements JobManager {
 		}
 	}
 	
-	@Override
+	@PostConstruct
 	public void start() {
 		// TODO only take N next recent ones (at least if allJobs has an
 		// excessive length)
@@ -93,7 +95,7 @@ abstract public class AkkaJobManager implements JobManager {
 		queueJob(job);
 	}
 
-	@Override
+	@PreDestroy
 	public void shutdown() {
 		// Shutdown system component
 		system.shutdown();

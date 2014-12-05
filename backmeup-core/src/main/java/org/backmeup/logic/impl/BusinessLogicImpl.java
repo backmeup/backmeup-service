@@ -68,6 +68,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     // with getClass().getSimpleName()). Therefore use class name. 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BusinessLogicImpl");
 
+    @Inject
     private JobManager jobManager;
 
     @Inject
@@ -95,23 +96,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Configuration(key = "backmeup.autoVerifyUser")
     private Boolean autoVerifyUser;
     
-    // Getter and Setter ------------------------------------------------------
-    
-    @Inject
-    public void setJobManager(JobManager jobManager) {
-        this.jobManager = jobManager;
-        this.jobManager.start();
-    }
-    
     // ========================================================================
     
     // CDI lifecycle methods --------------------------------------------------
     
-    @Override
     @PreDestroy
     public void shutdown() {
         logger.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
-        jobManager.shutdown();
     }
     
     // ========================================================================

@@ -3,7 +3,6 @@ package org.backmeup.job;
 import org.backmeup.model.BackupJob;
 
 /**
- * 
  * The JobManager is the interface to schedule jobs which will then be run 
  * asynchronously by this layer.
  * 
@@ -13,10 +12,8 @@ import org.backmeup.model.BackupJob;
  */
 public interface JobManager {
 
-	public BackupJob createBackupJob(BackupJob backupJob);
+	BackupJob createBackupJob(BackupJob backupJob);
 	
-	public void runBackUpJob(BackupJob job);
+	void runBackUpJob(BackupJob job);
 	
-	public void start();
-	public void shutdown();
 }
