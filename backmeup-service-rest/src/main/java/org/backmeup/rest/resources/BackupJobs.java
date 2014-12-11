@@ -172,7 +172,7 @@ public class BackupJobs extends Base {
 				Profile actionProfile = getLogic().getPluginProfile(action.getId());
 				PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
 				actionProfileDTO.setPluginId(actionProfile.getPluginId());
-				jobDTO.setSink(actionProfileDTO);
+				jobDTO.addAction(actionProfileDTO);
 			}
 		}
 		
