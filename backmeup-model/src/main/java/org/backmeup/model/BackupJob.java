@@ -178,11 +178,11 @@ public class BackupJob {
 
 	public void setActionProfiles(List<Profile> actionProfiles) {
 		for (Profile actionProfile : actionProfiles) {
-			if (actionProfile.getType() != PluginType.Sink) {
+			if (actionProfile.getType() != PluginType.Action) {
 				throw new IllegalArgumentException("Action profile ("
 						+ actionProfile.getName()
-						+ ") must be of type Sink, but is of type "
-						+ sinkProfile.getType());
+						+ ") must be of type Action, but is of type "
+						+ actionProfile.getType());
 			}
 		}
 		this.actionProfiles = actionProfiles;
