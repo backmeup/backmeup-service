@@ -1,6 +1,7 @@
 package org.backmeup.tests.integration.utils;
 
 import java.util.Date;
+import java.util.List;
 
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
@@ -35,7 +36,8 @@ public class TestDataManager {
 		
 		AuthDataDTO authData = new AuthDataDTO();
 		authData.setName(authName);
-		authData.addProperty("connectionString", "1");
+//		authData.addProperty("connectionString", "1");
+		authData.addProperty("connectionString", "backmeup-storage;http://localhost:8080/backmeup-storage-service/;Token=1");
 
 		return authData;
 	}
@@ -69,6 +71,19 @@ public class TestDataManager {
 		pluginProfile.addProperty("image", "true");
 		pluginProfile.addProperty("pdf", "true");
 		pluginProfile.addProperty("binary", "true");
+		
+		return pluginProfile;
+	}
+	
+	public static PluginProfileDTO getProfileThumbnailAction() {
+		String pluginId = "org.backmeup.thumbnail";
+		String profileName = "ThumbnailActionProfile";
+		PluginType profileType = PluginType.Action;
+		
+		PluginProfileDTO pluginProfile = new PluginProfileDTO();
+		pluginProfile.setTitle(profileName);
+		pluginProfile.setPluginId(pluginId);
+		pluginProfile.setProfileType(profileType);
 		
 		return pluginProfile;
 	}
@@ -141,6 +156,25 @@ public class TestDataManager {
 		backupJob.setSource(Long.parseLong(sourceProfileId));
 		backupJob.setSink(Long.parseLong(sinkProfileId));
 		
+		return backupJob;
+	}
+	
+	public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId, List<String> actionProfileIds) {
+		String jobTitle = "BackupJob1";
+		JobFrequency schedule = JobFrequency.weekly;
+		Date start = new Date();
+		
+		BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
+		backupJob.setJobTitle(jobTitle);
+		backupJob.setSchedule(schedule);
+		backupJob.setStart(start);
+		backupJob.setSource(Long.parseLong(sourceProfileId));
+		backupJob.setSink(Long.parseLong(sinkProfileId));
+		
+		for (String actionProfileId : actionProfileIds) {
+			backupJob.addAction(Long.parseLong(actionProfileId));
+		}
+			
 		return backupJob;
 	}
 }
