@@ -96,7 +96,7 @@ public class BackupLogicImpl implements BackupLogic {
     @Override
     public BackupJob getExistingUserJob(Long jobId, Long userId) {
         BackupJob job = getExistingJob(jobId);
-        if (job.getUser().getUserId() != userId) {
+        if (!job.getUser().getUserId().equals(userId)) {
             throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
                     jobId, userId));
         }
