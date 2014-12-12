@@ -1,6 +1,7 @@
 package org.backmeup.logic.impl;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -77,7 +78,7 @@ public class SearchLogicImpl implements SearchLogic {
     public void delete(Long userId, Long jobId, Long timestamp) {
         try (IndexClient client = getIndexClient(userId)) {
 
-            client.deleteRecordsForJobAndTimestamp(jobId, timestamp);
+            client.deleteRecordsForJobAndTimestamp(jobId, new Date(timestamp));
 
         }
     }
