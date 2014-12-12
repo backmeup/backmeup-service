@@ -39,15 +39,15 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
  
 	@Override
     public boolean delete(T entity) {
-		entity = em.merge(entity);
-		em.remove(entity);
+		T mergedEntity = em.merge(entity);
+		em.remove(mergedEntity);
 		return true;
 	}
  
 	@Override
     public T save(T entity) {
-		entity = em.merge(entity);		
-		return entity;
+		T savedEntity = em.merge(entity);		
+		return savedEntity;
 	} 
 	
 	@Override

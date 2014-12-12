@@ -73,6 +73,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
         return fetchFirstAuthenticationData(profile, keyRing);
     }
 
+    @Deprecated
     @Override
     public void initProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
         if (!keyserverClient.isServiceRegistered(profile.getId())) {
@@ -95,6 +96,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
         keyserverClient.addAuthInfo(profile, keyRing, entries);
     }
 
+    @Deprecated
     @Override
     public void appendProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
         Properties props = getProfileAuthInformation(profile, keyRing);
@@ -128,6 +130,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
         return keyserverClient.getData(token);
     }
 
+    @Deprecated
     @Override
     public List<KeyserverLog> getLogs(BackMeUpUser user) {
         return keyserverClient.getLogs(user);

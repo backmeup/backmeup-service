@@ -230,11 +230,11 @@ public class PluginImpl implements Plugin {
 					@Override
                     public Object invoke(Object o, Method method, Object[] os)
 							throws Throwable {
-						ServiceReference ref = getReference(service, filter);
-						if (ref == null) {
+						ServiceReference serviceRef = getReference(service, filter);
+						if (serviceRef == null) {
 							throw new PluginUnavailableException(filter);
 						}
-						Object instance = bundleContext().getService(ref);
+						Object instance = bundleContext().getService(serviceRef);
 						// TODO: Throw exception if instance is null! This might
 						// happen if <packaging>bundle</packaging> is missing in
 						// pom.xml
@@ -246,7 +246,7 @@ public class PluginImpl implements Plugin {
 									"An exception occured during execution of the method "
 											+ method.getName(), e);
 						} finally {
-							bundleContext().ungetService(ref);
+							bundleContext().ungetService(serviceRef);
 						}
 						return ret;
 					}
@@ -254,7 +254,6 @@ public class PluginImpl implements Plugin {
 	}
 
 	private static class SpecialInvocationHandler implements InvocationHandler {
-		private final Logger logger = LoggerFactory.getLogger(SpecialInvocationHandler.class);
 		private final ServiceReference reference;
 		private final BundleContext context;
 
