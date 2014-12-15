@@ -26,42 +26,37 @@ public class ConfigurationFactory {
 		if (properties == null) {
 			logger.debug("Locate configuration properties file");
 			
-			InputStream is = ConfigurationFactory.class.getClassLoader().getResourceAsStream(propertiesFileName);
-
-			if (is == null) {
-				logger.debug("No properties file ({}) in classpath found",propertiesFileName);
-
-				try {
-					is = new FileInputStream(new File(propertiesFilePath));
-				} catch (FileNotFoundException e) {
-					logger.debug("No properties file found at path: {}",propertiesFilePath);
-					logger.error("", e);
-				} 
-			}
-
-			if (is == null) {
-				logger.error("No properties file found. Add {} or add it to the classpath!", propertiesFilePath);
-				throw new RuntimeException("No properties file found");
-			}
-			
 			properties = new Properties();
-			try { 
-				properties.load(is);
+            try (InputStream is = propertyFileStream()) {
+                properties.load(is);
 			} catch (IOException e) {
 				logger.error("Failed to load properties file. Add {} or add it to the classpath!", propertiesFilePath);
 				throw new RuntimeException("Failed to load properties file", e);
-			} finally {
-			    if(is != null) {
-			        try {
-			            is.close();
-			        } catch (IOException e) {
-			            logger.error("", e);
-			        }
-			    }
-			}
+			} 
 		}
 		return properties;
 	}
+
+    private static InputStream propertyFileStream() {
+        InputStream is = ConfigurationFactory.class.getClassLoader().getResourceAsStream(propertiesFileName);
+
+        if (is == null) {
+        	logger.debug("No properties file ({}) in classpath found",propertiesFileName);
+
+        	try {
+        		is = new FileInputStream(new File(propertiesFilePath));
+        	} catch (FileNotFoundException e) {
+        		logger.debug("No properties file found at path: {}",propertiesFilePath);
+        		logger.error("", e);
+        	} 
+        }
+
+        if (is == null) {
+        	logger.error("No properties file found. Add {} or add it to the classpath!", propertiesFilePath);
+        	throw new RuntimeException("No properties file found");
+        }
+        return is;
+    }
 	
 	@Produces
 	@Configuration

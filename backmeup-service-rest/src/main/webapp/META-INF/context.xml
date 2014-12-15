@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Tomcat has a read-only JNDI, so Weld can’t automatically bind the BeanManager -->
+<!-- extension SPI. To bind the BeanManager into JNDI, you need this context.xml in -->
+<!-- the web root. Tomcat only allows you to bind entries to java:comp/env, so the -->
+<!-- BeanManager will be available at java:comp/env/BeanManager. -->
 <Context>
     <Resource name="BeanManager"
               auth="Container"

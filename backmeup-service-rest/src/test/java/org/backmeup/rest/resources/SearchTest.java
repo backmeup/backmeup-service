@@ -13,7 +13,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.model.FakeSearchResponse;
@@ -30,7 +30,7 @@ public class SearchTest {
     private final String HOST = server.host;
     private final int PORT = server.port;
 
-    private HttpClient client = new DefaultHttpClient();
+    private HttpClient client = HttpClients.createDefault();
     private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
 
     private static final Long USER = FakeUser.ACTIVE_USER_ID;
