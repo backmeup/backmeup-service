@@ -331,8 +331,10 @@ public class Plugins extends Base {
 			if(!auth.getUser().getUserId().equals(activeUser.getUserId())) {
 				throw new WebApplicationException(Status.FORBIDDEN);
 			}
-			AuthDataDTO authDTO = getMapper().map(auth, AuthDataDTO.class);
-			authDTOS.add(authDTO);
+			if (auth.getPluginId().equals(pluginId)) {
+				AuthDataDTO authDTO = getMapper().map(auth, AuthDataDTO.class);
+				authDTOS.add(authDTO);
+			}
 		}
 		return authDTOS;
 	}
