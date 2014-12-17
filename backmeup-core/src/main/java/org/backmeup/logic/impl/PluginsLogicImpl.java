@@ -151,7 +151,17 @@ public class PluginsLogicImpl implements PluginsLogic {
             }
         }
 
-        return auth.authorize(authProps);
+        String accountIdentification = auth.authorize(authProps);
+
+        // After we call authorize, authProps may contain additional or changed values.
+        // Therefore, we have to update the properties in authData
+        authData.getProperties().clear();
+        for (final String key: authProps.stringPropertyNames()) {
+        	String value = authProps.getProperty(key);
+            authData.addProperty(key, value);
+        }
+        
+        return accountIdentification;
     }
     
     @Override
