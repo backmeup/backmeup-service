@@ -10,6 +10,8 @@
 	</parent>
 
 	<artifactId>backmeup-service-client</artifactId>
+	<packaging>jar</packaging>
+	<name>BackMeUp Service Client</name>
 
 	<dependencies>
 		<dependency>
