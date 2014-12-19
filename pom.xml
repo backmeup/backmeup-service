@@ -54,6 +54,7 @@
 		<version.javax.el>2.2</version.javax.el>
 		<version.javax.enterprise.cdi-api>1.1</version.javax.enterprise.cdi-api>
 		<version.javax.mail.com.springsource.javax.mail>1.4.1</version.javax.mail.com.springsource.javax.mail>
+		<version.javax.persistence.com.springsource.javax.persistence>2.0.0.Beta1</version.javax.persistence.com.springsource.javax.persistence>
 		<version.javax.servlet>3.0.1</version.javax.servlet>
 		<version.jersey>1.12</version.jersey>
 		<version.junit>4.11</version.junit>

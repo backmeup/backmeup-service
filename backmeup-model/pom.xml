@@ -75,10 +75,10 @@
 									<version>${version.com.google.code.gson}</version>
 									<type>${project.packaging}</type>
 								</artifactItem>
-								<artifactItem>
-									<groupId>org.hibernate.javax.persistence</groupId>
-									<artifactId>hibernate-jpa-2.0-api</artifactId>
-									<version>${version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api}</version>
+								<artifactItem> 
+									<groupId>javax.persistence</groupId> 
+									<artifactId>com.springsource.javax.persistence</artifactId> 
+									<version>${version.javax.persistence.com.springsource.javax.persistence}</version> 
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>
