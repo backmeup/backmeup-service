@@ -142,6 +142,8 @@ public class PluginsLogicImpl implements PluginsLogic {
         
         // TODO: avoid Properties
         Properties authProps = new Properties();
+        // set callbackUrl because some plugins need it again
+        authProps.put(OAuthBasedAuthorizable.PROP_CALLBACK_URL, callbackUrl);
         authProps.putAll(authData.getProperties());
 
         if (auth.getAuthType() == AuthorizationType.InputBased) {
