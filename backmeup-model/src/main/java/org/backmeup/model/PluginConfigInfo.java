@@ -1,6 +1,8 @@
 package org.backmeup.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.backmeup.model.api.RequiredInputField;
 
@@ -15,12 +17,14 @@ import org.backmeup.model.api.RequiredInputField;
  */
 public class PluginConfigInfo {
 	private String redirectURL;
+	private Map<String, String> oAuthProperties;
 	private List<RequiredInputField> requiredInputs;
 	private List<RequiredInputField> propertiesDescription;
 	private List<String> availableOptions;
 
 
 	public PluginConfigInfo() {
+	    this.oAuthProperties = new HashMap<>();
 	}
 	
 	public List<RequiredInputField> getRequiredInputs() {
@@ -63,4 +67,19 @@ public class PluginConfigInfo {
 	public boolean hasConfigData() {
 		return propertiesDescription != null || availableOptions != null;
 	}
+
+    public Map<String, String> getOAuthProperties() {
+        return oAuthProperties;
+    }
+
+    public void setOAuthProperties(Map<String, String> oAuthProperties) {
+        this.oAuthProperties = oAuthProperties;
+    }
+    
+    public void addOAuthProperty(String key, String value) {
+        if (this.oAuthProperties == null) {
+            this.oAuthProperties = new HashMap<>();
+        }
+        this.oAuthProperties.put(key, value);
+    }
 }

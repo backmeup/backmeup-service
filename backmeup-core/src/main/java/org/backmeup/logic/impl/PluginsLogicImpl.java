@@ -101,8 +101,13 @@ public class PluginsLogicImpl implements PluginsLogic {
     			OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
     			Properties props = new Properties();
     			String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
-    			// TODO: also somehow save altered props for later use in authorize method!
     			pluginConfigInfo.setRedirectURL(redirectUrl);
+    			// save oauth properties for later use in authorize method
+    			pluginConfigInfo.getOAuthProperties().clear();
+    	        for (final String key: props.stringPropertyNames()) {
+    	            String value = props.getProperty(key);
+    	            pluginConfigInfo.addOAuthProperty(key, value);
+    	        }
     			break;
     		case InputBased:
     			InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
