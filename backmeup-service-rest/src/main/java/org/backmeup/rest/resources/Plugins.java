@@ -296,7 +296,7 @@ public class Plugins extends Base {
 		@SuppressWarnings("unchecked")
         Map<String, String> oAuthProps = (Map<String, String>) request.getSession().getAttribute("oauth_props_"+pluginId);
 		if (oAuthProps != null) {
-		    authData.getProperties().putAll(oAuthProps);
+		    authDataModel.getProperties().putAll(oAuthProps);
 		}
 		// clear session from oauth redirect properties
 		for (Enumeration<String> e = request.getSession().getAttributeNames(); e.hasMoreElements();) {
