@@ -47,7 +47,7 @@ public class AuthData {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@MapKeyColumn(name = "authdata_key")
-	@Column(name = "authdata_value")
+	@Column(name = "authdata_value", columnDefinition="text")
 	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
 	private Map<String, String> properties;
 
