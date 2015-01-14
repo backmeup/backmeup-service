@@ -36,9 +36,7 @@ public class TestDataManager {
 
         AuthDataDTO authData = new AuthDataDTO();
         authData.setName(authName);
-        //		authData.addProperty("connectionString", "1");
-        authData.addProperty("connectionString",
-                "backmeup-storage;http://localhost:8080/backmeup-storage-service/;Token=1");
+        authData.addProperty("connectionString", "backmeup-storage;http://localhost:8080/backmeup-storage-service/;Token=1");
 
         return authData;
     }
@@ -123,13 +121,11 @@ public class TestDataManager {
         String pluginId = "org.backmeup.dummy";
         String profileName = "DummySourceProfile";
         PluginType profileType = PluginType.Source;
-        AuthDataDTO authData = getAuthDataBackmeupDummyStorage();
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
         pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
-        pluginProfile.setAuthData(authData);
 
         return pluginProfile;
     }
@@ -138,26 +134,14 @@ public class TestDataManager {
         String pluginId = "org.backmeup.dummy";
         String profileName = "DummySinkProfile";
         PluginType profileType = PluginType.Sink;
-        AuthDataDTO authData = getAuthDataBackmeupDummyStorage();
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
         pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
-        pluginProfile.setAuthData(authData);
 
         return pluginProfile;
 
-    }
-
-    public static AuthDataDTO getAuthDataBackmeupDummyStorage() {
-        String authName = "BackmeupDummyStorage";
-
-        AuthDataDTO authData = new AuthDataDTO();
-        authData.setName(authName);
-        //      authData.addProperty("connectionString", "1");
-
-        return authData;
     }
 
     public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId) {
