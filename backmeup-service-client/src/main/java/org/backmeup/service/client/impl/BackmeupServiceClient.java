@@ -24,17 +24,18 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
-import org.backmeup.service.client.BackmeupServiceFacade;
+import org.backmeup.service.client.BackmeupService;
+import org.backmeup.service.client.model.auth.AuthInfo;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BackmeupServiceClient implements BackmeupServiceFacade {
-	private static final int DEFAULT_PORT = 80;
-
+public final class BackmeupServiceClient implements BackmeupService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BackmeupServiceClient.class);
+	
+	private static final int DEFAULT_PORT = 80;
 
 	private final String scheme;
 
@@ -42,7 +43,7 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 
 	private final String basePath;
 	
-	private final String accessToken;
+	private String accessToken;
 	
 	// Constructors -----------------------------------------------------------
 		
@@ -53,10 +54,49 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 		this.accessToken = accessToken;
 	}
 	
+	public BackmeupServiceClient(String scheme, String host, String basePath) {
+		this.scheme = scheme;
+		this.host = host;
+		this.basePath = basePath;
+	}
+	
+	// Properties -------------------------------------------------------------
+	
+	public String getAccessToken() {
+		return accessToken;
+	}
+	
+	public Boolean isAuthenticated() {
+		return !accessToken.isEmpty();
+	}
+	
 	// Public methods ---------------------------------------------------------
+	
+	@Override
+	public AuthInfo authenticate(String username, String password) {
+		Map<String, String> params = new HashMap<>();
+		params.put("username", username);
+		params.put("password", password);
+		
+		Result r = execute("/authenticate", ReqType.GET, params, null, null);
+		if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+			throw new BackMeUpException("Failed to authenticate user: " + r.content);
+		}
+				
+		try {
+			ObjectMapper mapper = createJsonMapper();
+			AuthInfo authInfo = mapper.readValue(r.content, AuthInfo.class);
+			accessToken = authInfo.getAccessToken();
+			return authInfo;
+		}  catch (IOException e) {
+			LOGGER.error("", e);
+			throw new BackMeUpException("Bad JSON in auth info: " + e);
+		}
+	}
 
 	@Override
 	public BackupJobDTO getBackupJob(Long jobId) {
+		ensureAuthenticated();
 		
 		Map<String, String> params = new HashMap<>();
 		params.put("expandUser", "true");
@@ -81,6 +121,8 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 
 	@Override
 	public BackupJobDTO updateBackupJob(BackupJobDTO backupJob) {	
+		ensureAuthenticated();
+		
 		try {
 			ObjectMapper mapper = createJsonMapper();
 			String json = mapper.writeValueAsString(backupJob);
@@ -100,15 +142,21 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 	}
 	
 	// Private methods --------------------------------------------------------
+	
+    private void ensureAuthenticated() {
+        if (accessToken.isEmpty()) {
+            throw new IllegalStateException(
+                    "Client is not authenticated, set access token or call authenticate");
+        }
+    }
 
 	private HttpClient createClient() {
 		return HttpClientBuilder.create().build();
 	}
 	
-	private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams, String authToken) {
-		HttpClient client = createClient();
-
+	private URI createRequestURI(String path, Map<String, String> queryParams) {
 		int rPort = DEFAULT_PORT;
+		
 		String rPath = basePath + path;
 		String rHost = host;
 		if (host.contains(":")) {
@@ -120,24 +168,35 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 				LOGGER.error("", ex);
 			}
 		}
+		
+		URIBuilder uriBuilder = new URIBuilder();
+		uriBuilder.setScheme(scheme).setHost(rHost).setPort(rPort).setPath(rPath);
+		
+		if(queryParams != null && !queryParams.isEmpty()) {
+			for(Entry<String, String> param : queryParams.entrySet()) {
+				uriBuilder.addParameter(param.getKey(), param.getValue());
+			}
+		}
+		
+		try {
+			return uriBuilder.build();
+		} catch (URISyntaxException e) {
+			LOGGER.error("", e);
+			throw new BackMeUpException(e);
+		}
+	}
+	
+	private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams, String authToken) {
+		HttpClient client = createClient();
 
 		try {
-			URIBuilder uriBuilder = new URIBuilder();
-			uriBuilder.setScheme(scheme).setHost(rHost).setPort(rPort).setPath(rPath);
-			
-			if(queryParams != null) {
-				for(Entry<String, String> param : queryParams.entrySet()) {
-					uriBuilder.addParameter(param.getKey(), param.getValue());
-				}
-			}
-			
-			URI registerUri = uriBuilder.build();
+			URI registerUri = createRequestURI(path, queryParams);
 			HttpUriRequest request;
 
 			switch (type) {
 			case PUT:
 				HttpPut put = new HttpPut(registerUri);
-				if (jsonParams != null) {
+				if (jsonParams != null && !jsonParams.isEmpty()) {
 					StringEntity entity = new StringEntity(jsonParams, StandardCharsets.UTF_8);					
 					put.setEntity(entity);
 
@@ -154,7 +213,7 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 				break;
 			default:
 				HttpPost post = new HttpPost(registerUri);
-				if (jsonParams != null) {
+				if (jsonParams != null && !jsonParams.isEmpty()) {
 					StringEntity entity = new StringEntity(jsonParams, "UTF-8");					
 					post.setEntity(entity);
 
@@ -165,7 +224,7 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 				break;
 			}
 
-			if(!authToken.isEmpty()) {
+			if(authToken != null && !authToken.isEmpty()) {
 				request.setHeader("Authorization", authToken);
 			}
 			
@@ -180,8 +239,6 @@ public class BackmeupServiceClient implements BackmeupServiceFacade {
 				}
 			}
 			return r;
-		} catch (URISyntaxException e) {
-			throw new BackMeUpException(e);
 		} catch (ClientProtocolException e) {
 			throw new BackMeUpException(e);
 		} catch (IOException e) {
