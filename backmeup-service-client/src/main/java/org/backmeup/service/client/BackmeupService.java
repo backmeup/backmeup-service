@@ -4,9 +4,9 @@ import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.service.client.model.auth.AuthInfo;
 
 public interface BackmeupService {
-	AuthInfo authenticate(String username, String password);
+    AuthInfo authenticate(String username, String password);
 
-	BackupJobDTO getBackupJob(Long jobId);
+    BackupJobDTO getBackupJob(Long jobId);
 
-	BackupJobDTO updateBackupJob(BackupJobDTO backupJob);
+    BackupJobDTO updateBackupJob(BackupJobDTO backupJob);
 }
