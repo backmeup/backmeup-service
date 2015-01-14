@@ -51,7 +51,7 @@ public class SearchTest {
 
     @Test
     public void shouldGetSearchResultForUserAndQuery() throws IOException {
-        HttpGet method = new HttpGet(HOST + PORT + "/search/" + USER + "?query=find_me");
+        HttpGet method = new HttpGet(HOST + PORT + "/search/" + "?query=find_me");
 
         HttpResponse response = client.execute(method);
 
