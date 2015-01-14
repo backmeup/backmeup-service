@@ -59,6 +59,19 @@ public final class BackmeupServiceClient implements BackmeupService {
         this.host = host;
         this.basePath = basePath;
     }
+    
+    public BackmeupServiceClient(String path) {
+        try {
+            URIBuilder uriBuilder = new URIBuilder(path);
+            URI uri = uriBuilder.build();
+            
+            this.scheme = uri.getScheme();
+            this.host = uri.getHost();
+            this.basePath = uri.getPath();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Path is not valid: " + path);
+        }
+    }
 
     // Properties -------------------------------------------------------------
 
