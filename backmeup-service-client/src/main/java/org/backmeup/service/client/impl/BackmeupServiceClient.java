@@ -66,7 +66,11 @@ public final class BackmeupServiceClient implements BackmeupService {
             URI uri = uriBuilder.build();
             
             this.scheme = uri.getScheme();
-            this.host = uri.getHost();
+            if(uri.getPort() == -1) {
+                this.host = uri.getHost(); 
+            }else {
+                this.host = uri.getHost() + ":" + uri.getPort();
+            }
             this.basePath = uri.getPath();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Path is not valid: " + path);
