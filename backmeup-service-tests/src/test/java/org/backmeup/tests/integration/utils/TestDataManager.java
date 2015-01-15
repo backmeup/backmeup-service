@@ -36,7 +36,8 @@ public class TestDataManager {
 
         AuthDataDTO authData = new AuthDataDTO();
         authData.setName(authName);
-        authData.addProperty("connectionString", "backmeup-storage;http://localhost:8080/backmeup-storage-service/;Token=1");
+        authData.addProperty("username", getUser().getUsername());
+        authData.addProperty("password", getUser().getPassword());
 
         return authData;
     }
