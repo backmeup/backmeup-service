@@ -38,6 +38,10 @@
 	<mapping>
 		<class-a>org.backmeup.model.PluginConfigInfo</class-a>
 		<class-b>org.backmeup.model.dto.PluginConfigurationDTO</class-b>
+		<field>
+  			<a>oAuthProperties</a>
+  			<b>properties</b>
+  		</field>
 	</mapping>
 	
 	<mapping>
