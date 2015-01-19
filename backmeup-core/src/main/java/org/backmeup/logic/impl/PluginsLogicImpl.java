@@ -32,10 +32,7 @@ import org.backmeup.plugin.spi.OAuthBasedAuthorizable;
 
 @ApplicationScoped
 public class PluginsLogicImpl implements PluginsLogic {
-
-    private static final String UNKNOWN_SOURCE_SINK = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_SOURCE_SINK";
     private static final String VALIDATION_OF_ACCESS_DATA_FAILED = "org.backmeup.logic.impl.BusinessLogicImpl.VALIDATION_OF_ACCESS_DATA_FAILED";
-//    private static final String UNKNOWN_ACTION = "org.backmeup.logic.impl.BusinessLogicImpl.UNKNOWN_ACTION";
 
     @Inject
     @Configuration(key="backmeup.callbackUrl")
@@ -46,20 +43,20 @@ public class PluginsLogicImpl implements PluginsLogic {
     private Plugin plugins;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("PluginsLogicImpl");
-    
+
     // lifecycle methods ------------------------------------------------------
 
     @PreDestroy
     public void shutdown() {
         plugins.shutdown();
     }
-    
+
     // PluginsLogic methods ---------------------------------------------------
-    
-	@Override
-	public boolean isPluginAvailable(String pluginId) {
-		return plugins.isPluginAvailable(pluginId);
-	}
+
+    @Override
+    public boolean isPluginAvailable(String pluginId) {
+        return plugins.isPluginAvailable(pluginId);
+    }
 
     @Override
     public List<PluginDescribable> getActions() {
@@ -85,67 +82,67 @@ public class PluginsLogicImpl implements PluginsLogic {
     public Validationable getValidator(String description) {
         return plugins.getValidator(description);
     }
-    
+
     @Override
     public PluginConfigInfo getPluginConfigInfo (String pluginId) {
-    	PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
-    	
-    	if(plugins.hasAuthorizable(pluginId)) {
-    		Authorizable auth = plugins.getAuthorizable(pluginId); 
-    		// Note that in the call above a java.lang.reflect.Proxy object is returned
-    		// We have to make a second call to get a proxy with the correct interface
-    		auth = plugins.getAuthorizable(pluginId, auth.getAuthType()); 
+        PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
 
-    		switch (auth.getAuthType()) {
-    		case OAuth:
-    			OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
-    			Properties props = new Properties();
-    			String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
-    			pluginConfigInfo.setRedirectURL(redirectUrl);
-    			// save oauth properties for later use in authorize method
-    			pluginConfigInfo.getOAuthProperties().clear();
-    	        for (final String key: props.stringPropertyNames()) {
-    	            String value = props.getProperty(key);
-    	            pluginConfigInfo.addOAuthProperty(key, value);
-    	        }
-    			break;
-    		case InputBased:
-    			InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
-    			pluginConfigInfo.setRequiredInputs(ibased.getRequiredInputFields());
-    			break;
-    		default:
-    			throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
-    		}
-    	}
-    	
-    	if(plugins.hasValidator(pluginId)) {
-    		Validationable validator = plugins.getValidator(pluginId);
-    		if(validator.hasRequiredProperties()) {
-    			pluginConfigInfo.setPropertiesDescription(validator.getRequiredProperties());
-    		}
-    		
-    		if(validator.hasAvailableOptions()) {
-    			pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions());
-    		}
-    	}
-        
+        if(plugins.hasAuthorizable(pluginId)) {
+            Authorizable auth = plugins.getAuthorizable(pluginId); 
+            // Note that in the call above a java.lang.reflect.Proxy object is returned
+            // We have to make a second call to get a proxy with the correct interface
+            auth = plugins.getAuthorizable(pluginId, auth.getAuthType()); 
+
+            switch (auth.getAuthType()) {
+            case OAuth:
+                OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
+                Properties props = new Properties();
+                String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
+                pluginConfigInfo.setRedirectURL(redirectUrl);
+                // save oauth properties for later use in authorize method
+                pluginConfigInfo.getOAuthProperties().clear();
+                for (final String key: props.stringPropertyNames()) {
+                    String value = props.getProperty(key);
+                    pluginConfigInfo.addOAuthProperty(key, value);
+                }
+                break;
+            case InputBased:
+                InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
+                pluginConfigInfo.setRequiredInputs(ibased.getRequiredInputFields());
+                break;
+            default:
+                throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
+            }
+        }
+
+        if(plugins.hasValidator(pluginId)) {
+            Validationable validator = plugins.getValidator(pluginId);
+            if(validator.hasRequiredProperties()) {
+                pluginConfigInfo.setPropertiesDescription(validator.getRequiredProperties());
+            }
+
+            if(validator.hasAvailableOptions()) {
+                pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions());
+            }
+        }
+
         return pluginConfigInfo;
     }
-    
+
     @Override
     public boolean requiresAuthorization(String pluginId) {
-    	return plugins.hasAuthorizable(pluginId);
+        return plugins.hasAuthorizable(pluginId);
     }
-    
+
     @Override
     public String authorizePlugin(AuthData authData) {
-    	if(!plugins.hasAuthorizable(authData.getPluginId())) {
-    		throw new PluginException(authData.getPluginId(), "Plugin doesn't provide an Authorizable");
-    	}
-    	
+        if(!plugins.hasAuthorizable(authData.getPluginId())) {
+            throw new PluginException(authData.getPluginId(), "Plugin doesn't provide an Authorizable");
+        }
+
         Authorizable auth = plugins.getAuthorizable(authData.getPluginId());
         auth = plugins.getAuthorizable(authData.getPluginId(), auth.getAuthType()); 
-        
+
         // TODO: avoid Properties
         Properties authProps = new Properties();
         authProps.putAll(authData.getProperties());
@@ -163,90 +160,90 @@ public class PluginsLogicImpl implements PluginsLogic {
         // Therefore, we have to update the properties in authData
         authData.getProperties().clear();
         for (final String key: authProps.stringPropertyNames()) {
-        	String value = authProps.getProperty(key);
+            String value = authProps.getProperty(key);
             authData.addProperty(key, value);
         }
-        
+
         return accountIdentification;
     }
-    
+
     @Override
     public boolean requiresValidation(String pluginId) {
-    	return plugins.hasValidator(pluginId);
+        return plugins.hasValidator(pluginId);
     }
-    
+
     @Override
     public ValidationNotes validatePlugin(String pluginId, java.util.Map<String,String> properties, java.util.List<String> options) {
-		if(!plugins.hasValidator(pluginId)) {
-    		throw new PluginException(pluginId, "Plugin doesn't provide a Validator");
-    	}
-		
-		Validationable validator = plugins.getValidator(pluginId);
-		ValidationNotes notes = new ValidationNotes();
-		
-		if(validator.hasRequiredProperties()){
-			notes.addAll(validator.validateProperties(properties));
-		}
-		
-		if(validator.hasAvailableOptions()) {
-			notes.addAll(validator.validateOptions(options));
-		}
-		
-		if(!notes.getValidationEntries().isEmpty()) {
-			throw new ValidationException(ValidationExceptionType.ConfigException, "Validation of config data failed");
-		}
-		
-		return notes;
+        if(!plugins.hasValidator(pluginId)) {
+            throw new PluginException(pluginId, "Plugin doesn't provide a Validator");
+        }
+
+        Validationable validator = plugins.getValidator(pluginId);
+        ValidationNotes notes = new ValidationNotes();
+
+        if(validator.hasRequiredProperties()){
+            notes.addAll(validator.validateProperties(properties));
+        }
+
+        if(validator.hasAvailableOptions()) {
+            notes.addAll(validator.validateOptions(options));
+        }
+
+        if(!notes.getValidationEntries().isEmpty()) {
+            throw new ValidationException(ValidationExceptionType.ConfigException, "Validation of config data failed");
+        }
+
+        return notes;
     }
-    
+
     // Deprecated methods -----------------------------------------------------
-    
+
     @Deprecated
     @Override
     public List<Profile> getActionProfilesFor(BackupJob request) {
         List<Profile> actions = new ArrayList<>();
 
         for (Profile action : request.getActionProfiles()) {
-//            PluginDescribable ad = plugins.getPluginDescribableById(action.getActionId());
-//
-//            if (ad == null) {
-//                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
-//            }
+            //            PluginDescribable ad = plugins.getPluginDescribableById(action.getActionId());
+            //
+            //            if (ad == null) {
+            //                throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_ACTION), action.getId()));
+            //            }
 
-//            Profile ap = new Profile(ad.getId(), ad.getPriority());
-//            for (Entry<String, String> entry : action.getProperties().entrySet()) {
-//                ap.addProperty(entry.getKey(), entry.getValue());
-//            }
-//            actions.add(ap);
-        	
-        	//TODO: Verify why code above is necessary 
-        	actions.add(action);
+            //            Profile ap = new Profile(ad.getId(), ad.getPriority());
+            //            for (Entry<String, String> entry : action.getProperties().entrySet()) {
+            //                ap.addProperty(entry.getKey(), entry.getValue());
+            //            }
+            //            actions.add(ap);
+
+            //TODO: Verify why code above is necessary 
+            actions.add(action);
         }
 
-//        Collections.sort(actions);
+        //        Collections.sort(actions);
         return actions;
     }
-    
-	@Deprecated
+
+    @Deprecated
     @Override
     public List<String> getActionOptions(String actionId) {
-//        PluginDescribable action = plugins.getPluginDescribableById(actionId);
-//        return action.getAvailableOptions();
+        //        PluginDescribable action = plugins.getPluginDescribableById(actionId);
+        //        return action.getAvailableOptions();
         return new ArrayList<>();
     }
-	
-	@Deprecated
+
+    @Deprecated
     @Override
     public Datasource getDatasource(String profileDescription) {
         return plugins.getDatasource(profileDescription);
     }
-	
-	@Deprecated
+
+    @Deprecated
     @Override
     public PluginDescribable getExistingSourceSink(String sourceSinkId) {
         PluginDescribable ssd = getPluginDescribableById(sourceSinkId);
         if (ssd == null) {
-            throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_SOURCE_SINK), sourceSinkId));
+//            throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_SOURCE_SINK), sourceSinkId));
         }
         return ssd;
     }
@@ -263,33 +260,33 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Deprecated
     @Override
     public AuthRequest configureAuth(Properties props, String uniqueDescIdentifier) {
-    	props.setProperty("callback", callbackUrl);
+        props.setProperty("callback", callbackUrl);
 
-    	AuthRequest ar = new AuthRequest();
+        AuthRequest ar = new AuthRequest();
 
-    	Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier); 
-    	// Note that in the call above a java.lang.reflect.Proxy object is returned
-    	// We have to make a second call to get a proxy with the correct interface
-    	auth = plugins.getAuthorizable(uniqueDescIdentifier, auth.getAuthType()); 
+        Authorizable auth = plugins.getAuthorizable(uniqueDescIdentifier); 
+        // Note that in the call above a java.lang.reflect.Proxy object is returned
+        // We have to make a second call to get a proxy with the correct interface
+        auth = plugins.getAuthorizable(uniqueDescIdentifier, auth.getAuthType()); 
 
         switch (auth.getAuthType()) {
         case OAuth:
-        	OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
+            OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
             String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
             ar.setRedirectURL(redirectUrl);
             // TODO Store all properties within keyserver & don't store them within the local database!
             break;
         case InputBased:
-        	InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
+            InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
             ar.setRequiredInputs(ibased.getRequiredInputFields());
             break;
         default:
             throw new IllegalArgumentException("unknown enum value " + auth.getAuthType());
         }
-        
+
         return ar;
     }
-    
+
     @Deprecated
     @Override
     public String getAuthorizedUserId(String sourceSinkId, Properties props) {
