@@ -1,7 +1,6 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -57,9 +55,10 @@ public class Plugins extends Base {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<PluginDTO> listPlugins(@Context HttpServletRequest request, 
+	public List<PluginDTO> listPlugins( 
 			@QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType,
 			@QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+	    
 		Set<String> pluginIds = new HashSet<>();
 
 		if ((pluginType == PluginSelectionType.Source) || (pluginType == PluginSelectionType.All)) {
@@ -78,7 +77,7 @@ public class Plugins extends Base {
 		
 		List<PluginDTO> pluginList= new ArrayList<>();
 		for(String pluginId : pluginIds) {
-			pluginList.add(getPlugin(request, pluginId, false));
+			pluginList.add(getPlugin(pluginId, false));
 		}
 
 		return pluginList;
@@ -88,7 +87,10 @@ public class Plugins extends Base {
 	@GET
 	@Path("/{pluginId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public PluginDTO getPlugin(@Context HttpServletRequest request, @PathParam("pluginId") String pluginId, @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+	public PluginDTO getPlugin(
+	        @PathParam("pluginId") String pluginId,
+	        @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+	    
 		PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
 		PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
 		
@@ -124,7 +126,6 @@ public class Plugins extends Base {
 			PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
 			if ((pluginConfigInfo.getRedirectURL() != null) && (pluginConfigInfo.getRedirectURL() != "")) {
 				pluginConfigDTO.setConfigType(PluginConfigurationType.oauth);
-				request.getSession().setAttribute("oauth_props_"+pluginId, pluginConfigInfo.getOAuthProperties());
 			} else {
 				pluginConfigDTO.setConfigType(PluginConfigurationType.input);
 			}
@@ -159,9 +160,6 @@ public class Plugins extends Base {
         profile.setUser(activeUser);
         
         if(pluginProfile.getAuthData() != null) {
-//        	AuthData authData = new AuthData();
-//          authData.setId(pluginProfile.getAuthData().getId());
-//          authData.setPluginId(pluginId);
         	AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
             profile.setAuthData(authData);
         }
@@ -282,7 +280,7 @@ public class Plugins extends Base {
 	@POST
 	@Path("/{pluginId}/authdata")
 	@Produces(MediaType.APPLICATION_JSON)
-	public AuthDataDTO addAuthData(@Context HttpServletRequest request, @PathParam("pluginId") String pluginId, AuthDataDTO authData) {
+	public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
 		throwIfPluginNotAvailable(pluginId);
@@ -291,20 +289,6 @@ public class Plugins extends Base {
 		AuthData authDataModel = getMapper().map(authData, AuthData.class);
 		authDataModel.setUser(activeUser);
 		authDataModel.setPluginId(pluginId);
-		
-		// retrieve oauth properties from session
-		@SuppressWarnings("unchecked")
-        Map<String, String> oAuthProps = (Map<String, String>) request.getSession().getAttribute("oauth_props_"+pluginId);
-		if (oAuthProps != null) {
-		    authDataModel.getProperties().putAll(oAuthProps);
-		}
-		// clear session from oauth redirect properties
-		for (Enumeration<String> e = request.getSession().getAttributeNames(); e.hasMoreElements();) {
-		    String key = e.nextElement();
-		    if (key.startsWith("oauth_props_")) {
-		        request.getSession().removeAttribute(key);
-		    }
-		}
 		
 		authDataModel = getLogic().addPluginAuthData(authDataModel);
 		
