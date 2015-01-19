@@ -29,4 +29,10 @@ public class Metadata {
      * Declares if a storage location is 'always on' i.e. the data accessible on demand. boolean flag True or False
      */
     public final static String STORAGE_ALWAYS_ACCESSIBLE = "META_STORAGE_ALWAYS_ACCESSIBLE";
+    
+    /**
+     * Host and common base path for datasinks that support on demand accessible data.
+     */
+    public final static String DOWNLOAD_BASE = "META_DOWNLOAD_BASE";
+    
 }
