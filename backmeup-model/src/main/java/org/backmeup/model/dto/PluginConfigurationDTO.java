@@ -9,47 +9,47 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class PluginConfigurationDTO {
-	public enum PluginConfigurationType {
-		input, oauth
-	}
-	
-	private PluginConfigurationType configType;
-	private String redirectURL;
-	private List<PluginInputFieldDTO> requiredInputs;
-	private Map<String, String> properties;
-	
-	public PluginConfigurationDTO() {
-		
-	}
-	
-	public PluginConfigurationDTO( PluginConfigurationType type) {
-		this.configType = type;
-	}
+    public enum PluginConfigurationType {
+        input, oauth
+    }
 
-	public PluginConfigurationType getConfigType() {
-		return configType;
-	}
+    private PluginConfigurationType configType;
+    private String redirectURL;
+    private List<PluginInputFieldDTO> requiredInputs;
+    private Map<String, String> properties;
 
-	public void setConfigType(PluginConfigurationType configType) {
-		this.configType = configType;
-	}
+    public PluginConfigurationDTO() {
 
-	public String getRedirectURL() {
-		return redirectURL;
-	}
+    }
 
-	public void setRedirectURL(String redirectURL) {
-		this.redirectURL = redirectURL;
-	}
+    public PluginConfigurationDTO( PluginConfigurationType type) {
+        this.configType = type;
+    }
 
-	public Map<String, String> getProperties() {
+    public PluginConfigurationType getConfigType() {
+        return configType;
+    }
+
+    public void setConfigType(PluginConfigurationType configType) {
+        this.configType = configType;
+    }
+
+    public String getRedirectURL() {
+        return redirectURL;
+    }
+
+    public void setRedirectURL(String redirectURL) {
+        this.redirectURL = redirectURL;
+    }
+
+    public Map<String, String> getProperties() {
         return properties;
     }
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
-    
+
     public void addProperty(String key, String value) {
         if (this.properties == null) {
             this.properties = new HashMap<>();
@@ -58,17 +58,17 @@ public class PluginConfigurationDTO {
     }
 
     public List<PluginInputFieldDTO> getRequiredInputs() {
-		return requiredInputs;
-	}
+        return requiredInputs;
+    }
 
-	public void setRequiredInputs(List<PluginInputFieldDTO> requiredInputs) {
-		this.requiredInputs = requiredInputs;
-	}	
-	
-	public void addRequiredInput(PluginInputFieldDTO requiredInput) {
-		if(requiredInputs == null) {
-			requiredInputs = new ArrayList<>();
-		}
-		this.requiredInputs.add(requiredInput);
-	}
+    public void setRequiredInputs(List<PluginInputFieldDTO> requiredInputs) {
+        this.requiredInputs = requiredInputs;
+    }	
+
+    public void addRequiredInput(PluginInputFieldDTO requiredInput) {
+        if(requiredInputs == null) {
+            requiredInputs = new ArrayList<>();
+        }
+        this.requiredInputs.add(requiredInput);
+    }
 }
