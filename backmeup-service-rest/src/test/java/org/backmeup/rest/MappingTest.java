@@ -250,7 +250,7 @@ public class MappingTest {
         pluginDTO.setAuthDataDescription(pluginConfigDTO);
 
         assertEquals(pluginConfigInfo.getRedirectURL(), pluginDTO.getAuthDataDescription().getRedirectURL());
-        assertEquals(oAuthPropValue, pluginConfigInfo.getOAuthProperties().get(oAuthPropKey).toString());
+        assertEquals(oAuthPropValue, pluginConfigDTO.getProperties().get(oAuthPropKey).toString());
 
         PluginInputFieldDTO authInputDTO = pluginDTO.getAuthDataDescription().getRequiredInputs().get(0);
         assertEquals(authInputModel.getLabel(), authInputDTO.getLabel());
