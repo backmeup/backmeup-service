@@ -1,7 +1,9 @@
 package org.backmeup.model.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -14,6 +16,7 @@ public class PluginConfigurationDTO {
 	private PluginConfigurationType configType;
 	private String redirectURL;
 	private List<PluginInputFieldDTO> requiredInputs;
+	private Map<String, String> properties;
 	
 	public PluginConfigurationDTO() {
 		
@@ -39,7 +42,22 @@ public class PluginConfigurationDTO {
 		this.redirectURL = redirectURL;
 	}
 
-	public List<PluginInputFieldDTO> getRequiredInputs() {
+	public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+    
+    public void addProperty(String key, String value) {
+        if (this.properties == null) {
+            this.properties = new HashMap<>();
+        }
+        this.properties.put(key, value);
+    }
+
+    public List<PluginInputFieldDTO> getRequiredInputs() {
 		return requiredInputs;
 	}
 
