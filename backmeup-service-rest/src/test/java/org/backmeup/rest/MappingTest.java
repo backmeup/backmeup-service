@@ -212,6 +212,8 @@ public class MappingTest {
 		String authInputDefaultValue = "";
 		
 		String authRedirectUrl = "http://redirecturl";
+		String oAuthPropKey = "token";
+		String oAuthPropValue = "abc123!§$";
 		
 		String propInputName = "activateOption";
 		String propInputLabel = "Activate Option";
@@ -222,8 +224,7 @@ public class MappingTest {
 		String proptInputDefaultValue = "true";
 		
 		String option1 = "-Option1";
-				
-		
+
 		RequiredInputField authInputModel = new RequiredInputField(authInputName, authInputLabel, authInputDesc, authInputRequired, authInputOrder, authInputType, authInputDefaultValue);
 		List<RequiredInputField> authInputFields = new ArrayList<>();
 		authInputFields.add(authInputModel);
@@ -237,6 +238,7 @@ public class MappingTest {
 		
 		PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
 		pluginConfigInfo.setRedirectURL(authRedirectUrl);
+		pluginConfigInfo.addOAuthProperty(oAuthPropKey, oAuthPropValue);
 		pluginConfigInfo.setRequiredInputs(authInputFields);
 		pluginConfigInfo.setPropertiesDescription(propInputFields);
 		pluginConfigInfo.setAvailableOptions(availOption);
@@ -248,6 +250,7 @@ public class MappingTest {
 		pluginDTO.setAuthDataDescription(pluginConfigDTO);
 		
 		assertEquals(pluginConfigInfo.getRedirectURL(), pluginDTO.getAuthDataDescription().getRedirectURL());
+		assertEquals(oAuthPropValue, pluginConfigInfo.getOAuthProperties().get(oAuthPropKey).toString());
 		
 		PluginInputFieldDTO authInputDTO = pluginDTO.getAuthDataDescription().getRequiredInputs().get(0);
 		assertEquals(authInputModel.getLabel(), authInputDTO.getLabel());
