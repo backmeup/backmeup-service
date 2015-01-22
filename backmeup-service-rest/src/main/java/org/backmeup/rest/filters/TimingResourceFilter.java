@@ -4,6 +4,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 import org.slf4j.Logger;
@@ -17,6 +19,9 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimingResourceFilter.class);
     private static final TimerThreadLocal TIMER = new TimerThreadLocal();
+    
+    @Context
+    ResourceInfo info;
 
     @Override
     public void filter(ContainerRequestContext request) {
@@ -27,7 +32,20 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         try {
             long reqProcessingTimeInMs = TIMER.stop();
-            LOGGER.info("Request processing time: " + reqProcessingTimeInMs + "ms");
+//            LOGGER.info("Request processing time: " + reqProcessingTimeInMs + "ms");
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append(request.getMethod());
+            sb.append(" ");
+            sb.append(info.getResourceClass().getName());
+            sb.append(" ");
+            sb.append(info.getResourceMethod().getName());
+            sb.append(" ");
+            sb.append(response.getStatus());
+            sb.append(" ");
+            sb.append(reqProcessingTimeInMs);
+            
+            LOGGER.info(sb.toString());
         } finally {
             TIMER.remove();
         }
