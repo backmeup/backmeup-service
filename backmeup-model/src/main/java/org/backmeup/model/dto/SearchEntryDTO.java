@@ -1,7 +1,7 @@
 package org.backmeup.model.dto;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,15 +12,15 @@ public class SearchEntryDTO {
     private Date timeStamp;
     private String title;
     private String type;
-    private String preview;
     private String thumbnailUrl;
     private String datasource;
+    //private String datasourceId;
     private String jobName;
-
-    private List<KeyValue> properties;
+    private String preview;
+    private Map<String, String> properties;
 
     public String getFileId() {
-        return fileId;
+        return this.fileId;
     }
 
     public void setFileId(String fileId) {
@@ -28,7 +28,7 @@ public class SearchEntryDTO {
     }
 
     public Date getTimeStamp() {
-        return timeStamp;
+        return this.timeStamp;
     }
 
     public void setTimeStamp(Date timeStamp) {
@@ -36,7 +36,7 @@ public class SearchEntryDTO {
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title) {
@@ -44,7 +44,7 @@ public class SearchEntryDTO {
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {
@@ -52,7 +52,7 @@ public class SearchEntryDTO {
     }
 
     public String getThumbnailUrl() {
-        return thumbnailUrl;
+        return this.thumbnailUrl;
     }
 
     public void setThumbnailUrl(String thumbnailUrl) {
@@ -60,23 +60,23 @@ public class SearchEntryDTO {
     }
 
     public String getDatasource() {
-        return datasource;
+        return this.datasource;
     }
 
     public void setDatasource(String datasource) {
         this.datasource = datasource;
     }
 
-    public List<KeyValue> getProperties() {
-        return properties;
+    public Map<String, String> getProperties() {
+        return this.properties;
     }
 
-    public void setProperties(List<KeyValue> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 
     public String getPreview() {
-        return preview;
+        return this.preview;
     }
 
     public void setPreview(String preview) {
@@ -84,14 +84,14 @@ public class SearchEntryDTO {
     }
 
     public String getJobName() {
-        return jobName;
+        return this.jobName;
     }
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
     }
 
-    public static class KeyValue {
+    /*public static class KeyValue {
 
         private String key;
         private String value;
@@ -102,7 +102,7 @@ public class SearchEntryDTO {
         }
 
         public String getKey() {
-            return key;
+            return this.key;
         }
 
         public void setKey(String key) {
@@ -110,12 +110,12 @@ public class SearchEntryDTO {
         }
 
         public String getValue() {
-            return value;
+            return this.value;
         }
 
         public void setValue(String value) {
             this.value = value;
         }
-    }
+    }*/
 
 }
