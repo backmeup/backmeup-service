@@ -75,6 +75,16 @@
 	</mapping>
 	
 	<mapping>
+		<class-a>org.backmeup.model.spi.PluginDescribable</class-a>
+		<class-b>org.backmeup.model.dto.PluginProfileDTO</class-b>
+
+		<field>
+  			<a get-method="getMetadata">metadata</a>
+  			<b>metadata</b>
+		</field>		
+	</mapping>
+	
+	<mapping>
 		<class-a>org.backmeup.model.AuthData</class-a>
 		<class-b>org.backmeup.model.dto.AuthDataDTO</class-b>
 		
