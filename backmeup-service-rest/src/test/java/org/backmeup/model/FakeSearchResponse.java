@@ -2,6 +2,7 @@ package org.backmeup.model;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.backmeup.index.model.CountedEntry;
 import org.backmeup.index.model.SearchEntry;
@@ -15,9 +16,8 @@ public class FakeSearchResponse {
         searchResponse.setByJob(Arrays.asList(new CountedEntry("first Job", 1), new CountedEntry("next Job", 1)));
         searchResponse.setBySource(Arrays.asList(new CountedEntry("Dropbox", 2), new CountedEntry("Facebook", 2)));
         searchResponse.setByType(Arrays.asList(new CountedEntry("Type", 3)));
-        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", new Date(), "type", "A wonderful file (title)", "thmbnailUrl",
-                "Dropbox", "first Job")));
+        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", new Date(), "type", "A wonderful file (title)",
+                "thmbnailUrl", "Dropbox", "first Job", "...lore ipsum...", new HashMap<String, String>())));
         return searchResponse;
     }
-
 }
