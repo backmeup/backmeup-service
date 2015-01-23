@@ -14,6 +14,10 @@ The following document contains a 'quickstart' guide for setting up the BackMeUp
  - RabbitMQ and Erlang [Tested under RabbitMQ 3.3.3 and Erlang R16B02]
  - Apache Webserver [Tested under v2.2.25]
  - JDK v1.7 [Tested under Oracle JDK 1.7 and openJDK]
+
+ optional
+ - Thumbnails-Plugin please make sure you've installed GraphicsMagick as external dependency
+
  
  For implicitly required software artefacts and version see the project's pom.xml files
 
