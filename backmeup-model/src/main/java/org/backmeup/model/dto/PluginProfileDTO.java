@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,108 +11,99 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @XmlRootElement
 public class PluginProfileDTO {
-    private long profileId;
-    private String title;
-    private String pluginId;
-    private PluginType profileType;
-    private long modified;
-    private AuthDataDTO authData;
-    // Init with HashMap is necessary as long as the props are 
-    // stored within the service db (jpa mapping). Otherwise, 
-    // dozer maps the persistentmap from the domain model
-    // which results in a lazyinitexception in dozer. 
-    private Map<String, String> properties = new HashMap<>();
-    private List<String> options;
-    private Properties metadata;
+	private long profileId;
+	private String title;
+	private String pluginId;
+	private PluginType profileType;
+	private long modified;
+	private AuthDataDTO authData;
+	// Init with HashMap is necessary as long as the props are 
+	// stored within the service db (jpa mapping). Otherwise, 
+	// dozer maps the persistentmap from the domain model
+	// which results in a lazyinitexception in dozer. 
+	private Map<String, String> properties = new HashMap<>();
+	private List<String> options;
+	
+	public PluginProfileDTO() {
+		
+	}
 
-    public Properties getMetadata() {
-        return this.metadata;
-    }
+	public long getProfileId() {
+		return profileId;
+	}
 
-    public void setMetadata(Properties metadata) {
-        this.metadata = metadata;
-    }
+	public void setProfileId(long profileId) {
+		this.profileId = profileId;
+	}
 
-    public PluginProfileDTO() {
+	public String getTitle() {
+		return title;
+	}
 
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public long getProfileId() {
-        return this.profileId;
-    }
+	public String getPluginId() {
+		return pluginId;
+	}
 
-    public void setProfileId(long profileId) {
-        this.profileId = profileId;
-    }
+	public void setPluginId(String pluginId) {
+		this.pluginId = pluginId;
+	}
 
-    public String getTitle() {
-        return this.title;
-    }
+	public PluginType getProfileType() {
+		return profileType;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setProfileType(PluginType profileType) {
+		this.profileType = profileType;
+	}
 
-    public String getPluginId() {
-        return this.pluginId;
-    }
+	public long getModified() {
+		return modified;
+	}
 
-    public void setPluginId(String pluginId) {
-        this.pluginId = pluginId;
-    }
+	public void setModified(long modified) {
+		this.modified = modified;
+	}
 
-    public PluginType getProfileType() {
-        return this.profileType;
-    }
+	public AuthDataDTO getAuthData() {
+		return authData;
+	}
 
-    public void setProfileType(PluginType profileType) {
-        this.profileType = profileType;
-    }
+	public void setAuthData(AuthDataDTO authData) {
+		this.authData = authData;
+	}
 
-    public long getModified() {
-        return this.modified;
-    }
+	public Map<String, String> getProperties() {
+		return properties;
+	}
 
-    public void setModified(long modified) {
-        this.modified = modified;
-    }
+	public void setProperties(Map<String, String> configProperties) {
+		this.properties = configProperties;
+	}
+	
+	public void addProperty(String key, String value) {
+		if(properties == null) {
+			properties = new HashMap<>();
+		}
+		properties.put(key, value);
+	}
 
-    public AuthDataDTO getAuthData() {
-        return this.authData;
-    }
+	public List<String> getOptions() {
+		return options;
+	}
 
-    public void setAuthData(AuthDataDTO authData) {
-        this.authData = authData;
-    }
-
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(Map<String, String> configProperties) {
-        this.properties = configProperties;
-    }
-
-    public void addProperty(String key, String value) {
-        if (this.properties == null) {
-            this.properties = new HashMap<>();
-        }
-        this.properties.put(key, value);
-    }
-
-    public List<String> getOptions() {
-        return this.options;
-    }
-
-    public void setOptions(List<String> options) {
-        this.options = options;
-    }
-
-    public void addOption(String option) {
-        if (this.options == null) {
-            this.options = new ArrayList<>();
-        }
-        this.options.add(option);
-    }
-
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
+	
+	public void addOption(String option) {
+		if(options == null) {
+			options = new ArrayList<>();
+		}
+		options.add(option);
+	}
+	
 }
