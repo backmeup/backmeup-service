@@ -2,7 +2,6 @@ package org.backmeup.logic.impl;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,7 +12,6 @@ import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.model.BackMeUpUser;
-import org.backmeup.model.KeyserverLog;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
@@ -73,16 +71,6 @@ public class AuthorizationImpl implements AuthorizationLogic {
         return fetchFirstAuthenticationData(profile, keyRing);
     }
 
-    @Deprecated
-    @Override
-    public void initProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
-        if (!keyserverClient.isServiceRegistered(profile.getId())) {
-            keyserverClient.addService(profile.getId());
-        }
-
-        keyserverClient.addAuthInfo(profile, keyRing, entries);
-    }
-
     @Override
     public void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
         if (!keyserverClient.isServiceRegistered(profile.getId())) {
@@ -94,15 +82,6 @@ public class AuthorizationImpl implements AuthorizationLogic {
         }
 
         keyserverClient.addAuthInfo(profile, keyRing, entries);
-    }
-
-    @Deprecated
-    @Override
-    public void appendProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
-        Properties props = getProfileAuthInformation(profile, keyRing);
-        props.putAll(entries);
-
-        overwriteProfileAuthInformation(profile, props, keyRing);
     }
 
     private Properties fetchFirstAuthenticationData(Profile profile, String password) {
@@ -128,12 +107,6 @@ public class AuthorizationImpl implements AuthorizationLogic {
         Token token = keyserverClient.getToken(profile, password, now, reusable, null);
 
         return keyserverClient.getData(token);
-    }
-
-    @Deprecated
-    @Override
-    public List<KeyserverLog> getLogs(BackMeUpUser user) {
-        return keyserverClient.getLogs(user);
     }
 
 }
