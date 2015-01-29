@@ -76,7 +76,6 @@ public abstract class BaseActionDescribable implements PluginDescribable {
 
 	@Override
 	public String getImageURL() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

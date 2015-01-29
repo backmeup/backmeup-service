@@ -1,13 +1,12 @@
 package org.backmeup.plugin.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class PluginUtils {
     public static class QueryParameters {
