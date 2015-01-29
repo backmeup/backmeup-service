@@ -2,13 +2,10 @@ package org.backmeup.logic;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
-import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
@@ -34,11 +31,4 @@ public interface BackupLogic {
 
     void deleteProtocolsOf(Long userId);
     
-    // Deprecated methods -----------------------------------------------------
-    @Deprecated BackupJob updateRequestFor(Long jobId);
-    @Deprecated Profile getJobActionOption(String actionId, Long jobId);
-    @Deprecated void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions);
-    @Deprecated List<StatusWithFiles> getStatus(Long userId, Long jobId);
-    
-
 }

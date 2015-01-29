@@ -1,6 +1,5 @@
 package org.backmeup.logic.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,14 +19,13 @@ import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.JobProtocol;
-import org.backmeup.model.Token;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.Status;
-import org.backmeup.model.StatusWithFiles;
+import org.backmeup.model.Token;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.JobProtocolDTO;
 
@@ -36,7 +34,6 @@ public class BackupLogicImpl implements BackupLogic {
 
     private static final String JOB_USER_MISSMATCH = "org.backmeup.logic.impl.BusinessLogicImpl.JOB_USER_MISSMATCH";
     private static final String NO_SUCH_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_SUCH_JOB";
-    private static final String NO_PROFILE_WITHIN_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_PROFILE_WITHIN_JOB";
     
     @Inject
     private DataAccessLayer dal;
@@ -240,81 +237,5 @@ public class BackupLogicImpl implements BackupLogic {
 
 		keyserverClient.addService(profile.getId());
 		keyserverClient.addAuthInfo(profile, password, props);
-    }
-    
-    // Deprecated methods -----------------------------------------------------
-    
-    @Deprecated
-    @Override
-    public Profile getJobActionOption(String actionId, Long jobId) {
-        BackupJob job = getExistingJob(jobId);
-        for (Profile action : job.getActionProfiles()) {
-            if (action.getId().equals(actionId)) {
-                return action;
-            }
-        }
-        throw new IllegalArgumentException(String.format(textBundle.getString(NO_PROFILE_WITHIN_JOB), jobId, actionId));
-    }
-
-    @Deprecated
-    @Override
-    public void updateJobActionOption(String actionId, Long jobId, Map<String, String> actionOptions) {
-        BackupJob job = getExistingJob(jobId);
-        for (Profile ap : job.getActionProfiles()) {
-            if (ap.getId().equals(actionId)) {
-                ap.getProperties().clear();
-                addActionProperties(ap, actionOptions);
-            }
-        }
-    }
-
-    @Deprecated
-    private void addActionProperties(Profile ap, Map<String, String> keyValues) {
-            ap.getProperties().putAll(keyValues);
-    }
-    
-    @Deprecated
-    @Override
-    public BackupJob updateRequestFor(Long jobId) {
-        return getExistingJob(jobId);
-    }
-
-    @Deprecated
-    @Override
-    public List<StatusWithFiles> getStatus(Long userId, Long jobId) {
-        BackupJobDao jobDao = getBackupJobDao();
-        
-        if (jobId == null) {
-            List<Status> status = new ArrayList<>();
-            BackupJob job = jobDao.findLastBackupJob(userId);
-            if (job != null) {
-                status.addAll(getStatusForJob(job));
-            }
-            // for (BackupJob job : jobs) {
-            //     status.add(getStatusForJob(job));
-            // }
-            return allowFiles(status);
-        }
-        
-        BackupJob job = getExistingUserJob(jobId, userId);
-        List<Status> status = new ArrayList<>();
-        status.addAll(getStatusForJob(job));
-        return allowFiles(status);
-    }
-
-    @Deprecated
-    private List<StatusWithFiles> allowFiles(List<Status> statuses) {
-        List<StatusWithFiles> list = new ArrayList<>();
-        for (Status status : statuses) {
-            list.add(new StatusWithFiles(status));
-        }
-        return list;
-    }
-
-    @Deprecated
-    private List<Status> getStatusForJob(final BackupJob job) {
-        StatusDao sd = dal.createStatusDao();
-        List<Status> status = sd.findLastByJob(job.getUser().getUsername(), job.getId());
-        return status;
     }
 }
