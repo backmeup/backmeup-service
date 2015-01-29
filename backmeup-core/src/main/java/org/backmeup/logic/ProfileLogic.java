@@ -1,12 +1,9 @@
 package org.backmeup.logic;
 
 import java.util.List;
-import java.util.Set;
 
 import org.backmeup.model.AuthData;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
-import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
  * Profile related business logic.
@@ -36,13 +33,4 @@ public interface ProfileLogic {
     
     void deleteAuthData(Long authDataId);
     
-    // Deprecated methods -----------------------------------------------------
-    @Deprecated Profile getExistingUserProfile(Long profileId, Long userId);
-    @Deprecated Profile deleteProfile(Long profileId, Long userId);
-    @Deprecated List<Profile> getDatasinkProfilesOf(Long userId);
-    @Deprecated Set<Profile> getSourceProfilesOptionsFor(List<Profile> sourceProfiles);
-    @Deprecated List<String> getProfileOptions(Long profileId, Profile sourceProfile);
-    @Deprecated void setProfileOptions(Long profileId, Profile sourceProfiles, List<String> sourceOptions);
-    @Deprecated Profile createNewProfile(BackMeUpUser user, String uniqueDescIdentifier, String profileName, PluginType type);
-    @Deprecated void setIdentification(Profile profile, String identification);
 }
