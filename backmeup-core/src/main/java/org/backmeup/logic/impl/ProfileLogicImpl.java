@@ -26,9 +26,9 @@ public class ProfileLogicImpl implements ProfileLogic {
     private ProfileDao getProfileDao() {
         return dal.createProfileDao();
     }
-    
+
     private AuthDataDao getAuthDataDao() {
-    	return dal.createAuthDataDao();
+        return dal.createAuthDataDao();
     }
 
     @Override
@@ -58,30 +58,30 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
         return profile;
     }
-    
+
     @Override
     public Profile save(Profile profile) {
-    	// TODO: Store (auth) data in keyserver
+        // TODO: Store (auth) data in keyserver
         // authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-    	
+
         return getProfileDao().save(profile);
     }
-    
+
     @Override
     public Profile updateProfile(Profile profile) {
-    	return getProfileDao().merge(profile);
+        return getProfileDao().merge(profile);
     }
 
-	@Override
-	public AuthData addAuthData(AuthData authData) {
+    @Override
+    public AuthData addAuthData(AuthData authData) {
         if (authData == null) {
             throw new IllegalArgumentException("AuthData must not be null");
         }
-		return getAuthDataDao().save(authData);
-	}
+        return getAuthDataDao().save(authData);
+    }
 
-	@Override
-	public AuthData getAuthData(Long authDataId) {
+    @Override
+    public AuthData getAuthData(Long authDataId) {
         if (authDataId == null) {
             throw new IllegalArgumentException("AuthDataId must not be null");
         }
@@ -90,19 +90,19 @@ public class ProfileLogicImpl implements ProfileLogic {
             throw new IllegalArgumentException("No auth data found with id: " + authDataId);
         }
         return authData;
-	}
-	
-	@Override
-	public List<AuthData> getAuthDataOf(Long userId) {
-		if (userId == null) {
+    }
+
+    @Override
+    public List<AuthData> getAuthDataOf(Long userId) {
+        if (userId == null) {
             throw new IllegalArgumentException("UserId must not be null");
         }
-		return getAuthDataDao().findAuthDataByUserId(userId);
-	}
+        return getAuthDataDao().findAuthDataByUserId(userId);
+    }
 
-	@Override
-	public void deleteAuthData(Long authDataId) {
-		AuthData authData = getAuthData(authDataId);
-		getAuthDataDao().delete(authData);
-	}
+    @Override
+    public void deleteAuthData(Long authDataId) {
+        AuthData authData = getAuthData(authDataId);
+        getAuthDataDao().delete(authData);
+    }
 }

@@ -42,7 +42,7 @@ public class UserRegistrationImpl implements UserRegistration {
     private final ResourceBundle textBundle = ResourceBundle.getBundle("UserRegistrationImpl");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     @Inject
     @Configuration(key = "backmeup.autoVerifyUser")
     private Boolean autoVerifyUser;
@@ -65,34 +65,34 @@ public class UserRegistrationImpl implements UserRegistration {
     private BackMeUpUser save(BackMeUpUser user) {
         return getUserDao().save(user);
     }
-    
+
     @Override
     public BackMeUpUser getUserByUserId(Long userId) {
-    	return getUserByUserId(userId, false);
+        return getUserByUserId(userId, false);
     }
-    
+
     @Override
     public BackMeUpUser getUserByUserId(Long userId, boolean ensureActivated) {
-    	BackMeUpUser user = getUserDao().findById(userId);
+        BackMeUpUser user = getUserDao().findById(userId);
         if (user == null) {
             throw new UnknownUserException(userId);
         }
-        
+
         if(ensureActivated) {
-        	user.ensureActivated();
+            user.ensureActivated();
         }
         return user;
     }
-    
+
     @Override
     public BackMeUpUser getUserByUsername(String username, boolean ensureActivated) {
-    	BackMeUpUser user = getUserDao().findByName(username);
+        BackMeUpUser user = getUserDao().findByName(username);
         if (user == null) {
             throw new UnknownUserException(username);
         }
-        
+
         if(ensureActivated) {
-        	user.ensureActivated();
+            user.ensureActivated();
         }
         return user;
     }
@@ -223,23 +223,23 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public BackMeUpUser update(BackMeUpUser user) {
-    	BackMeUpUser persistentUser = getUserByUsername(user.getUsername(), true);
-    	
-    	if (user.getFirstname() != null && !user.getFirstname().equals(persistentUser.getFirstname())){
-    		persistentUser.setFirstname(user.getFirstname());
-    	}
-    	
-    	if (user.getLastname() != null && !user.getLastname().equals(persistentUser.getLastname())){
-    		persistentUser.setLastname(user.getLastname());
-    	}
+        BackMeUpUser persistentUser = getUserByUsername(user.getUsername(), true);
+
+        if (user.getFirstname() != null && !user.getFirstname().equals(persistentUser.getFirstname())){
+            persistentUser.setFirstname(user.getFirstname());
+        }
+
+        if (user.getLastname() != null && !user.getLastname().equals(persistentUser.getLastname())){
+            persistentUser.setLastname(user.getLastname());
+        }
 
         if (user.getEmail() != null && !user.getEmail().equals(persistentUser.getEmail())) {
             persistentUser.setEmail(user.getEmail());
-			if (!autoVerifyUser) {
-				persistentUser.setActivated(false);
-				setNewVerificationKeyTo(user);
-				sendVerificationEmailFor(user);
-			}
+            if (!autoVerifyUser) {
+                persistentUser.setActivated(false);
+                setNewVerificationKeyTo(user);
+                sendVerificationEmailFor(user);
+            }
         }
 
         return save(persistentUser);

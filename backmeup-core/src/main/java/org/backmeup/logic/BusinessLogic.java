@@ -24,50 +24,50 @@ import org.backmeup.model.spi.PluginDescribable;
  * @author fschoeppl
  */
 public interface BusinessLogic {
-	// authorization ----------------------------------------------------------
-	BackMeUpUser authorize(String username, String password);
-	
-	// user operations --------------------------------------------------------
-	BackMeUpUser addUser(BackMeUpUser user);
-	BackMeUpUser getUserByUsername(String username);
-	BackMeUpUser getUserByUserId(Long userId);
-	BackMeUpUser updateUser(BackMeUpUser user);
-	BackMeUpUser deleteUser(Long userId);
-	
-	// plugin operations ------------------------------------------------------
-	boolean                 isPluginAvailable(String pluginId);
-	List<PluginDescribable> getDatasources();
-	List<PluginDescribable> getDatasinks();
-	List<PluginDescribable> getActions();
-	PluginDescribable       getPluginDescribable(String pluginId);
-	PluginConfigInfo        getPluginConfiguration(String pluginId, String dummy);
+    // authorization ----------------------------------------------------------
+    BackMeUpUser authorize(String username, String password);
 
-	// profile operations ------------------------------------------------------
-	AuthData       addPluginAuthData(AuthData authData);
-	AuthData       getPluginAuthData(Long authDataId);
-	List<AuthData> listPluginAuthData(Long userId);
-	AuthData       updatePluginAuthData(AuthData authData);
-	void           deletePluginAuthData(Long authDataId);
-	
-	Profile         addPluginProfile(Profile profile);
-	Profile         getPluginProfile(Long profileId);
-	Profile         updatePluginProfile(Profile profile);
-	ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
-	void            deleteProfile(Long profileId);
+    // user operations --------------------------------------------------------
+    BackMeUpUser addUser(BackMeUpUser user);
+    BackMeUpUser getUserByUsername(String username);
+    BackMeUpUser getUserByUserId(Long userId);
+    BackMeUpUser updateUser(BackMeUpUser user);
+    BackMeUpUser deleteUser(Long userId);
 
-	// backupjob operations ---------------------------------------------------
-	BackupJob       createBackupJob(BackupJob backupJob, String dummy);
-	List<BackupJob> getJobs(Long userId);
-	BackupJob       getBackupJobFull(Long jobId);
-	ValidationNotes validateBackupJob(BackupJob backupJob);
-	BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
-	void            deleteJob(Long userId, Long jobId);
+    // plugin operations ------------------------------------------------------
+    boolean                 isPluginAvailable(String pluginId);
+    List<PluginDescribable> getDatasources();
+    List<PluginDescribable> getDatasinks();
+    List<PluginDescribable> getActions();
+    PluginDescribable       getPluginDescribable(String pluginId);
+    PluginConfigInfo        getPluginConfiguration(String pluginId, String dummy);
 
-	ProtocolDetails  getProtocolDetails(Long userId, String fileId);
-	ProtocolOverview getProtocolOverview(Long userId, String duration);
-	void             updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
-	void             deleteJobProtocols(Long userId);
-	
-	// search operations ------------------------------------------------------
+    // profile operations ------------------------------------------------------
+    AuthData       addPluginAuthData(AuthData authData);
+    AuthData       getPluginAuthData(Long authDataId);
+    List<AuthData> listPluginAuthData(Long userId);
+    AuthData       updatePluginAuthData(AuthData authData);
+    void           deletePluginAuthData(Long authDataId);
+
+    Profile         addPluginProfile(Profile profile);
+    Profile         getPluginProfile(Long profileId);
+    Profile         updatePluginProfile(Profile profile);
+    ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
+    void            deleteProfile(Long profileId);
+
+    // backupjob operations ---------------------------------------------------
+    BackupJob       createBackupJob(BackupJob backupJob, String dummy);
+    List<BackupJob> getJobs(Long userId);
+    BackupJob       getBackupJobFull(Long jobId);
+    ValidationNotes validateBackupJob(BackupJob backupJob);
+    BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
+    void            deleteJob(Long userId, Long jobId);
+
+    ProtocolDetails  getProtocolDetails(Long userId, String fileId);
+    ProtocolOverview getProtocolOverview(Long userId, String duration);
+    void             updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
+    void             deleteJobProtocols(Long userId);
+
+    // search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
 }

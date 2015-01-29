@@ -34,15 +34,15 @@ public class BackupLogicImpl implements BackupLogic {
 
     private static final String JOB_USER_MISSMATCH = "org.backmeup.logic.impl.BusinessLogicImpl.JOB_USER_MISSMATCH";
     private static final String NO_SUCH_JOB = "org.backmeup.logic.impl.BusinessLogicImpl.NO_SUCH_JOB";
-    
+
     @Inject
     private DataAccessLayer dal;
-    
+
     @Inject
     private Keyserver keyserverClient;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BackupLogicImpl");
-    
+
     private BackupJobDao getBackupJobDao() {
         return dal.createBackupJobDao();
     }
@@ -54,30 +54,30 @@ public class BackupLogicImpl implements BackupLogic {
     private JobProtocolDao createJobProtocolDao() {
         return dal.createJobProtocolDao();
     }
-    
+
     // BackupLogic methods ----------------------------------------------------
-    
+
     @Override
     public BackupJob createJob(BackupJob job) {
-		job.setStatus(BackupJobStatus.queued);
+        job.setStatus(BackupJobStatus.queued);
 
-		Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
-		
-		storePluginConfigOnKeyserver(job);
+        Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
 
-		// reusable=true means, that we can get the data for the token + a new token for the next backup
-		Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
-		job.setToken(t);
-		
-		return getBackupJobDao().save(job);
-		
+        storePluginConfigOnKeyserver(job);
+
+        // reusable=true means, that we can get the data for the token + a new token for the next backup
+        Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
+        job.setToken(t);
+
+        return getBackupJobDao().save(job);
+
     }
-    
+
     @Override
     public List<BackupJob> getBackupJobsOf(Long userId) {
         return getBackupJobDao().findByUserId(userId);
     }
-    
+
     @Override
     public BackupJob getExistingJob(Long jobId) {
         if (jobId == null) {
@@ -99,16 +99,16 @@ public class BackupLogicImpl implements BackupLogic {
         }
         return job;
     }
-    
+
     @Override
     public void updateJob(BackupJob persistentJob, BackupJob updatedJob) {
-    	persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
-    	persistentJob.getToken().setToken(updatedJob.getToken().getToken());
-    	persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
-    	
-    	persistentJob.setStatus(updatedJob.getStatus());
-    	
-    	// TODO: update fields
+        persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
+        persistentJob.getToken().setToken(updatedJob.getToken().getToken());
+        persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
+
+        persistentJob.setStatus(updatedJob.getStatus());
+
+        // TODO: update fields
     }
 
     @Override
@@ -119,7 +119,7 @@ public class BackupLogicImpl implements BackupLogic {
 
         getBackupJobDao().delete(job);
     }
-    
+
     @Override
     public void deleteJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
@@ -131,20 +131,20 @@ public class BackupLogicImpl implements BackupLogic {
             jobDao.delete(job);
         }
     }
-    
+
     @Override
     public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
         JobProtocolDao jpd = createJobProtocolDao();
-        
+
         JobProtocol protocol = new JobProtocol();
         protocol.setUser(user);
         protocol.setJob(job);
         protocol.setSuccessful(jobProtocol.isSuccessful());
-        
-//        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
-//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
-//        }
-        
+
+        //        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+        //            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+        //        }
+
         if (protocol.isSuccessful()) {
             job.setLastSuccessful(protocol.getExecutionTime());
             job.setStatus(BackupJobStatus.successful);
@@ -152,7 +152,7 @@ public class BackupLogicImpl implements BackupLogic {
             job.setLastFailed(protocol.getExecutionTime());
             job.setStatus(BackupJobStatus.error);
         }
-        
+
         jpd.save(protocol);
     }
 
@@ -193,9 +193,9 @@ public class BackupLogicImpl implements BackupLogic {
     public void deleteProtocolsOf(Long userId) {
         createJobProtocolDao().deleteByUserId(userId);
     }
-    
+
     // Helper methods ---------------------------------------------------------
-    
+
     private void deleteStatuses(Long jobId) {
         // Delete Job status records first
         StatusDao statusDao = getStatusDao();
@@ -203,39 +203,39 @@ public class BackupLogicImpl implements BackupLogic {
             statusDao.delete(status);
         }
     }
-    
+
     private void storePluginConfigOnKeyserver(BackupJob job) {
-    	// Active user (password is set) is stored in job.getUser()
-    	// profile users (job.getXProfile().getUser() password is null!
-    	updateProfileOnKeyserver(job.getSourceProfile(), job.getUser().getPassword());
-    	updateProfileOnKeyserver(job.getSinkProfile(), job.getUser().getPassword());
-		for (Profile actionProfile : job.getActionProfiles()) {
-			updateProfileOnKeyserver(actionProfile, job.getUser().getPassword());
-		}
+        // Active user (password is set) is stored in job.getUser()
+        // profile users (job.getXProfile().getUser() password is null!
+        updateProfileOnKeyserver(job.getSourceProfile(), job.getUser().getPassword());
+        updateProfileOnKeyserver(job.getSinkProfile(), job.getUser().getPassword());
+        for (Profile actionProfile : job.getActionProfiles()) {
+            updateProfileOnKeyserver(actionProfile, job.getUser().getPassword());
+        }
     }
-    
+
     private void updateProfileOnKeyserver(Profile profile, String password) {    
-    	if(keyserverClient.isServiceRegistered(profile.getId())){
-    		keyserverClient.deleteService(profile.getId());
-    	}
-    	
+        if(keyserverClient.isServiceRegistered(profile.getId())){
+            keyserverClient.deleteService(profile.getId());
+        }
+
         if (keyserverClient.isAuthInformationAvailable(profile, password)) {
             keyserverClient.deleteAuthInfo(profile.getId());
         }
-        
+
         // For now, store auth data and props together
         Properties props = new Properties();
         // Otherwise, we cannot retrieve the token later on.
         // If no property is available the keyserver throws internally an IndexOutOfBoundsException
         props.put("dummy", "dummy"); 
-		if (profile.getAuthData() != null && profile.getAuthData().getProperties() != null) {
-			props.putAll(profile.getAuthData().getProperties());
-		}
-		if (profile.getProperties() != null) {
-			props.putAll(profile.getProperties());
-		}
+        if (profile.getAuthData() != null && profile.getAuthData().getProperties() != null) {
+            props.putAll(profile.getAuthData().getProperties());
+        }
+        if (profile.getProperties() != null) {
+            props.putAll(profile.getProperties());
+        }
 
-		keyserverClient.addService(profile.getId());
-		keyserverClient.addAuthInfo(profile, password, props);
+        keyserverClient.addService(profile.getId());
+        keyserverClient.addAuthInfo(profile, password, props);
     }
 }

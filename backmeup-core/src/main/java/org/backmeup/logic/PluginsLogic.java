@@ -11,7 +11,7 @@ import org.backmeup.model.spi.Validationable;
 
 public interface PluginsLogic {
 
-	boolean isPluginAvailable(String pluginId);
+    boolean isPluginAvailable(String pluginId);
 
 
     List<PluginDescribable> getActions();
@@ -21,19 +21,19 @@ public interface PluginsLogic {
     List<PluginDescribable> getDatasinks();
 
     PluginDescribable getPluginDescribableById(String pluginId);
-    
+
     PluginConfigInfo getPluginConfigInfo (String pluginId);
 
-    
+
     boolean requiresValidation(String pluginId);
-    
+
     Validationable getValidator(String description);
-    
+
     ValidationNotes validatePlugin(String pluginId, Map<String, String> properties, List<String> options);
 
 
     boolean requiresAuthorization(String pluginId);
-    
+
     String authorizePlugin(AuthData authData);
-    
+
 }
