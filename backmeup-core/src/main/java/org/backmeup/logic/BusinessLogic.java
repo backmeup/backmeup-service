@@ -1,20 +1,15 @@
 package org.backmeup.logic;
 
-import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.model.AuthData;
-import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.spi.PluginDescribable;
@@ -75,34 +70,4 @@ public interface BusinessLogic {
 	
 	// search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
-	
-	// deprecated methods ----------------------------------------------------
-	@Deprecated AuthRequest getPluginConfiguration(String pluginId);
-	@Deprecated Profile addPluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
-	@Deprecated void updatePluginProfile(String pluginId, Profile profile, Properties props, List<String> options);
-	@Deprecated Profile deleteProfile(Long userId, Long profile);
-	
-	@Deprecated void changeActionOptions(String actionId, Long jobId, Map<String, String> actionOptions);
-	@Deprecated Profile getStoredActionOptions(String actionId, Long jobId);
-	
-	@Deprecated List<Profile> getDatasourceProfiles(Long userId);
-	@Deprecated List<String> getDatasourceOptions(Long userId, Long profileId, String keyRingPassword);
-	@Deprecated List<String> getStoredDatasourceOptions(Long userId, Long profileId, Long jobId);
-	@Deprecated void changeProfile(Long profileId, Long jobId, List<String> sourceOptions);
-	
-	@Deprecated List<Profile> getDatasinkProfiles(Long userId);
-	
-	@Deprecated List<String> getActionOptions(String actionId);
-	
-	@Deprecated ValidationNotes validateBackupJob(Long userId, Long jobId, String keyRing);
-	
-	@Deprecated BackupJob getBackupJob(Long jobId);
-	@Deprecated ValidationNotes createBackupJob(BackupJob backupJob);
-	
-	@Deprecated List<StatusWithFiles> getStatus(Long userId, Long jobId);
-	
-	@Deprecated File getThumbnail(Long userId, String fileId);
-	@Deprecated void deleteIndexForUser(Long userId);
-	@Deprecated void deleteIndexForJobAndTimestamp(Long userId, Long jobId, Long timestamp);
-	
 }

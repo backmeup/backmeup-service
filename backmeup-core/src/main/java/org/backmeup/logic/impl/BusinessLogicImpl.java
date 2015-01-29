@@ -1,13 +1,11 @@
 package org.backmeup.logic.impl;
 
-import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.annotation.PreDestroy;
@@ -16,7 +14,6 @@ import javax.inject.Inject;
 
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
-import org.backmeup.index.model.FileItem;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
@@ -27,14 +24,12 @@ import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.AuthData;
-import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.StatusWithFiles;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -44,7 +39,6 @@ import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
-import org.backmeup.plugin.api.connectors.Datasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -601,340 +595,5 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
 		
 	}
-	
-	
-	/*
-	 * ======================================================================================
-	 * ======================================================================================
-	 * 
-	 */
-	
-	@Deprecated
-    @Override
-    public List<Profile> getDatasourceProfiles(final Long userId) {
-        return conn.txNewReadOnly(new Callable<List<Profile>>() {
-            @Override public List<Profile> call() {
-                
-                return profiles.getProfilesOf(userId);
-                
-            }
-        });
-    }
-
-    @Deprecated
-    @Override
-    public Profile deleteProfile(final Long userId, final Long profileId) {
-        return conn.txNew(new Callable<Profile>() {
-            @Override public Profile call() {
-                
-                return profiles.deleteProfile(profileId, userId);
-                
-            }
-        });
-    }
-
-    @Deprecated
-    @Override
-    public List<Profile> getDatasinkProfiles(final Long userId) {
-        return conn.txNewReadOnly(new Callable<List<Profile>>() {
-            @Override public List<Profile> call() {
-                
-                return profiles.getDatasinkProfilesOf(userId);
-                
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public List<String> getDatasourceOptions(final Long userId, final Long profileId, final String keyRingPassword) {
-        return conn.txJoinReadOnly(new Callable<List<String>>() {
-            @Override public List<String> call() {
-                
-                Profile p = profiles.getExistingUserProfile(profileId, userId);
-                String pluginId = p.getPluginId();
-                Datasource source = plugins.getDatasource(pluginId);
-                Properties accessData = authorization.fetchProfileAuthenticationData(p, keyRingPassword);
-                return source.getAvailableOptions(accessData);
-                
-            }
-        });
-    }
-
-    @Deprecated
-    @Override
-    public List<String> getStoredDatasourceOptions(final Long userId, final Long profileId, final Long jobId) {
-        return conn.txJoinReadOnly(new Callable<List<String>>() {
-            @Override public List<String> call() {
-
-//                registration.ensureUserIsActive(username);
-                BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
-                Profile sourceProfile = job.getSourceProfile();
-                return profiles.getProfileOptions(profileId, sourceProfile);
-            
-            }
-        });
-    }
-
-    @Deprecated
-	@Override
-    public void changeProfile(final Long profileId, final Long jobId, final List<String> sourceOptions) {
-		conn.txJoin(new Runnable() {
-			@Override public void run() {
-
-			    BackupJob backupjob = backupJobs.getExistingJob(jobId);
-				Profile sourceProfiles = backupjob.getSourceProfile();
-                profiles.setProfileOptions(profileId, sourceProfiles, sourceOptions);
-				
-			}
-		});
-	}
-	
-    @Deprecated
-    @Override
-    public Profile getStoredActionOptions(final String actionId, final Long jobId) {
-        return conn.txJoinReadOnly(new Callable<Profile>() {
-            @Override public Profile call() {
-
-                return backupJobs.getJobActionOption(actionId, jobId);
-            
-            }
-        });
-    }
-
-    @Deprecated
-	@Override
-	public List<String> getActionOptions(String actionId) {
-	    return plugins.getActionOptions(actionId);
-	}
-
-    @Deprecated
-    @Override
-    public void changeActionOptions(final String actionId, final Long jobId, final Map<String, String> actionOptions) {
-        conn.txJoin(new Runnable() {
-            @Override public void run() {
-
-                backupJobs.updateJobActionOption(actionId, jobId, actionOptions);
-            
-            }
-        });
-    }
-
-    @Deprecated
-    @Override
-    public AuthRequest getPluginConfiguration(final String pluginId) {
-    	return conn.txNew(new Callable<AuthRequest>() {
-            @Override public AuthRequest call() {
-
-                Properties p = new Properties();
-                AuthRequest ar = plugins.configureAuth(p, pluginId);
-                
-//                SourceSinkDescribable desc = plugins.getSourceSinkById(uniqueDescIdentifier);
-//                Profile profile = profiles.createNewProfile(user, uniqueDescIdentifier, profileName, desc.getType());
-//                authorization.initProfileAuthInformation(profile, p, keyRing);
-                
-//                ar.setProfile(profile);
-                return ar;
-
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public Profile addPluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
-    	return conn.txNew(new Callable<Profile>() {
-            @Override public Profile call() {
-            	
-            	// TODO: onyl for oauth, why?
-            	// -> props now filled with "callback=http://localhost:9998/oauth_callback" 
-            	plugins.configureAuth(props, pluginId);               
-                
-                Profile p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, identification); // ?
-                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-                return p;
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public void updatePluginProfile(final String pluginId, final Profile profile, final Properties props, final List<String> options) {
-    	conn.txNew(new Runnable() {
-            @Override public void run() {
-                
-                Profile p = profiles.getProfile(profile.getId());
-                if(p == null) {
-                	p = profiles.createNewProfile(profile.getUser(), pluginId, profile.getName(), profile.getType());
-                }
-
-                String identification = plugins.getAuthorizedUserId(pluginId, props); // plugin -> postAuthorize
-                profiles.setIdentification(p, identification); // ?
-                authorization.overwriteProfileAuthInformation(p, props, profile.getUser().getPassword());
-
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public BackupJob getBackupJob(final Long jobId) {
-        return conn.txNewReadOnly(new Callable<BackupJob>() {
-            @Override public BackupJob call() {
-
-                return backupJobs.getExistingJob(jobId);
-                
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public List<StatusWithFiles> getStatus(final Long userId, final Long jobIdOrNull) {
-        return conn.txNewReadOnly(new Callable<List<StatusWithFiles>>() {
-            @Override public List<StatusWithFiles> call() {
-                
-            	registration.getUserByUserId(userId, true);
-                List<StatusWithFiles> status = backupJobs.getStatus(userId, jobIdOrNull);
-
-                if (status.size() > 0) {
-                    Long newOrExistingId = status.get(0).getStatus().getJob().getId();
-                    addFileItemsToStatuses(userId, status, newOrExistingId);
-                }
-                
-                return status;
-                
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public ValidationNotes createBackupJob(BackupJob backupJob) {
-        if (true) {
-            throw new UnsupportedOperationException("BackupJob job = null - code likely needs migration");
-        }
-
-        try {
-            conn.begin();
-            
-            BackMeUpUser user = backupJob.getUser();
-            Date startDate = backupJob.getStart();
-            long delayTime = backupJob.getDelay();
-            String jobTitle = backupJob.getJobTitle();
-            boolean reschedule = backupJob.isReschedule();
-            String timeExpression = backupJob.getTimeExpression();
-
-            Profile source = backupJob.getSourceProfile();
-            Profile sink = backupJob.getSinkProfile();
-            List<Profile> actions = backupJob.getActionProfiles();
-
-            conn.rollback();
-
-            // BackupJob job = jobManager.createBackupJob(user, source, sink, actions, startDate, delayTime, jobTitle, reschedule, timeExpression);
-            BackupJob job = null;
-            ValidationNotes vn = validateBackupJob(backupJob.getUser().getUserId(), job.getId(), backupJob.getUser().getPassword());
-            vn.setJob(job);
-            return vn;
-            
-        } finally {
-            conn.rollback();
-        }
-    }
-
-    @Deprecated
-    private void addFileItemsToStatuses(Long userId, List<StatusWithFiles> status, Long jobId) {
-        Set<FileItem> fileItems = search.getAllFileItems(userId, jobId);
-        for (StatusWithFiles stat : status) {
-            stat.setFiles(fileItems);
-        }
-    }
-    
-    @Deprecated
-    @Override
-    public void deleteIndexForUser(final Long userId) {
-        conn.txNewReadOnly(new Runnable() {
-            @Override public void run() {
-
-            	registration.getUserByUserId(userId, true);
-                search.deleteIndexOf(userId);
-                
-            }
-        });
-    }
-
-    @Deprecated
-    @Override
-    public void deleteIndexForJobAndTimestamp(final Long userId, final Long jobId, final Long timestamp) {
-        conn.txNewReadOnly(new Runnable() {
-            @Override public void run() {
-
-                BackupJob job = backupJobs.getExistingJob(jobId);
-                search.delete(userId, job.getId(), timestamp);
-                
-            }
-        });
-    }
-    
-    @Deprecated
-    @Override
-    public File getThumbnail(final Long userId, final String fileId) {
-        return conn.txNewReadOnly(new Callable<File>() {
-            @Override public File call() {
-                
-//                BackMeUpUser user = registration.getActiveUser(username);
-            	registration.getUserByUserId(userId, true);
-                return search.getThumbnailPathForFile(userId, fileId);
-
-            }
-        });
-    }
-
-    //TODO Add password parameter to get token from keyserver to validate the profile
-    @Deprecated
-    @Override
-    public ValidationNotes validateBackupJob(final Long userId, final Long jobId, final String keyRing) {
-        return conn.txNewReadOnly(new Callable<ValidationNotes>() {
-            @Override public ValidationNotes call() {
-                
-//                registration.ensureUserIsActive(username);
-            	registration.getUserByUserId(userId, true);
-                return validatePluginProfiles();
-
-            }
-
-            private ValidationNotes validatePluginProfiles() {
-                ValidationNotes notes = new ValidationNotes();
-                try {
-                    BackupJob job = backupJobs.getExistingUserJob(jobId, userId); 
-                    validateSourceProfiles(job.getSourceProfile(), notes);
-
-                    Long sinkProfileId = job.getSinkProfile().getId();
-                    getValidationEntriesForProfile(sinkProfileId, notes);
-
-                } catch (BackMeUpException bme) {
-                    notes.addValidationEntry(ValidationExceptionType.Error, bme);
-                }
-                return notes;
-            }
-
-            private void validateSourceProfiles(Profile sourceProfile, ValidationNotes notes) {
-            	Profile source = sourceProfile;
-                String sourceSinkId = source.getPluginId();
-                plugins.validateSourceSinkExists(sourceSinkId, notes);
-
-                Long profileId = source.getId();
-                getValidationEntriesForProfile(profileId, notes);
-            }
-
-            private void getValidationEntriesForProfile(Long id, ValidationNotes notes) {
-                notes.getValidationEntries().addAll(
-                        validateProfile(userId, id, keyRing)
-                        .getValidationEntries());
-            }
-        });
-    }
 
 }
