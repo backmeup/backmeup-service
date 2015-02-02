@@ -23,22 +23,22 @@ import org.backmeup.rest.auth.AuthInfo;
 @Path("/authenticate")
 public class Authentication extends Base {	
 
-	@PermitAll
-	@GET
-	@Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
-	public AuthInfo authenticate(@QueryParam("username") String username, @QueryParam("password") String password) {
-		try {
-			BackMeUpUser user = getLogic().authorize(username, password);
-			String accessToken = user.getUserId() + ";" + password;
-			Date issueDate = new Date();
-			return new AuthInfo(accessToken, issueDate);
-		} catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
-		    LOGGER.info("", ex);
-			throw new WebApplicationException(Status.UNAUTHORIZED);
-		} catch (Exception ex) {
-	        LOGGER.info("", ex);
-			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-		}
-	}
+    @PermitAll
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthInfo authenticate(@QueryParam("username") String username, @QueryParam("password") String password) {
+        try {
+            BackMeUpUser user = getLogic().authorize(username, password);
+            String accessToken = user.getUserId() + ";" + password;
+            Date issueDate = new Date();
+            return new AuthInfo(accessToken, issueDate);
+        } catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        } catch (Exception ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
