@@ -73,7 +73,7 @@ public final class BackmeupServiceClient implements BackmeupService {
             }
             this.basePath = uri.getPath();
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Path is not valid: " + path);
+            throw new IllegalArgumentException("Path is not valid: " + path, e);
         }
     }
 

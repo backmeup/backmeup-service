@@ -34,8 +34,10 @@ public class Authentication extends Base {
 			Date issueDate = new Date();
 			return new AuthInfo(accessToken, issueDate);
 		} catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
+		    LOGGER.info("", ex);
 			throw new WebApplicationException(Status.UNAUTHORIZED);
 		} catch (Exception ex) {
+	        LOGGER.info("", ex);
 			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
 		}
 	}

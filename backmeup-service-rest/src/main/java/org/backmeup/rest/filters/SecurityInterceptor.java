@@ -26,9 +26,13 @@ import org.backmeup.rest.auth.BackmeupSecurityContext;
 import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityInterceptor.class);
+    
 	 private static final ServerResponse ACCESS_FORBIDDEN = new ServerResponse("Access forbidden", 403, new Headers<>());
 	 private static final ServerResponse ACCESS_DENIED = new ServerResponse("Access denied for this resource", 401, new Headers<>());
 	 private static final String AUTHORIZATION_PROPERTY = "Authorization";
@@ -103,10 +107,11 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			}
             return logic.getUserByUserId(Long.parseLong(userId));
 		} catch (UnknownUserException uue) {
-			return null;
+		    LOGGER.info("", uue);
 		} catch (UserNotActivatedException una) {
-			return null;
+		    LOGGER.info("", una);
 		}
+		return null;
 	}
 
 	private boolean isUserAllowed(final BackMeUpUser user, final Set<String> rolesSet) {
