@@ -13,12 +13,22 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Mailer {
-  private static final Logger logger = LoggerFactory.getLogger(Mailer.class);
-  private static final ExecutorService service = Executors.newFixedThreadPool(4);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Mailer.class);
+  private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
+  private static final Properties MAIL_SETTINGS = loadMailSettings();
+  
+  private Mailer() {
+      //  Utility classes should not have a public constructor
+  }
+  
+  private static Properties getMailSettings() {
+    return MAIL_SETTINGS;
+  }
   
   public static void send(final String to, final String subject, final String text) {
     send(to, subject, text, "text/plain");
@@ -49,13 +59,14 @@ public class Mailer {
       // Send message
       Transport.send(message);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+        LOGGER.info("", e);
+      throw new BackMeUpException(e);
     } 
   }
   
   public static void send(final String to, final String subject, final String text, final String mimeType) {    
     // Get system properties
-    service.submit(new Runnable() {
+    SERVICE.submit(new Runnable() {
       @Override
     public void run() {
         executeSend(to, subject, text, mimeType);
@@ -63,18 +74,12 @@ public class Mailer {
     });    
   }
   
-  private static final Properties mailSettings = loadMailSettings();
-  
-  private static Properties getMailSettings() {
-    return mailSettings;
-  }
-
   private static Properties loadMailSettings() {
       Properties props = new Properties();
       try (InputStream is = Mailer.class.getClassLoader().getResourceAsStream("mail.properties")) {
         props.load(is);          
       } catch (Exception e) {
-    	  logger.error("", e); 
+          LOGGER.error("", e); 
       }
       return props;
   }

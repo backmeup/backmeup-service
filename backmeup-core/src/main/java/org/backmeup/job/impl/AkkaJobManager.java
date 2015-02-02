@@ -33,11 +33,11 @@ import akka.util.Duration;
  * 
  * @author Rainer Simon <rainer.simon@ait.ac.at>
  */
-abstract public class AkkaJobManager implements JobManager {
+public abstract class AkkaJobManager implements JobManager {
 	
-	private static final ActorSystem system = ActorSystem.create();
+	private static final ActorSystem SYSTEM = ActorSystem.create();
 	
-	private final Logger LOGGER = LoggerFactory.getLogger(AkkaJobManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobManager.class);
 	
 	@Inject
 	protected Connection conn;
@@ -98,8 +98,8 @@ abstract public class AkkaJobManager implements JobManager {
 	@PreDestroy
 	public void shutdown() {
 		// Shutdown system component
-		system.shutdown();
-		system.awaitTermination();
+		SYSTEM.shutdown();
+		SYSTEM.awaitTermination();
 	}
 
 	protected abstract void runJob(BackupJob job);
@@ -147,9 +147,10 @@ abstract public class AkkaJobManager implements JobManager {
 			job.setValidScheduleID(schedulerID);
 			conn.commit();
 
-			// TODO we can use the 'cancellable' to terminate later on
-			system.scheduler().scheduleOnce(
-					Duration.create(executeIn, TimeUnit.MILLISECONDS), // Initial delay
+			// We can use the 'cancellable' to terminate later on
+			SYSTEM.scheduler().scheduleOnce(
+			        // Initial delay
+					Duration.create(executeIn, TimeUnit.MILLISECONDS),
 					new RunAndReschedule(job, dal, schedulerID));
 
 		} catch (Exception e) {
@@ -196,7 +197,7 @@ abstract public class AkkaJobManager implements JobManager {
 					logger.debug("Rescheduling job for execution in "+ job.getDelay() + "ms");
 					Date execTime = new Date(new Date().getTime() + job.getDelay());
 					nextJob.setNextExecutionTime(execTime);
-					system.scheduler().scheduleOnce(
+					SYSTEM.scheduler().scheduleOnce(
 							Duration.create(job.getDelay(),
 									TimeUnit.MILLISECONDS),
 							new RunAndReschedule(job, dal, schedulerID));
