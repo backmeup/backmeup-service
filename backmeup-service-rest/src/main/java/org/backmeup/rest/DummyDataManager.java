@@ -54,7 +54,6 @@ public class DummyDataManager {
 		PluginProfileDTO pluginProfile = new PluginProfileDTO();
 
 		pluginProfile.setProfileId(1);
-		pluginProfile.setTitle("MailProfile");
 		pluginProfile.setPluginId("org.backmeup.mail");
 		pluginProfile.setProfileType(PluginType.Source);
 		pluginProfile.setModified(1401099707142L);

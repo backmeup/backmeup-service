@@ -12,7 +12,6 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 @XmlRootElement
 public class PluginProfileDTO {
 	private long profileId;
-	private String title;
 	private String pluginId;
 	private PluginType profileType;
 	private long modified;
@@ -34,14 +33,6 @@ public class PluginProfileDTO {
 
 	public void setProfileId(long profileId) {
 		this.profileId = profileId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public String getPluginId() {

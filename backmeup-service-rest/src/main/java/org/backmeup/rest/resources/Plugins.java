@@ -154,7 +154,6 @@ public class Plugins extends Base {
         throwIfPluginNotAvailable(pluginId);
 
         Profile profile = new Profile();
-        profile.setName(pluginProfile.getTitle());
         profile.setPluginId(pluginId);
         profile.setType(pluginProfile.getProfileType());
         profile.setUser(activeUser);
@@ -228,7 +227,6 @@ public class Plugins extends Base {
             throw new WebApplicationException(Status.CONFLICT);
         }
 
-        persistentProfile.setName(pluginProfile.getTitle());
         persistentProfile.setPluginId(pluginProfile.getPluginId());
         persistentProfile.setType(pluginProfile.getProfileType());
 

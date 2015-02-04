@@ -360,7 +360,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.statusCode(200)
 				.body("profileId", equalTo(Integer.parseInt(profileId)))
-				.body("title", equalTo(pluginProfile.getTitle()))
 				.body("pluginId", equalTo(pluginProfile.getPluginId()))
 				.body("profileType", equalTo(pluginProfile.getProfileType().toString()));
 		
@@ -422,7 +421,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 			profileId = response.extract().path("profileId").toString();
 			
 			pluginProfile = BackMeUpUtils.getProfile(accessToken, pluginProfile.getPluginId(), profileId);			
-			pluginProfile.setTitle(newProfileName);
 						
 			response = 
 			given()

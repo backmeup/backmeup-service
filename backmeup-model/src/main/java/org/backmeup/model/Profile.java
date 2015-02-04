@@ -40,8 +40,6 @@ public class Profile {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
 	private BackMeUpUser user;
 
-	private String name;
-
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
@@ -72,15 +70,13 @@ public class Profile {
 
 	}
 
-	public Profile(BackMeUpUser user, String profileName, String pluginId,
-			PluginType pluginType) {
-		this(null, user, profileName, pluginId, pluginType);
+	public Profile(BackMeUpUser user, String pluginId, PluginType pluginType) {
+		this(null, user, pluginId, pluginType);
 	}
 
-	public Profile(Long id, BackMeUpUser user, String profileName, String pluginId, PluginType pluginType) {
+	public Profile(Long id, BackMeUpUser user, String pluginId, PluginType pluginType) {
 		this.id = id;
 		this.user = user;
-		this.name = profileName;
 		this.pluginId = pluginId;
 		this.pluginType = pluginType;
 		this.created = new Date();
@@ -102,15 +98,6 @@ public class Profile {
 
 	public void setUser(BackMeUpUser user) {
 		this.user = user;
-		this.modified = new Date();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 		this.modified = new Date();
 	}
 

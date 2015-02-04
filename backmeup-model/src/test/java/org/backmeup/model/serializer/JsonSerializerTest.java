@@ -17,7 +17,6 @@ public class JsonSerializerTest {
   private void testProfiles(Profile p1, Profile p2) {
     Assert.assertEquals(p1.getPluginId(), p2.getPluginId());
     Assert.assertEquals(p1.getId(), p2.getId());
-    Assert.assertEquals(p1.getName(), p2.getName());
     Assert.assertEquals(p1.getType(), p2.getType());
     
     if((p1.getOptions() != null) && (p2.getOptions() != null)) {
@@ -38,11 +37,11 @@ public class JsonSerializerTest {
   public void testBackupJobSerializiation() {
     BackMeUpUser user = new BackMeUpUser(1L, "john.doe", "John", "Doe", "Sepp@Mail.at", "John123!#");
     
-    Profile source = new Profile(2L, user, "TestProfile", "org.backmeup.source", PluginType.Source);
+    Profile source = new Profile(2L, user, "org.backmeup.source", PluginType.Source);
     source.addOption("folder1");
     source.addOption("folder2");
     
-    Profile sink = new Profile(2L, user, "TestProfile2", "org.backmeup.sink", PluginType.Sink);
+    Profile sink = new Profile(2L, user, "org.backmeup.sink", PluginType.Sink);
     
     List<Profile> actions = new ArrayList<>();
     

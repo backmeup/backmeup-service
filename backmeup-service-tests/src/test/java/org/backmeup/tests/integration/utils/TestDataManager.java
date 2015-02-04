@@ -63,7 +63,6 @@ public class TestDataManager {
         PluginType profileType = PluginType.Source;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
 
@@ -81,7 +80,6 @@ public class TestDataManager {
         PluginType profileType = PluginType.Action;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
 
@@ -95,7 +93,6 @@ public class TestDataManager {
         AuthDataDTO authData = getAuthDataBackmeupStorage();
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
         pluginProfile.setAuthData(authData);
@@ -110,7 +107,6 @@ public class TestDataManager {
         AuthDataDTO authData = getAuthDataEmail();
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
         pluginProfile.setAuthData(authData);
@@ -124,7 +120,6 @@ public class TestDataManager {
         PluginType profileType = PluginType.Source;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
 
@@ -137,7 +132,6 @@ public class TestDataManager {
         PluginType profileType = PluginType.Sink;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
-        pluginProfile.setTitle(profileName);
         pluginProfile.setPluginId(pluginId);
         pluginProfile.setProfileType(profileType);
 

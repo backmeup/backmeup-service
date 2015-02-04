@@ -95,7 +95,6 @@ public class MappingTest {
         user.setUserId(userId);
 
         Long profileId = 1L;
-        String profileName = "TestProfile";
         String pluginId = "org.backmeup.dummy";
         String identification = "identification";
         PluginType profileTypeModel = PluginType.Source;
@@ -116,7 +115,7 @@ public class MappingTest {
         authData.setPluginId(pluginId);
         authData.addProperty(authDataKey, authDataValue);
 
-        Profile profile = new Profile(profileId, user, profileName, pluginId, PluginType.Source);
+        Profile profile = new Profile(profileId, user, pluginId, PluginType.Source);
         profile.setIdentification(identification);
         profile.setAuthData(authData);
         profile.addProperty(propKey, propValue);
@@ -131,7 +130,6 @@ public class MappingTest {
         profileDTO.getAuthData().getProperties().putAll(profile.getAuthData().getProperties());
 
         assertEquals(profile.getId().longValue(), profileDTO.getProfileId());
-        assertEquals(profile.getName(), profileDTO.getTitle());
         assertEquals(profile.getType(), profileTypeModel);
         assertEquals(profileDTO.getProfileType(), profileTypeDTO);
 
@@ -160,7 +158,6 @@ public class MappingTest {
 
 
         Long profileId = 1L;
-        String profileName = "TestProfile";
         String description = "Description of test profile";
         String identification = "identification";
 
@@ -177,7 +174,7 @@ public class MappingTest {
 
         BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 
-        Profile profile = new Profile(profileId, user, profileName, description, PluginType.Source);
+        Profile profile = new Profile(profileId, user, description, PluginType.Source);
         profile.setIdentification(identification);
 
         RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType, inputDefaultValue);
