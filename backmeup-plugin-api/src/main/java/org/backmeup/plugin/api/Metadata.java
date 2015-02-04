@@ -35,4 +35,9 @@ public class Metadata {
      */
     public final static String DOWNLOAD_BASE = "META_DOWNLOAD_BASE";
     
+    /**
+     * Indicates that a plugin provides user account specific options. Boolean flag True or False
+     */
+    public final static String DYNAMIC_OPTIONS = "META_DYNAMIC_OPTIONS";
+    
 }
