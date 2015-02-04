@@ -62,11 +62,6 @@
   			<a>id</a>
   			<b>profileId</b>
   		</field>
-		
-		<field>
-  			<a>name</a>
-  			<b>title</b>
-  		</field>
   		
   		<field>
   			<a>type</a>
