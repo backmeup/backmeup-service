@@ -77,7 +77,7 @@ public class Plugins extends Base {
 
         List<PluginDTO> pluginList= new ArrayList<>();
         for(String pluginId : pluginIds) {
-            pluginList.add(getPlugin(pluginId, false));
+            pluginList.add(getPlugin(pluginId, -1L, false));
         }
 
         return pluginList;
@@ -89,6 +89,7 @@ public class Plugins extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public PluginDTO getPlugin(
             @PathParam("pluginId") String pluginId,
+            @QueryParam("authData") @DefaultValue("-1") Long authDataId,
             @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
 
         PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
@@ -121,7 +122,25 @@ public class Plugins extends Base {
             pluginDTO.addMetadata(key, value);
         } 
 
-        PluginConfigInfo pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, "");
+        // If authentication data id is passed as query parameter, use it to load
+        // user account specific plugin information (e.g. dynamic options like email folders). 
+        PluginConfigInfo pluginConfigInfo = null;
+        if(authDataId.equals(-1L)) {
+            pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, "");
+        } else {
+            AuthData authData = getLogic().getPluginAuthData(authDataId);
+            if(!authData.getPluginId().equals(pluginId)){
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+            
+            BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+            if(!authData.getUser().getUserId().equals(activeUser.getUserId())) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+
+            pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, authData);
+        }
+        
         if(pluginConfigInfo.hasAuthData()) {
             PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
             if ((pluginConfigInfo.getRedirectURL() != null) && (pluginConfigInfo.getRedirectURL() != "")) {
@@ -135,7 +154,7 @@ public class Plugins extends Base {
         if(pluginConfigInfo.hasConfigData()) {
             getMapper().map(pluginConfigInfo, pluginDTO);
         }
-
+        
         if(expandProfiles){
 
         }
