@@ -46,10 +46,6 @@ public class Profile {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date modified;
 
-	// The username that has been used for a certain profile, 
-	// e.g. the dropbox username or facebook username
-	private String identification;
-	
 	private String pluginId;
 
 	@Enumerated(EnumType.STRING)
@@ -125,14 +121,6 @@ public class Profile {
 
 	public Date getModified() {
 		return modified;
-	}
-
-	public String getIdentification() {
-		return identification;
-	}
-
-	public void setIdentification(String identification) {
-		this.identification = identification;
 	}
 
 	public AuthData getAuthData() {

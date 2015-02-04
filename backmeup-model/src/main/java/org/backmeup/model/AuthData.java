@@ -36,6 +36,10 @@ public class AuthData {
 
 	private String pluginId;
 	
+    // The username that has been used for a certain profile, 
+    // e.g. the dropbox username or facebook username
+    private String identification;
+	
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
 
@@ -113,6 +117,14 @@ public class AuthData {
 		return modified;
 	}
 
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+	
 	public Map<String, String> getProperties() {
 		return properties;
 	}

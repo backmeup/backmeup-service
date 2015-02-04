@@ -264,7 +264,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     profile.setAuthData(authData);
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
-                    profile.setIdentification(identification);
+                    profile.getAuthData().setIdentification(identification);
                 }			
 
                 // Check if plugin validation is required and properties and options are valid
@@ -322,7 +322,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                         profile.setAuthData(authData);
 
                         String identification = plugins.authorizePlugin(profile.getAuthData());
-                        profile.setIdentification(identification);
+                        profile.getAuthData().setIdentification(identification);
                     }			
 
                     // Check if plugin validation is required and properties and options are valid
@@ -352,7 +352,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     profile.setAuthData(authData);
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
-                    profile.setIdentification(identification);
+                    profile.getAuthData().setIdentification(identification);
                 }			
 
                 // Check if plugin validation is required and properties and options are valid

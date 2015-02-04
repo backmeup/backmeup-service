@@ -116,8 +116,8 @@ public class MappingTest {
         authData.addProperty(authDataKey, authDataValue);
 
         Profile profile = new Profile(profileId, user, pluginId, PluginType.Source);
-        profile.setIdentification(identification);
         profile.setAuthData(authData);
+        profile.getAuthData().setIdentification(identification);
         profile.addProperty(propKey, propValue);
         profile.addOption(option);
 
@@ -159,7 +159,6 @@ public class MappingTest {
 
         Long profileId = 1L;
         String description = "Description of test profile";
-        String identification = "identification";
 
         String inputName = "username";
         String inputLabel = "Username";
@@ -175,7 +174,6 @@ public class MappingTest {
         BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
 
         Profile profile = new Profile(profileId, user, description, PluginType.Source);
-        profile.setIdentification(identification);
 
         RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType, inputDefaultValue);
         List<RequiredInputField> inputFields = new ArrayList<>();
