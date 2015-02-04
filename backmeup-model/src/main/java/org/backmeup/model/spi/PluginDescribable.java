@@ -65,6 +65,4 @@ public interface PluginDescribable {
 	
 	public String getImageURL();
 	public Properties getMetadata(Properties accessData);
-	
-//	public List<String> getAvailableOptions();
 }
