@@ -285,8 +285,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     public ValidationNotes validateProfile(final Long userId, final Long profileId, final String keyRing) {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
             @Override public ValidationNotes call() {
-
                 String pluginId = null;
+                ValidationNotes notes = new ValidationNotes();
+                
                 try {
 
                     Profile p = profiles.getProfile(profileId);
@@ -296,16 +297,13 @@ public class BusinessLogicImpl implements BusinessLogic {
                     Map<String, String> authProps = new HashMap<>();
                     for (final String name: accessData.stringPropertyNames())
                         authProps.put(name, accessData.getProperty(name));
-                    return validator.validateProperties(authProps);
+                    notes.addAll(validator.validateProperties(authProps));
+                    return notes;
 
                 } catch (PluginUnavailableException pue) {
-                    ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.NoValidatorAvailable, pluginId, pue);
-                    return notes;
+                    return ValidationNotes.createExceptionNotes(ValidationExceptionType.NoValidatorAvailable, pluginId, pue);
                 } catch (Exception pe) {
-                    ValidationNotes notes = new ValidationNotes();
-                    notes.addValidationEntry(ValidationExceptionType.Error, pluginId, pe);
-                    return notes;
+                    return ValidationNotes.createExceptionNotes(ValidationExceptionType.Error, pluginId, pe);
                 }
 
             }
@@ -314,7 +312,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     public ValidationNotes validateProfile(final Profile profile) {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
-
             @Override public ValidationNotes call() {
                 ValidationNotes notes = new ValidationNotes();
 
@@ -330,8 +327,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                     // Check if plugin validation is required and properties and options are valid
                     if (plugins.requiresValidation(profile.getPluginId())) {
-                        ValidationNotes vn = plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
-                        notes.addAll(vn);
+                        notes.addAll(plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions()));
                     }
                     return notes;
 
@@ -503,28 +499,19 @@ public class BusinessLogicImpl implements BusinessLogic {
     public ValidationNotes validateBackupJob(final BackupJob backupJob) {
         return conn.txNewReadOnly(new Callable<ValidationNotes>() {
             @Override public ValidationNotes call() {
-
                 ValidationNotes notes = new ValidationNotes();
                 try {
-                    getValidationEntriesForProfile(backupJob.getSourceProfile(), notes);
-
-                    getValidationEntriesForProfile(backupJob.getSinkProfile(), notes);
+                    notes.addAll(validateProfile(backupJob.getSourceProfile()));
+                    notes.addAll(validateProfile(backupJob.getSinkProfile()));
 
                     for(Profile actionProfile : backupJob.getActionProfiles()) {
-                        getValidationEntriesForProfile(actionProfile, notes);
+                        notes.addAll(validateProfile(actionProfile));
                     }
 
                 } catch (BackMeUpException bme) {
                     notes.addValidationEntry(ValidationExceptionType.Error, bme);
                 }
                 return notes;
-
-            }
-
-            private void getValidationEntriesForProfile(Profile profile, ValidationNotes notes) {
-                notes.getValidationEntries().addAll(
-                        validateProfile(profile)
-                        .getValidationEntries());
             }
         });
     }

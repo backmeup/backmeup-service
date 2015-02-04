@@ -117,7 +117,8 @@ public class PluginsLogicImpl implements PluginsLogic {
             }
 
             if(validator.hasAvailableOptions()) {
-                pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions());
+                //TODO: at some calls we have properties (if we already have authentication data)
+                pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions(new Properties()));
             }
         }
 

@@ -9,7 +9,7 @@ import org.backmeup.plugin.api.storage.StorageException;
 /**
  * An abstract base class for all datasource implementations
  * 
- * @author Rainer Simon <rainer.simon@ait.ac.at>
+ * @author Rainer Simon <rainer.simon@ait.ac.at>, w.eibner
  */
 public interface Datasource {
 	/**
@@ -17,22 +17,5 @@ public interface Datasource {
 	 * data storage.
 	 * @param storage the datastorage
 	 */
-	public abstract void downloadAll(Properties accessData, Properties properties, List<String> options, Storage storage, Progressable progressor) throws DatasourceException, StorageException;
-	
-	/**
-	 * Returns any type of overview information/statistics that can be
-	 * shown to the user as 'detail view' for this datasource. The
-	 * returned string can be HTML formatted.
-	 * 
-	 * @return statistics or any other information about the datasource
-	 */
-	public abstract String getStatistics(Properties accesssData);
-	
-	/**
-	 * Returns a List of items that might be chosen for the backup.
-	 * e.g. a social media plugin could return: "Pictures, Videos, Messages",
-	 *      a filestorage plugin could return the root folders of an account.
-	 */
-	public List<String> getAvailableOptions(Properties accessData);
-
+	void downloadAll(Properties accessData, Properties properties, List<String> options, Storage storage, Progressable progressor) throws DatasourceException, StorageException;
 }

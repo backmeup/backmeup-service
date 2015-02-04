@@ -44,7 +44,9 @@ public class ValidationNotes {
   }
   
   public void addAll(ValidationNotes notes) {
-	  this.validationNotes.addAll(notes.getValidationEntries());
+      if(notes != null) {
+          this.validationNotes.addAll(notes.getValidationEntries());
+      }
   }
   
   public List<ValidationEntry> getValidationEntries() {
@@ -59,6 +61,12 @@ public class ValidationNotes {
     this.job = job;
   }
 
+  public static ValidationNotes createExceptionNotes(ValidationExceptionType type, String pluginId, Exception cause) {
+      ValidationNotes notes = new ValidationNotes();
+      notes.addValidationEntry(type, pluginId, cause);
+      return notes;
+  }
+  
   public static class ValidationEntry {
     private ValidationExceptionType type;
     private String message;
