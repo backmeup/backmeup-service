@@ -41,6 +41,7 @@ public interface BusinessLogic {
     List<PluginDescribable> getActions();
     PluginDescribable       getPluginDescribable(String pluginId);
     PluginConfigInfo        getPluginConfiguration(String pluginId, String dummy);
+    PluginConfigInfo        getPluginConfiguration(String pluginId, AuthData authData);
 
     // profile operations ------------------------------------------------------
     AuthData       addPluginAuthData(AuthData authData);

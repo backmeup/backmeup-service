@@ -77,9 +77,14 @@ public class PluginsLogicImpl implements PluginsLogic {
     public Validationable getValidator(String description) {
         return plugins.getValidator(description);
     }
+    
+    @Override 
+    public PluginConfigInfo getPluginConfigInfo(String pluginId) {
+        return getPluginConfigInfo(pluginId, null);
+    };
 
     @Override
-    public PluginConfigInfo getPluginConfigInfo (String pluginId) {
+    public PluginConfigInfo getPluginConfigInfo(String pluginId, AuthData authData) {
         PluginConfigInfo pluginConfigInfo = new PluginConfigInfo();
 
         if(plugins.hasAuthorizable(pluginId)) {
@@ -117,8 +122,12 @@ public class PluginsLogicImpl implements PluginsLogic {
             }
 
             if(validator.hasAvailableOptions()) {
-                //TODO: at some calls we have properties (if we already have authentication data)
-                pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions(new Properties()));
+                //At some calls we have properties (if we already have authentication data)
+                Properties authProps = new Properties();
+                if(authData != null) {
+                    authProps.putAll(authData.getProperties());
+                }
+                pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions(authProps));
             }
         }
 

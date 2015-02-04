@@ -22,7 +22,9 @@ public interface PluginsLogic {
 
     PluginDescribable getPluginDescribableById(String pluginId);
 
-    PluginConfigInfo getPluginConfigInfo (String pluginId);
+    PluginConfigInfo getPluginConfigInfo(String pluginId);
+
+    PluginConfigInfo getPluginConfigInfo(String pluginId, AuthData authData);
 
 
     boolean requiresValidation(String pluginId);

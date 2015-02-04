@@ -252,6 +252,17 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    public PluginConfigInfo getPluginConfiguration(final String pluginId, final AuthData authData) {
+        return conn.txNew(new Callable<PluginConfigInfo>() {
+
+            @Override public PluginConfigInfo call() {
+                PluginConfigInfo pluginConfigInfo = plugins.getPluginConfigInfo(pluginId, authData);
+                return pluginConfigInfo;
+
+            }
+        });
+    }
 
     @Override
     public Profile addPluginProfile(final Profile profile) {
