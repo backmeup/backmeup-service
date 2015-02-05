@@ -410,8 +410,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 		PluginProfileDTO pluginProfile = TestDataManager.getProfileDummySource();
 		String profileId = "";
 		
-		String newProfileName = "NewDummyProfile";
-		
 		try {
 			ValidatableResponse response = BackMeUpUtils.addUser(user);
 			userId = response.extract().path("userId").toString();
@@ -435,7 +433,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
 				.log().all()
 				.statusCode(200)
 				.body("profileId", equalTo(Integer.parseInt(profileId)))
-				.body("title", equalTo(newProfileName))
 				.body("pluginId", equalTo(pluginProfile.getPluginId()))
 				.body("profileType", equalTo(pluginProfile.getProfileType().toString()));
 		
