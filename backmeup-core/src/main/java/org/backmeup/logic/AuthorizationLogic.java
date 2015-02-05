@@ -1,6 +1,6 @@
 package org.backmeup.logic;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
@@ -18,10 +18,10 @@ public interface AuthorizationLogic {
 
     void authorize(BackMeUpUser user, String password);
 
-    Properties getProfileAuthInformation(Profile profile, String keyRing);
+    Map<String, String> getProfileAuthInformation(Profile profile, String keyRing);
 
-    void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing);
+    void overwriteProfileAuthInformation(Profile profile, Map<String, String> entries, String keyRing);
 
-    Properties fetchProfileAuthenticationData(Profile profile, String keyRingPassword);
+    Map<String, String> fetchProfileAuthenticationData(Profile profile, String keyRingPassword);
 
 }

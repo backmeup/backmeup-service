@@ -2,6 +2,8 @@ package org.backmeup.logic.impl;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -60,19 +62,19 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public Properties getProfileAuthInformation(Profile profile, String keyRing) {
+    public Map<String, String> getProfileAuthInformation(Profile profile, String keyRing) {
         if (keyRing == null) {
-            return new Properties();
+            return new HashMap<>();
         }
         if (!keyserverClient.isAuthInformationAvailable(profile, keyRing)) {
-            return new Properties();
+            return new HashMap<>();
         }
 
         return fetchFirstAuthenticationData(profile, keyRing);
     }
 
     @Override
-    public void overwriteProfileAuthInformation(Profile profile, Properties entries, String keyRing) {
+    public void overwriteProfileAuthInformation(Profile profile, Map<String, String> entries, String keyRing) {
         if (!keyserverClient.isServiceRegistered(profile.getId())) {
             keyserverClient.addService(profile.getId());
         }
@@ -81,13 +83,15 @@ public class AuthorizationImpl implements AuthorizationLogic {
             keyserverClient.deleteAuthInfo(profile.getId());
         }
 
-        keyserverClient.addAuthInfo(profile, keyRing, entries);
+        Properties props = new Properties();
+        props.putAll(entries);
+        keyserverClient.addAuthInfo(profile, keyRing, props);
     }
 
-    private Properties fetchFirstAuthenticationData(Profile profile, String password) {
+    private Map<String, String> fetchFirstAuthenticationData(Profile profile, String password) {
         AuthDataResult authData = getAuthDataFor(profile, password);
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         if (authData.getAuthinfos().length > 0) {
             props.putAll(authData.getAuthinfos()[0].getAi_data());
         }
@@ -96,9 +100,14 @@ public class AuthorizationImpl implements AuthorizationLogic {
     }
 
     @Override
-    public Properties fetchProfileAuthenticationData(Profile profile, String keyRingPassword) {
+    public Map<String, String> fetchProfileAuthenticationData(Profile profile, String keyRingPassword) {
         AuthDataResult authData = getAuthDataFor(profile, keyRingPassword);
-        return authData.getByProfileId(profile.getId());
+        Properties entries = authData.getByProfileId(profile.getId());
+        Map<String, String> authProps = new HashMap<>();
+        for (final String key: entries.stringPropertyNames()) {
+            authProps.put(key, entries.getProperty(key));
+        }
+        return authProps;
     }
 
     private AuthDataResult getAuthDataFor(Profile profile, String password) {
