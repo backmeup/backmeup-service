@@ -59,7 +59,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileFilegenerator() {
         String pluginId = "org.backmeup.filegenerator";
-        String profileName = "FilegeneratorProfile";
         PluginType profileType = PluginType.Source;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
@@ -76,7 +75,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileThumbnailAction() {
         String pluginId = "org.backmeup.thumbnail";
-        String profileName = "ThumbnailActionProfile";
         PluginType profileType = PluginType.Action;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
@@ -88,7 +86,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileBackmeupStorageSink() {
         String pluginId = "org.backmeup.storage";
-        String profileName = "BackmeupStorageSinkProfile";
         PluginType profileType = PluginType.Sink;
         AuthDataDTO authData = getAuthDataBackmeupStorage();
 
@@ -102,7 +99,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileEmail() {
         String pluginId = "org.backmeup.mail";
-        String profileName = "MailProfile";
         PluginType profileType = PluginType.Source;
         AuthDataDTO authData = getAuthDataEmail();
 
@@ -116,7 +112,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileDummySource() {
         String pluginId = "org.backmeup.dummy";
-        String profileName = "DummySourceProfile";
         PluginType profileType = PluginType.Source;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
@@ -128,7 +123,6 @@ public class TestDataManager {
 
     public static PluginProfileDTO getProfileDummySink() {
         String pluginId = "org.backmeup.dummy";
-        String profileName = "DummySinkProfile";
         PluginType profileType = PluginType.Sink;
 
         PluginProfileDTO pluginProfile = new PluginProfileDTO();
