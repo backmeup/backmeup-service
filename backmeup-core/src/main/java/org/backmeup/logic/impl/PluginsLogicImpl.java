@@ -1,6 +1,7 @@
 package org.backmeup.logic.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -178,24 +179,28 @@ public class PluginsLogicImpl implements PluginsLogic {
     }
 
     @Override
-    public ValidationNotes validatePlugin(String pluginId, java.util.Map<String,String> properties, java.util.List<String> options) {
-        if(!plugins.hasValidator(pluginId)) {
+    public ValidationNotes validatePlugin(String pluginId, Map<String,String> properties, List<String> options) {
+        if (!plugins.hasValidator(pluginId)) {
             throw new PluginException(pluginId, "Plugin doesn't provide a Validator");
         }
 
         Validationable validator = plugins.getValidator(pluginId);
         ValidationNotes notes = new ValidationNotes();
 
-        if(validator.hasRequiredProperties()){
+        if (validator.hasRequiredProperties()) {
             notes.addAll(validator.validateProperties(properties));
         }
 
-        if(validator.hasAvailableOptions()) {
-            notes.addAll(validator.validateOptions(options));
+        if (validator.hasAvailableOptions()) {
+            if ((options != null) && !options.isEmpty()) {
+                notes.addAll(validator.validateOptions(options));
+            }
         }
 
-        if(!notes.getValidationEntries().isEmpty()) {
-            throw new ValidationException(ValidationExceptionType.ConfigException, "Validation of config data failed");
+        if (!notes.getValidationEntries().isEmpty()) {
+            throw new ValidationException(
+                    ValidationExceptionType.ConfigException,
+                    "Validation of config data failed");
         }
 
         return notes;
