@@ -1,6 +1,7 @@
 package org.backmeup.model.spi;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.backmeup.plugin.api.Metadata;
 import org.backmeup.plugin.api.connectors.BaseSourceSinkDescribable;
@@ -38,11 +39,11 @@ public class FakePluginDescribable extends BaseSourceSinkDescribable {
     }
 
     @Override
-    public Properties getMetadata(@SuppressWarnings("unused") Properties accessData) {
-        Properties metadata = new Properties();
-        metadata.setProperty(Metadata.BACKUP_FREQUENCY, "daily");
-        metadata.setProperty(Metadata.FILE_SIZE_LIMIT, "150");
-        metadata.setProperty(Metadata.QUOTA_LIMIT, "2048");
+    public Map<String, String> getMetadata(@SuppressWarnings("unused") Map<String, String> authData ) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(Metadata.BACKUP_FREQUENCY, "daily");
+        metadata.put(Metadata.FILE_SIZE_LIMIT, "150");
+        metadata.put(Metadata.QUOTA_LIMIT, "2048");
         return metadata;
     }
 }

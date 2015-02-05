@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -114,14 +112,9 @@ public class Plugins extends Base {
         default:
             break;
         }
-
-        Set<Entry<Object, Object>> metadataProperties = pluginDescribable.getMetadata(new Properties()).entrySet();
-        for (Entry<Object, Object> e : metadataProperties) {
-            String key = (String) e.getKey();
-            String value = (String) e.getValue();
-            pluginDTO.addMetadata(key, value);
-        } 
-
+        
+        pluginDTO.setMetadata(pluginDescribable.getMetadata(new HashMap<String, String>()));
+        
         // If authentication data id is passed as query parameter, use it to load
         // user account specific plugin information (e.g. dynamic options like email folders). 
         PluginConfigInfo pluginConfigInfo = null;
