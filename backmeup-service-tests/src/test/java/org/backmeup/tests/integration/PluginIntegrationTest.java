@@ -4,6 +4,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.tests.IntegrationTest;
@@ -117,7 +118,41 @@ public class PluginIntegrationTest extends IntegrationTestBase {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
     }
-
+    
+    @Ignore
+    @Test
+    public void testGetPluginEmailWithOptions() {  
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+        
+        String pluginId = "org.backmeup.mail";
+        String authDataId = "";
+        AuthDataDTO authDataEmail = TestDataManager.getAuthDataEmail();
+        
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+            
+            response = BackMeUpUtils.addAuthData(accessToken, pluginId, authDataEmail);
+            authDataId = response.extract().path("id").toString();
+            
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/" + pluginId + "?authData=" + authDataId)
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteAuthData(accessToken, pluginId, authDataId);
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+    
     @Ignore
     @Test
     public void testGetPluginExpandProfiles() {	
