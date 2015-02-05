@@ -197,12 +197,6 @@ public class PluginsLogicImpl implements PluginsLogic {
             }
         }
 
-        if (!notes.getValidationEntries().isEmpty()) {
-            throw new ValidationException(
-                    ValidationExceptionType.ConfigException,
-                    "Validation of config data failed");
-        }
-
         return notes;
     }
 }

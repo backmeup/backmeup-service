@@ -36,6 +36,7 @@ import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
+import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
@@ -280,7 +281,11 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 // Check if plugin validation is required and properties and options are valid
                 if (plugins.requiresValidation(profile.getPluginId())) {
-                    plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+                    ValidationNotes notes = plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+                    if (!notes.getValidationEntries().isEmpty()) {
+                        throw new ValidationException(ValidationExceptionType.ConfigException, notes);
+                    }
+
                 }
 
                 // Everything is in place and valid, now we can store the new profile
@@ -368,7 +373,10 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 // Check if plugin validation is required and properties and options are valid
                 if (plugins.requiresValidation(profile.getPluginId())) {
-                    plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+                    ValidationNotes notes = plugins.validatePlugin(profile.getPluginId(), profile.getProperties(), profile.getOptions());
+                    if (!notes.getValidationEntries().isEmpty()) {
+                        throw new ValidationException(ValidationExceptionType.ConfigException, notes);
+                    }
                 }
 
                 return profiles.updateProfile(profile);
@@ -382,10 +390,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public BackupJob createBackupJob(BackupJob backupJob, String dummy) {
         try {
-            ValidationNotes notes = validateBackupJob(backupJob);
-            if(!notes.getValidationEntries().isEmpty()){
-                //TODO: throw exception?
-            }
+            validateBackupJob(backupJob);
             BackupJob job = jobManager.createBackupJob(backupJob);
             return job;
         } finally {
@@ -507,9 +512,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public ValidationNotes validateBackupJob(final BackupJob backupJob) {
-        return conn.txNewReadOnly(new Callable<ValidationNotes>() {
-            @Override public ValidationNotes call() {
+    public void validateBackupJob(final BackupJob backupJob) {
+        conn.txNewReadOnly(new Runnable() {
+            @Override public void run() {
                 ValidationNotes notes = new ValidationNotes();
                 try {
                     notes.addAll(validateProfile(backupJob.getSourceProfile()));
@@ -522,7 +527,10 @@ public class BusinessLogicImpl implements BusinessLogic {
                 } catch (BackMeUpException bme) {
                     notes.addValidationEntry(ValidationExceptionType.Error, bme);
                 }
-                return notes;
+                
+                if (!notes.getValidationEntries().isEmpty()) {
+                    throw new ValidationException(ValidationExceptionType.ConfigException, notes);
+                }
             }
         });
     }

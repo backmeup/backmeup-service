@@ -60,7 +60,7 @@ public interface BusinessLogic {
     BackupJob       createBackupJob(BackupJob backupJob, String dummy);
     List<BackupJob> getJobs(Long userId);
     BackupJob       getBackupJobFull(Long jobId);
-    ValidationNotes validateBackupJob(BackupJob backupJob);
+    void           validateBackupJob(BackupJob backupJob);
     BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
     void            deleteJob(Long userId, Long jobId);
 
