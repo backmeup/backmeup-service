@@ -1,8 +1,8 @@
 package org.backmeup.logic.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.annotation.PreDestroy;
@@ -97,15 +97,11 @@ public class PluginsLogicImpl implements PluginsLogic {
             switch (auth.getAuthType()) {
             case OAuth:
                 OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
-                Properties props = new Properties();
-                String redirectUrl = oauth.createRedirectURL(props, callbackUrl);
+                Map<String, String> oauthProps = new HashMap<>();
+                String redirectUrl = oauth.createRedirectURL(oauthProps, callbackUrl);
                 pluginConfigInfo.setRedirectURL(redirectUrl);
                 // save oauth properties for later use in authorize method
-                pluginConfigInfo.getOAuthProperties().clear();
-                for (final String key: props.stringPropertyNames()) {
-                    String value = props.getProperty(key);
-                    pluginConfigInfo.addOAuthProperty(key, value);
-                }
+                pluginConfigInfo.setOAuthProperties(oauthProps);
                 break;
             case InputBased:
                 InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
@@ -124,8 +120,8 @@ public class PluginsLogicImpl implements PluginsLogic {
 
             if(validator.hasAvailableOptions()) {
                 //At some calls we have properties (if we already have authentication data)
-                Properties authProps = new Properties();
-                if(authData != null) {
+                Map<String, String> authProps = new HashMap<>();
+                if (authData != null) {
                     authProps.putAll(authData.getProperties());
                 }
                 pluginConfigInfo.setAvailableOptions(validator.getAvailableOptions(authProps));
@@ -145,31 +141,21 @@ public class PluginsLogicImpl implements PluginsLogic {
         if(!plugins.hasAuthorizable(authData.getPluginId())) {
             throw new PluginException(authData.getPluginId(), "Plugin doesn't provide an Authorizable");
         }
-
+        
         Authorizable auth = plugins.getAuthorizable(authData.getPluginId());
         auth = plugins.getAuthorizable(authData.getPluginId(), auth.getAuthType()); 
-
-        // TODO: avoid Properties
-        Properties authProps = new Properties();
-        authProps.putAll(authData.getProperties());
-
+        
         if (auth.getAuthType() == AuthorizationType.InputBased) {
             InputBasedAuthorizable inputBasedService = (InputBasedAuthorizable) auth;
-            if (!inputBasedService.isValid(authProps)) {
+            if (!inputBasedService.isValid(authData.getProperties())) {
                 throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));
             }
         }
-
-        String accountIdentification = auth.authorize(authProps);
-
-        // After we call authorize, authProps may contain additional or changed values.
-        // Therefore, we have to update the properties in authData
-        authData.getProperties().clear();
-        for (final String key: authProps.stringPropertyNames()) {
-            String value = authProps.getProperty(key);
-            authData.addProperty(key, value);
-        }
-
+        
+        // Note: After we call authorize, properties in authData may contain additional
+        // or changed values.
+        String accountIdentification = auth.authorize(authData.getProperties());
+        
         return accountIdentification;
     }
 

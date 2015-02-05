@@ -1,10 +1,8 @@
 package org.backmeup.logic.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
@@ -305,14 +303,10 @@ public class BusinessLogicImpl implements BusinessLogic {
                 ValidationNotes notes = new ValidationNotes();
                 
                 try {
-
                     Profile p = profiles.getProfile(profileId);
                     pluginId = p.getPluginId();
                     Validationable validator = plugins.getValidator(pluginId);
-                    Properties accessData = authorization.getProfileAuthInformation(p, keyRing);
-                    Map<String, String> authProps = new HashMap<>();
-                    for (final String name: accessData.stringPropertyNames())
-                        authProps.put(name, accessData.getProperty(name));
+                    Map<String, String> authProps = authorization.getProfileAuthInformation(p, keyRing);
                     notes.addAll(validator.validateProperties(authProps));
                     return notes;
 
@@ -549,9 +543,6 @@ public class BusinessLogicImpl implements BusinessLogic {
                 if (!plugins.requiresAuthorization(authData.getPluginId())) {
                     throw new PluginException(authData.getPluginId(), "AuthData is not required for this plugin");
                 }
-
-                Properties authProps = new Properties();
-                authProps.putAll(authData.getProperties());
 
                 // The following statement calls the authorize method of the plugin authorizable
                 // It checks if the authentication data is required and valid
