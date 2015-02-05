@@ -243,7 +243,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public PluginConfigInfo getPluginConfiguration(final String pluginId, String dummy) {
+    public PluginConfigInfo getPluginConfiguration(final String pluginId) {
         return conn.txNew(new Callable<PluginConfigInfo>() {
 
             @Override public PluginConfigInfo call() {
@@ -388,7 +388,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     // ========================================================================
 
     @Override
-    public BackupJob createBackupJob(BackupJob backupJob, String dummy) {
+    public BackupJob createBackupJob(BackupJob backupJob) {
         try {
             validateBackupJob(backupJob);
             BackupJob job = jobManager.createBackupJob(backupJob);

@@ -40,7 +40,7 @@ public interface BusinessLogic {
     List<PluginDescribable> getDatasinks();
     List<PluginDescribable> getActions();
     PluginDescribable       getPluginDescribable(String pluginId);
-    PluginConfigInfo        getPluginConfiguration(String pluginId, String dummy);
+    PluginConfigInfo        getPluginConfiguration(String pluginId);
     PluginConfigInfo        getPluginConfiguration(String pluginId, AuthData authData);
 
     // profile operations ------------------------------------------------------
@@ -57,10 +57,10 @@ public interface BusinessLogic {
     void            deleteProfile(Long profileId);
 
     // backupjob operations ---------------------------------------------------
-    BackupJob       createBackupJob(BackupJob backupJob, String dummy);
+    BackupJob       createBackupJob(BackupJob backupJob);
     List<BackupJob> getJobs(Long userId);
     BackupJob       getBackupJobFull(Long jobId);
-    void           validateBackupJob(BackupJob backupJob);
+    void            validateBackupJob(BackupJob backupJob);
     BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
     void            deleteJob(Long userId, Long jobId);
 

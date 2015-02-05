@@ -126,7 +126,7 @@ public class Plugins extends Base {
         // user account specific plugin information (e.g. dynamic options like email folders). 
         PluginConfigInfo pluginConfigInfo = null;
         if(authDataId.equals(-1L)) {
-            pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, "");
+            pluginConfigInfo = getLogic().getPluginConfiguration(pluginId);
         } else {
             AuthData authData = getLogic().getPluginAuthData(authDataId);
             if(!authData.getPluginId().equals(pluginId)){

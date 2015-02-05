@@ -113,7 +113,7 @@ public class BackupJobs extends Base {
 		
 		BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
 		job.setTimeExpression(timeExpression);
-		job = getLogic().createBackupJob(job, "");
+		job = getLogic().createBackupJob(job);
 		
 //		if(vn.getValidationEntries().size() > 0) {
 //			List<ValidationEntry> entries = vn.getValidationEntries();
