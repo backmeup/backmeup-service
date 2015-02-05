@@ -53,12 +53,24 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();
 
-            given().log().all().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .get("/backupjobs/" + jobId).then().log().all().statusCode(200)
-                    .body("jobId", equalTo(Integer.parseInt(jobId))).body("jobTitle", equalTo(backupJob.getJobTitle()))
-                    .body("jobStatus", equalTo(JobStatus.queued.toString())).body("onHold", equalTo(false))
-                    .body("schedule", equalTo(backupJob.getSchedule().toString())).body(containsString("created"))
-                    .body(containsString("modified")).body(containsString("start")).body(containsString("delay"));
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/" + jobId)
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body("jobId", equalTo(Integer.parseInt(jobId)))
+                .body("jobTitle", equalTo(backupJob.getJobTitle()))
+                .body("jobStatus", equalTo(JobStatus.queued.toString()))
+                .body("onHold", equalTo(false))
+                .body("schedule", equalTo(backupJob.getSchedule().toString()))
+                .body(containsString("created"))
+                .body(containsString("modified"))
+                .body(containsString("start"))
+                .body(containsString("delay"));
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -96,20 +108,28 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();
 
-            given().log()
-                    .all()
-                    .header("Accept", "application/json")
-                    .header("Authorization", accessToken)
-                    .when()
-                    .get("/backupjobs/" + jobId
-                            + "?expandUser=true&expandToken=true&expandProfiles=true&expandProtocol=true").then().log()
-                    .all().statusCode(200).body("jobId", equalTo(Integer.parseInt(jobId)))
-                    .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                    .body("jobStatus", equalTo(JobStatus.queued.toString())).body("onHold", equalTo(false))
-                    .body("schedule", equalTo(backupJob.getSchedule().toString())).body(containsString("created"))
-                    .body(containsString("modified")).body(containsString("start")).body(containsString("delay"))
-                    .body(containsString("user")).body(containsString("token")).body(containsString("source"))
-                    .body(containsString("sink"));
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/" + jobId + "?expandUser=true&expandToken=true&expandProfiles=true&expandProtocol=true")
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body("jobId", equalTo(Integer.parseInt(jobId)))
+                .body("jobTitle", equalTo(backupJob.getJobTitle()))
+                .body("jobStatus", equalTo(JobStatus.queued.toString()))
+                .body("onHold", equalTo(false))
+                .body("schedule", equalTo(backupJob.getSchedule().toString()))
+                .body(containsString("created"))
+                .body(containsString("modified"))
+                .body(containsString("start"))
+                .body(containsString("delay"))
+                .body(containsString("user"))
+                .body(containsString("token"))
+                .body(containsString("source"))
+                .body(containsString("sink"));
 
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
@@ -148,8 +168,15 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();
 
-            given().log().all().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .get("/backupjobs/").then().log().all().statusCode(200);
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/")
+            .then()
+                .log().all()
+                .statusCode(200);
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -187,8 +214,15 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();
 
-            given().log().all().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .get("/backupjobs?jobStatus=queued").then().log().all().statusCode(200);
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs?jobStatus=queued")
+            .then()
+                .log().all()
+                .statusCode(200);
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -208,8 +242,15 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             userId = response.extract().path("userId").toString();
             accessToken = BackMeUpUtils.authenticateUser(user);
 
-            given().log().all().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .get("/backupjobs?jobStatus=queued").then().log().all().statusCode(200);
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs?jobStatus=queued")
+            .then()
+                .log().all()
+                .statusCode(200);
         } finally {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
@@ -242,9 +283,17 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
 
-            response = given().log().all().header("Accept", "application/json").header("Authorization", accessToken)
-                    .body(backupJob, ObjectMapperType.JACKSON_1).when().post("/backupjobs").then().log().all()
-                    .statusCode(200);
+            response = 
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(backupJob, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/backupjobs")
+            .then()
+                .log().all()
+                .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
         } finally {
@@ -282,9 +331,17 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
 
-            response = given().log().all().header("Accept", "application/json").header("Authorization", accessToken)
-                    .body(backupJob, ObjectMapperType.JACKSON_1).when().post("/backupjobs").then().log().all()
-                    .statusCode(200);
+            response = 
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(backupJob, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/backupjobs")
+            .then()
+                .log().all()
+                .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
         } finally {
@@ -328,9 +385,17 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
 
-            response = given().log().all().header("Accept", "application/json").header("Authorization", accessToken)
-                    .body(backupJob, ObjectMapperType.JACKSON_1).when().post("/backupjobs").then().log().all()
-                    .statusCode(200);
+            response = 
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(backupJob, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/backupjobs")
+            .then()
+                .log().all()
+                .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
         } finally {
@@ -371,11 +436,24 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();
 
-            given().log().all().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .delete("/backupjobs/" + jobId).then().log().all().statusCode(204);
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .delete("/backupjobs/" + jobId)
+            .then()
+                .log().all()
+                .statusCode(204);
 
-            given().header("Accept", "application/json").header("Authorization", accessToken).when()
-                    .get("/backupjobs/" + jobId).then().statusCode(500); // Internal Server Error is thrown
+            given()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/" + jobId)
+            .then()
+                .statusCode(500); // Internal Server Error is thrown
+            
         } finally {
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
             BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
@@ -428,9 +506,17 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId,
                     actionProfiles);
 
-            response = given().log().all().header("Accept", "application/json").header("Authorization", accessToken)
-                    .body(backupJob, ObjectMapperType.JACKSON_1).when().post("/backupjobs").then().log().all()
-                    .statusCode(200);
+            response = 
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(backupJob, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/backupjobs")
+            .then()
+                .log().all()
+                .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
         } finally {

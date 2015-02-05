@@ -18,226 +18,226 @@ import com.jayway.restassured.response.ValidatableResponse;
 @Category(IntegrationTest.class)
 public class PluginIntegrationTest extends IntegrationTestBase {
 
-	@Test
-	public void testGetPluginFilegenerator() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		String pluginId = "org.backmeup.filegenerator";
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/" + pluginId)
-			.then()
-				.log().all()
-				.body("pluginId", equalTo(pluginId))
-				.body(containsString("title"))
-				.body(containsString("description"))
-				.body(containsString("imageURL"))
-				.body(containsString("pluginType"))
-				.body(containsString("propertiesDescription"))
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Test
-	public void testGetPluginBackmeupStorage() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		String pluginId = "org.backmeup.storage";
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/" + pluginId)
-			.then()
-				.log().all()
-				.body("pluginId", equalTo(pluginId))
-				.body(containsString("title"))
-				.body(containsString("description"))
-				.body(containsString("imageURL"))
-				.body(containsString("pluginType"))
-				.body(containsString("authDataDescription"))
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Test
-	public void testGetPluginDummy() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		String pluginId = "org.backmeup.dummy";
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/" + pluginId)
-			.then()
-				.log().all()
-				.body("pluginId", equalTo(pluginId))
-				.body(containsString("title"))
-				.body(containsString("description"))
-				.body(containsString("imageURL"))
-				.body(containsString("pluginType"))
-				.body(containsString("metadata"))
-				.body(containsString("authDataDescription"))
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Ignore
-	@Test
-	public void testGetPluginExpandProfiles() {	
-		String pluginId = "backmeupPlugin1";
-		try {
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-			.when()
-				.get("/plugins/" + pluginId + "/?expandProfiles=true")
-			.then()
-				.log().all()
-				.statusCode(200);
-		} finally {
-		}
-	}
-	
-	@Test
-	public void testGetAllPlugins() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/")
-			.then()
-				.log().all()
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Test
-	public void testGetAllDatasourcePlugins() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		PluginType pluginType = PluginType.Source;
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/?types=" + pluginType)
-			.then()
-				.log().all()
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Test
-	public void testGetAllDatasinkPlugins() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		PluginType pluginType = PluginType.Sink;
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/?types=" + pluginType)
-			.then()
-				.log().all()
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
-	
-	@Test
-	public void testGetAllActionPlugins() {	
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-		
-		PluginType pluginType = PluginType.Action;
-		
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			accessToken = BackMeUpUtils.authenticateUser(user);
-			
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-				.header("Authorization", accessToken)
-			.when()
-				.get("/plugins/?types=" + pluginType)
-			.then()
-				.log().all()
-				.statusCode(200);
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
+    @Test
+    public void testGetPluginFilegenerator() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        String pluginId = "org.backmeup.filegenerator";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/" + pluginId)
+            .then()
+                .log().all()
+                .body("pluginId", equalTo(pluginId))
+                .body(containsString("title"))
+                .body(containsString("description"))
+                .body(containsString("imageURL"))
+                .body(containsString("pluginType"))
+                .body(containsString("propertiesDescription"))
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Test
+    public void testGetPluginBackmeupStorage() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        String pluginId = "org.backmeup.storage";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/" + pluginId)
+            .then()
+                .log().all()
+                .body("pluginId", equalTo(pluginId))
+                .body(containsString("title"))
+                .body(containsString("description"))
+                .body(containsString("imageURL"))
+                .body(containsString("pluginType"))
+                .body(containsString("authDataDescription"))
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Test
+    public void testGetPluginDummy() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        String pluginId = "org.backmeup.dummy";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/" + pluginId)
+            .then()
+                .log().all()
+                .body("pluginId", equalTo(pluginId))
+                .body(containsString("title"))
+                .body(containsString("description"))
+                .body(containsString("imageURL"))
+                .body(containsString("pluginType"))
+                .body(containsString("metadata"))
+                .body(containsString("authDataDescription"))
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Ignore
+    @Test
+    public void testGetPluginExpandProfiles() {	
+        String pluginId = "backmeupPlugin1";
+        try {
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+            .when()
+                .get("/plugins/" + pluginId + "/?expandProfiles=true")
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+        }
+    }
+
+    @Test
+    public void testGetAllPlugins() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/")
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Test
+    public void testGetAllDatasourcePlugins() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        PluginType pluginType = PluginType.Source;
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/?types=" + pluginType)
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Test
+    public void testGetAllDatasinkPlugins() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        PluginType pluginType = PluginType.Sink;
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/?types=" + pluginType)
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+
+    @Test
+    public void testGetAllActionPlugins() {	
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        PluginType pluginType = PluginType.Action;
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/?types=" + pluginType)
+            .then()
+                .log().all()
+                .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
 }

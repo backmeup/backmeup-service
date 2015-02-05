@@ -16,33 +16,33 @@ import com.jayway.restassured.response.ValidatableResponse;
 @Category(IntegrationTest.class)
 public class AuthenticationIntegrationTest extends IntegrationTestBase {
 
-	@Test
-	public void testAuthenticateUser() {
-		UserDTO user = TestDataManager.getUser();
-		String userId = "";
-		String accessToken = "";
-			
-		try {
-			ValidatableResponse response = BackMeUpUtils.addUser(user);
-			userId = response.extract().path("userId").toString();
-			
-			String expectedAccessToken = userId + ";" + user.getPassword();
-			
-			response = 
-			given()
-				.log().all()
-				.header("Accept", "application/json")
-			.when()
-				.get("/authenticate?username=" + user.getUsername() + "&password=" + user.getPassword())
-			.then()
-				.log().all()
-				.statusCode(200)
-				.body("accessToken", equalTo(expectedAccessToken))
-				.body(containsString("issueDate"));
-			
-			accessToken = response.extract().path("accessToken");
-		} finally {
-			BackMeUpUtils.deleteUser(accessToken, userId);
-		}
-	}
+    @Test
+    public void testAuthenticateUser() {
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+
+            String expectedAccessToken = userId + ";" + user.getPassword();
+
+            response = 
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+            .when()
+                .get("/authenticate?username=" + user.getUsername() + "&password=" + user.getPassword())
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body("accessToken", equalTo(expectedAccessToken))
+                .body(containsString("issueDate"));
+
+            accessToken = response.extract().path("accessToken");
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
 }

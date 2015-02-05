@@ -10,22 +10,22 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.parsing.Parser;
 
 public abstract class IntegrationTestBase {
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		Configuration config = new Configuration();
-		try (InputStream in = IntegrationTestBase.class.getClassLoader().getResourceAsStream("integrationtests.properties")) {
-		    config.load(in);
-		}
-		
-		RestAssured.baseURI = config.getProperty("backmeup.service.baseuri");
-		RestAssured.port = Integer.parseInt(config.getProperty("backmeup.service.port"));
-		RestAssured.basePath = config.getProperty("backmeup.service.basepath");
-		RestAssured.defaultParser = Parser.JSON;
-		RestAssured.requestContentType("application/json");
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        Configuration config = new Configuration();
+        try (InputStream in = IntegrationTestBase.class.getClassLoader().getResourceAsStream("integrationtests.properties")) {
+            config.load(in);
+        }
 
-	@AfterClass
-	public static void tearDownAfterClass() {
-		RestAssured.reset();
-	}
+        RestAssured.baseURI = config.getProperty("backmeup.service.baseuri");
+        RestAssured.port = Integer.parseInt(config.getProperty("backmeup.service.port"));
+        RestAssured.basePath = config.getProperty("backmeup.service.basepath");
+        RestAssured.defaultParser = Parser.JSON;
+        RestAssured.requestContentType("application/json");
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+        RestAssured.reset();
+    }
 }

@@ -16,175 +16,175 @@ import com.jayway.restassured.response.ValidatableResponse;
 
 
 public class BackMeUpUtils {
-	// ========================================================================
-	//  USER OPERATIONS
-	// ------------------------------------------------------------------------
-		
-	public static ValidatableResponse addUser(UserDTO user){
-		ValidatableResponse response = 
-			given()
-//				.log().all()
-				.header("Accept", "application/json")
-				.body(user, ObjectMapperType.JACKSON_1)
-			.when()
-				.post("/users/")
-			.then()
-//				.log().all()
-				.statusCode(200)
-				.body("username", equalTo(user.getUsername()))
-				.body("firstname", equalTo(user.getFirstname()))
-				.body("lastname", equalTo(user.getLastname()))
-				.body("email", equalTo(user.getEmail()))
-				.body("activated", equalTo(true))
-				.body(containsString("userId"));
-		
-		return response;
-	}
-	
-	public static void deleteUser(String accessToken, String userId){
-		given()
-//			.log().all()
-			.header("Authorization", accessToken)
-		.when()
-			.delete("/users/" + userId)
-		.then()
-//			.log().all()
-			.statusCode(204);
-	}
-	
-	public static String authenticateUser(UserDTO user) {
-		ValidatableResponse response = 
-			given()
-//				.log().all()
-				.header("Accept", "application/json")
-			.when()
-				.get("/authenticate?username=" + user.getUsername() + "&password=" + user.getPassword())
-			.then()
-//				.log().all()
-				.statusCode(200)
-				.body(containsString("accessToken"))
-				.body(containsString("issueDate"));
+    // ========================================================================
+    //  USER OPERATIONS
+    // ------------------------------------------------------------------------
 
-		return response.extract().path("accessToken");
-	}
-	
-	// ========================================================================
-	//  PLUGIN OPERATIONS
-	// ------------------------------------------------------------------------
-	public static void deleteProfile(String accessToken, String pluginId, String profileId) {
-		given()
-//			.log().all()
-			.header("Authorization", accessToken)
-		.when()
-			.delete("/plugins/" +  pluginId + "/" + profileId)
-		.then()
-//			.log().all()
-			.statusCode(204);
-	}
-		
-	public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
-		ValidatableResponse response = 
-		given()
-			.log().all()
-			.contentType("application/json")
-			.header("Accept", "application/json")
-			.header("Authorization", accessToken)
-			.body(pluginProfile, ObjectMapperType.JACKSON_1)
-		.when()
-			.post("/plugins/" + pluginId)
-		.then()
-			.log().all()
-			.statusCode(200);
-		
-		return response;
-	}
-	
-	public static PluginProfileDTO getProfile(String accessToken, String pluginId, String profileId) {
-		return getProfile(accessToken, pluginId, Long.parseLong(profileId));
-	}
-	
-	public static PluginProfileDTO getProfile(String accessToken, String pluginId, Long profileId) {
-		Response response = 
-				given()
-					.log().all()
-					.contentType("application/json")
-					.header("Accept", "application/json")
-					.header("Authorization", accessToken)
-				.when()
-					.get("/plugins/" + pluginId + "/" + profileId);
-		return parseResponse(PluginProfileDTO.class, response);
-	}
-	
-	private static <T> T parseResponse(Class<T> type, Response response) {
-		return response.getBody().as(type);
-	}
-	
-	
-	// ========================================================================
-	//  PROFILE OPERATIONS
-	// ------------------------------------------------------------------------
-		
-	public static ValidatableResponse addAuthData(String accessToken, String pluginId, AuthDataDTO authData) {		
-		ValidatableResponse response = 
-		given()
-//			.log().all()
-			.contentType("application/json")
-			.header("Accept", "application/json")
-			.header("Authorization", accessToken)
-			.body(authData, ObjectMapperType.JACKSON_1)
-		.when()
-			.post("/plugins/" + pluginId + "/authdata")
-		.then()
-//			.log().all()
-			.statusCode(200)
-			.body("id", notNullValue())
-			.body("name", equalTo(authData.getName()));
-		
-		return response;
-	}
-	
-	public static void deleteAuthData(String accessToken, String pluginId, String authDataId) {
-		given()
-			.log().all()
-			.contentType("application/json")
-			.header("Accept", "application/json")
-			.header("Authorization", accessToken)
-		.when()
-			.delete("/plugins/" + pluginId + "/authdata/" + authDataId)
-		.then()
-			.log().all()
-			.statusCode(204);
-	}
-	
-	// ========================================================================
-	//  BACKUPJOB OPERATIONS
-	// ------------------------------------------------------------------------
-	
-	public static ValidatableResponse addBackupJob(String accessToken, BackupJobCreationDTO backupJob) {
-		ValidatableResponse response = 
-		given()
-//			.log().all()
-			.header("Accept", "application/json")
-			.header("Authorization", accessToken)
-			.body(backupJob, ObjectMapperType.JACKSON_1)
-		.when()
-			.post("/backupjobs")
-		.then()
-//			.log().all()
-			.body(containsString("jobId"))
-			.statusCode(200);
-			
-		return response;
-	}
-	
-	public static void deleteBackupJob(String accessToken, String jobId) {
-		given()
-//			.log().all()
-			.header("Authorization", accessToken)
-		.when()
-			.delete("/backupjobs/" +  jobId)
-		.then()
-//			.log().all()
-			.statusCode(204);
-	}
+    public static ValidatableResponse addUser(UserDTO user){
+        ValidatableResponse response = 
+            given()
+//                .log().all()
+                .header("Accept", "application/json")
+                .body(user, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/users/")
+            .then()
+//                .log().all()
+                .statusCode(200)
+                .body("username", equalTo(user.getUsername()))
+                .body("firstname", equalTo(user.getFirstname()))
+                .body("lastname", equalTo(user.getLastname()))
+                .body("email", equalTo(user.getEmail()))
+                .body("activated", equalTo(true))
+                .body(containsString("userId"));
+
+        return response;
+    }
+
+    public static void deleteUser(String accessToken, String userId){
+        given()
+//            .log().all()
+            .header("Authorization", accessToken)
+        .when()
+            .delete("/users/" + userId)
+        .then()
+//            .log().all()
+            .statusCode(204);
+    }
+
+    public static String authenticateUser(UserDTO user) {
+        ValidatableResponse response = 
+            given()
+//                .log().all()
+                .header("Accept", "application/json")
+            .when()
+                .get("/authenticate?username=" + user.getUsername() + "&password=" + user.getPassword())
+            .then()
+//                .log().all()
+                .statusCode(200)
+                .body(containsString("accessToken"))
+                .body(containsString("issueDate"));
+
+        return response.extract().path("accessToken");
+    }
+
+    // ========================================================================
+    //  PLUGIN OPERATIONS
+    // ------------------------------------------------------------------------
+    public static void deleteProfile(String accessToken, String pluginId, String profileId) {
+        given()
+//            .log().all()
+            .header("Authorization", accessToken)
+        .when()
+            .delete("/plugins/" +  pluginId + "/" + profileId)
+        .then()
+//            .log().all()
+            .statusCode(204);
+    }
+
+    public static ValidatableResponse addProfile(String accessToken, String pluginId, PluginProfileDTO pluginProfile) {		
+        ValidatableResponse response = 
+            given()
+                .log().all()
+                .contentType("application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(pluginProfile, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/plugins/" + pluginId)
+            .then()
+                .log().all()
+                .statusCode(200);
+
+        return response;
+    }
+
+    public static PluginProfileDTO getProfile(String accessToken, String pluginId, String profileId) {
+        return getProfile(accessToken, pluginId, Long.parseLong(profileId));
+    }
+
+    public static PluginProfileDTO getProfile(String accessToken, String pluginId, Long profileId) {
+        Response response = 
+            given()
+                .log().all()
+                .contentType("application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/plugins/" + pluginId + "/" + profileId);
+        return parseResponse(PluginProfileDTO.class, response);
+    }
+
+    private static <T> T parseResponse(Class<T> type, Response response) {
+        return response.getBody().as(type);
+    }
+
+
+    // ========================================================================
+    //  PROFILE OPERATIONS
+    // ------------------------------------------------------------------------
+
+    public static ValidatableResponse addAuthData(String accessToken, String pluginId, AuthDataDTO authData) {		
+        ValidatableResponse response = 
+            given()
+//                .log().all()
+                .contentType("application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(authData, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/plugins/" + pluginId + "/authdata")
+            .then()
+//                .log().all()
+                .statusCode(200)
+                .body("id", notNullValue())
+                .body("name", equalTo(authData.getName()));
+
+        return response;
+    }
+
+    public static void deleteAuthData(String accessToken, String pluginId, String authDataId) {
+        given()
+            .log().all()
+            .contentType("application/json")
+            .header("Accept", "application/json")
+            .header("Authorization", accessToken)
+        .when()
+            .delete("/plugins/" + pluginId + "/authdata/" + authDataId)
+        .then()
+            .log().all()
+            .statusCode(204);
+    }
+
+    // ========================================================================
+    //  BACKUPJOB OPERATIONS
+    // ------------------------------------------------------------------------
+
+    public static ValidatableResponse addBackupJob(String accessToken, BackupJobCreationDTO backupJob) {
+        ValidatableResponse response = 
+            given()
+//                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+                .body(backupJob, ObjectMapperType.JACKSON_1)
+            .when()
+                .post("/backupjobs")
+            .then()
+//                .log().all()
+                .body(containsString("jobId"))
+                .statusCode(200);
+
+        return response;
+    }
+
+    public static void deleteBackupJob(String accessToken, String jobId) {
+        given()
+//            .log().all()
+            .header("Authorization", accessToken)
+        .when()
+            .delete("/backupjobs/" +  jobId)
+        .then()
+//            .log().all()
+            .statusCode(204);
+    }
 }
