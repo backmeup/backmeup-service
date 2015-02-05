@@ -13,7 +13,9 @@ public class SearchEntryDTO {
     private String title;
     private String type;
     private String thumbnailUrl;
+    private String downloadUrl;
     private String datasource;
+    private String datasink;
     //private String datasourceId;
     private String jobName;
     private String preview;
@@ -59,12 +61,28 @@ public class SearchEntryDTO {
         this.thumbnailUrl = thumbnailUrl;
     }
 
+    public String getDownloadUrl() {
+        return this.downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
     public String getDatasource() {
         return this.datasource;
     }
 
     public void setDatasource(String datasource) {
         this.datasource = datasource;
+    }
+
+    public String getDatasink() {
+        return this.datasink;
+    }
+
+    public void setDatasink(String datasink) {
+        this.datasink = datasink;
     }
 
     public Map<String, String> getProperties() {
