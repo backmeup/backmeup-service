@@ -25,7 +25,7 @@ public class ValidationException extends BackMeUpException {
     public ValidationException(ValidationExceptionType type, String message) {
         this(type, message, null);
     }
-    
+
     public ValidationException(ValidationExceptionType type, ValidationNotes notes) {
         super("Validation failed", null);
         this.type = type;
