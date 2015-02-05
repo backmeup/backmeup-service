@@ -29,7 +29,11 @@ public class ValidationException extends BackMeUpException {
     public ValidationException(ValidationExceptionType type, ValidationNotes notes) {
         super("Validation failed", null);
         this.type = type;
-        this.notes = notes;
+        if (notes != null) {
+            this.notes = notes;
+        } else {
+            this.notes = new ValidationNotes();
+        }
     }
 
     public ValidationExceptionType getType() {

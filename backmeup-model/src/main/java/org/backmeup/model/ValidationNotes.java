@@ -13,6 +13,7 @@ import org.backmeup.model.spi.ValidationExceptionType;
 public class ValidationNotes {  
   public static final String AUTH_EXCEPTION = "Error during authentication";
   public static final String API_EXCEPTION = "Error during API call";
+  public static final String CONFIG_EXCEPTION = "Error in plugin configuration";
   public static final String ERROR = "Plugin threw an unhandled error during the validation";
   public static final String NO_VALIDATOR_AVAILABLE = "Plugin doesn't provide a validator";
   public static final String PLUGIN_UNAVAILABLE = "Plugin is not available";
@@ -26,21 +27,22 @@ public class ValidationNotes {
     exceptionText = new HashMap<>();
     exceptionText.put(ValidationExceptionType.AuthException, AUTH_EXCEPTION);    
     exceptionText.put(ValidationExceptionType.APIException, API_EXCEPTION);
+    exceptionText.put(ValidationExceptionType.ConfigException, CONFIG_EXCEPTION);
     exceptionText.put(ValidationExceptionType.Error, ERROR);
     exceptionText.put(ValidationExceptionType.NoValidatorAvailable, NO_VALIDATOR_AVAILABLE);
     exceptionText.put(ValidationExceptionType.PluginUnavailable, NO_VALIDATOR_AVAILABLE);
   }
   
   public void addValidationEntry(ValidationExceptionType type, String pluginId, Exception cause) {
-    this.validationNotes.add(new ValidationEntry(type, exceptionText.get(type), pluginId, cause));
+    this.validationNotes.add(new ValidationEntry(type, pluginId, exceptionText.get(type), cause));
   }
   
   public void addValidationEntry(ValidationExceptionType type, Exception e) {
     this.addValidationEntry(type, null, e);
   }
   
-  public void addValidationEntry(ValidationExceptionType type, String pluginId) {
-    this.addValidationEntry(type, pluginId, null);
+  public void addValidationEntry(ValidationExceptionType type, String pluginId, String message) {
+    this.validationNotes.add(new ValidationEntry(type, pluginId, message, null));
   }
   
   public void addAll(ValidationNotes notes) {
@@ -70,14 +72,14 @@ public class ValidationNotes {
   public static class ValidationEntry {
     private ValidationExceptionType type;
     private String message;
+    private String pluginId;
     private String cause;
     private String stackTrace;
-    private String pluginId;
     
-    public ValidationEntry(ValidationExceptionType type, String message, String pluginId, Exception cause) {
+    public ValidationEntry(ValidationExceptionType type, String pluginId, String message, Exception cause) {
       this.type = type;
-      this.message = message;
       this.pluginId = pluginId;
+      this.message = message;
         if (cause != null) {
             this.setCause(cause.getMessage());
             try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
