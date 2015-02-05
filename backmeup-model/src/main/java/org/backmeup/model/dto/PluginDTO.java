@@ -19,6 +19,7 @@ public class PluginDTO {
 	private Map<String, String> metadata;
 	private PluginConfigurationDTO authDataDescription;
 	private List<PluginInputFieldDTO> propertiesDescription;
+	private List<String> availableOptions;
 	private List<PluginProfileDTO> profiles;
 
 	public PluginDTO() {
@@ -104,7 +105,22 @@ public class PluginDTO {
 		this.propertiesDescription.add(desc);
 	}
 
-	public List<PluginProfileDTO> getProfiles() {
+	public List<String> getAvailableOptions() {
+        return availableOptions;
+    }
+
+    public void setAvailableOptions(List<String> availableOptions) {
+        this.availableOptions = availableOptions;
+    }
+    
+    public void addAvailableOption(String option) {
+        if(availableOptions == null) {
+            this.availableOptions = new ArrayList<>();
+        }
+        this.availableOptions.add(option);
+    }
+
+    public List<PluginProfileDTO> getProfiles() {
 		return profiles;
 	}
 
