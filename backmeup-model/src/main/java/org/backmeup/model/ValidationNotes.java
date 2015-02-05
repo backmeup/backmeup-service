@@ -51,6 +51,10 @@ public class ValidationNotes {
       }
   }
   
+  public boolean hasEntries() {
+      return this.validationNotes != null && !this.validationNotes.isEmpty();
+  }
+  
   public List<ValidationEntry> getValidationEntries() {
     return this.validationNotes;
   }
