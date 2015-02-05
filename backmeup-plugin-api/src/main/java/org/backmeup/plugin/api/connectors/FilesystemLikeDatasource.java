@@ -3,7 +3,7 @@ package org.backmeup.plugin.api.connectors;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.backmeup.plugin.api.MetainfoContainer;
 import org.backmeup.plugin.api.storage.Storage;
@@ -22,25 +22,25 @@ public abstract class FilesystemLikeDatasource implements Datasource {
 	private final Logger logger = LoggerFactory.getLogger(FilesystemLikeDatasource.class);
 	
 	@Override
-    public void downloadAll(Properties accessData, Properties properties, List<String> options, Storage storage, Progressable progressor) throws StorageException {
-		List<FilesystemURI> files = list(accessData, options);
+    public void downloadAll(Map<String, String> authData, Map<String, String> properties, List<String> options, Storage storage, Progressable progressor) throws StorageException {
+		List<FilesystemURI> files = list(authData, options);
 		for (int i=0; i < files.size(); i++) {
 			FilesystemURI uri = files.get(i);			
-			download(accessData, properties, options, uri, storage, progressor);			
+			download(authData, properties, options, uri, storage, progressor);			
 		}
 	}
 	
-	private void download(Properties accessData, Properties properties, List<String> options, FilesystemURI uri, Storage storage, Progressable progressor) throws StorageException {
+	private void download(Map<String, String> authData, Map<String, String> properties, List<String> options, FilesystemURI uri, Storage storage, Progressable progressor) throws StorageException {
 	  MetainfoContainer metainfo = uri.getMetainfoContainer();	  
 		if (uri.isDirectory()) {
 			logger.info("Downloading contents of directory " + uri);
-			for (FilesystemURI child : list(accessData, options, uri)) {
-				download(accessData, properties, options, child, storage, progressor);
+			for (FilesystemURI child : list(authData, options, uri)) {
+				download(authData, properties, options, child, storage, progressor);
 			}
 		} else {
 			logger.info("Downloading file " + uri);
 			progressor.progress(String.format("Downloading file %s ...", uri.toString()));
-			InputStream is = getFile(accessData, options, uri);
+			InputStream is = getFile(authData, options, uri);
 			if (is == null) {
 				logger.warn("Got a null input stream for " + uri.getUri().getPath().toString());
 				progressor.progress(String.format("Downloading file %s failed!", uri.toString()));
@@ -54,12 +54,12 @@ public abstract class FilesystemLikeDatasource implements Datasource {
 		}
 	}
 	
-	public List<FilesystemURI> list(Properties accessData, List<String> options) {
+	public List<FilesystemURI> list(Map<String, String> accessData, List<String> options) {
 		return list(accessData, options, null);
 	}
 	
-	public abstract List<FilesystemURI> list(Properties accessData, List<String> options, FilesystemURI uri);
+	public abstract List<FilesystemURI> list(Map<String, String> accessData, List<String> options, FilesystemURI uri);
 	
-	public abstract InputStream getFile(Properties accessData, List<String> options, FilesystemURI uri);
+	public abstract InputStream getFile(Map<String, String> accessData, List<String> options, FilesystemURI uri);
 	
 }

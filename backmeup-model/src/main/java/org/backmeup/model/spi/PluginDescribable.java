@@ -1,6 +1,6 @@
 package org.backmeup.model.spi;
 
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * A plugin is eather a source, an action or a sink plugin.
@@ -57,5 +57,5 @@ public interface PluginDescribable {
     public PluginVisibility getVisibility();
 
     public String getImageURL();
-    public Properties getMetadata(Properties accessData);
+    public Map<String, String> getMetadata(Map<String, String> authData);
 }

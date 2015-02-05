@@ -1,7 +1,7 @@
 package org.backmeup.plugin.api.connectors;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.backmeup.plugin.api.storage.Storage;
 import org.backmeup.plugin.api.storage.StorageException;
@@ -18,7 +18,7 @@ public interface Datasink {
 
     /**
      * 
-     * @param accessData
+     * @param authData
      * @param properties
      * @param options
      * @param storage
@@ -30,7 +30,6 @@ public interface Datasink {
      *         value for this String
      * @throws StorageException
      */
-    public String upload(Properties accessData, Properties properties, List<String> options, Storage storage,
-            Progressable progressor) throws StorageException;
-
+    public String upload(Map<String, String> authData, Map<String, String> properties, List<String> options, 
+            Storage storage, Progressable progressor) throws StorageException;
 }

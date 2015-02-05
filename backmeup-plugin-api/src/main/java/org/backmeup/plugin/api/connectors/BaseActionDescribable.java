@@ -2,6 +2,8 @@ package org.backmeup.plugin.api.connectors;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.backmeup.model.exceptions.PluginException;
@@ -59,8 +61,8 @@ public abstract class BaseActionDescribable implements PluginDescribable {
 	}
 
 	@Override
-	public Properties getMetadata(Properties accessData) {
-		return new Properties();
+	public Map<String, String> getMetadata(Map<String, String> authData) {
+		return new HashMap<>();
 	}
 
 	@Override
