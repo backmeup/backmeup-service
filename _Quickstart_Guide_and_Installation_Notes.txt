@@ -17,6 +17,7 @@ The following document contains a 'quickstart' guide for setting up the BackMeUp
 
  optional
  - Thumbnails-Plugin please make sure you've installed GraphicsMagick as external dependency
+ - Indexing-Plugin please make sure you've installed a Tika-Server runninng on localhost:99998 [see hint G]
 
  
  For implicitly required software artefacts and version see the project's pom.xml files
@@ -169,7 +170,9 @@ mvn install
 
 Info:
 It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment, as some dependencies are exposed for all bundles and some are embedded for the individual plugins.
-Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys.
+Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys or use Jenkins for managing the configuration. 
+
+Certain Plugins as e.g. the Facebook Plugin also require to have a Facebook-App registered at developer.facebook.com which manages the Canvas URLS as https://apps.facebook.com/bmu_themis
 
 
 H) Building the backmeup-worker component
@@ -284,10 +287,15 @@ when this is completed restart the queue with rabbitmq-server.bat
 to check on the status of the queue go to http://localhost:15672/ username/pw: guest/guest
 when running the first backup you should find a 'keyserv' and 'backmeup' message queue.
 
+G) Apache Tika in Server Mode
+----------------------------------
+The Indexing Plugin relies on Apache Tika for advanced object identification, metadata and fulltext extraction
+The Plugin does not provide the apache Tika bundle itself [mainly due to stability caused by ignored and missing artefacts in the bundle] but requires to have an Apache Tika Server running locally on localhost:9998 to issue the calls.
 
-
-
-
+To provide the JAX-RS webservice of Tika, go to https://github.com/willp-bl/ProcessIsolatedTika
+A pre-configured version with Tika 1.7 is already provided in backmeup-plugins/backmeup-indexing-plugin src/main/resources/processisolatedtika-0.0.4-SNAPSHOT-jar-with-dependencies.jar
+To launch Tika call:
+java -jar processisolatedtika-0.0.4-SNAPSHOT-jar-with-dependencies.jar
 
 
 
