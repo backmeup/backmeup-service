@@ -20,6 +20,7 @@ public class SearchEntryDTO {
     private String jobName;
     private String preview;
     private Map<String, String> properties;
+    private Map<String, String> metadata;
 
     public String getFileId() {
         return this.fileId;
@@ -87,6 +88,14 @@ public class SearchEntryDTO {
 
     public Map<String, String> getProperties() {
         return this.properties;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+
+    public Map<String, String> getMetadata() {
+        return this.metadata;
     }
 
     public void setProperties(Map<String, String> properties) {
