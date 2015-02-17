@@ -8,7 +8,6 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>org.backmeup.model.BackMeUpUser</class>
 		<class>org.backmeup.model.Profile</class>
-		<class>org.backmeup.model.Status</class>
 		<class>org.backmeup.model.BackupJob</class>
 		<class>org.backmeup.model.UserProperty</class>
 		<class>org.backmeup.model.JobProtocol</class>

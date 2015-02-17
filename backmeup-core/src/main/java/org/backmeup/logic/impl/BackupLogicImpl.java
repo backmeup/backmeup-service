@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
-import org.backmeup.dal.StatusDao;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
@@ -24,7 +23,6 @@ import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ProtocolOverview.Activity;
 import org.backmeup.model.ProtocolOverview.Entry;
-import org.backmeup.model.Status;
 import org.backmeup.model.Token;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.JobProtocolDTO;
@@ -45,10 +43,6 @@ public class BackupLogicImpl implements BackupLogic {
 
     private BackupJobDao getBackupJobDao() {
         return dal.createBackupJobDao();
-    }
-
-    private StatusDao getStatusDao() {
-        return dal.createStatusDao();
     }
 
     private JobProtocolDao createJobProtocolDao() {
@@ -115,19 +109,13 @@ public class BackupLogicImpl implements BackupLogic {
     public void deleteJob(Long userId, Long jobId) {
         BackupJob job = getExistingUserJob(jobId, userId);
 
-        deleteStatuses(job.getId());
-
         getBackupJobDao().delete(job);
     }
 
     @Override
     public void deleteJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
-        StatusDao statusDao = getStatusDao();
         for (BackupJob job : jobDao.findByUserId(userId)) {
-            for (Status status : statusDao.findByJobId(job.getId())) {
-                statusDao.delete(status);
-            }
             jobDao.delete(job);
         }
     }
@@ -195,14 +183,6 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     // Helper methods ---------------------------------------------------------
-
-    private void deleteStatuses(Long jobId) {
-        // Delete Job status records first
-        StatusDao statusDao = getStatusDao();
-        for (Status status : statusDao.findByJobId(jobId)) {
-            statusDao.delete(status);
-        }
-    }
 
     private void storePluginConfigOnKeyserver(BackupJob job) {
         // Active user (password is set) is stored in job.getUser()

@@ -8,7 +8,6 @@ import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.ProfileDao;
-import org.backmeup.dal.StatusDao;
 import org.backmeup.dal.UserDao;
 
 /**
@@ -32,11 +31,6 @@ public class DataAccessLayerImpl implements DataAccessLayer {
 	@Override
 	public ProfileDao createProfileDao() {
 		return new ProfileDaoImpl(threaLocalEntityManager.get());
-	}
-
-	@Override
-	public StatusDao createStatusDao() {
-		return new StatusDaoImpl(threaLocalEntityManager.get());
 	}
 
 	@Override
