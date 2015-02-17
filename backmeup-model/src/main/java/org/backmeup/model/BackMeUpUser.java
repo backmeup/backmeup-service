@@ -1,9 +1,7 @@
 package org.backmeup.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -49,9 +47,6 @@ public class BackMeUpUser {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "user")
 	private final List<JobProtocol> protocols = new ArrayList<>();
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private final Set<UserProperty> properties = new HashSet<>();
 
 	public BackMeUpUser() {
 
@@ -135,42 +130,6 @@ public class BackMeUpUser {
 
 	public void setVerificationKey(String verificationKey) {
 		this.verificationKey = verificationKey;
-	}
-
-	public Set<UserProperty> getUserProperties() {
-		return properties;
-	}
-
-	public String getUserProperty(String key) {
-		UserProperty up = findProperty(key);
-		if (up == null) {
-			return null;
-		}
-		return up.getValue();
-	}
-
-	public void setUserProperty(String key, String value) {
-		UserProperty up = findProperty(key);
-		if (up == null) {
-			up = new UserProperty(key, value);
-			this.getUserProperties().add(up);
-		} else {
-			up.setValue(value);
-		}
-	}
-
-	public void deleteUserProperty(String key) {
-		UserProperty up = new UserProperty(key, null);
-		this.getUserProperties().remove(up);
-	}
-
-	private UserProperty findProperty(String key) {
-		for (UserProperty up : getUserProperties()) {
-			if (up.getKey().equals(key)) {
-				return up;
-			}
-		}
-		return null;
 	}
 
 	public void ensureActivated() {
