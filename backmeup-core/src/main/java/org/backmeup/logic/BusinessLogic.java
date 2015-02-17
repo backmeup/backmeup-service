@@ -10,7 +10,6 @@ import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
 import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.spi.PluginDescribable;
 
@@ -53,16 +52,14 @@ public interface BusinessLogic {
     Profile         addPluginProfile(Profile profile);
     Profile         getPluginProfile(Long profileId);
     Profile         updatePluginProfile(Profile profile);
-    ValidationNotes validateProfile(Long userId, Long profileId, String keyRing);
     void            deleteProfile(Long profileId);
 
     // backupjob operations ---------------------------------------------------
     BackupJob       createBackupJob(BackupJob backupJob);
-    List<BackupJob> getJobs(Long userId);
-    BackupJob       getBackupJobFull(Long jobId);
-    void            validateBackupJob(BackupJob backupJob);
+    BackupJob       getBackupJob(Long jobId);
+    List<BackupJob> getBackupJobs(Long userId);
     BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
-    void            deleteJob(Long userId, Long jobId);
+    void            deleteBackupJob(Long userId, Long jobId);
 
     ProtocolDetails  getProtocolDetails(Long userId, String fileId);
     ProtocolOverview getProtocolOverview(Long userId, String duration);

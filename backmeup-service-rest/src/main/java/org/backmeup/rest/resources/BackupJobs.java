@@ -51,7 +51,7 @@ public class BackupJobs extends Base {
 			status = getMapper().map(jobStatus, BackupJobStatus.class);
 		}
 		
-		List<BackupJob> allJobsOfUser = getLogic().getJobs(activeUser.getUserId());
+		List<BackupJob> allJobsOfUser = getLogic().getBackupJobs(activeUser.getUserId());
 		List<BackupJobDTO> jobList = new ArrayList<>();
 		
 		for(BackupJob job : allJobsOfUser) {
@@ -139,7 +139,7 @@ public class BackupJobs extends Base {
 		
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
+		BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
 		if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -190,7 +190,7 @@ public class BackupJobs extends Base {
 		}
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull(backupjob.getJobId());
+		BackupJob job = getLogic().getBackupJob(backupjob.getJobId());
 		if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -216,11 +216,11 @@ public class BackupJobs extends Base {
 	public void deleteBackupJob(@PathParam("jobId") String jobId) {
 		BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 		
-		BackupJob job = getLogic().getBackupJobFull(Long.parseLong(jobId));
+		BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
 		if (!job.getUser().getUserId().equals(activeUser.getUserId())) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		getLogic().deleteJob(activeUser.getUserId(), Long.parseLong(jobId));
+		getLogic().deleteBackupJob(activeUser.getUserId(), Long.parseLong(jobId));
 	}
 }

@@ -2,7 +2,6 @@ package org.backmeup.logic.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
@@ -33,11 +32,9 @@ import org.backmeup.model.constants.DelayTimes;
 import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
-import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
-import org.backmeup.model.spi.Validationable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +121,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public BackMeUpUser call() {
 
                 return registration.getUserByUsername(username, true);
-
+                
             }
         });
     }
@@ -184,14 +181,13 @@ public class BusinessLogicImpl implements BusinessLogic {
                 }
                 return user;
 
-
             }
         });
     }
 
     // ========================================================================
 
-            // Plugin operations ------------------------------------------------------
+    // Plugin operations ------------------------------------------------------
 
     @Override
     public boolean isPluginAvailable(String pluginId) {
@@ -295,31 +291,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     }
 
-    @Override
-    public ValidationNotes validateProfile(final Long userId, final Long profileId, final String keyRing) {
-        return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
-            @Override public ValidationNotes call() {
-                String pluginId = null;
-                ValidationNotes notes = new ValidationNotes();
-                
-                try {
-                    Profile p = profiles.getProfile(profileId);
-                    pluginId = p.getPluginId();
-                    Validationable validator = plugins.getValidator(pluginId);
-                    Map<String, String> authProps = authorization.getProfileAuthInformation(p, keyRing);
-                    notes.addAll(validator.validateProperties(authProps));
-                    return notes;
-
-                } catch (PluginUnavailableException pue) {
-                    return ValidationNotes.createExceptionNotes(ValidationExceptionType.NoValidatorAvailable, pluginId, pue);
-                } catch (Exception pe) {
-                    return ValidationNotes.createExceptionNotes(ValidationExceptionType.Error, pluginId, pe);
-                }
-
-            }
-        });
-    }
-
     public ValidationNotes validateProfile(final Profile profile) {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
             @Override public ValidationNotes call() {
@@ -350,7 +321,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
-
     @Override
     public Profile updatePluginProfile(final Profile profile) {
         return conn.txNew(new Callable<Profile>() {
@@ -380,157 +350,8 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     // ========================================================================
-
-    @Override
-    public BackupJob createBackupJob(BackupJob backupJob) {
-        try {
-            validateBackupJob(backupJob);
-            BackupJob job = jobManager.createBackupJob(backupJob);
-            return job;
-        } finally {
-            //            conn.rollback();
-        }
-    }
-
-    @Override
-    public BackupJob getBackupJobFull(final Long jobId) {
-        return conn.txNewReadOnly(new Callable<BackupJob>() {
-            @Override public BackupJob call() {
-
-                return backupJobs.getExistingJob(jobId);
-
-            }
-        });
-    }
-
-    @Override
-    public BackupJob updateBackupJob(final Long userId, final BackupJob backupJob) {
-        if (backupJob.getId() == null) {
-            throw new IllegalArgumentException("JobId must not be null!");
-        }
-
-        BackupJob job = conn.txNew(new Callable<BackupJob>() {
-            @Override public BackupJob call() {
-
-                BackupJob persistentJob = backupJobs.getExistingUserJob(backupJob.getId(), userId);
-                backupJobs.updateJob(persistentJob, backupJob);
-                return persistentJob;
-
-            }
-        });
-
-        return job;
-    }
-
-    @Override
-    public List<BackupJob> getJobs(final Long userId) {
-        return conn.txNewReadOnly(new Callable<List<BackupJob>>() {
-            @Override public List<BackupJob> call() {
-
-                registration.getUserByUserId(userId, true);
-                return backupJobs.getBackupJobsOf(userId);
-
-            }
-        });
-    }
-
-    @Override
-    public void deleteJob(final Long userId, final Long jobId) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-
-                registration.getUserByUserId(userId, true);
-                backupJobs.deleteJob(userId, jobId);
-
-            }
-        });
-    }
-
-    @Override
-    public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
-        return search.getProtocolDetails(userId, fileId);
-    }
-
-    @Override
-    public ProtocolOverview getProtocolOverview(final Long userId, final String duration) {
-        return conn.txNewReadOnly(new Callable<ProtocolOverview>() {
-            @Override public ProtocolOverview call() {
-
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-
-                Date to = new Date();
-                Date from = duration.equals("month") ? new Date(to.getTime() - DelayTimes.DELAY_MONTHLY) :
-                    new Date(to.getTime() - DelayTimes.DELAY_WEEKLY);
-
-                return backupJobs.getProtocolOverview(user, from, to);
-
-            }
-        });
-    }
-
-    @Override
-    public void updateJobProtocol(final Long userId, final Long jobId, final JobProtocolDTO jobProtocol) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-                BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
-                backupJobs.createJobProtocol(user, job, jobProtocol);
-
-            }
-        });
-    }
-
-    @Override
-    public void deleteJobProtocols(final Long userId) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-
-                registration.getUserByUserId(userId, true);
-                backupJobs.deleteProtocolsOf(userId);
-
-            }
-        });
-    }
-
-    @Override
-    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type, final String job) {
-        return conn.txNewReadOnly(new Callable<SearchResponse>() {
-            @Override public SearchResponse call() {
-
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.runSearch(user, query, source, type, job);
-
-            }
-        });
-    }
-
-    @Override
-    public void validateBackupJob(final BackupJob backupJob) {
-        conn.txNewReadOnly(new Runnable() {
-            @Override public void run() {
-                ValidationNotes notes = new ValidationNotes();
-                try {
-                    notes.addAll(validateProfile(backupJob.getSourceProfile()));
-                    notes.addAll(validateProfile(backupJob.getSinkProfile()));
-
-                    for(Profile actionProfile : backupJob.getActionProfiles()) {
-                        notes.addAll(validateProfile(actionProfile));
-                    }
-
-                } catch (BackMeUpException bme) {
-                    notes.addValidationEntry(ValidationExceptionType.Error, bme);
-                }
-                
-                if (!notes.getValidationEntries().isEmpty()) {
-                    throw new ValidationException(ValidationExceptionType.ConfigException, notes);
-                }
-            }
-        });
-    }
-
-
-
+    
+    // Profile operations -----------------------------------------------------
     @Override
     public AuthData addPluginAuthData(final AuthData authData) {
         return conn.txNew(new Callable<AuthData>() {
@@ -592,5 +413,162 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
 
     }
+    
+    // ========================================================================
+
+    // BackupJob operations ---------------------------------------------------
+    
+    @Override
+    public BackupJob createBackupJob(BackupJob backupJob) {
+        try {
+            validateBackupJob(backupJob);
+            BackupJob job = jobManager.createBackupJob(backupJob);
+            return job;
+        } finally {
+            //            conn.rollback();
+        }
+    }
+
+    @Override
+    public BackupJob getBackupJob(final Long jobId) {
+        return conn.txNewReadOnly(new Callable<BackupJob>() {
+            @Override public BackupJob call() {
+
+                return backupJobs.getExistingJob(jobId);
+
+            }
+        });
+    }
+
+    @Override
+    public BackupJob updateBackupJob(final Long userId, final BackupJob backupJob) {
+        if (backupJob.getId() == null) {
+            throw new IllegalArgumentException("JobId must not be null!");
+        }
+
+        BackupJob job = conn.txNew(new Callable<BackupJob>() {
+            @Override public BackupJob call() {
+
+                BackupJob persistentJob = backupJobs.getExistingUserJob(backupJob.getId(), userId);
+                backupJobs.updateJob(persistentJob, backupJob);
+                return persistentJob;
+
+            }
+        });
+
+        return job;
+    }
+
+    @Override
+    public List<BackupJob> getBackupJobs(final Long userId) {
+        return conn.txNewReadOnly(new Callable<List<BackupJob>>() {
+            @Override public List<BackupJob> call() {
+
+                registration.getUserByUserId(userId, true);
+                return backupJobs.getBackupJobsOf(userId);
+
+            }
+        });
+    }
+
+    @Override
+    public void deleteBackupJob(final Long userId, final Long jobId) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+
+                registration.getUserByUserId(userId, true);
+                backupJobs.deleteJob(userId, jobId);
+
+            }
+        });
+    }
+
+    @Override
+    public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
+        return search.getProtocolDetails(userId, fileId);
+    }
+
+    @Override
+    public ProtocolOverview getProtocolOverview(final Long userId, final String duration) {
+        return conn.txNewReadOnly(new Callable<ProtocolOverview>() {
+            @Override public ProtocolOverview call() {
+
+                BackMeUpUser user = registration.getUserByUserId(userId, true);
+
+                Date to = new Date();
+                Date from = duration.equals("month") ? new Date(to.getTime() - DelayTimes.DELAY_MONTHLY) :
+                    new Date(to.getTime() - DelayTimes.DELAY_WEEKLY);
+
+                return backupJobs.getProtocolOverview(user, from, to);
+
+            }
+        });
+    }
+
+    @Override
+    public void updateJobProtocol(final Long userId, final Long jobId, final JobProtocolDTO jobProtocol) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+
+                BackMeUpUser user = registration.getUserByUserId(userId, true);
+                BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
+                backupJobs.createJobProtocol(user, job, jobProtocol);
+
+            }
+        });
+    }
+
+    @Override
+    public void deleteJobProtocols(final Long userId) {
+        conn.txNew(new Runnable() {
+            @Override public void run() {
+
+                registration.getUserByUserId(userId, true);
+                backupJobs.deleteProtocolsOf(userId);
+
+            }
+        });
+    }
+    
+    private void validateBackupJob(final BackupJob backupJob) {
+        conn.txNewReadOnly(new Runnable() {
+            @Override public void run() {
+                ValidationNotes notes = new ValidationNotes();
+                try {
+                    notes.addAll(validateProfile(backupJob.getSourceProfile()));
+                    notes.addAll(validateProfile(backupJob.getSinkProfile()));
+
+                    for(Profile actionProfile : backupJob.getActionProfiles()) {
+                        notes.addAll(validateProfile(actionProfile));
+                    }
+
+                } catch (BackMeUpException bme) {
+                    notes.addValidationEntry(ValidationExceptionType.Error, bme);
+                }
+                
+                if (!notes.getValidationEntries().isEmpty()) {
+                    throw new ValidationException(ValidationExceptionType.ConfigException, notes);
+                }
+            }
+        });
+    }
+    
+    // ========================================================================
+
+    // search operations ------------------------------------------------------
+
+    @Override
+    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type, final String job) {
+        return conn.txNewReadOnly(new Callable<SearchResponse>() {
+            @Override public SearchResponse call() {
+
+                BackMeUpUser user = registration.getUserByUserId(userId, true);
+                return search.runSearch(user, query, source, type, job);
+
+            }
+        });
+    }
+    
+    // ========================================================================
 
 }
