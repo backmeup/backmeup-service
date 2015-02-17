@@ -93,6 +93,7 @@
 		<module>backmeup-core</module>
 		<module>backmeup-service-client</module>
 		<module>backmeup-service-rest</module>
+		<module>backmeup-service-scheduler</module>
 		<module>backmeup-service-tests</module>
 	</modules>
 
