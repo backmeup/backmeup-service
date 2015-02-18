@@ -538,7 +538,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     private void validateBackupJob(final BackupJob backupJob) {
-        conn.txNewReadOnly(new Runnable() {
+        conn.txJoinReadOnly(new Runnable() {
             @Override public void run() {
                 ValidationNotes notes = new ValidationNotes();
                 try {
