@@ -12,8 +12,6 @@ import org.backmeup.model.BackupJob;
  */
 public interface JobManager {
 
-//    BackupJob createBackupJob(BackupJob backupJob);
-
     void runBackUpJob(BackupJob job);
 
 }
