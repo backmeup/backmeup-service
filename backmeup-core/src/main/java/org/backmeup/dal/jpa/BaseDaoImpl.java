@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.backmeup.dal.BaseDao;
- 
+
 /**
  * Realizes the CRUD operations for a model class <T>
  * based on the JPA (EntityManager).
@@ -16,44 +16,44 @@ import org.backmeup.dal.BaseDao;
  * @param <T> The model class to use
  */
 public abstract class BaseDaoImpl<T> implements BaseDao<T> {
-	protected EntityManager em;
-	protected Class<T> entityClass;	
-	
-	@SuppressWarnings("unchecked")
-	public BaseDaoImpl(EntityManager em) {
-		this.em = em;
-		ParameterizedType superType = (ParameterizedType) this.getClass().getGenericSuperclass();
-		entityClass = (Class<T>) superType.getActualTypeArguments()[0];
-	} 
-	
-	@Override
+    protected EntityManager em;
+    protected Class<T> entityClass;	
+
+    @SuppressWarnings("unchecked")
+    public BaseDaoImpl(EntityManager em) {
+        this.em = em;
+        ParameterizedType superType = (ParameterizedType) this.getClass().getGenericSuperclass();
+        entityClass = (Class<T>) superType.getActualTypeArguments()[0];
+    } 
+
+    @Override
     public T merge(T entity) {
-	  return em.merge(entity);
-	}
- 
-	@Override
+        return em.merge(entity);
+    }
+
+    @Override
     public T findById(long id) {
-		T item = em.find(entityClass, id);
-		return item;
-	}
- 
-	@Override
+        T item = em.find(entityClass, id);
+        return item;
+    }
+
+    @Override
     public boolean delete(T entity) {
-		T mergedEntity = em.merge(entity);
-		em.remove(mergedEntity);
-		return true;
-	}
- 
-	@Override
+        T mergedEntity = em.merge(entity);
+        em.remove(mergedEntity);
+        return true;
+    }
+
+    @Override
     public T save(T entity) {
-		T savedEntity = em.merge(entity);		
-		return savedEntity;
-	} 
-	
-	@Override
+        T savedEntity = em.merge(entity);		
+        return savedEntity;
+    } 
+
+    @Override
     public long count() {
-		Query q = em.createQuery("SELECT COUNT(u) FROM " + entityClass.getName() + " u");
-		Long cnt = (Long) q.getSingleResult();
-		return cnt;
-	} 
+        Query q = em.createQuery("SELECT COUNT(u) FROM " + entityClass.getName() + " u");
+        Long cnt = (Long) q.getSingleResult();
+        return cnt;
+    } 
 }
