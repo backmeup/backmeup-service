@@ -59,21 +59,6 @@ public abstract class AkkaJobManager implements JobManager {
         return getBackupJobDao().findById(jobId);
     }
 
-    @Override
-    public BackupJob createBackupJob(BackupJob backupJob) {
-        try {
-            conn.begin();
-            BackupJob job = backupLogic.createJob(backupJob);
-            conn.commit();
-
-            // Queue new job immediately
-            queueJob(job);
-            return job;
-        } finally {
-            conn.rollback();
-        }
-    }
-
     @PostConstruct
     public void start() {
         // TODO only take N next recent ones (at least if allJobs has an
