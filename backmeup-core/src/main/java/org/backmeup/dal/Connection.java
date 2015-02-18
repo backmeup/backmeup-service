@@ -19,6 +19,8 @@ public interface Connection {
     void txNewReadOnly(Runnable call);
 
     <T> T txJoinReadOnly(Callable<T> getter);
+    void txJoinReadOnly(Runnable call);
+    
     void txJoin(Runnable call);
 
 }

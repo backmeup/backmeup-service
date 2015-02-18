@@ -158,6 +158,11 @@ public class ConnectionImpl implements Connection {
     public void txJoin(Runnable call) {
         new ConnectionTemplate(this).insideJoinedTransaction(call);
     }
+    
+    @Override
+    public void txJoinReadOnly(Runnable call) {
+        new ConnectionTemplate(this).insideJoinedTransactionRolledBack(call);
+    }
 
     @Override
     public <T> T txJoinReadOnly(Callable<T> getter) {

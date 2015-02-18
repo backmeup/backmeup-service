@@ -79,6 +79,10 @@ public class ConnectionTemplate {
             }
         });
     }
+    
+    public void insideJoinedTransactionRolledBack(Runnable call) {
+        insideJoinedTransactionRolledBack(callableFrom(call));
+    }
 
     private static Callable<Void> callableFrom(final Runnable runnable) {
         return new Callable<Void>() {
