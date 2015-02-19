@@ -35,7 +35,9 @@ public class BackMeUpExceptionMapper implements ExceptionMapper<BackMeUpExceptio
         StringWriter errorStackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(errorStackTrace));
         info.put("stacktrace", errorStackTrace.toString());
-        info.put("cause", mapExceptionInformation(e.getCause()));
+        if (e.getCause() != null) {
+            info.put("cause", mapExceptionInformation(e.getCause()));
+        }
         
         return info;
     }
