@@ -7,8 +7,8 @@ import javax.ws.rs.core.Application;
 
 import org.backmeup.rest.filters.SecurityInterceptor;
 import org.backmeup.rest.filters.TimingResourceFilter;
+import org.backmeup.rest.provider.BackMeUpExceptionMapper;
 import org.backmeup.rest.provider.JacksonJsonConfiguration;
-import org.backmeup.rest.provider.PluginExceptionMapper;
 import org.backmeup.rest.provider.ValidationExceptionMapper;
 import org.backmeup.rest.resources.Authentication;
 import org.backmeup.rest.resources.BackupJobs;
@@ -31,7 +31,7 @@ public class BackmeupServiceApplication extends Application {
         // The default life-cycle for providers (registered directly or via a feature) is singleton.
         set.add(JacksonJsonConfiguration.class); // provider
         set.add(ValidationExceptionMapper.class);
-        set.add(PluginExceptionMapper.class);
+        set.add(BackMeUpExceptionMapper.class);
         set.add(TimingResourceFilter.class); // filter = provider
         set.add(SecurityInterceptor.class); // filter = provider
     }
