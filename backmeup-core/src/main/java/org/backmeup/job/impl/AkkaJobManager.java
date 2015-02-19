@@ -3,6 +3,7 @@ package org.backmeup.job.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -58,33 +59,35 @@ public abstract class AkkaJobManager implements JobManager {
     private BackupJob getBackUpJob(Long jobId) {
         return getBackupJobDao().findById(jobId);
     }
+    
+    // Lifecycle methods ------------------------------------------------------
 
     @PostConstruct
     public void start() {
-        // TODO only take N next recent ones (at least if allJobs has an
-        // excessive length)
-        try {
-            conn.begin();
-            List<BackupJob> storedJobs = getBackupJobDao().findAll();
-            conn.rollback();
-            for (BackupJob storedJob : storedJobs) {
-                queueJob(storedJob);
+        List<BackupJob> jobs = conn.txNewReadOnly(new Callable<List<BackupJob>>() {
+            @Override
+            public List<BackupJob> call() {
+                return getBackupJobDao().findAll();
             }
-        } finally {
-            conn.rollback();
+        });
+
+        for (BackupJob storedJob : jobs) {
+            queueJob(storedJob);
         }
     }
-
-    @Override
-    public void runBackUpJob(BackupJob job) {
-        queueJob(job);
-    }
-
+    
     @PreDestroy
     public void shutdown() {
         // Shutdown system component
         SYSTEM.shutdown();
         SYSTEM.awaitTermination();
+    }
+    
+    // ========================================================================
+
+    @Override
+    public void runBackUpJob(BackupJob job) {
+        queueJob(job);
     }
 
     protected abstract void runJob(BackupJob job);

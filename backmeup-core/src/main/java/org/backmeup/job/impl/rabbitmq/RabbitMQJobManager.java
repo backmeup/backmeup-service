@@ -44,20 +44,16 @@ public class RabbitMQJobManager extends AkkaJobManager {
     public void start() {
         super.start();
         try {
-            init();
+            // Setup connection to the message queue
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost(this.mqHost);
+
+            this.mqConnection = factory.newConnection();
+            this.mqChannel = this.mqConnection.createChannel();
+            this.mqChannel.queueDeclare(this.mqName, false, false, false, null);
         } catch (IOException e) {
             throw new BackMeUpException(e);
         }
-    }
-
-    private void init() throws IOException {
-        // Setup connection to the message queue
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(this.mqHost);
-
-        this.mqConnection = factory.newConnection();
-        this.mqChannel = this.mqConnection.createChannel();
-        this.mqChannel.queueDeclare(this.mqName, false, false, false, null);
     }
 
     @PreDestroy
