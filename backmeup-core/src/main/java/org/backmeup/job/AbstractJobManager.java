@@ -1,4 +1,4 @@
-package org.backmeup.job.impl;
+package org.backmeup.job;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.job.JobManager;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
@@ -34,11 +33,11 @@ import akka.util.Duration;
  * 
  * @author Rainer Simon <rainer.simon@ait.ac.at>
  */
-public abstract class AkkaJobManager implements JobManager {
+public abstract class AbstractJobManager implements JobManager {
 
     private static final ActorSystem SYSTEM = ActorSystem.create();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJobManager.class);
 
     @Inject
     protected Connection conn;

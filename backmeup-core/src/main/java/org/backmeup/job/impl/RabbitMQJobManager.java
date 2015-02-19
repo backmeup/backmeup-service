@@ -1,4 +1,4 @@
-package org.backmeup.job.impl.rabbitmq;
+package org.backmeup.job.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,7 +9,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.backmeup.configuration.cdi.Configuration;
-import org.backmeup.job.impl.AkkaJobManager;
+import org.backmeup.job.AbstractJobManager;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
@@ -20,11 +20,11 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 /**
- * An implementation of {@link AkkaJobManager} that pushes backup jobs into a RabbitMQ queue, where they can be handled
+ * An implementation of {@link AbstractJobManager} that pushes backup jobs into a RabbitMQ queue, where they can be handled
  * by worker nodes.
  */
 @ApplicationScoped
-public class RabbitMQJobManager extends AkkaJobManager {
+public class RabbitMQJobManager extends AbstractJobManager {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQJobManager.class);
 
     @Inject
