@@ -18,7 +18,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
         
         info.put("type", e.getType());
         if (e.getNotes() != null && e.getNotes().hasEntries()) {
-            info.put("validationEntries", e.getNotes());
+            info.put("validationEntries", e.getNotes().getValidationEntries());
         }
         
         return info;
