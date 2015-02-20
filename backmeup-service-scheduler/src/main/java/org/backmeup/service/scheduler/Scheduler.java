@@ -8,7 +8,6 @@ import java.util.List;
  * 
  * A Scheduler maintains a set of BackupJobs and is responsible
  * for executing them when their schedule time arrives. 
- *
  */
 public interface Scheduler {
     ///////////////////////////////////////////////////////////////////////////
@@ -25,13 +24,11 @@ public interface Scheduler {
      * 
      * If the scheduler is already managing jobs (eg. there are jobs in it's 
      * db tables), the recovery process will be started
-     * 
      */
     void start();
     
     /**
      * Indicates whether the scheduler has been started. 
-     * 
      */
     boolean isStarted();
     
@@ -39,13 +36,11 @@ public interface Scheduler {
      * Temporarily halts the scheduler and prevents it from triggering job
      * executions. The scheduler can be restarted at any time by calling 
      * start() method;
-     * 
      */
     void standby();
     
     /**
      * Indicates whether the scheduler is in stand-by mode. 
-     * 
      */
     boolean isInStandby();
     
@@ -56,7 +51,6 @@ public interface Scheduler {
      * @param waitForJobsToComplete
      *          if true the scheduler will not allow this method
      *          to return until all currently executing jobs have completed.
-     * 
      */
     void shutdown(boolean waitForJobsToComplete);
 
@@ -67,7 +61,6 @@ public interface Scheduler {
     
     /**
      * Returns a list of objects that the scheduler is currently executing.
-     * 
      */
     List<Object> getCurrentlyExecutingJobs();
     
@@ -80,7 +73,6 @@ public interface Scheduler {
     /**
      * Add the give BackupJob to the scheduler and associate the given Trigger 
      * with it.
-     * 
      */
     Date scheduleJob(Object job, Object trigger);
     
@@ -88,7 +80,6 @@ public interface Scheduler {
      * Remove the given trigger from the scheduler. 
      * It its associated job doesn't have any other triggers, 
      * it is also deleted.
-     * 
      */
     boolean unscheduleJob(Object triggerKey);
     
