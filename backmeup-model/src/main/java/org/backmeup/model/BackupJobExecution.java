@@ -23,6 +23,7 @@ public class BackupJobExecution {
     private BackupJobStatus status;
     
     private BackMeUpUser user;
+    private BackupJob backupJob;
     private Profile sourceProfile;
     private List<Profile> actionProfiles = new ArrayList<>();
     private Profile sinkProfile;
@@ -95,6 +96,14 @@ public class BackupJobExecution {
 
     public void setUser(BackMeUpUser user) {
         this.user = user;
+    }
+
+    public BackupJob getBackupJob() {
+        return backupJob;
+    }
+
+    public void setBackupJob(BackupJob backupJob) {
+        this.backupJob = backupJob;
     }
 
     public Profile getSourceProfile() {
