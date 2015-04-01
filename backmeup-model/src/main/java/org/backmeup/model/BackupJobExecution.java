@@ -2,9 +2,21 @@ package org.backmeup.model;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.backmeup.model.constants.BackupJobStatus;
 
@@ -13,22 +25,50 @@ import org.backmeup.model.constants.BackupJobStatus;
  * of a BackupJob.
  * 
  */
+@Entity
 public class BackupJobExecution {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
+    
     private String jobName;
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
+    
+    @Enumerated(EnumType.STRING)
     private BackupJobStatus status;
     
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private BackMeUpUser user;
+    
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private BackupJob backupJob;
+    
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private Profile sourceProfile;
+    
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private List<Profile> actionProfiles = new ArrayList<>();
+    
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private Profile sinkProfile;
+    
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Token token;
-    private Set<JobProtocol> jobProtocol = new HashSet<>();
+    
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
+//    private Set<JobProtocol> jobProtocol = new HashSet<>();
     
     // ExecutionContext
     // failureExceptions
@@ -138,13 +178,13 @@ public class BackupJobExecution {
         this.token = token;
     }
 
-    public Set<JobProtocol> getJobProtocol() {
-        return jobProtocol;
-    }
-
-    public void setJobProtocol(Set<JobProtocol> jobProtocol) {
-        this.jobProtocol = jobProtocol;
-    }
+//    public Set<JobProtocol> getJobProtocol() {
+//        return jobProtocol;
+//    }
+//
+//    public void setJobProtocol(Set<JobProtocol> jobProtocol) {
+//        this.jobProtocol = jobProtocol;
+//    }
 
     public void setJobName(String jobName) {
         this.jobName = jobName;

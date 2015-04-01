@@ -13,6 +13,7 @@
 		<class>org.backmeup.model.JobProtocol$JobProtocolMember</class>
 		<class>org.backmeup.model.Token</class>
 		<class>org.backmeup.model.AuthData</class>
+		<class>org.backmeup.model.BackupJobExecution</class>
 		<properties>
 			<property name="javax.persistence.jdbc.user" value="dbu_core" />
 			<property name="javax.persistence.jdbc.password" value="dbu_core" />
