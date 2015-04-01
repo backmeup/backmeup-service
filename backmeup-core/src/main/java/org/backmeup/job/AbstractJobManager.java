@@ -15,7 +15,6 @@ import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
-import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Token;
 import org.slf4j.Logger;
@@ -44,9 +43,6 @@ public abstract class AbstractJobManager implements JobManager {
 
     @Inject
     protected DataAccessLayer dal;
-
-    @Inject
-    protected BackupLogic backupLogic;
 
     @Inject
     private Keyserver keyserver;
