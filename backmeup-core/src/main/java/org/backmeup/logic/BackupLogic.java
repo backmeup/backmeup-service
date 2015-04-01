@@ -10,19 +10,19 @@ import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
 
-    BackupJob createJob(BackupJob job);
+    BackupJob addBackupJob(BackupJob job);
+       
+    BackupJob getBackupJob(Long jobId);
+
+    BackupJob getBackupJob(Long jobId, Long userId);
     
     List<BackupJob> getBackupJobsOf(Long userId);
-    
-    BackupJob getExistingJob(Long jobId);
 
-    BackupJob getExistingUserJob(Long jobId, Long userId);
-
-    void updateJob(BackupJob job, BackupJob updatedJob);
+    void updateBackupJob(BackupJob job, BackupJob updatedJob);
     
-    void deleteJob(Long userId, Long jobId);
+    void deleteBackupJob(Long userId, Long jobId);
     
-    void deleteJobsOf(Long userId);
+    void deleteBackupJobsOf(Long userId);
 
     
     void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);

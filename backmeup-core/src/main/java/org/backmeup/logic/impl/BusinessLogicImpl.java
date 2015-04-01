@@ -144,7 +144,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 BackMeUpUser u = registration.getUserByUserId(userId);
                 authorization.unregister(u);
-                backupJobs.deleteJobsOf(u.getUserId());
+                backupJobs.deleteBackupJobsOf(u.getUserId());
                 profiles.deleteProfilesOf(u.getUserId());
                 registration.delete(u); 
                 return u;
@@ -425,7 +425,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public BackupJob call() {
 
                 validateBackupJob(backupJob);
-                BackupJob job = backupJobs.createJob(backupJob);
+                BackupJob job = backupJobs.addBackupJob(backupJob);
                 return job;
 
             }
@@ -441,7 +441,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNewReadOnly(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                return backupJobs.getExistingJob(jobId);
+                return backupJobs.getBackupJob(jobId);
 
             }
         });
@@ -456,8 +456,8 @@ public class BusinessLogicImpl implements BusinessLogic {
         BackupJob job = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                BackupJob persistentJob = backupJobs.getExistingUserJob(backupJob.getId(), userId);
-                backupJobs.updateJob(persistentJob, backupJob);
+                BackupJob persistentJob = backupJobs.getBackupJob(backupJob.getId(), userId);
+                backupJobs.updateBackupJob(persistentJob, backupJob);
                 return persistentJob;
 
             }
@@ -484,7 +484,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public void run() {
 
                 registration.getUserByUserId(userId, true);
-                backupJobs.deleteJob(userId, jobId);
+                backupJobs.deleteBackupJob(userId, jobId);
 
             }
         });
@@ -518,7 +518,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public void run() {
 
                 BackMeUpUser user = registration.getUserByUserId(userId, true);
-                BackupJob job = backupJobs.getExistingUserJob(jobId, userId);
+                BackupJob job = backupJobs.getBackupJob(jobId, userId);
                 backupJobs.createJobProtocol(user, job, jobProtocol);
 
             }

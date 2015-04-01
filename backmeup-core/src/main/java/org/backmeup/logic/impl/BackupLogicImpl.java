@@ -52,7 +52,7 @@ public class BackupLogicImpl implements BackupLogic {
     // BackupLogic methods ----------------------------------------------------
 
     @Override
-    public BackupJob createJob(BackupJob job) {
+    public BackupJob addBackupJob(BackupJob job) {
         job.setStatus(BackupJobStatus.queued);
 
         Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
@@ -73,7 +73,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public BackupJob getExistingJob(Long jobId) {
+    public BackupJob getBackupJob(Long jobId) {
         if (jobId == null) {
             throw new IllegalArgumentException("JobId must not be null");
         }
@@ -85,8 +85,8 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public BackupJob getExistingUserJob(Long jobId, Long userId) {
-        BackupJob job = getExistingJob(jobId);
+    public BackupJob getBackupJob(Long jobId, Long userId) {
+        BackupJob job = getBackupJob(jobId);
         if (!job.getUser().getUserId().equals(userId)) {
             throw new IllegalArgumentException(String.format(textBundle.getString(JOB_USER_MISSMATCH),
                     jobId, userId));
@@ -95,7 +95,7 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void updateJob(BackupJob persistentJob, BackupJob updatedJob) {
+    public void updateBackupJob(BackupJob persistentJob, BackupJob updatedJob) {
         persistentJob.getToken().setTokenId(updatedJob.getToken().getTokenId());
         persistentJob.getToken().setToken(updatedJob.getToken().getToken());
         persistentJob.getToken().setBackupdate(updatedJob.getToken().getBackupdate());
@@ -106,14 +106,14 @@ public class BackupLogicImpl implements BackupLogic {
     }
 
     @Override
-    public void deleteJob(Long userId, Long jobId) {
-        BackupJob job = getExistingUserJob(jobId, userId);
+    public void deleteBackupJob(Long userId, Long jobId) {
+        BackupJob job = getBackupJob(jobId, userId);
 
         getBackupJobDao().delete(job);
     }
 
     @Override
-    public void deleteJobsOf(Long userId) {
+    public void deleteBackupJobsOf(Long userId) {
         BackupJobDao jobDao = getBackupJobDao();
         for (BackupJob job : jobDao.findByUserId(userId)) {
             jobDao.delete(job);
