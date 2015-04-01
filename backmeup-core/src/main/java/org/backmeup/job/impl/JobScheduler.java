@@ -76,7 +76,7 @@ public class JobScheduler {
 
     public void standby() {
         schedulerThread.setPause(true);
-        LOGGER.info("Scheduler  paused.");
+        LOGGER.info("Scheduler paused.");
     }
 
     public void shutdown() {
