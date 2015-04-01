@@ -11,12 +11,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.backmeup.dal.BackupJobDao;
+import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.JobProtocol;
 import org.backmeup.model.JobProtocol.JobProtocolMember;
 import org.backmeup.model.Profile;
@@ -47,6 +49,10 @@ public class BackupLogicImpl implements BackupLogic {
 
     private JobProtocolDao createJobProtocolDao() {
         return dal.createJobProtocolDao();
+    }
+    
+    private BackupJobExecutionDao getBackupJobExecutionDao() {
+        return dal.createBackupJobExecutionDao();
     }
 
     // BackupLogic methods ----------------------------------------------------
@@ -118,6 +124,11 @@ public class BackupLogicImpl implements BackupLogic {
         for (BackupJob job : jobDao.findByUserId(userId)) {
             jobDao.delete(job);
         }
+    }
+    
+    @Override
+    public List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId) {
+        return getBackupJobExecutionDao().findByBackupJobId(jobId);
     }
 
     @Override

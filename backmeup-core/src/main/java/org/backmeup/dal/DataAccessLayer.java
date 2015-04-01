@@ -13,6 +13,8 @@ public interface DataAccessLayer {
     ProfileDao createProfileDao();
 
     BackupJobDao createBackupJobDao();
+    
+    BackupJobExecutionDao createBackupJobExecutionDao();
 
     JobProtocolDao createJobProtocolDao();
     

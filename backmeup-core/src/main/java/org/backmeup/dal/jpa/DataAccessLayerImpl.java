@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 
 import org.backmeup.dal.AuthDataDao;
 import org.backmeup.dal.BackupJobDao;
+import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.ProfileDao;
@@ -18,38 +19,42 @@ import org.backmeup.dal.UserDao;
  */
 @ApplicationScoped
 public class DataAccessLayerImpl implements DataAccessLayer {
-    private final ThreadLocal<EntityManager> threaLocalEntityManager = new ThreadLocal<>();
+    private final ThreadLocal<EntityManager> threadLocalEntityManager = new ThreadLocal<>();
 
     public DataAccessLayerImpl() {
     }
 
     @Override
     public UserDao createUserDao() {
-        return new UserDaoImpl(threaLocalEntityManager.get());
+        return new UserDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
     public ProfileDao createProfileDao() {
-        return new ProfileDaoImpl(threaLocalEntityManager.get());
+        return new ProfileDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
     public BackupJobDao createBackupJobDao() {
-        return new BackupJobDaoImpl(threaLocalEntityManager.get());
+        return new BackupJobDaoImpl(threadLocalEntityManager.get());
+    }
+    
+    public BackupJobExecutionDao createBackupJobExecutionDao() {
+        return new BackupJobExecutionDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
     public JobProtocolDao createJobProtocolDao() {
-        return new JobProtocolDaoImpl(threaLocalEntityManager.get());
+        return new JobProtocolDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
     public AuthDataDao createAuthDataDao() {
-        return new AuthDataDaoImpl(threaLocalEntityManager.get());
+        return new AuthDataDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
     public void setConnection(Object connection) {
-        this.threaLocalEntityManager.set((EntityManager) connection);
+        this.threadLocalEntityManager.set((EntityManager) connection);
     }
 }
