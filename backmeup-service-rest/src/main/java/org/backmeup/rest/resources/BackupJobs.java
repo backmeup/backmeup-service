@@ -103,7 +103,7 @@ public class BackupJobs extends Base {
             timeExpression = "monthly";
             reschedule = true;
 
-        } else if (backupJob.getSchedule().equals(JobFrequency.onece)) {
+        } else if (backupJob.getSchedule().equals(JobFrequency.once)) {
             delay = DelayTimes.DELAY_REALTIME;
             timeExpression = "realtime";
             reschedule = false;

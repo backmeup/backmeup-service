@@ -18,7 +18,7 @@ public class BackupJobDTO {
 	}
 	
 	public static enum JobFrequency {
-		onece, daily, weekly, montly
+		once, daily, weekly, montly
 	}
 
 	private Long jobId;

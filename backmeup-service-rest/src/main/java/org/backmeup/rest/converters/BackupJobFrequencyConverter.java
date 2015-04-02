@@ -27,7 +27,7 @@ public class BackupJobFrequencyConverter implements CustomConverter {
                 return JobFrequency.montly;
 
             case "realtime":
-                return JobFrequency.onece;
+                return JobFrequency.once;
             default:
                 throw new IllegalStateException();
             }
@@ -44,7 +44,7 @@ public class BackupJobFrequencyConverter implements CustomConverter {
             case montly:
                 return "monthly";
 
-            case onece:
+            case once:
                 return "realtime";
 
             default:
