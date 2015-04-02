@@ -19,6 +19,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
  * Domain object representing a uniquely identifiable execution 
@@ -151,6 +152,11 @@ public class BackupJobExecution {
     }
 
     public void setSourceProfile(Profile sourceProfile) {
+        if (sourceProfile.getType() != PluginType.Source) {
+            throw new IllegalArgumentException(
+                    "Source profile must be of type Source, but is of type "
+                            + sourceProfile.getType());
+        }
         this.sourceProfile = sourceProfile;
     }
 
@@ -159,6 +165,14 @@ public class BackupJobExecution {
     }
 
     public void setActionProfiles(List<Profile> actionProfiles) {
+        for (Profile actionProfile : actionProfiles) {
+            if (actionProfile.getType() != PluginType.Action) {
+                throw new IllegalArgumentException("Action profile ("
+                        + actionProfile.getId()
+                        + ") must be of type Action, but is of type "
+                        + actionProfile.getType());
+            }
+        }
         this.actionProfiles = actionProfiles;
     }
 
@@ -167,6 +181,11 @@ public class BackupJobExecution {
     }
 
     public void setSinkProfile(Profile sinkProfile) {
+        if (sinkProfile.getType() != PluginType.Sink) {
+            throw new IllegalArgumentException(
+                    "Sink profile must be of type Sink, but is of type "
+                            + sinkProfile.getType());
+        }
         this.sinkProfile = sinkProfile;
     }
 
