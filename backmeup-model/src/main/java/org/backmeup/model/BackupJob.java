@@ -64,8 +64,8 @@ public class BackupJob {
 
 //	private long delay;
 
-//	@Temporal(TemporalType.TIMESTAMP)
-//	private Date start;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date startTime;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date nextExecutionTime;
@@ -106,7 +106,7 @@ public class BackupJob {
 		setSinkProfile(sinkProfile);
 		setActionProfiles(actionProfiles);
 		this.actionProfiles = actionProfiles;
-//		this.start = start;
+		this.startTime = start;
 //		this.delay = delay;
 
 		this.createTime = new Date();
@@ -184,13 +184,13 @@ public class BackupJob {
 		this.actionProfiles = actionProfiles;
 	}
 
-//	public Date getStart() {
-//		return (Date) start.clone();
-//	}
-//
-//	public void setStart(Date start) {
-//		this.start = (Date) start.clone();
-//	}
+	public Date getStartTime() {
+		return (Date) startTime.clone();
+	}
+
+	public void setStartTime(Date start) {
+		this.startTime = (Date) start.clone();
+	}
 
 //	public long getDelay() {
 //		return delay;
@@ -319,5 +319,42 @@ public class BackupJob {
 //		this.validScheduleID = validScheduleID;
 //	}
     
+    @Override
+    public String toString() {
+        return String.format("%s: id=%d Job=[%s]", "BackupJob", id, jobName);
+    }
     
+    /**
+     * Attempt to establish identity based on id if both exist. 
+     * If either id does not exist use Object.equals().
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof BackupJob)) {
+            return false;
+        }
+        BackupJob entity = (BackupJob) other;
+        if (id == null || entity.getId() == null) {
+            return false;
+        }
+        return id.equals(entity.getId());
+    }
+    
+    /**
+     * Use ID if it exists to establish hash code, otherwise fall back to
+     * Object.hashCode(). 
+     */
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        }
+        return 59 * id.hashCode();
+    }
 }

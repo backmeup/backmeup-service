@@ -91,6 +91,10 @@ public class BackupJobExecution {
         return jobName;
     }
     
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+    
     public Date getCreateTime() {
         return (Date) createTime.clone();
     }
@@ -205,10 +209,6 @@ public class BackupJobExecution {
 //        this.jobProtocol = jobProtocol;
 //    }
 
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
-
     @Override
     public String toString() {
         return String.format("%s: id=%d Job=[%s]", "BackupJobExecution", id, jobName);
@@ -245,6 +245,6 @@ public class BackupJobExecution {
         if (id == null) {
             return super.hashCode();
         }
-        return 39 + 87 * id.hashCode();
+        return 139 * id.hashCode();
     }
 }
