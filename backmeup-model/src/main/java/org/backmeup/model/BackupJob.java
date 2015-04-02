@@ -40,7 +40,7 @@ public class BackupJob {
 	@Column(nullable = false)
 	private Long id;
 
-	private String jobTitle;
+	private String jobName;
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private BackMeUpUser user;
@@ -57,20 +57,20 @@ public class BackupJob {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private Token token;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
-	private final Set<JobProtocol> jobProtocols = new HashSet<>();
+//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
+//	private final Set<JobProtocol> jobProtocols = new HashSet<>();
 
 	private String timeExpression;
 
-	private long delay;
+//	private long delay;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date start;
+//	@Temporal(TemporalType.TIMESTAMP)
+//	private Date start;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date nextExecutionTime;
 
-	private boolean reschedule;
+//	private boolean reschedule;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastSuccessful;
@@ -81,15 +81,18 @@ public class BackupJob {
 	@Enumerated(EnumType.STRING)
 	private BackupJobStatus status;
 
-	private boolean onHold = false;
+	private boolean isActive = true;
 
-	private UUID validScheduleID = null;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date created;
+//	private UUID validScheduleID = null;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date modified;
+	private Date createTime;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastUpdatedTime;
+	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "backupJob")
+    private Set<BackupJobExecution> jobExecutions = new HashSet<>();
 
 	public BackupJob() {
 		super();
@@ -103,13 +106,13 @@ public class BackupJob {
 		setSinkProfile(sinkProfile);
 		setActionProfiles(actionProfiles);
 		this.actionProfiles = actionProfiles;
-		this.start = start;
-		this.delay = delay;
+//		this.start = start;
+//		this.delay = delay;
 
-		this.created = new Date();
-		this.modified = this.created;
-		this.jobTitle = jobTitle;
-		this.reschedule = reschedule;
+		this.createTime = new Date();
+		this.lastUpdatedTime = this.createTime;
+		this.jobName = jobTitle;
+//		this.reschedule = reschedule;
 	}
 
 	public Long getId() {
@@ -117,17 +120,15 @@ public class BackupJob {
 	}
 
 	public void setId(Long id) {
-		this.modified = new Date();
 		this.id = id;
 	}
 
-	public String getJobTitle() {
-		return jobTitle;
+	public String getJobName() {
+		return jobName;
 	}
 
-	public void setJobTitle(String jobTitle) {
-		this.modified = new Date();
-		this.jobTitle = jobTitle;
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
 	}
 
 	public BackMeUpUser getUser() {
@@ -135,7 +136,6 @@ public class BackupJob {
 	}
 
 	public void setUser(BackMeUpUser user) {
-		this.modified = new Date();
 		this.user = user;
 	}
 
@@ -150,7 +150,6 @@ public class BackupJob {
 							+ sourceProfile.getType());
 		}
 		this.sourceProfile = sourceProfile;
-		this.modified = new Date();
 	}
 
 	public Profile getSinkProfile() {
@@ -164,7 +163,6 @@ public class BackupJob {
 							+ sinkProfile.getType());
 		}
 		this.sinkProfile = sinkProfile;
-		this.modified = new Date();
 	}
 
 	public List<Profile> getActionProfiles() {
@@ -184,70 +182,70 @@ public class BackupJob {
 			}
 		}
 		this.actionProfiles = actionProfiles;
-		this.modified = new Date();
 	}
 
-	public Date getStart() {
-		return start;
-	}
+//	public Date getStart() {
+//		return (Date) start.clone();
+//	}
+//
+//	public void setStart(Date start) {
+//		this.start = (Date) start.clone();
+//	}
 
-	public void setStart(Date start) {
-		this.modified = new Date();
-		this.start = start;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.modified = new Date();
-		this.delay = delay;
-	}
+//	public long getDelay() {
+//		return delay;
+//	}
+//
+//	public void setDelay(long delay) {
+//		this.delay = delay;
+//	}
 
 	public Token getToken() {
 		return token;
 	}
 
 	public void setToken(Token token) {
-		this.modified = new Date();
 		this.token = token;
 	}
 
-	public Date getCreated() {
-		return created;
+	public Date getCreateTime() {
+		return (Date)createTime.clone();
 	}
 
-	public Date getModified() {
-		return modified;
-	}
+    public Date getLastUpdatedTime() {
+        return (Date) lastUpdatedTime.clone();
+    }
 
-	public JobProtocol lastProtocol() {
-		JobProtocol last = null;
-		for (JobProtocol jp : jobProtocols) {
-			if (last == null
-					|| jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
-				last = jp;
-			}
-		}
-		return last;
-	}
+    public void setLastUpdatedTime(Date date) {
+        this.lastUpdatedTime = (Date) date.clone();
+    }
+
+//	public JobProtocol lastProtocol() {
+//		JobProtocol last = null;
+//		for (JobProtocol jp : jobProtocols) {
+//			if (last == null
+//					|| jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
+//				last = jp;
+//			}
+//		}
+//		return last;
+//	}
 
 	public Date getNextExecutionTime() {
-		return nextExecutionTime;
+		return (Date) nextExecutionTime.clone();
 	}
 
 	public void setNextExecutionTime(Date nextExecutionTime) {
-		this.nextExecutionTime = nextExecutionTime;
+		this.nextExecutionTime = (Date) nextExecutionTime.clone();
 	}
 
-	public boolean isReschedule() {
-		return reschedule;
-	}
-
-	public void setReschedule(boolean reschedule) {
-		this.reschedule = reschedule;
-	}
+//	public boolean isReschedule() {
+//		return reschedule;
+//	}
+//
+//	public void setReschedule(boolean reschedule) {
+//		this.reschedule = reschedule;
+//	}
 
 	public BackupJobStatus getStatus() {
 		return status;
@@ -258,42 +256,68 @@ public class BackupJob {
 	}
 
 	public Date getLastSuccessful() {
-		return lastSuccessful;
+		return (Date) lastSuccessful.clone();
 	}
 
 	public void setLastSuccessful(Date lastSuccessful) {
-		this.lastSuccessful = lastSuccessful;
+		this.lastSuccessful = (Date) lastSuccessful.clone();
 	}
 
 	public Date getLastFailed() {
-		return lastFailed;
+		return (Date) lastFailed.clone();
 	}
 
 	public void setLastFailed(Date lastFailed) {
 		this.lastFailed = lastFailed;
 	}
 
-	public boolean isOnHold() {
-		return onHold;
-	}
+//	public boolean isOnHold() {
+//		return isActive;
+//	}
+//
+//	public void setOnHold(boolean onHold) {
+//		this.isActive = onHold;
+//	}
+	
+    public boolean isActive() {
+        return isActive;
+    }
 
-	public void setOnHold(boolean onHold) {
-		this.onHold = onHold;
-	}
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
 	public String getTimeExpression() {
 		return timeExpression;
 	}
 
-	public void setTimeExpression(String timeExpression) {
+    public void setTimeExpression(String timeExpression) {
 		this.timeExpression = timeExpression;
 	}
 
-	public UUID getValidScheduleID() {
-		return validScheduleID;
-	}
+    public Set<BackupJobExecution> getJobExecutions() {
+        return jobExecutions;
+    }
 
-	public void setValidScheduleID(UUID validScheduleID) {
-		this.validScheduleID = validScheduleID;
-	}
+    public void setJobExecutions(Set<BackupJobExecution> jobExecutions) {
+        for (BackupJobExecution jobExecution : jobExecutions) {
+            if (jobExecution.getBackupJob().getId() != this.getId()) {
+                throw new IllegalArgumentException(String.format(
+                        "JobExecution with id '%s' is attached to another job",
+                        jobExecution.getBackupJob().getId()));
+            }
+        }
+        this.jobExecutions = jobExecutions;
+    }
+    
+
+//	public UUID getValidScheduleID() {
+//		return validScheduleID;
+//	}
+//
+//	public void setValidScheduleID(UUID validScheduleID) {
+//		this.validScheduleID = validScheduleID;
+//	}
+    
+    
 }
