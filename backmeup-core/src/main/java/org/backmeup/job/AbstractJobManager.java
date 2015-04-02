@@ -37,6 +37,8 @@ public abstract class AbstractJobManager implements JobManager {
     private static final ActorSystem SYSTEM = ActorSystem.create();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJobManager.class);
+    
+    private static final long DELAY = 604800000;
 
     @Inject
     protected Connection conn;
@@ -92,7 +94,7 @@ public abstract class AbstractJobManager implements JobManager {
         try {
             // Compute next job execution time
             long currentTime = new Date().getTime();
-            long executeIn = job.getStart().getTime() - currentTime;
+            long executeIn = job.getStartTime().getTime() - currentTime;
             if (job.getNextExecutionTime() != null) {
                 executeIn = job.getNextExecutionTime().getTime() - currentTime;
             }
@@ -106,7 +108,8 @@ public abstract class AbstractJobManager implements JobManager {
             // ...otherwise, schedule on the next occasion defined by .getStart
             // and .getDelay
             if (executeIn < 0) {
-                executeIn += Math.ceil((double) Math.abs(executeIn) / (double) job.getDelay()) * job.getDelay();
+                // DELAY = job.getDelay());
+                executeIn += Math.ceil((double) Math.abs(executeIn) / (double) DELAY * DELAY);
                 conn.begin();
                 job = getBackUpJob(job.getId());
                 // TODO we need to update these jobs' tokens - but where do we
@@ -127,7 +130,7 @@ public abstract class AbstractJobManager implements JobManager {
             conn.begin();
             job = getBackUpJob(job.getId());
             UUID schedulerID = UUID.randomUUID();
-            job.setValidScheduleID(schedulerID);
+//            job.setValidScheduleID(schedulerID);
             conn.commit();
 
             // We can use the 'cancellable' to terminate later on
@@ -162,12 +165,12 @@ public abstract class AbstractJobManager implements JobManager {
         public void run() {
             // check if the scheduler is still valid. If not a new scheduler was
             // created and this one should not be executed
-            if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
-                return;
-            }
+//            if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
+//                return;
+//            }
 
             // Run the job
-            if (!job.isOnHold()) {
+            if (job.isActive()) {
                 runJob(job);
             }
 
@@ -176,12 +179,12 @@ public abstract class AbstractJobManager implements JobManager {
                 conn.beginOrJoin();
 
                 BackupJob nextJob = dal.createBackupJobDao().findById(job.getId());
-                if (nextJob != null && nextJob.isReschedule()) {
-                    logger.debug("Rescheduling job for execution in "+ job.getDelay() + "ms");
-                    Date execTime = new Date(new Date().getTime() + job.getDelay());
+                if (nextJob != null /* && nextJob.isReschedule() */) {
+                    logger.debug("Rescheduling job for execution in "+ DELAY + "ms");
+                    Date execTime = new Date(new Date().getTime() + DELAY);
                     nextJob.setNextExecutionTime(execTime);
                     SYSTEM.scheduler().scheduleOnce(
-                            Duration.create(job.getDelay(),
+                            Duration.create(DELAY,
                                     TimeUnit.MILLISECONDS),
                                     new RunAndReschedule(job, dal, schedulerID));
                     // store the next execution time

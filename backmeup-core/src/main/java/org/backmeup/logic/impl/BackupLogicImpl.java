@@ -61,7 +61,11 @@ public class BackupLogicImpl implements BackupLogic {
     public BackupJob addBackupJob(BackupJob job) {
         job.setStatus(BackupJobStatus.queued);
 
-        Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
+        // TODO SP: adding and starting a backup job should be two distinct methods.
+        // This following step is necessary when a job is started and therefore a 
+        // jobexecution is created and scheduled. 
+//        Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
+        Long firstExecutionDate = 1L;
 
         storePluginConfigOnKeyserver(job);
 
@@ -174,7 +178,7 @@ public class BackupLogicImpl implements BackupLogic {
                 }
                 totalSize += member.getSpace();
             }
-            po.getActivities().add(new Activity(prot.getJob().getJobTitle(), prot.getExecutionTime()));
+            po.getActivities().add(new Activity(prot.getJob().getJobName(), prot.getExecutionTime()));
         }
 
         for (Entry entry : entries.values()) {
