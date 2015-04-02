@@ -22,6 +22,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
 import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
@@ -220,5 +221,26 @@ public class BackupJobs extends Base {
         }
 
         getLogic().deleteBackupJob(activeUser.getUserId(), Long.parseLong(jobId));
+    }
+    
+    @RolesAllowed("user")
+    @GET
+    @Path("/{jobId}/executions/")
+    public List<BackupJobExecution> listBackupJobExecutions(@PathParam("jobId") String jobId) {
+        return null;
+    }
+    
+    @RolesAllowed("user")
+    @POST
+    @Path("/{jobId}/executions/")
+    public void executeBackupJob(@PathParam("jobId") String jobId) {
+        
+    }
+    
+    @RolesAllowed("user")
+    @GET
+    @Path("/{jobId}/executions/{jobExecutionId}")
+    public BackupJobExecution getBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId) {
+        return null;
     }
 }
