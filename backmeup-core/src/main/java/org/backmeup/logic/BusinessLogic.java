@@ -56,6 +56,8 @@ public interface BusinessLogic {
 
     // backupjob operations ---------------------------------------------------
     BackupJob       createBackupJob(BackupJob backupJob);
+    BackupJob       createBackupJob(BackupJob backupJob, boolean startImmediately);
+    void            startBackupJob(BackupJob backupJob);
     BackupJob       getBackupJob(Long jobId);
     List<BackupJob> getBackupJobs(Long userId);
     BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
