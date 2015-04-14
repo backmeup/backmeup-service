@@ -16,9 +16,9 @@ public class FakeSearchResponse {
         searchResponse.setByJob(Arrays.asList(new CountedEntry("first Job", 1), new CountedEntry("next Job", 1)));
         searchResponse.setBySource(Arrays.asList(new CountedEntry("Dropbox", 2), new CountedEntry("Facebook", 2)));
         searchResponse.setByType(Arrays.asList(new CountedEntry("Type", 3)));
-        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", new Date(), "type", "A wonderful file (title)",
-                "downloadUrl", "thmbnailUrl", "Dropbox", "Storage", "first Job", "...lore ipsum...",
-                new HashMap<String, String>(), new HashMap<String, String>())));
+        searchResponse.setFiles(Arrays.asList(new SearchEntry("fileId", "2", true, new Date(), "type",
+                "A wonderful file (title)", "downloadUrl", "thmbnailUrl", "Dropbox", "Storage", "first Job",
+                "...lore ipsum...", new HashMap<String, String>(), new HashMap<String, String>())));
         return searchResponse;
     }
 }

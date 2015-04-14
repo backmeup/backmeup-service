@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class SearchEntryDTO {
 
     private String fileId;
+    private String ownerId; //the user/sharingpartner that provides this record 
+    private boolean isSharing;
     private Date timeStamp;
     private String title;
     private String type;
@@ -118,6 +120,21 @@ public class SearchEntryDTO {
         this.jobName = jobName;
     }
 
+    public String getOwnerId() {
+        return this.ownerId;
+    }
+
+    public void setOwnerId(String userId) {
+        this.ownerId = userId;
+    }
+
+    public boolean getIsSharing() {
+        return this.isSharing;
+    }
+
+    public void setIsSharing(boolean isSharing) {
+        this.isSharing = isSharing;
+    }
     /*public static class KeyValue {
 
         private String key;
