@@ -62,7 +62,7 @@ public class BackupJob {
 
 	private String timeExpression;
 
-//	private long delay;
+	private long delay;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date startTime;
@@ -83,7 +83,7 @@ public class BackupJob {
 
 	private boolean isActive = true;
 
-//	private UUID validScheduleID = null;
+	private UUID validScheduleID = null;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createTime;
@@ -107,7 +107,7 @@ public class BackupJob {
 		setActionProfiles(actionProfiles);
 		this.actionProfiles = actionProfiles;
 		this.startTime = start;
-//		this.delay = delay;
+		this.delay = delay;
 
 		this.createTime = new Date();
 		this.lastUpdatedTime = this.createTime;
@@ -192,13 +192,13 @@ public class BackupJob {
 		this.startTime = (Date) start.clone();
 	}
 
-//	public long getDelay() {
-//		return delay;
-//	}
-//
-//	public void setDelay(long delay) {
-//		this.delay = delay;
-//	}
+	public long getDelay() {
+		return delay;
+	}
+
+	public void setDelay(long delay) {
+		this.delay = delay;
+	}
 
 	public Token getToken() {
 		return token;
@@ -311,13 +311,13 @@ public class BackupJob {
     }
     
 
-//	public UUID getValidScheduleID() {
-//		return validScheduleID;
-//	}
-//
-//	public void setValidScheduleID(UUID validScheduleID) {
-//		this.validScheduleID = validScheduleID;
-//	}
+	public UUID getValidScheduleID() {
+		return validScheduleID;
+	}
+
+	public void setValidScheduleID(UUID validScheduleID) {
+		this.validScheduleID = validScheduleID;
+	}
     
     @Override
     public String toString() {

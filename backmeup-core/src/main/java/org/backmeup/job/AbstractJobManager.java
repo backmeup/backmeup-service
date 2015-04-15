@@ -38,8 +38,6 @@ public abstract class AbstractJobManager implements JobManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJobManager.class);
     
-    private static final long DELAY = 604800000;
-
     @Inject
     protected Connection conn;
 
@@ -48,6 +46,10 @@ public abstract class AbstractJobManager implements JobManager {
 
     @Inject
     private Keyserver keyserver;
+    
+    private boolean shutdownInProgress = false;
+    
+    // DAOs -------------------------------------------------------------------
 
     private BackupJobDao getBackupJobDao() {
         return dal.createBackupJobDao();
@@ -75,6 +77,7 @@ public abstract class AbstractJobManager implements JobManager {
     
     @PreDestroy
     public void shutdown() {
+        shutdownInProgress = true;
         // Shutdown system component
         SYSTEM.shutdown();
         SYSTEM.awaitTermination();
@@ -88,35 +91,25 @@ public abstract class AbstractJobManager implements JobManager {
     }
 
     protected abstract void runJob(BackupJob job);
-
+ 
     // Don't call this method within a database transaction!
     private void queueJob(BackupJob job) {
         try {
             // Compute next job execution time
             long currentTime = new Date().getTime();
-            long executeIn = job.getStartTime().getTime() - currentTime;
-            if (job.getNextExecutionTime() != null) {
-                executeIn = job.getNextExecutionTime().getTime() - currentTime;
-            }
+            long executeIn = calcNextExecutionTime(job);
 
-            // If job execution was scheduled for within the past 5 mins, still
-            // schedule now...
-            if (executeIn >= -300000 && executeIn < 0) {
-                executeIn = 0;
-            }
-
-            // ...otherwise, schedule on the next occasion defined by .getStart
-            // and .getDelay
+            // If we missed the last execution slot, schedule on 
+            // the next occasion defined by getStart() and DELAY
             if (executeIn < 0) {
-                // DELAY = job.getDelay());
-                executeIn += Math.ceil((double) Math.abs(executeIn) / (double) DELAY * DELAY);
+                // delay represents the jobfrequency (daily, weekly, ...) in milliseconds
+                long delay = job.getDelay();
+                executeIn += Math.ceil((double) Math.abs(executeIn) / (double) delay) * delay;
                 conn.begin();
                 job = getBackUpJob(job.getId());
-                // TODO we need to update these jobs' tokens - but where do we
-                // get keyRing password from?
+                
+                // Update these jobs' access tokens
                 job.getToken().setBackupdate(currentTime + executeIn);
-
-                // get access data + new token for next access
                 AuthDataResult authenticationData = keyserver.getData(job.getToken());
 
                 // the token for the next getData call
@@ -130,12 +123,11 @@ public abstract class AbstractJobManager implements JobManager {
             conn.begin();
             job = getBackUpJob(job.getId());
             UUID schedulerID = UUID.randomUUID();
-//            job.setValidScheduleID(schedulerID);
+            job.setValidScheduleID(schedulerID);
             conn.commit();
 
             // We can use the 'cancellable' to terminate later on
             SYSTEM.scheduler().scheduleOnce(
-                    // Initial delay
                     Duration.create(executeIn, TimeUnit.MILLISECONDS),
                     new RunAndReschedule(job, dal, schedulerID));
 
@@ -146,6 +138,26 @@ public abstract class AbstractJobManager implements JobManager {
         } finally {
             conn.rollback();
         }
+    }
+    
+    private long calcNextExecutionTime(BackupJob job) {
+     // Compute next job execution time
+        long currentTime = new Date().getTime();
+        long executeIn = 0;
+        if (job.getNextExecutionTime() == null) {
+            // First time to run this job
+            executeIn = job.getStartTime().getTime() - currentTime;
+        } else {
+            executeIn = job.getNextExecutionTime().getTime() - currentTime;
+        }
+
+        // If job execution was scheduled for within the past 5 mins, still
+        // schedule now...
+        if (executeIn >= -300000 && executeIn < 0) {
+            executeIn = 0;
+        }
+        
+        return executeIn;
     }
 
     private class RunAndReschedule implements Runnable {
@@ -163,37 +175,38 @@ public abstract class AbstractJobManager implements JobManager {
 
         @Override
         public void run() {
-            // check if the scheduler is still valid. If not a new scheduler was
-            // created and this one should not be executed
-//            if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
-//                return;
-//            }
-
-            // Run the job
-            if (job.isActive()) {
-                runJob(job);
-            }
-
-            // Reschedule if it's still in the DB
-            try {
-                conn.beginOrJoin();
-
-                BackupJob nextJob = dal.createBackupJobDao().findById(job.getId());
-                if (nextJob != null /* && nextJob.isReschedule() */) {
-                    logger.debug("Rescheduling job for execution in "+ DELAY + "ms");
-                    Date execTime = new Date(new Date().getTime() + DELAY);
-                    nextJob.setNextExecutionTime(execTime);
-                    SYSTEM.scheduler().scheduleOnce(
-                            Duration.create(DELAY,
-                                    TimeUnit.MILLISECONDS),
-                                    new RunAndReschedule(job, dal, schedulerID));
-                    // store the next execution time
-                    conn.commit();
-                } else {
-                    logger.debug("Job deleted in the mean time - no re-scheduling.");
+            if (!shutdownInProgress) {
+                // check if the scheduler is still valid. If not a new scheduler
+                // was created and this one should not be executed
+                if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
+                    return;
                 }
-            } finally {
-                conn.rollback();
+
+                // Run the job
+                if (job.isActive()) {
+                    runJob(job);
+                }
+
+                // Reschedule if it's still in the DB
+                try {
+                    conn.beginOrJoin();
+
+                    BackupJob nextJob = dal.createBackupJobDao().findById(job.getId());
+                    if (nextJob != null /* && nextJob.isReschedule() */) {
+                        logger.debug("Rescheduling job for execution in "+ job.getDelay() + "ms");
+                        Date execTime = new Date(new Date().getTime() + job.getDelay());
+                        nextJob.setNextExecutionTime(execTime);
+                        SYSTEM.scheduler().scheduleOnce(
+                                Duration.create(job.getDelay(), TimeUnit.MILLISECONDS),
+                                new RunAndReschedule(job, dal, schedulerID));
+                        // store the next execution time
+                        conn.commit();
+                    } else {
+                        logger.debug("Job deleted in the mean time - no re-scheduling.");
+                    }
+                } finally {
+                    conn.rollback();
+                }
             }
         }
     }
