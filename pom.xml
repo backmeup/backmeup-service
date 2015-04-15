@@ -61,7 +61,7 @@
 		<version.net.htmlparser.jericho>3.2</version.net.htmlparser.jericho>
 		<version.net.sf.dozer>5.4.0</version.net.sf.dozer>
 		<version.org.apache.ant>1.8.2</version.org.apache.ant>
-		<version.org.apache.felix>4.0.2</version.org.apache.felix>
+		<version.org.apache.felix>4.6.1</version.org.apache.felix>
 		<version.org.apache.httpcomponents>4.3.3</version.org.apache.httpcomponents>
 		<version.org.apache.tika>1.2</version.org.apache.tika>
 		<version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
