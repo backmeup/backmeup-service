@@ -84,9 +84,9 @@ public abstract class AbstractJobManager implements JobManager {
     }
     
     // ========================================================================
-
+    
     @Override
-    public void runBackUpJob(BackupJob job) {
+    public void runBackupJob(BackupJob job) {
         queueJob(job);
     }
 
