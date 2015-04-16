@@ -71,7 +71,7 @@
 		<version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
 		<version.org.im4java>1.2.0</version.org.im4java>
 		<version.org.jboss.resteasy>3.0.7.Final</version.org.jboss.resteasy>
-		<version.org.jboss.weld.servlet>2.1.0.Final</version.org.jboss.weld.servlet>
+		<version.org.jboss.weld.servlet>2.2.10.SP1</version.org.jboss.weld.servlet>
 		<version.org.postgresql>9.3-1100-jdbc41</version.org.postgresql>
 		<version.org.slf4j>1.7.6</version.org.slf4j>
 
