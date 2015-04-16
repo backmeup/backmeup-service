@@ -1,6 +1,7 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -89,6 +90,7 @@ public class BackupJobs extends Base {
         long delay = DelayTimes.DELAY_MONTHLY;
         boolean reschedule = false;
         String timeExpression = "monthly";
+        long nextExecution = new Date().getTime(); 
 
         if (backupJob.getSchedule().equals(JobFrequency.daily)) {
             delay = DelayTimes.DELAY_DAILY;
@@ -108,11 +110,12 @@ public class BackupJobs extends Base {
             delay = DelayTimes.DELAY_REALTIME;
             timeExpression = "realtime";
             reschedule = false;
-
         } 
 
         BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
         job.setTimeExpression(timeExpression);
+        nextExecution += delay;
+        job.setNextExecutionTime(new Date(nextExecution));
         job = getLogic().createBackupJob(job);
 
 //        if(vn.getValidationEntries().size() > 0) {
