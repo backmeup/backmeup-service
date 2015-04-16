@@ -75,21 +75,15 @@ public class RabbitMQJobManager extends AbstractJobManager {
     @Override
     protected void runJob(BackupJob job) {
         try {
-            // conn.beginOrJoin();
-            // we need a JPA-managed instance
-            // BackupJob job2 = dal.createBackupJobDao().findById(job.getId());
-            this.logger.info("Sending job to processing queue: " + job.getId() + " for userID: "
-                    + job.getUser().getUserId());
-            // String json = JsonSerializer.serialize(job2);
-            // mqChannel.basicPublish("", mqName, null, json.getBytes());
+            this.logger.info("Sending job to processing queue: " + job.getId()
+                    + " for userID: " + job.getUser().getUserId());
+
             byte[] bytes = longToBytes(job.getId());
             this.mqChannel.basicPublish("", this.mqName, null, bytes);
         } catch (IOException e) {
             // Should only happen if message queue is down
             this.logger.error("message queue down", e);
             throw new RuntimeException(e);
-        } finally {
-            // conn.rollback();
         }
     }
 

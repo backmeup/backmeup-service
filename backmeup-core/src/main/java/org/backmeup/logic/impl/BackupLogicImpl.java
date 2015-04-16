@@ -62,21 +62,21 @@ public class BackupLogicImpl implements BackupLogic {
         job.setStatus(BackupJobStatus.queued);
 
         // TODO SP: adding and starting a backup job should be two distinct methods.
-        // This following step is necessary when a job is started and therefore a 
+        // The following steps are necessary when a job is started and therefore a 
         // jobexecution is created and scheduled. 
-//        Long firstExecutionDate = job.getStart().getTime() + job.getDelay();
-        Long firstExecutionDate = 1L;
+        Long firstExecutionDate = job.getStartTime().getTime() + job.getDelay();
 
         storePluginConfigOnKeyserver(job);
 
+        // Obtain an access token from the keyserver. We have to do this, because 
+        // the user password is necessary for this step.
         // reusable=true means, that we can get the data for the token + a new token for the next backup
         Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
         job.setToken(t);
 
         return getBackupJobDao().save(job);
-
     }
-
+    
     @Override
     public List<BackupJob> getBackupJobsOf(Long userId) {
         return getBackupJobDao().findByUserId(userId);
@@ -144,9 +144,9 @@ public class BackupLogicImpl implements BackupLogic {
         protocol.setJob(job);
         protocol.setSuccessful(jobProtocol.isSuccessful());
 
-        //        for(JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
-        //            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
-        //        }
+//        for (JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
+//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
+//        }
 
         if (protocol.isSuccessful()) {
             job.setLastSuccessful(protocol.getExecutionTime());

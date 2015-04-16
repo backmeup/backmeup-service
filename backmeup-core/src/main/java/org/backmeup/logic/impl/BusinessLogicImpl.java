@@ -437,7 +437,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
         
         if (startImmediately) {
-            jobManager.runBackUpJob(job);
+            jobManager.runBackupJob(job);
         }
         
         return job;
@@ -445,7 +445,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     
     @Override
     public void startBackupJob(final BackupJob backupJob) {
-        jobManager.runBackUpJob(backupJob);
+        jobManager.runBackupJob(backupJob);
         
     }
 
