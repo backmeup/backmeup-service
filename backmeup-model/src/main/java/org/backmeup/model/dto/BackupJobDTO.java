@@ -24,7 +24,7 @@ public class BackupJobDTO {
 	private Long jobId;
 	private String jobTitle;
 	private JobStatus jobStatus;
-	private boolean onHold = false;
+	private boolean isActive = true;
 	
 	private UserDTO user;
 	private TokenDTO token;
@@ -70,15 +70,15 @@ public class BackupJobDTO {
 		this.jobStatus = jobStatus;
 	}
 
-	public boolean isOnHold() {
-		return onHold;
-	}
+	public boolean isActive() {
+        return isActive;
+    }
 
-	public void setOnHold(boolean onHold) {
-		this.onHold = onHold;
-	}
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
 
-	public UserDTO getUser() {
+    public UserDTO getUser() {
 		return user;
 	}
 

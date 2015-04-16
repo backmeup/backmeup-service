@@ -277,6 +277,7 @@ public class MappingTest {
         job.setTimeExpression("daily");
         Date next = new Date();
         job.setNextExecutionTime(next);
+        job.setActive(false);
 
         Mapper mapper = getMapper();
 
@@ -286,6 +287,7 @@ public class MappingTest {
         assertEquals(JobStatus.queued, jobDTO.getJobStatus());
         assertEquals(JobFrequency.daily, jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
+        assertEquals(job.isActive(), jobDTO.isActive());
     }
 
     @Test
