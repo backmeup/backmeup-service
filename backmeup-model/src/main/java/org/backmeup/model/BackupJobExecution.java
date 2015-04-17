@@ -75,9 +75,27 @@ public class BackupJobExecution {
     // ExecutionContext
     // failureExceptions
     
-    public BackupJobExecution(Long id, String jobName) {
-        this.id = id;
+    public BackupJobExecution() {
+
+    }
+
+    public BackupJobExecution(String jobName) {
         this.jobName = jobName;
+    }
+
+    public BackupJobExecution(BackupJob job) {
+        this.jobName = job.getJobName() + " Execution";
+        this.createTime = new Date();
+        this.lastUpdated = createTime;
+        this.status = BackupJobStatus.queued;
+        this.user = job.getUser();
+        this.backupJob = job;
+        this.sourceProfile = job.getSourceProfile();
+        this.sinkProfile = job.getSinkProfile();
+        for (Profile action : job.getActionProfiles()) {
+            actionProfiles.add(action);
+        }
+        this.token = job.getToken();
     }
 
     public Long getId() {
@@ -212,7 +230,7 @@ public class BackupJobExecution {
 
     @Override
     public String toString() {
-        return String.format("%s: id=%d Job=[%s]", "BackupJobExecution", id, jobName);
+        return String.format("%s: id=%d Name=%s", "BackupJobExecution", id, jobName);
     }
     
     /**

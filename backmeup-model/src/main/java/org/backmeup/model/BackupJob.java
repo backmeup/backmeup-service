@@ -321,7 +321,7 @@ public class BackupJob {
     
     @Override
     public String toString() {
-        return String.format("%s: id=%d Job=[%s]", "BackupJob", id, jobName);
+        return String.format("%s: id=%d Name=%s", "BackupJob", id, jobName);
     }
     
     /**
