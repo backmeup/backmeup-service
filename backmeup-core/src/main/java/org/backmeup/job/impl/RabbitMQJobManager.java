@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.job.AbstractJobManager;
-import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,10 +73,11 @@ public class RabbitMQJobManager extends AbstractJobManager {
     }
 
     @Override
-    protected void runJob(BackupJob job) {
+    protected void runJob(BackupJobExecution job) {
         try {
-            this.logger.info("Sending job to processing queue: " + job.getId()
-                    + " for userID: " + job.getUser().getUserId());
+            this.logger.info(
+                    String.format("Job execution with id %s started for user %d", 
+                            job.getId(), job.getUser().getUserId()));
 
             byte[] bytes = longToBytes(job.getId());
             this.mqChannel.basicPublish("", this.mqName, null, bytes);
