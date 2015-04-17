@@ -57,7 +57,7 @@ public class JobScheduler {
         return new Date(initialStart.getTime());
     }
 
-    // ========================================================================
+    // State Management -------------------------------------------------------
 
     public void start() {
         if (shuttingDown || closed) {
