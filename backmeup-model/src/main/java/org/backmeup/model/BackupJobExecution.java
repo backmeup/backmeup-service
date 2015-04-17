@@ -34,7 +34,7 @@ public class BackupJobExecution {
     @Column(nullable = false)
     private Long id;
     
-    private String jobName;
+    private String name;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
@@ -79,12 +79,12 @@ public class BackupJobExecution {
 
     }
 
-    public BackupJobExecution(String jobName) {
-        this.jobName = jobName;
+    public BackupJobExecution(String name) {
+        this.name = name;
     }
 
     public BackupJobExecution(BackupJob job) {
-        this.jobName = job.getJobName() + " Execution";
+        this.name = job.getJobName() + " Execution";
         this.createTime = new Date();
         this.lastUpdated = createTime;
         this.status = BackupJobStatus.queued;
@@ -106,12 +106,12 @@ public class BackupJobExecution {
         this.id = id;
     }
     
-    public String getJobName() {
-        return jobName;
+    public String getName() {
+        return name;
     }
     
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
+    public void setName(String name) {
+        this.name = name;
     }
     
     public Date getCreateTime() {
@@ -230,7 +230,7 @@ public class BackupJobExecution {
 
     @Override
     public String toString() {
-        return String.format("%s: id=%d Name=%s", "BackupJobExecution", id, jobName);
+        return String.format("%s: id=%d Name=%s", "BackupJobExecution", id, name);
     }
     
     /**
