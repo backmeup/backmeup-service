@@ -23,6 +23,7 @@ import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
@@ -436,9 +437,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
         
-        if (startImmediately) {
-            jobManager.runBackupJob(job);
-        }
+        jobManager.runBackupJob(job);
         
         return job;
     }
@@ -486,6 +485,28 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 registration.getUserByUserId(userId, true);
                 return backupJobs.getBackupJobsOf(userId);
+
+            }
+        });
+    }
+    
+    @Override
+    public BackupJobExecution getBackupJobExecution(final Long jobExecId) {
+        return conn.txNewReadOnly(new Callable<BackupJobExecution>() {
+            @Override public BackupJobExecution call() {
+
+                return backupJobs.getBackupJobExecution(jobExecId);
+
+            }
+        });
+    }
+    
+    @Override
+    public List<BackupJobExecution> getBackupJobExecutions(final Long jobId) {
+        return conn.txNewReadOnly(new Callable<List<BackupJobExecution>>() {
+            @Override public List<BackupJobExecution> call() {
+
+                return backupJobs.getBackupJobExecutionsOfBackup(jobId);
 
             }
         });

@@ -6,6 +6,7 @@ import org.backmeup.index.model.SearchResponse;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.ProtocolDetails;
@@ -55,13 +56,15 @@ public interface BusinessLogic {
     void            deleteProfile(Long profileId);
 
     // backupjob operations ---------------------------------------------------
-    BackupJob       createBackupJob(BackupJob backupJob);
-    BackupJob       createBackupJob(BackupJob backupJob, boolean startImmediately);
-    void            startBackupJob(BackupJob backupJob);
-    BackupJob       getBackupJob(Long jobId);
-    List<BackupJob> getBackupJobs(Long userId);
-    BackupJob       updateBackupJob(Long userId, BackupJob backupJob);
-    void            deleteBackupJob(Long userId, Long jobId);
+    BackupJob                createBackupJob(BackupJob backupJob);
+    BackupJob                createBackupJob(BackupJob backupJob, boolean startImmediately);
+    void                     startBackupJob(BackupJob backupJob);
+    BackupJob                getBackupJob(Long jobId);
+    List<BackupJob>          getBackupJobs(Long userId);
+    BackupJobExecution       getBackupJobExecution(Long jobExecId);
+    List<BackupJobExecution> getBackupJobExecutions(Long jobId);
+    BackupJob                updateBackupJob(Long userId, BackupJob backupJob);
+    void                     deleteBackupJob(Long userId, Long jobId);
 
     ProtocolDetails  getProtocolDetails(Long userId, String fileId);
     ProtocolOverview getProtocolOverview(Long userId, String duration);

@@ -131,6 +131,11 @@ public class BackupLogicImpl implements BackupLogic {
     }
     
     @Override
+    public BackupJobExecution getBackupJobExecution(Long jobExecId) {
+        return getBackupJobExecutionDao().findById(jobExecId);
+    }
+    
+    @Override
     public List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId) {
         return getBackupJobExecutionDao().findByBackupJobId(jobId);
     }
