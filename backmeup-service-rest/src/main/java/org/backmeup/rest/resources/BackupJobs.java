@@ -31,6 +31,7 @@ import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.backmeup.rest.filters.SecurityInterceptor;
@@ -90,7 +91,7 @@ public class BackupJobs extends Base {
         long delay = DelayTimes.DELAY_MONTHLY;
         boolean reschedule = false;
         String timeExpression = "monthly";
-        long nextExecution = new Date().getTime(); 
+//        long nextExecution = new Date().getTime(); 
 
         if (backupJob.getSchedule().equals(JobFrequency.daily)) {
             delay = DelayTimes.DELAY_DAILY;
@@ -114,8 +115,8 @@ public class BackupJobs extends Base {
 
         BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
         job.setTimeExpression(timeExpression);
-        nextExecution += delay;
-        job.setNextExecutionTime(new Date(nextExecution));
+//        nextExecution += delay;
+        job.setNextExecutionTime(new Date());
         job = getLogic().createBackupJob(job);
 
 //        if(vn.getValidationEntries().size() > 0) {
@@ -229,8 +230,21 @@ public class BackupJobs extends Base {
     @RolesAllowed("user")
     @GET
     @Path("/{jobId}/executions/")
-    public List<BackupJobExecution> listBackupJobExecutions(@PathParam("jobId") String jobId) {
-        return null;
+    public List<BackupJobExecutionDTO> listBackupJobExecutions(@PathParam("jobId") String jobId) {
+        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+
+        List<BackupJobExecution> allJobExecsOfUser = getLogic().getBackupJobExecutions(Long.parseLong(jobId));
+        List<BackupJobExecutionDTO> jobExecsList = new ArrayList<>();
+
+        for(BackupJobExecution exec : allJobExecsOfUser) {
+            if(!exec.getUser().getUserId().equals(activeUser.getUserId())) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+            BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);
+            jobExecsList.add(execDTO);
+        }
+
+        return jobExecsList;
     }
     
     @RolesAllowed("user")
@@ -240,10 +254,19 @@ public class BackupJobs extends Base {
         
     }
     
-    @RolesAllowed("user")
+    @RolesAllowed({"user", "worker"})
     @GET
     @Path("/{jobId}/executions/{jobExecutionId}")
-    public BackupJobExecution getBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId) {
-        return null;
+    public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId) {
+        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        
+        BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId));
+        if ((!activeUser.getUserId().equals(exec.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
+        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);
+        
+        return execDTO;
     }
 }
