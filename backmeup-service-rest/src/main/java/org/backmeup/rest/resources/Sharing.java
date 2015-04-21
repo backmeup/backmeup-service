@@ -1,8 +1,13 @@
 package org.backmeup.rest.resources;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,6 +24,8 @@ import javax.ws.rs.core.UriInfo;
 import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.dto.SharingPolicyDTO;
+import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
@@ -62,6 +69,19 @@ public class Sharing extends SecureBase {
 
     @RolesAllowed("user")
     @POST
+    @Path("/add/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public SharingPolicyEntry add(SharingPolicyDTO sharingRequest) {
+        //the UI framework is set to use POST operations with JSON requests and not Query Parameters
+        return this.add(//
+                sharingRequest.getWithUserId(),//
+                convert(sharingRequest.getPolicyType()),//
+                sharingRequest.getPolicyValue());
+    }
+
+    @RolesAllowed("user")
+    @POST
     @Path("/add")
     @Produces(MediaType.APPLICATION_JSON)
     public SharingPolicyEntry add(//
@@ -74,6 +94,10 @@ public class Sharing extends SecureBase {
         if ((policyType == SharingPolicyTypeEntry.Backup) || (policyType == SharingPolicyTypeEntry.Document)) {
             mandatory("policyValue", sharedElementID);
         }
+        if ((policyType == SharingPolicyTypeEntry.DocumentGroup)) {
+            mandatoryListFromString("policyValue", sharedElementID);
+        }
+
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
@@ -134,10 +158,63 @@ public class Sharing extends SecureBase {
         }
     }
 
+    private void mandatoryListFromString(String name, String value) {
+        if (value == null || value.isEmpty()) {
+            badRequestMissingParameter(name);
+        }
+        try {
+            String[] sArr = value.substring(1, value.length() - 1).split(",\\s*");
+            List<String> lArr = Arrays.asList(sArr);
+            if (lArr.size() < 1) {
+                badRequestMalformedListOfUUIDsParameter(name);
+            }
+            //test sample on UUIDs
+            for (int i = 0; i < lArr.size(); i++) {
+                UUID.fromString(lArr.get(i));
+            }
+        } catch (Exception e) {
+            badRequestMalformedListOfUUIDsParameter(name);
+        }
+    }
+
     private void badRequestMissingParameter(String name) {
         throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                 entity(name + " parameter is mandatory"). //
                 build());
+    }
+
+    private void badRequestMalformedListOfUUIDsParameter(String name) {
+        List<UUID> l = new ArrayList<UUID>();
+        l.add(UUID.randomUUID());
+        l.add(UUID.randomUUID());
+        throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
+                entity(name + " parameter is malformed. Expecting list in syntax: " + l.toString()). //
+                build());
+    }
+
+    /**
+     * A simple converter as the Model Objects of the bmu service project can't access the index-model
+     * 
+     * @param entry
+     * @return
+     */
+    public SharingPolicyTypeEntry convert(SharingPolicyTypeEntryDTO entry) {
+        if (entry == SharingPolicyTypeEntryDTO.AllFromNow) {
+            return SharingPolicyTypeEntry.AllFromNow;
+        }
+        if (entry == SharingPolicyTypeEntryDTO.AllInklOld) {
+            return SharingPolicyTypeEntry.AllInklOld;
+        }
+        if (entry == SharingPolicyTypeEntryDTO.Backup) {
+            return SharingPolicyTypeEntry.Backup;
+        }
+        if (entry == SharingPolicyTypeEntryDTO.Document) {
+            return SharingPolicyTypeEntry.Document;
+        }
+        if (entry == SharingPolicyTypeEntryDTO.DocumentGroup) {
+            return SharingPolicyTypeEntry.DocumentGroup;
+        }
+        return null;
     }
 
 }
