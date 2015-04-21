@@ -78,7 +78,7 @@ public class SearchLogicImpl implements SearchLogic {
     public void delete(Long userId, Long jobId, Long timestamp) {
         try (IndexClient client = getIndexClient(userId)) {
 
-            client.deleteRecordsForJobAndTimestamp(jobId, new Date(timestamp));
+            client.deleteRecordsForUserAndJobAndTimestamp(jobId, new Date(timestamp));
 
         }
     }
