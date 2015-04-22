@@ -23,6 +23,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.backmeup.model.dto.BackupJobDTO;
+import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.service.client.BackmeupService;
 import org.backmeup.service.client.model.auth.AuthInfo;
@@ -151,6 +152,47 @@ public final class BackmeupServiceClient implements BackmeupService {
 
             LOGGER.debug("saveBackupJob: " + r.content);
             return mapper.readValue(r.content, BackupJobDTO.class);
+
+        } catch (IOException e) {
+            LOGGER.error("", e);
+            throw new BackMeUpException("Failed to update BackupJob: " + e);
+        }
+    }
+    
+    @Override
+    public BackupJobExecutionDTO getBackupJobExecution(Long jobExecId) {
+        ensureAuthenticated();
+        
+        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, null, null, accessToken);
+        if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + r.content);
+        }
+        LOGGER.debug("getBackupJobExecution: " + r.content);
+
+        try {
+            ObjectMapper mapper = createJsonMapper();
+            return mapper.readValue(r.content, BackupJobExecutionDTO.class);
+        }  catch (IOException e) {
+            LOGGER.error("", e);
+            throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + e);
+        }
+    }
+
+    @Override
+    public BackupJobExecutionDTO updateBackupJobExecution(BackupJobExecutionDTO jobExecution) {   
+        ensureAuthenticated();
+
+        try {
+            ObjectMapper mapper = createJsonMapper();
+            String json = mapper.writeValueAsString(jobExecution);
+
+            Result r = execute("/backupjobs/" + jobExecution.getJobId() + "/executions" + jobExecution.getId(), ReqType.PUT, null, json, accessToken);
+            if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new BackMeUpException("Failed to update BackupJob: " + r.content);
+            }
+
+            LOGGER.debug("saveBackupJobExecution: " + r.content);
+            return mapper.readValue(r.content, BackupJobExecutionDTO.class);
 
         } catch (IOException e) {
             LOGGER.error("", e);
