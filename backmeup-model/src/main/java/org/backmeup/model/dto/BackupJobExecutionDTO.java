@@ -20,6 +20,7 @@ public class BackupJobExecutionDTO {
     private Date start;
     private Date end;
 
+    private Long jobId;
     private UserDTO user;
     private TokenDTO token;
 
@@ -69,6 +70,14 @@ public class BackupJobExecutionDTO {
 
     public void setToken(TokenDTO token) {
         this.token = token;
+    }
+
+    public Long getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
     }
 
     public Date getCreated() {
