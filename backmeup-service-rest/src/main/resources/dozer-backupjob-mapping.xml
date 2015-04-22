@@ -23,4 +23,9 @@
   			<b>next</b>
 		</field> 
 	</mapping>
+	
+	<mapping>
+		<class-a>org.backmeup.model.BackupJobExecution</class-a>
+		<class-b>org.backmeup.model.dto.BackupJobExecutionDTO</class-b>
+	</mapping>
 </mappings> 
