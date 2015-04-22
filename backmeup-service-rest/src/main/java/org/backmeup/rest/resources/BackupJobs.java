@@ -258,6 +258,13 @@ public class BackupJobs extends Base {
     @GET
     @Path("/{jobId}/executions/{jobExecutionId}")
     public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId) {
+        return getBackupJobExecution(jobExecutionId);
+    }
+    
+    @RolesAllowed({"user", "worker"})
+    @GET
+    @Path("/executions/{jobExecutionId}")
+    public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobExecutionId") String jobExecutionId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId));
