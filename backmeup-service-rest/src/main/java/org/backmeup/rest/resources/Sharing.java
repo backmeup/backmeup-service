@@ -89,12 +89,11 @@ public class Sharing extends SecureBase {
             @QueryParam("policyType") SharingPolicyTypeEntry policyType,//
             @QueryParam("policyValue") String sharedElementID) {
 
-        mandatory("withUserId", sharingWithUserId);
-        mandatory("policyType", policyType);
-        if ((policyType == SharingPolicyTypeEntry.Backup) || (policyType == SharingPolicyTypeEntry.Document)) {
+        if (policyType == SharingPolicyTypeEntry.Backup) {
             mandatory("policyValue", sharedElementID);
-        }
-        if ((policyType == SharingPolicyTypeEntry.DocumentGroup)) {
+        } else if (policyType == SharingPolicyTypeEntry.Document) {
+            mandatoryUUID("policyValue", sharedElementID);
+        } else if ((policyType == SharingPolicyTypeEntry.DocumentGroup)) {
             mandatoryListFromString("policyValue", sharedElementID);
         }
 
@@ -146,12 +145,6 @@ public class Sharing extends SecureBase {
         }
     }
 
-    private void mandatory(String name, SharingPolicyTypeEntry type) {
-        if (type == null || type.toString().isEmpty()) {
-            badRequestMissingParameter(name);
-        }
-    }
-
     private void mandatory(String name, String value) {
         if (value == null || value.isEmpty()) {
             badRequestMissingParameter(name);
@@ -165,7 +158,7 @@ public class Sharing extends SecureBase {
         try {
             String[] sArr = value.substring(1, value.length() - 1).split(",\\s*");
             List<String> lArr = Arrays.asList(sArr);
-            if (lArr.size() < 1) {
+            if (lArr.size() <= 1) {
                 badRequestMalformedListOfUUIDsParameter(name);
             }
             //test sample on UUIDs
@@ -174,6 +167,20 @@ public class Sharing extends SecureBase {
             }
         } catch (Exception e) {
             badRequestMalformedListOfUUIDsParameter(name);
+        }
+    }
+
+    private void mandatoryUUID(String name, String value) {
+        if (value == null || value.isEmpty()) {
+            badRequestMissingParameter(name);
+        }
+        try {
+            UUID.fromString(value);
+        } catch (Exception e) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity(name + " parameter is malformed. Expecting UUID of syntax: "
+                                    + UUID.randomUUID().toString()).build());
         }
     }
 
