@@ -77,7 +77,9 @@ public class Sharing extends SecureBase {
         return this.add(//
                 sharingRequest.getWithUserId(),//
                 convert(sharingRequest.getPolicyType()),//
-                sharingRequest.getPolicyValue());
+                sharingRequest.getPolicyValue(),//
+                sharingRequest.getName(), //
+                sharingRequest.getDescription());
     }
 
     @RolesAllowed("user")
@@ -87,7 +89,9 @@ public class Sharing extends SecureBase {
     public SharingPolicyEntry add(//
             @QueryParam("withUserId") Long sharingWithUserId,// 
             @QueryParam("policyType") SharingPolicyTypeEntry policyType,//
-            @QueryParam("policyValue") String sharedElementID) {
+            @QueryParam("policyValue") String sharedElementID,//
+            @QueryParam("name") String name,//
+            @QueryParam("description") String description) {
 
         if (policyType == SharingPolicyTypeEntry.Backup) {
             mandatory("policyValue", sharedElementID);
@@ -100,7 +104,7 @@ public class Sharing extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
-                    sharingWithUserId, policyType, sharedElementID);
+                    sharingWithUserId, policyType, sharedElementID, name, description);
             return response;
         } catch (UnknownUserException e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //

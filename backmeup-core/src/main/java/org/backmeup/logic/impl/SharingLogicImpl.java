@@ -45,9 +45,10 @@ public class SharingLogicImpl implements SharingLogic {
 
     @Override
     public SharingPolicyEntry add(BackMeUpUser currUser, BackMeUpUser sharingWith, SharingPolicyTypeEntry policy,
-            String sharedElementID) {
+            String sharedElementID, String name, String description) {
         try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
-            SharingPolicyEntry result = client.add(new User(sharingWith.getUserId()), policy, sharedElementID);
+            SharingPolicyEntry result = client.add(new User(sharingWith.getUserId()), policy, sharedElementID, name,
+                    description);
             return result;
         }
     }

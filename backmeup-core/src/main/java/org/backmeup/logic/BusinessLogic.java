@@ -107,7 +107,7 @@ public interface BusinessLogic {
     Set<SharingPolicyEntry> getAllIncomingSharingPolicies(Long currUserId);
 
     SharingPolicyEntry createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId,
-            SharingPolicyTypeEntry policy, String sharedElementID);
+            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description);
 
     String removeOwnedSharingPolicy(Long currUserId, Long policyID);
 

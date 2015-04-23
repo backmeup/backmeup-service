@@ -662,14 +662,15 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Override
     public SharingPolicyEntry createAndAddSharingPolicy(final Long currUserId, final Long sharingWithUserId,
-            final SharingPolicyTypeEntry policy, final String sharedElementID) {
+            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
+            final String description) {
         return this.conn.txNew(new Callable<SharingPolicyEntry>() {
             @Override
             public SharingPolicyEntry call() {
 
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
-                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID);
+                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID, name, description);
 
             }
         });

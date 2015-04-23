@@ -17,7 +17,7 @@ public interface SharingLogic {
     Set<SharingPolicyEntry> getAllIncoming(BackMeUpUser forUser);
 
     SharingPolicyEntry add(BackMeUpUser owner, BackMeUpUser sharingWith, SharingPolicyTypeEntry policy,
-            String sharedElementID);
+            String sharedElementID, String name, String description);
 
     String removeOwned(BackMeUpUser owner, Long policyID);
 

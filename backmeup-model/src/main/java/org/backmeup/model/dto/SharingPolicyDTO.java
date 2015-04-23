@@ -13,6 +13,8 @@ public class SharingPolicyDTO {
     private Long withUserId;
     private SharingPolicyTypeEntryDTO policyType;
     private String policyValue;
+    private String name;
+    private String description;
 
     public Long getWithUserId() {
         return this.withUserId;
@@ -36,6 +38,22 @@ public class SharingPolicyDTO {
 
     public void setPolicyValue(String policyValue) {
         this.policyValue = policyValue;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
