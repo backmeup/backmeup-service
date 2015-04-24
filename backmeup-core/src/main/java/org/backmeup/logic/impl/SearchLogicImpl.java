@@ -24,19 +24,20 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Inject
     private IndexClientFactory indexClientFactory;
-    
+
     private IndexClient getIndexClient(Long userId) {
         return this.indexClientFactory.getIndexClient(userId);
     }
 
     @Override
-    public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job) {
+    public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job,
+            String owner) {
         try (IndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse result = new SearchResponse(query);
-            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, user.getUsername()));
+            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, owner, user.getUsername()));
             return result;
-            
+
         }
     }
 
@@ -45,7 +46,7 @@ public class SearchLogicImpl implements SearchLogic {
         try (IndexClient client = getIndexClient(userId)) {
 
             return client.searchAllFileItemsForJob(jobId);
-            
+
         }
     }
 
@@ -56,7 +57,7 @@ public class SearchLogicImpl implements SearchLogic {
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(client.getFileInfoForFile(fileId));
             return pd;
-            
+
         }
     }
 

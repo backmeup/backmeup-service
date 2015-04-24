@@ -99,7 +99,7 @@ public interface BusinessLogic {
     void deleteJobProtocols(Long userId);
 
     // search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner);
 
     // sharing operations -----------------------------------------------------
     Set<SharingPolicyEntry> getAllOwnedSharingPolicies(Long currUserId);

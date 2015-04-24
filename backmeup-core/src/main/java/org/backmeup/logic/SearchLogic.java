@@ -15,7 +15,7 @@ import org.backmeup.model.ProtocolDetails;
  */
 public interface SearchLogic {
 
-    SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job);
+    SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job, String owner);
 
     Set<FileItem> getAllFileItems(Long userId, Long jobId);
 

@@ -27,8 +27,8 @@ public class SearchTest {
 
     @Rule
     public final EmbeddedRestServer server = new EmbeddedRestServer(SearchWithMockedLogic.class);
-    private final String HOST = server.host;
-    private final int PORT = server.port;
+    private final String HOST = this.server.host;
+    private final int PORT = this.server.port;
 
     private HttpClient client = HttpClients.createDefault();
     private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
@@ -40,9 +40,10 @@ public class SearchTest {
         protected BusinessLogic getLogic() {
             BusinessLogic logic = mock(BusinessLogic.class);
             SearchResponse sr = FakeSearchResponse.oneFile();
-            when(logic.queryBackup(USER, "find_me", null, null, null)).thenReturn(sr);
+            when(logic.queryBackup(USER, "find_me", null, null, null, null)).thenReturn(sr);
             return logic;
         }
+
         @Override
         protected Mapper getMapper() {
             return new DozerBeanMapper(Arrays.asList(DOZER_SEARCH_MAPPING));
@@ -51,9 +52,9 @@ public class SearchTest {
 
     @Test
     public void shouldGetSearchResultForUserAndQuery() throws IOException {
-        HttpGet method = new HttpGet(HOST + PORT + "/search/" + "?query=find_me");
+        HttpGet method = new HttpGet(this.HOST + this.PORT + "/search/" + "?query=find_me");
 
-        HttpResponse response = client.execute(method);
+        HttpResponse response = this.client.execute(method);
 
         assertStatusCode(200, response);
 
@@ -61,9 +62,11 @@ public class SearchTest {
         String body = IOUtils.toString(entity.getContent());
         System.out.println(body);
         assertTrue(body.indexOf("\"searchQuery\":\"find_me\"") >= 0);
-        assertTrue(body.indexOf("\"byJob\":[{\"title\":\"first Job\",\"count\":1},{\"title\":\"next Job\",\"count\":1}]") >= 0);
+        assertTrue(body
+                .indexOf("\"byJob\":[{\"title\":\"first Job\",\"count\":1},{\"title\":\"next Job\",\"count\":1}]") >= 0);
         assertTrue(body.indexOf("\"byType\":[{\"title\":\"Type\",\"count\":3}]") >= 0);
-        assertTrue(body.indexOf("\"bySource\":[{\"title\":\"Dropbox\",\"count\":2},{\"title\":\"Facebook\",\"count\":2}]") >= 0);
+        assertTrue(body
+                .indexOf("\"bySource\":[{\"title\":\"Dropbox\",\"count\":2},{\"title\":\"Facebook\",\"count\":2}]") >= 0);
         assertTrue(body.indexOf("\"files\":[{\"fileId\":\"fileId\",") >= 0);
     }
 
