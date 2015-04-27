@@ -3,6 +3,7 @@ package org.backmeup.logic.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.annotation.PreDestroy;
@@ -12,6 +13,8 @@ import javax.inject.Inject;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.Connection;
 import org.backmeup.index.model.SearchResponse;
+import org.backmeup.index.model.sharing.SharingPolicyEntry;
+import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BackupLogic;
@@ -19,6 +22,7 @@ import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
+import org.backmeup.logic.SharingLogic;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
@@ -40,11 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements the BusinessLogic interface by delegating most operations to
- * following layers: - DataAccessLayer - JobManager - PluginLayer
+ * Implements the BusinessLogic interface by delegating most operations to following layers: - DataAccessLayer -
+ * JobManager - PluginLayer
  * 
- * If an error occurs within a method an exception will be thrown that must be
- * handled by the client of the business logic.
+ * If an error occurs within a method an exception will be thrown that must be handled by the client of the business
+ * logic.
  * 
  * @author fschoeppl
  */
@@ -73,6 +77,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private SearchLogic search;
+
+    @Inject
+    private SharingLogic share;
 
     @Inject
     private ProfileLogic profiles;
@@ -272,7 +279,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
                     profile.getAuthData().setIdentification(identification);
-                }			
+                }           
 
                 // Check if plugin validation is required and properties and options are valid
                 if (plugins.requiresValidation(profile.getPluginId())) {
@@ -305,7 +312,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                         String identification = plugins.authorizePlugin(profile.getAuthData());
                         profile.getAuthData().setIdentification(identification);
-                    }			
+                    }           
 
                     // Check if plugin validation is required and properties and options are valid
                     if (plugins.requiresValidation(profile.getPluginId())) {
@@ -334,7 +341,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
                     profile.getAuthData().setIdentification(identification);
-                }			
+                }           
 
                 // Check if plugin validation is required and properties and options are valid
                 if (plugins.requiresValidation(profile.getPluginId())) {
@@ -597,19 +604,87 @@ public class BusinessLogicImpl implements BusinessLogic {
     // ========================================================================
 
     // search operations ------------------------------------------------------
-
     @Override
-    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type, final String job) {
-        return conn.txNewReadOnly(new Callable<SearchResponse>() {
-            @Override public SearchResponse call() {
+    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type,
+            final String job, final String owner) {
+        return this.conn.txNewReadOnly(new Callable<SearchResponse>() {
+            @Override
+            public SearchResponse call() {
 
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-                return search.runSearch(user, query, source, type, job);
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(userId, true);
+                return BusinessLogicImpl.this.search.runSearch(user, query, source, type, job, owner);
 
             }
         });
     }
-    
-    // ========================================================================
+
+    // sharing operations======================================================
+    @Override
+    public Set<SharingPolicyEntry> getAllOwnedSharingPolicies(final Long ownerId) {
+        return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
+            @Override
+            public Set<SharingPolicyEntry> call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
+                return BusinessLogicImpl.this.share.getAllOwned(user);
+
+            }
+        });
+    }
+
+    @Override
+    public Set<SharingPolicyEntry> getAllIncomingSharingPolicies(final Long ownerId) {
+        return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
+            @Override
+            public Set<SharingPolicyEntry> call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
+                return BusinessLogicImpl.this.share.getAllIncoming(user);
+
+            }
+        });
+    }
+
+    @Override
+    public SharingPolicyEntry createAndAddSharingPolicy(final Long currUserId, final Long sharingWithUserId,
+            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
+            final String description) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
+                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID, name, description);
+
+            }
+        });
+    }
+
+    @Override
+    public String removeOwnedSharingPolicy(final Long currUserId, final Long policyID) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.share.removeOwned(user, policyID);
+
+            }
+        });
+    }
+
+    @Override
+    public String removeAllOwnedSharingPolicies(final Long currUserId) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.share.removeAllOwned(user);
+
+            }
+        });
+    }
 
 }

@@ -10,11 +10,12 @@ public class SearchResponseDTO {
     private List<CountedEntryDTO> bySource;
     private List<CountedEntryDTO> byType;
     private List<CountedEntryDTO> byJob;
+    private List<CountedEntryDTO> byOwner;
     private String searchQuery;
     private int progress;
 
     public List<CountedEntryDTO> getBySource() {
-        return bySource;
+        return this.bySource;
     }
 
     public void setBySource(List<CountedEntryDTO> bySource) {
@@ -22,7 +23,7 @@ public class SearchResponseDTO {
     }
 
     public List<CountedEntryDTO> getByType() {
-        return byType;
+        return this.byType;
     }
 
     public void setByType(List<CountedEntryDTO> byType) {
@@ -30,7 +31,7 @@ public class SearchResponseDTO {
     }
 
     public List<CountedEntryDTO> getByJob() {
-        return byJob;
+        return this.byJob;
     }
 
     public void setByJob(List<CountedEntryDTO> byJob) {
@@ -38,7 +39,7 @@ public class SearchResponseDTO {
     }
 
     public String getSearchQuery() {
-        return searchQuery;
+        return this.searchQuery;
     }
 
     public void setSearchQuery(String searchQuery) {
@@ -46,7 +47,7 @@ public class SearchResponseDTO {
     }
 
     public int getProgress() {
-        return progress;
+        return this.progress;
     }
 
     public void setProgress(int progress) {
@@ -54,11 +55,19 @@ public class SearchResponseDTO {
     }
 
     public List<SearchEntryDTO> getFiles() {
-        return files;
+        return this.files;
     }
 
     public void setFiles(List<SearchEntryDTO> files) {
         this.files = files;
+    }
+
+    public List<CountedEntryDTO> getByOwner() {
+        return this.byOwner;
+    }
+
+    public void setByOwner(List<CountedEntryDTO> byOwner) {
+        this.byOwner = byOwner;
     }
 
 }

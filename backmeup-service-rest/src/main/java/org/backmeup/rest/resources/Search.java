@@ -39,12 +39,13 @@ public class Search extends SecureBase {
             @QueryParam("query") String query, //
             @QueryParam("source") String source, //
             @QueryParam("type") String type, //
-            @QueryParam("job") String job) {
+            @QueryParam("job") String job,//
+            @QueryParam("owner") String owner) {
 
         mandatory("query", query);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         //canOnlyWorkWithMyData(userId);
-        SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job);
+        SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job, owner);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }

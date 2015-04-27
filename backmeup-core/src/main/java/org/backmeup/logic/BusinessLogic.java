@@ -1,8 +1,11 @@
 package org.backmeup.logic;
 
 import java.util.List;
+import java.util.Set;
 
 import org.backmeup.index.model.SearchResponse;
+import org.backmeup.index.model.sharing.SharingPolicyEntry;
+import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -70,7 +73,14 @@ public interface BusinessLogic {
     ProtocolOverview getProtocolOverview(Long userId, String duration);
     void             updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
     void             deleteJobProtocols(Long userId);
-
+    
     // search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner);
+
+    // sharing operations -----------------------------------------------------
+    Set<SharingPolicyEntry> getAllOwnedSharingPolicies(Long currUserId);
+    Set<SharingPolicyEntry> getAllIncomingSharingPolicies(Long currUserId);
+    SharingPolicyEntry      createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId, SharingPolicyTypeEntry policy, String sharedElementID, String name, String description);
+    String                  removeOwnedSharingPolicy(Long currUserId, Long policyID);
+    String                  removeAllOwnedSharingPolicies(Long currUserId);
 }
