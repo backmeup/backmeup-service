@@ -12,9 +12,6 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProtocolDetails;
-import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.spi.PluginDescribable;
 
 /**
@@ -68,11 +65,6 @@ public interface BusinessLogic {
     List<BackupJobExecution> getBackupJobExecutions(Long jobId);
     BackupJob                updateBackupJob(Long userId, BackupJob backupJob);
     void                     deleteBackupJob(Long userId, Long jobId);
-
-    ProtocolDetails  getProtocolDetails(Long userId, String fileId);
-    ProtocolOverview getProtocolOverview(Long userId, String duration);
-    void             updateJobProtocol(Long userId, Long jobId, JobProtocolDTO jobProtocol);
-    void             deleteJobProtocols(Long userId);
     
     // search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner);

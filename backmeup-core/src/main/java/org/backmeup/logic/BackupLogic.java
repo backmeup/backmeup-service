@@ -1,13 +1,9 @@
 package org.backmeup.logic;
 
-import java.util.Date;
 import java.util.List;
 
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
-import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.dto.JobProtocolDTO;
 
 public interface BackupLogic {
 
@@ -29,12 +25,4 @@ public interface BackupLogic {
     BackupJobExecution getBackupJobExecution(Long jobExecId);
 
     List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId);
-    
-
-    void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol);
-
-    ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to);
-
-    void deleteProtocolsOf(Long userId);
-
 }

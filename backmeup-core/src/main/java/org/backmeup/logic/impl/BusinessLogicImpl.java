@@ -1,6 +1,5 @@
 package org.backmeup.logic.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -30,11 +29,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProtocolDetails;
-import org.backmeup.model.ProtocolOverview;
 import org.backmeup.model.ValidationNotes;
-import org.backmeup.model.constants.DelayTimes;
-import org.backmeup.model.dto.JobProtocolDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.ValidationException;
@@ -526,53 +521,6 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 registration.getUserByUserId(userId, true);
                 backupJobs.deleteBackupJob(userId, jobId);
-
-            }
-        });
-    }
-
-    @Override
-    public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
-        return search.getProtocolDetails(userId, fileId);
-    }
-
-    @Override
-    public ProtocolOverview getProtocolOverview(final Long userId, final String duration) {
-        return conn.txNewReadOnly(new Callable<ProtocolOverview>() {
-            @Override public ProtocolOverview call() {
-
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-
-                Date to = new Date();
-                Date from = duration.equals("month") ? new Date(to.getTime() - DelayTimes.DELAY_MONTHLY) :
-                    new Date(to.getTime() - DelayTimes.DELAY_WEEKLY);
-
-                return backupJobs.getProtocolOverview(user, from, to);
-
-            }
-        });
-    }
-
-    @Override
-    public void updateJobProtocol(final Long userId, final Long jobId, final JobProtocolDTO jobProtocol) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-
-                BackMeUpUser user = registration.getUserByUserId(userId, true);
-                BackupJob job = backupJobs.getBackupJob(jobId, userId);
-                backupJobs.createJobProtocol(user, job, jobProtocol);
-
-            }
-        });
-    }
-
-    @Override
-    public void deleteJobProtocols(final Long userId) {
-        conn.txNew(new Runnable() {
-            @Override public void run() {
-
-                registration.getUserByUserId(userId, true);
-                backupJobs.deleteProtocolsOf(userId);
 
             }
         });

@@ -40,8 +40,6 @@ public class BackupJobDTO {
 	private List<PluginProfileDTO> actions;
 	private PluginProfileDTO sink;
 	
-	private Set<JobProtocolDTO> protocol;
-
 	public BackupJobDTO() {
 		
 	}
@@ -181,32 +179,5 @@ public class BackupJobDTO {
 			throw new IllegalArgumentException("Only profiles from a sink plugin can be assigned, but type is: " + source.getProfileType());
 		}
 		this.sink = sink;
-	}
-
-	public Set<JobProtocolDTO> getProtocol() {
-		return protocol;
-	}
-	
-	public void setProtocol(Set<JobProtocolDTO> protocol) {
-		this.protocol = protocol;
-	}
-
-	public void addProtocol(JobProtocolDTO jobProtocol) {
-		if(this.protocol == null) {
-			this.protocol = new HashSet<>();
-		}
-		protocol.add(jobProtocol);
-	}
-	
-	public JobProtocolDTO lastProtocol() {
-		JobProtocolDTO last = null;
-		if(protocol != null) {
-			for (JobProtocolDTO jp : protocol) {
-				if (last == null || jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
-					last = jp;
-				}
-			}
-		}
-		return last;
 	}
 }

@@ -1,9 +1,6 @@
 package org.backmeup.logic.impl;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -13,21 +10,13 @@ import javax.inject.Inject;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.logic.BackupLogic;
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
-import org.backmeup.model.JobProtocol;
-import org.backmeup.model.JobProtocol.JobProtocolMember;
 import org.backmeup.model.Profile;
-import org.backmeup.model.ProtocolOverview;
-import org.backmeup.model.ProtocolOverview.Activity;
-import org.backmeup.model.ProtocolOverview.Entry;
 import org.backmeup.model.Token;
 import org.backmeup.model.constants.BackupJobStatus;
-import org.backmeup.model.dto.JobProtocolDTO;
 
 @ApplicationScoped
 public class BackupLogicImpl implements BackupLogic {
@@ -45,10 +34,6 @@ public class BackupLogicImpl implements BackupLogic {
 
     private BackupJobDao getBackupJobDao() {
         return dal.createBackupJobDao();
-    }
-
-    private JobProtocolDao createJobProtocolDao() {
-        return dal.createJobProtocolDao();
     }
     
     private BackupJobExecutionDao getBackupJobExecutionDao() {
@@ -138,68 +123,6 @@ public class BackupLogicImpl implements BackupLogic {
     @Override
     public List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId) {
         return getBackupJobExecutionDao().findByBackupJobId(jobId);
-    }
-
-    @Override
-    public void createJobProtocol(BackMeUpUser user, BackupJob job, JobProtocolDTO jobProtocol) {
-        JobProtocolDao jpd = createJobProtocolDao();
-
-        JobProtocol protocol = new JobProtocol();
-        protocol.setUser(user);
-        protocol.setJob(job);
-        protocol.setSuccessful(jobProtocol.isSuccessful());
-
-//        for (JobProtocolMemberDTO pm : jobProtocol.getMembers()) {
-//            protocol.addMember(new JobProtocolMember(protocol, pm.getTitle(), pm.getSpace()));
-//        }
-
-        if (protocol.isSuccessful()) {
-            job.setLastSuccessful(protocol.getExecutionTime());
-            job.setStatus(BackupJobStatus.successful);
-        } else {
-            job.setLastFailed(protocol.getExecutionTime());
-            job.setStatus(BackupJobStatus.error);
-        }
-
-        jpd.save(protocol);
-    }
-
-    @Override
-    public ProtocolOverview getProtocolOverview(BackMeUpUser user, Date from, Date to) {
-        List<JobProtocol> protocols = createJobProtocolDao().findByUsernameAndDuration(user.getUsername(), from, to);
-        ProtocolOverview po = new ProtocolOverview();
-        Map<String, Entry> entries = new HashMap<>();
-        double totalSize = 0;
-        long totalCount = 0;
-        for (JobProtocol prot : protocols) {
-            totalCount += prot.getTotalStoredEntries();
-            for (JobProtocolMember member : prot.getMembers()) {
-                Entry entry = entries.get(member.getTitle());
-                if (entry == null) {
-                    entry = new Entry(member.getTitle(), 0, member.getSpace());
-                    entries.put(member.getTitle(), entry);
-                } else {
-                    entry.setAbsolute(entry.getAbsolute() + member.getSpace());
-                }
-                totalSize += member.getSpace();
-            }
-            po.getActivities().add(new Activity(prot.getJob().getJobName(), prot.getExecutionTime()));
-        }
-
-        for (Entry entry : entries.values()) {
-            entry.setPercent(100 * entry.getAbsolute() / totalSize);
-            po.getStoredAmount().add(entry);
-        }
-        po.setTotalCount(totalCount+"");
-        // TODO Determine format of bytes (currently MB)
-        po.setTotalStored(totalSize / 1024 / 1024 +" MB");
-        po.setUser(user.getUserId());
-        return po;
-    }
-
-    @Override
-    public void deleteProtocolsOf(Long userId) {
-        createJobProtocolDao().deleteByUserId(userId);
     }
 
     // Helper methods ---------------------------------------------------------
