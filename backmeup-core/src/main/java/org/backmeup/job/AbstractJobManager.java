@@ -144,10 +144,11 @@ public abstract class AbstractJobManager implements JobManager {
         long currentTime = new Date().getTime();
         long executeIn = job.getNextExecutionTime().getTime() - currentTime;
 
-        // If job execution was scheduled for within the past 5 mins, still
-        // schedule now...
+        // If job execution was scheduled for within the past 5 mins, 
+        // still schedule now. We start with a small delay of 2 secs. 
         if (executeIn >= -300000 && executeIn < 0) {
-            executeIn = 0;
+            // executeIn = 0;
+            executeIn = 2000;
         }
         
         return executeIn;
@@ -169,11 +170,14 @@ public abstract class AbstractJobManager implements JobManager {
         @Override
         public void run() {
             if (!shutdownInProgress) {
-
                 try {
                     conn.begin();
                     BackupJob job = dal.createBackupJobDao().findById(jobId);
-                    conn.commit();
+                    
+                    // Check if job still exists. Could be deleted in the meantime. 
+                    if(job == null) {
+                        return;
+                    }
                     
                     // check if the scheduler is still valid. If not a new scheduler
                     // was created and this one should not be executed
@@ -183,26 +187,22 @@ public abstract class AbstractJobManager implements JobManager {
 
                     // Run the job by creating a JobExecution
                     if (job.isActive()) {
-                        conn.begin();
-                        job = dal.createBackupJobDao().merge(job);
                         BackupJobExecution jobExecution = new BackupJobExecution(job);
                         jobExecution = dal.createBackupJobExecutionDao().save(jobExecution);
                         job.getJobExecutions().add(jobExecution);
-                        conn.commit();
                         
                         runJob(jobExecution);
                     }
 
                     if(!job.getTimeExpression().equals("realtime")) {
-                        conn.begin();
                         LOGGER.debug(String.format("Rescheduling job: execute in %d ms", job.getDelay()));
                         Date execTime = new Date(new Date().getTime() + job.getDelay());
                         job.setNextExecutionTime(execTime);
                         SYSTEM.scheduler().scheduleOnce(
                                 Duration.create(job.getDelay(),TimeUnit.MILLISECONDS),
                                 new RunAndReschedule(job.getId(), dal,schedulerID));
-                        conn.commit();
                     }
+                    conn.commit();
                 } finally {
                     conn.rollback();
                 }
