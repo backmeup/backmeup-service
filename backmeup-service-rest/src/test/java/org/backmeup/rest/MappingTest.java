@@ -13,6 +13,7 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
+import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
@@ -20,6 +21,7 @@ import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
@@ -288,6 +290,32 @@ public class MappingTest {
         assertEquals(JobFrequency.daily, jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
         assertEquals(job.isActive(), jobDTO.isActive());
+    }
+    
+    @Test
+    public void testBackupJobExecutionMapping() {
+        BackupJob job = new BackupJob();
+        job.setId(9L);
+        job.setStatus(BackupJobStatus.queued);
+                
+        BackupJobExecution jobExec = new BackupJobExecution(job);
+        jobExec.setId(1L);
+        jobExec.setName("Execution1");
+        jobExec.setCreateTime(new Date());
+        jobExec.setLastUpdated(new Date());
+        jobExec.setStartTime(new Date());
+        jobExec.setEndTime(new Date());
+        
+        Mapper mapper = getMapper();
+        BackupJobExecutionDTO jobExecDTO = mapper.map(jobExec, BackupJobExecutionDTO.class);
+
+        assertEquals(jobExec.getId(), jobExecDTO.getId());
+        assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
+        assertEquals(JobStatus.queued, jobExecDTO.getStatus());  
+        assertEquals(jobExec.getCreateTime(), jobExecDTO.getCreated());
+        assertEquals(jobExec.getLastUpdated(), jobExecDTO.getModified()); 
+        assertEquals(jobExec.getStartTime(), jobExecDTO.getStart()); 
+        assertEquals(jobExec.getEndTime(), jobExecDTO.getEnd()); 
     }
 
     @Test

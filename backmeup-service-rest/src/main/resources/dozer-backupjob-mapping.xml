@@ -27,5 +27,30 @@
 	<mapping>
 		<class-a>org.backmeup.model.BackupJobExecution</class-a>
 		<class-b>org.backmeup.model.dto.BackupJobExecutionDTO</class-b>
+		
+		<field>
+  			<a>backupJob.id</a>
+  			<b>jobId</b>
+		</field>
+		
+		<field>
+  			<a>createTime</a>
+  			<b>created</b>
+		</field>
+		
+		<field>
+  			<a>lastUpdated</a>
+  			<b>modified</b>
+		</field>
+		
+		<field>
+  			<a>startTime</a>
+  			<b>start</b>
+		</field>
+		
+		<field>
+  			<a>endTime</a>
+  			<b>end</b>
+		</field>
 	</mapping>
 </mappings> 
