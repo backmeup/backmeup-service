@@ -230,6 +230,7 @@ public class BackupJobs extends Base {
     @RolesAllowed("user")
     @GET
     @Path("/{jobId}/executions/")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<BackupJobExecutionDTO> listBackupJobExecutions(@PathParam("jobId") String jobId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
@@ -257,6 +258,7 @@ public class BackupJobs extends Base {
     @RolesAllowed({"user", "worker"})
     @GET
     @Path("/{jobId}/executions/{jobExecutionId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId) {
         return getBackupJobExecution(jobExecutionId);
     }
@@ -264,6 +266,7 @@ public class BackupJobs extends Base {
     @RolesAllowed({"user", "worker"})
     @GET
     @Path("/executions/{jobExecutionId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobExecutionId") String jobExecutionId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         
