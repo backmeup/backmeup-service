@@ -186,7 +186,7 @@ public final class BackmeupServiceClient implements BackmeupService {
             ObjectMapper mapper = createJsonMapper();
             String json = mapper.writeValueAsString(jobExecution);
 
-            Result r = execute("/backupjobs/" + jobExecution.getJobId() + "/executions" + jobExecution.getId(), ReqType.PUT, null, json, accessToken);
+            Result r = execute("/backupjobs/" + jobExecution.getJobId() + "/executions/" + jobExecution.getId(), ReqType.PUT, null, json, accessToken);
             if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new BackMeUpException("Failed to update BackupJob: " + r.content);
             }
@@ -196,7 +196,7 @@ public final class BackmeupServiceClient implements BackmeupService {
 
         } catch (IOException e) {
             LOGGER.error("", e);
-            throw new BackMeUpException("Failed to update BackupJob: " + e);
+            throw new BackMeUpException("Failed to update BackupJobExecution: " + e);
         }
     }
 
