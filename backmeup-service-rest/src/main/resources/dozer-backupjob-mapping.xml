@@ -26,10 +26,10 @@
 	
 	<mapping>
 		<class-a>org.backmeup.model.BackupJobExecution</class-a>
-		<class-b>org.backmeup.model.dto.BackupJobExecutionDTO</class-b>
+		<class-b map-null="false">org.backmeup.model.dto.BackupJobExecutionDTO</class-b>
 		
 		<field>
-  			<a>backupJob.id</a>
+  			<a>backupJobId</a>
   			<b>jobId</b>
 		</field>
 		

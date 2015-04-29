@@ -310,12 +310,31 @@ public class MappingTest {
         BackupJobExecutionDTO jobExecDTO = mapper.map(jobExec, BackupJobExecutionDTO.class);
 
         assertEquals(jobExec.getId(), jobExecDTO.getId());
+        assertEquals(jobExec.getName(), jobExecDTO.getName());
         assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
+        assertEquals(jobExec.getBackupJobId(), jobExecDTO.getJobId());
         assertEquals(JobStatus.queued, jobExecDTO.getStatus());  
         assertEquals(jobExec.getCreateTime(), jobExecDTO.getCreated());
         assertEquals(jobExec.getLastUpdated(), jobExecDTO.getModified()); 
         assertEquals(jobExec.getStartTime(), jobExecDTO.getStart()); 
         assertEquals(jobExec.getEndTime(), jobExecDTO.getEnd()); 
+    }
+    
+    @Test
+    public void testBackupJobExecutionMappingWhenDatesNull() {
+        BackupJob job = new BackupJob();
+        job.setId(9L);
+                
+        BackupJobExecution jobExec = new BackupJobExecution(job);
+        jobExec.setId(1L);
+        jobExec.setName("Execution1");
+        
+        Mapper mapper = getMapper();
+        BackupJobExecutionDTO jobExecDTO = mapper.map(jobExec, BackupJobExecutionDTO.class);
+
+        assertEquals(jobExec.getId(), jobExecDTO.getId());
+        assertEquals(jobExec.getName(), jobExecDTO.getName());
+        assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
     }
 
     @Test
