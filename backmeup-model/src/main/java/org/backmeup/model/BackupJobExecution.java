@@ -57,6 +57,9 @@ public class BackupJobExecution {
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private BackupJob backupJob;
     
+    @Column(name="backupjob_id", updatable=false, insertable=false)
+    private Long backupJobId;
+    
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private Profile sourceProfile;
     
@@ -90,6 +93,7 @@ public class BackupJobExecution {
         this.status = BackupJobStatus.queued;
         this.user = job.getUser();
         this.backupJob = job;
+        this.backupJobId = job.getId();
         this.sourceProfile = job.getSourceProfile();
         this.sinkProfile = job.getSinkProfile();
         for (Profile action : job.getActionProfiles()) {
@@ -115,6 +119,9 @@ public class BackupJobExecution {
     }
     
     public Date getCreateTime() {
+        if (this.createTime == null) {
+            return null;
+        }
         return (Date) createTime.clone();
     }
 
@@ -123,6 +130,9 @@ public class BackupJobExecution {
     }
 
     public Date getStartTime() {
+        if (this.startTime == null) {
+            return null;
+        }
         return (Date) startTime.clone();
     }
 
@@ -131,6 +141,9 @@ public class BackupJobExecution {
     }
 
     public Date getEndTime() {
+        if (this.endTime == null) {
+            return null;
+        }
         return (Date) endTime.clone();
     }
 
@@ -139,6 +152,9 @@ public class BackupJobExecution {
     }
 
     public Date getLastUpdated() {
+        if (this.lastUpdated == null) {
+            return null;
+        }
         return (Date) lastUpdated.clone();
     }
 
@@ -168,6 +184,11 @@ public class BackupJobExecution {
 
     public void setBackupJob(BackupJob backupJob) {
         this.backupJob = backupJob;
+        this.backupJobId = backupJob.getId();
+    }
+
+    public Long getBackupJobId() {
+        return backupJobId;
     }
 
     public Profile getSourceProfile() {
