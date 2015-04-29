@@ -279,4 +279,36 @@ public class BackupJobs extends Base {
         
         return execDTO;
     }
+    
+    @RolesAllowed({"worker"})
+    @PUT
+    @Path("/{jobId}/executions/{jobExecutionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public BackupJobExecutionDTO updateBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId, BackupJobExecutionDTO jobExecution) {
+        if ((Long.parseLong(jobId) != jobExecution.getJobId() || 
+                (Long.parseLong(jobExecutionId) != jobExecution.getId()))) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+
+        BackupJobExecution jobExec = getLogic().getBackupJobExecution(jobExecution.getId());
+        if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
+        if (jobExecution.getStart() != null) {
+            jobExec.setStartTime(jobExecution.getStart());
+        }
+        if (jobExecution.getEnd() != null) {
+            jobExec.setEndTime(jobExecution.getEnd());
+        }
+        BackupJobStatus jobStatus = getMapper().map(jobExecution.getStatus(), BackupJobStatus.class);
+        jobExec.setStatus(jobStatus);
+
+        getLogic().updateBackupJobExecution(jobExec);
+
+        return jobExecution;
+
+    }
 }

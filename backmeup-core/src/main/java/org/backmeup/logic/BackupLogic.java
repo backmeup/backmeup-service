@@ -25,4 +25,6 @@ public interface BackupLogic {
     BackupJobExecution getBackupJobExecution(Long jobExecId);
 
     List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId);
+    
+    BackupJobExecution updateBackupJobExecution(BackupJobExecution jobExec);
 }

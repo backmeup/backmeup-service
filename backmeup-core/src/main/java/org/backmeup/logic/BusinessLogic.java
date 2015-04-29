@@ -64,6 +64,7 @@ public interface BusinessLogic {
     BackupJobExecution       getBackupJobExecution(Long jobExecId);
     List<BackupJobExecution> getBackupJobExecutions(Long jobId);
     BackupJob                updateBackupJob(Long userId, BackupJob backupJob);
+    BackupJobExecution       updateBackupJobExecution(BackupJobExecution jobExecution);
     void                     deleteBackupJob(Long userId, Long jobId);
     
     // search operations ------------------------------------------------------

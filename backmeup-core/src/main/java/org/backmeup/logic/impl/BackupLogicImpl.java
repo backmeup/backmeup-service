@@ -124,6 +124,16 @@ public class BackupLogicImpl implements BackupLogic {
     public List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId) {
         return getBackupJobExecutionDao().findByBackupJobId(jobId);
     }
+    
+    @Override
+    public BackupJobExecution updateBackupJobExecution(BackupJobExecution jobExec) {
+        BackupJobExecutionDao jobExeDao = getBackupJobExecutionDao();
+        if(jobExeDao.findById(jobExec.getId()) == null){
+            throw new IllegalArgumentException("Unknown BackupJobExecution id");
+        }
+
+        return jobExeDao.merge(jobExec);
+    }
 
     // Helper methods ---------------------------------------------------------
 

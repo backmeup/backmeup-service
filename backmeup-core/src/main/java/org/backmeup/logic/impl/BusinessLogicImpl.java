@@ -513,6 +513,23 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Override
+    public BackupJobExecution updateBackupJobExecution(final BackupJobExecution jobExecution) {
+        if (jobExecution.getId() == null) {
+            throw new IllegalArgumentException("Id must not be null!");
+        }
+
+        BackupJobExecution jobExec = conn.txNew(new Callable<BackupJobExecution>() {
+            @Override public BackupJobExecution call() {
+
+                return backupJobs.updateBackupJobExecution(jobExecution);
+
+            }
+        });
+
+        return jobExec;
+    }
 
     @Override
     public void deleteBackupJob(final Long userId, final Long jobId) {
