@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
@@ -298,6 +299,67 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             .then()
                 .log().all()
                 .statusCode(200);
+        } finally {
+            BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+            BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
+            BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+    
+    @Test
+    public void testGetBackupJobExecutionDummy() throws InterruptedException {
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        PluginProfileDTO sourcePluginProfile = TestDataManager.getProfileDummySource();
+        String sourceProfileId = "";
+
+        PluginProfileDTO sinkPluginProfile = TestDataManager.getProfileDummySink();
+        String sinkProfileId = "";
+
+        String jobId = "";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            response = BackMeUpUtils.addProfile(accessToken, sourcePluginProfile.getPluginId(), sourcePluginProfile);
+            sourceProfileId = response.extract().path("profileId").toString();
+
+            response = BackMeUpUtils.addProfile(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile);
+            sinkProfileId = response.extract().path("profileId").toString();
+
+            BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
+
+            response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
+            jobId = response.extract().path("jobId").toString();
+            
+            // Wait for 5 seconds to make sure the job execution is created. 
+            Thread.sleep(5000);
+
+            List<BackupJobExecutionDTO> jobExecutions = BackMeUpUtils.getBackupJobExecutions(accessToken, jobId);
+            String jobExecId = jobExecutions.get(0).getId().toString();
+            
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/" + jobId + "/executions/" + jobExecId)
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body("jobId", equalTo(Integer.parseInt(jobId)))
+                .body("status", equalTo(JobStatus.queued.toString()))
+                .body(containsString("id"))
+                .body(containsString("name"))
+                .body(containsString("created"))
+                .body(containsString("modified"))
+                .body(containsString("user"));
+            
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);

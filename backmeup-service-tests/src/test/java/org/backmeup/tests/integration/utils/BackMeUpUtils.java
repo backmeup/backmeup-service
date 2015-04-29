@@ -5,8 +5,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
+import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 
@@ -113,6 +117,19 @@ public class BackMeUpUtils {
             .when()
                 .get("/plugins/" + pluginId + "/" + profileId);
         return parseResponse(PluginProfileDTO.class, response);
+    }
+    
+    public static List<BackupJobExecutionDTO> getBackupJobExecutions(String accessToken, String jobId) {
+        Response response = 
+            given()
+                .log().all()
+                .contentType("application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", accessToken)
+            .when()
+                .get("/backupjobs/" + jobId + "/executions");
+        
+        return Arrays.asList(parseResponse(BackupJobExecutionDTO[].class, response));
     }
 
     private static <T> T parseResponse(Class<T> type, Response response) {
