@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -40,13 +42,13 @@ public class BackupJobExecution {
     private Date createTime;
     
     @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdated;
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
-    
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdated;
     
     @Enumerated(EnumType.STRING)
     private BackupJobStatus status;
@@ -88,8 +90,6 @@ public class BackupJobExecution {
 
     public BackupJobExecution(BackupJob job) {
         this.name = job.getJobName() + " Execution";
-        this.createTime = new Date();
-        this.lastUpdated = createTime;
         this.status = BackupJobStatus.queued;
         this.user = job.getUser();
         this.backupJob = job;
@@ -124,9 +124,22 @@ public class BackupJobExecution {
         }
         return (Date) createTime.clone();
     }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = (Date) createTime.clone();
+    
+    @PrePersist
+    protected void onCreate() {
+        this.createTime = new Date();
+    }
+    
+    public Date getLastUpdated() {
+        if (this.lastUpdated == null) {
+            return null;
+        }
+        return (Date) lastUpdated.clone();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+      lastUpdated = new Date();
     }
 
     public Date getStartTime() {
@@ -149,17 +162,6 @@ public class BackupJobExecution {
 
     public void setEndTime(Date endTime) {
         this.endTime = (Date) endTime.clone();
-    }
-
-    public Date getLastUpdated() {
-        if (this.lastUpdated == null) {
-            return null;
-        }
-        return (Date) lastUpdated.clone();
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = (Date) lastUpdated.clone();
     }
 
     public BackupJobStatus getStatus() {

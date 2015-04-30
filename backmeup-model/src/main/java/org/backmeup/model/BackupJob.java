@@ -19,6 +19,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -108,9 +110,6 @@ public class BackupJob {
 		this.actionProfiles = actionProfiles;
 		this.startTime = start;
 		this.delay = delay;
-
-		this.createTime = new Date();
-		this.lastUpdatedTime = this.createTime;
 		this.jobName = jobTitle;
 //		this.reschedule = reschedule;
 	}
@@ -185,6 +184,9 @@ public class BackupJob {
 	}
 
 	public Date getStartTime() {
+        if (this.startTime == null) {
+            return null;
+        }
 		return (Date) startTime.clone();
 	}
 
@@ -209,15 +211,27 @@ public class BackupJob {
 	}
 
 	public Date getCreateTime() {
+        if (this.createTime == null) {
+            return null;
+        }
 		return (Date)createTime.clone();
 	}
-
-    public Date getLastUpdatedTime() {
-        return (Date) lastUpdatedTime.clone();
+	
+    @PrePersist
+    protected void onCreate() {
+        this.createTime = new Date();
     }
 
-    public void setLastUpdatedTime(Date date) {
-        this.lastUpdatedTime = (Date) date.clone();
+    public Date getLastUpdatedTime() {
+        if (this.lastUpdatedTime == null) {
+            return null;
+        }
+        return (Date) lastUpdatedTime.clone();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+      this.lastUpdatedTime = new Date();
     }
 
 //	public JobProtocol lastProtocol() {
@@ -232,6 +246,9 @@ public class BackupJob {
 //	}
 
 	public Date getNextExecutionTime() {
+        if (this.nextExecutionTime == null) {
+            return null;
+        }
 		return (Date) nextExecutionTime.clone();
 	}
 
@@ -256,6 +273,9 @@ public class BackupJob {
 	}
 
 	public Date getLastSuccessful() {
+        if (this.lastSuccessful == null) {
+            return null;
+        }
 		return (Date) lastSuccessful.clone();
 	}
 
@@ -264,6 +284,9 @@ public class BackupJob {
 	}
 
 	public Date getLastFailed() {
+        if (this.lastFailed == null) {
+            return null;
+        }
 		return (Date) lastFailed.clone();
 	}
 
