@@ -66,11 +66,11 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
                 .body("jobStatus", equalTo(JobStatus.queued.toString()))
-                .body("onHold", equalTo(false))
+                .body("active", equalTo(true))
                 .body("schedule", equalTo(backupJob.getSchedule().toString()))
                 .body(containsString("created"))
                 .body(containsString("modified"))
-                .body(containsString("start"))
+                .body(containsString("next"))
                 .body(containsString("delay"));
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
@@ -121,11 +121,14 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
                 .body("jobStatus", equalTo(JobStatus.queued.toString()))
-                .body("onHold", equalTo(false))
+                .body("active", equalTo(true))
                 .body("schedule", equalTo(backupJob.getSchedule().toString()))
+                .body("user.userId", equalTo(Integer.parseInt(userId)))
+                .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
+                .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))
                 .body(containsString("created"))
                 .body(containsString("modified"))
-                .body(containsString("start"))
+                .body(containsString("next"))
                 .body(containsString("delay"))
                 .body(containsString("user"))
                 .body(containsString("token"))
@@ -356,8 +359,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .body("status", equalTo(JobStatus.queued.toString()))
                 .body(containsString("id"))
                 .body(containsString("name"))
-                .body(containsString("created"))
-                .body(containsString("modified"));
+                .body(containsString("created"));
             
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
@@ -436,7 +438,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateBackupJobDummyToDummy() {
+    public void testCreateBackupJobDummyToDummy() throws InterruptedException {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -475,6 +477,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
+            
+            // Wait for 2 seconds to make sure we are not deleting the 
+            // job while creating the job execution
+            Thread.sleep(5000);
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -484,7 +490,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateBackupJobFilegeneratorToDummy() {
+    public void testCreateBackupJobFilegeneratorToDummy() throws InterruptedException {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -523,6 +529,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
+            
+            // Wait for 2 seconds to make sure we are not deleting the 
+            // job while creating the job execution
+            Thread.sleep(5000);
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -531,8 +541,9 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
         }
     }
 
+    @Ignore
     @Test
-    public void testCreateBackupJobFilegeneratorToBackmeupStorage() {
+    public void testCreateBackupJobFilegeneratorToBackmeupStorage() throws InterruptedException {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -577,6 +588,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200);
 
             jobId = response.extract().path("jobId").toString();
+            
+            // Wait for 2 seconds to make sure we are not deleting the 
+            // job while creating the job execution
+            Thread.sleep(5000);
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
@@ -587,7 +602,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testDeleteBackupJob() {
+    public void testDeleteBackupJob() throws InterruptedException {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -624,6 +639,10 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             .then()
                 .log().all()
                 .statusCode(204);
+            
+            // Wait for 2 seconds to make sure we are not deleting the 
+            // job while creating the job execution
+            Thread.sleep(5000);
 
             given()
                 .header("Accept", "application/json")
