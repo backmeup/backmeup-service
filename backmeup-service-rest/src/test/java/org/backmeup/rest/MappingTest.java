@@ -274,6 +274,7 @@ public class MappingTest {
     @Test
     public void testBackupJobMapping() {
         BackupJob job = new BackupJob();
+        job.setJobName("BackupJob1");
         job.setStatus(BackupJobStatus.queued);
         job.setId(9L);
         job.setTimeExpression("daily");
@@ -286,6 +287,7 @@ public class MappingTest {
         BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
 
         assertEquals(job.getId(), jobDTO.getJobId());
+        assertEquals(job.getJobName(), jobDTO.getJobTitle());
         assertEquals(JobStatus.queued, jobDTO.getJobStatus());
         assertEquals(JobFrequency.daily, jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
@@ -301,8 +303,6 @@ public class MappingTest {
         BackupJobExecution jobExec = new BackupJobExecution(job);
         jobExec.setId(1L);
         jobExec.setName("Execution1");
-        jobExec.setCreateTime(new Date());
-        jobExec.setLastUpdated(new Date());
         jobExec.setStartTime(new Date());
         jobExec.setEndTime(new Date());
         
@@ -314,8 +314,6 @@ public class MappingTest {
         assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
         assertEquals(jobExec.getBackupJobId(), jobExecDTO.getJobId());
         assertEquals(JobStatus.queued, jobExecDTO.getStatus());  
-        assertEquals(jobExec.getCreateTime(), jobExecDTO.getCreated());
-        assertEquals(jobExec.getLastUpdated(), jobExecDTO.getModified()); 
         assertEquals(jobExec.getStartTime(), jobExecDTO.getStart()); 
         assertEquals(jobExec.getEndTime(), jobExecDTO.getEnd()); 
     }
