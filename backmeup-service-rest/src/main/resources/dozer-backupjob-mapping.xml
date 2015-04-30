@@ -4,11 +4,23 @@
 
 	<mapping>
 		<class-a>org.backmeup.model.BackupJob</class-a>
-		<class-b>org.backmeup.model.dto.BackupJobDTO</class-b>
+		<class-b map-null="false">org.backmeup.model.dto.BackupJobDTO</class-b>
 		
 		<field>
   			<a>id</a>
   			<b>jobId</b>
+		</field> 
+		<field>
+  			<a>jobName</a>
+  			<b>jobTitle</b>
+		</field> 
+		<field>
+  			<a>createTime</a>
+  			<b>created</b>
+		</field> 
+		<field>
+  			<a>lastUpdatedTime</a>
+  			<b>modified</b>
 		</field> 
 		<field>
   			<a>status</a>
