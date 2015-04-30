@@ -52,5 +52,20 @@
   			<a>endTime</a>
   			<b>end</b>
 		</field>
+		
+		<field>
+  			<a>sourceProfile</a>
+  			<b>source</b>
+		</field>
+		
+		<field>
+  			<a>actionProfiles</a>
+  			<b>actions</b>
+		</field>
+		
+		<field>
+  			<a>sinkProfile</a>
+  			<b>sink</b>
+		</field>
 	</mapping>
 </mappings> 
