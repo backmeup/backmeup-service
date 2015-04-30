@@ -117,7 +117,9 @@ public class BackupJobExecutionDTO {
     }
 
     public void setSource(PluginProfileDTO source) {
-        if ((source.getProfileType() != PluginType.Source) && (source.getProfileType() != PluginType.SourceSink)) {
+        if ((source != null) && 
+            (source.getProfileType() != PluginType.Source) && 
+            (source.getProfileType() != PluginType.SourceSink)) {
             throw new IllegalArgumentException("Only profiles from a source plugin can be assigned, but type is: " + source.getProfileType());
         }
         this.source = source;
@@ -147,7 +149,9 @@ public class BackupJobExecutionDTO {
     }
 
     public void setSink(PluginProfileDTO sink) {
-        if ((sink.getProfileType() != PluginType.Sink) && (sink.getProfileType() != PluginType.SourceSink)) {
+        if ((sink != null) && 
+            (sink.getProfileType() != PluginType.Sink) && 
+            (sink.getProfileType() != PluginType.SourceSink)) {
             throw new IllegalArgumentException("Only profiles from a sink plugin can be assigned, but type is: " + source.getProfileType());
         }
         this.sink = sink;
