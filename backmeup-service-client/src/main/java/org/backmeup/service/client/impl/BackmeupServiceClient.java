@@ -163,7 +163,12 @@ public final class BackmeupServiceClient implements BackmeupService {
     public BackupJobExecutionDTO getBackupJobExecution(Long jobExecId) {
         ensureAuthenticated();
         
-        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, null, null, accessToken);
+        Map<String, String> params = new HashMap<>();
+        params.put("expandUser", "true");
+        params.put("expandToken", "true");
+        params.put("expandProfiles", "true");
+        
+        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, params, null, accessToken);
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + r.content);
         }
