@@ -15,7 +15,7 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 public class BackupJobDTO {
 	private Long jobId;
 	private String jobTitle;
-	private JobStatus jobStatus;
+	private JobStatus status;
 	private boolean isActive = true;
 	
 	private UserDTO user;
@@ -52,12 +52,12 @@ public class BackupJobDTO {
 		this.jobTitle = jobTitle;
 	}
 
-	public JobStatus getJobStatus() {
-		return jobStatus;
+	public JobStatus getStatus() {
+		return status;
 	}
 
-	public void setJobStatus(JobStatus jobStatus) {
-		this.jobStatus = jobStatus;
+	public void setStatus(JobStatus jobStatus) {
+		this.status = jobStatus;
 	}
 
 	public boolean isActive() {

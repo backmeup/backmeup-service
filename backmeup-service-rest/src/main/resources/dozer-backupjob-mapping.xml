@@ -23,10 +23,6 @@
   			<b>modified</b>
 		</field> 
 		<field>
-  			<a>status</a>
-  			<b>jobStatus</b>
-		</field> 
-		<field>
   			<a>timeExpression</a>
   			<b>schedule</b>
 		</field> 

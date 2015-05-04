@@ -96,7 +96,7 @@ public class DummyDataManager {
 		BackupJobDTO job = new BackupJobDTO();
 		job.setJobId(1L);
 		job.setJobTitle("BackupJob1");
-		job.setJobStatus(JobStatus.ACTIVE);
+		job.setStatus(JobStatus.ACTIVE);
 		job.setSchedule(JobFrequency.WEEKLY);
 		job.setCreated(new Date(1401201920089L));
 		job.setModified(new Date(1401201921774L));

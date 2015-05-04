@@ -195,7 +195,7 @@ public class BackupJobs extends Base {
 //        job.getToken().setTokenId(backupjob.getToken().getTokenId());
         job.getToken().setToken(backupjob.getToken().getToken());
         job.getToken().setBackupdate(backupjob.getToken().getValidity());
-        job.setStatus(backupjob.getJobStatus());
+        job.setStatus(backupjob.getStatus());
 
         // TODO: Job protocol
 

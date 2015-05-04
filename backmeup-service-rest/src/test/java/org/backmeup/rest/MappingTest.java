@@ -287,7 +287,7 @@ public class MappingTest {
 
         assertEquals(job.getId(), jobDTO.getJobId());
         assertEquals(job.getJobName(), jobDTO.getJobTitle());
-        assertEquals(job.getStatus(), jobDTO.getJobStatus());
+        assertEquals(job.getStatus(), jobDTO.getStatus());
         assertEquals(JobFrequency.DAILY, jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
         assertEquals(job.isActive(), jobDTO.isActive());
