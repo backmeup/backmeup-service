@@ -26,6 +26,7 @@ import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntr
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.SharingPolicyDTO;
 import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
+import org.backmeup.model.dto.SharingPolicyHandshakeDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
@@ -41,9 +42,6 @@ public class Sharing extends SecureBase {
 
     @Context
     private UriInfo info;
-
-    //TODO a user can remove a created sharing OR (or sharing that involves him?)
-    //TODO a user must approve a sharing policy or individual record?
 
     @RolesAllowed("user")
     @GET
@@ -141,6 +139,61 @@ public class Sharing extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
         return response;
+    }
+
+    // --------- approve or decline incoming sharings ----------//
+
+    @RolesAllowed("user")
+    @POST
+    @Path("/incoming/approval/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String approvalOfIncomingSharing(SharingPolicyHandshakeDTO handshake) {
+        //the UI framework is set to use POST operations with JSON requests and not Query Parameters
+        if (handshake.getApprove()) {
+            return this.acceptIncomingSharing(handshake.getPolicyID());
+        } else {
+            return this.declineIncomingSharing(handshake.getPolicyID());
+        }
+    }
+
+    @RolesAllowed("user")
+    @POST
+    @Path("/incoming/decline")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String declineIncomingSharing(//
+            @QueryParam("policyID") Long policyID) {
+
+        mandatory("policyID", policyID);
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        try {
+            String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
+            return response;
+        } catch (UnknownUserException e) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
+                    entity("declining incoming sharing failed"). //
+                    build());
+        }
+    }
+
+    @RolesAllowed("user")
+    @POST
+    @Path("/incoming/accept")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String acceptIncomingSharing(//
+            @QueryParam("policyID") Long policyID) {
+
+        mandatory("policyID", policyID);
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+
+        try {
+            String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);
+            return response;
+        } catch (UnknownUserException e) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
+                    entity("approving incoming sharing failed"). //
+                    build());
+        }
     }
 
     private void mandatory(String name, Long l) {

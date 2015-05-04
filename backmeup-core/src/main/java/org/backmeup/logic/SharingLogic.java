@@ -23,4 +23,8 @@ public interface SharingLogic {
 
     String removeAllOwned(BackMeUpUser owner);
 
+    String acceptIncomingSharing(BackMeUpUser user, Long policyID);
+
+    String declineIncomingSharing(BackMeUpUser user, Long policyID);
+
 }
