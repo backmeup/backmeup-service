@@ -6,19 +6,13 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.backmeup.model.constants.JobFrequency;
+import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 
 @XmlRootElement
 public class BackupJobDTO {
-	public static enum JobStatus {
-		queued, running, successful, error
-	}
-	
-	public static enum JobFrequency {
-		once, daily, weekly, montly
-	}
-
 	private Long jobId;
 	private String jobTitle;
 	private JobStatus jobStatus;
