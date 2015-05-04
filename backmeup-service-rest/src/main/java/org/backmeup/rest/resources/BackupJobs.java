@@ -45,7 +45,7 @@ public class BackupJobs extends Base {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BackupJobDTO> listBackupJobs(@QueryParam("jobStatus") JobStatus jobStatus) {
+    public List<BackupJobDTO> listBackupJobs(@QueryParam("status") JobStatus jobStatus) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
         List<BackupJob> allJobsOfUser = getLogic().getBackupJobs(activeUser.getUserId());

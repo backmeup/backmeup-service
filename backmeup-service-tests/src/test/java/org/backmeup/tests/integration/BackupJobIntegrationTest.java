@@ -224,7 +224,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .header("Accept", "application/json")
                 .header("Authorization", accessToken)
             .when()
-                .get("/backupjobs?jobStatus=CREATED")
+                .get("/backupjobs?status=CREATED")
             .then()
                 .log().all()
                 .statusCode(200);
@@ -252,7 +252,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .header("Accept", "application/json")
                 .header("Authorization", accessToken)
             .when()
-                .get("/backupjobs?jobStatus=ACTIVE")
+                .get("/backupjobs?status=ACTIVE")
             .then()
                 .log().all()
                 .statusCode(200);
