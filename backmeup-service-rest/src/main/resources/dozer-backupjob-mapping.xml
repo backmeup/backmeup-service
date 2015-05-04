@@ -23,7 +23,7 @@
   			<b>modified</b>
 		</field> 
 		<field>
-  			<a>timeExpression</a>
+  			<a>jobFrequency</a>
   			<b>schedule</b>
 		</field> 
 		<field>

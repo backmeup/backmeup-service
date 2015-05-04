@@ -16,6 +16,7 @@ import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Token;
+import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.constants.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,7 +197,7 @@ public abstract class AbstractJobManager implements JobManager {
                         runJob(jobExecution);
                     }
 
-                    if(!job.getTimeExpression().equals("realtime")) {
+                    if(job.getJobFrequency() != JobFrequency.ONCE) {
                         LOGGER.debug(String.format("Rescheduling job: execute in %d ms", job.getDelay()));
                         Date execTime = new Date(new Date().getTime() + job.getDelay());
                         job.setNextExecutionTime(execTime);

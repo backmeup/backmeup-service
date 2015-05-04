@@ -8,6 +8,7 @@ import java.util.List;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.Profile;
+import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class JsonSerializerTest {
     
     List<Profile> actions = new ArrayList<>();
     
-    BackupJob job = new BackupJob(user, source, sink, actions, new Date(), new Date().getTime() + 1000000L, "TestJob1", false);
+    BackupJob job = new BackupJob(user, "TestJob1", source, sink, actions, new Date(), JobFrequency.ONCE);
     
     String serializedJob = JsonSerializer.serialize(job);
     BackupJob restored = JsonSerializer.deserialize(serializedJob, BackupJob.class);

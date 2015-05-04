@@ -24,6 +24,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
@@ -62,7 +63,8 @@ public class BackupJob {
 //	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
 //	private final Set<JobProtocol> jobProtocols = new HashSet<>();
 
-	private String timeExpression;
+	@Enumerated(EnumType.STRING)
+	private JobFrequency jobFrequency;
 
 	private long delay;
 
@@ -71,8 +73,6 @@ public class BackupJob {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date nextExecutionTime;
-
-//	private boolean reschedule;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastSuccessful;
@@ -98,18 +98,16 @@ public class BackupJob {
 		super();
 	}
 
-	public BackupJob(BackMeUpUser user, Profile sourceProfile,
-			Profile sinkProfile, List<Profile> actionProfiles, Date start,
-			long delay, String jobTitle, boolean reschedule) {
+	public BackupJob(BackMeUpUser user, String name, Profile sourceProfile,
+			Profile sinkProfile, List<Profile> actionProfiles, Date start, JobFrequency frequency) {
 		this.user = user;
-		setSourceProfile(sourceProfile);
-		setSinkProfile(sinkProfile);
-		setActionProfiles(actionProfiles);
-		this.actionProfiles = actionProfiles;
+		this.jobName = name;
 		this.startTime = start;
-		this.delay = delay;
-		this.jobName = jobTitle;
-//		this.reschedule = reschedule;
+		this.jobFrequency = frequency;
+		this.delay = jobFrequency.getDelayTime();
+	    setSourceProfile(sourceProfile);
+	    setSinkProfile(sinkProfile);
+	    setActionProfiles(actionProfiles);
 	}
 
 	public Long getId() {
@@ -296,13 +294,14 @@ public class BackupJob {
         return status == JobStatus.ACTIVE;
     }
 
-	public String getTimeExpression() {
-		return timeExpression;
-	}
+    public JobFrequency getJobFrequency() {
+        return jobFrequency;
+    }
 
-    public void setTimeExpression(String timeExpression) {
-		this.timeExpression = timeExpression;
-	}
+    public void setJobFrequency(JobFrequency jobFrequency) {
+        this.jobFrequency = jobFrequency;
+        this.delay = jobFrequency.getDelayTime();
+    }
 
     public Set<BackupJobExecution> getJobExecutions() {
         return jobExecutions;

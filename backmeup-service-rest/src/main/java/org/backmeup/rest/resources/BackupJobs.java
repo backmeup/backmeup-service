@@ -25,8 +25,6 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
-import org.backmeup.model.constants.DelayTimes;
-import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
@@ -82,43 +80,10 @@ public class BackupJobs extends Base {
             }
         }
 
-        long delay = DelayTimes.DELAY_MONTHLY;
-        boolean reschedule = false;
-        String timeExpression = "monthly";
-//        long nextExecution = new Date().getTime(); 
-
-        if (backupJob.getSchedule().equals(JobFrequency.DAILY)) {
-            delay = DelayTimes.DELAY_DAILY;
-            timeExpression = "daily";
-            reschedule = true;
-        } else if (backupJob.getSchedule().equals(JobFrequency.WEEKLY)) {
-            delay = DelayTimes.DELAY_WEEKLY;
-            timeExpression = "weekly";
-            reschedule = true;
-
-        } else if (backupJob.getSchedule().equals(JobFrequency.MONTHLY)) {
-            delay = DelayTimes.DELAY_MONTHLY;
-            timeExpression = "monthly";
-            reschedule = true;
-
-        } else if (backupJob.getSchedule().equals(JobFrequency.ONCE)) {
-            delay = DelayTimes.DELAY_REALTIME;
-            timeExpression = "realtime";
-            reschedule = false;
-        } 
-
-        BackupJob job = new BackupJob(activeUser, sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), delay, backupJob.getJobTitle(), reschedule);
-        job.setTimeExpression(timeExpression);
-//        nextExecution += delay;
+        BackupJob job = new BackupJob(activeUser, backupJob.getJobTitle(), sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), backupJob.getSchedule());
         job.setNextExecutionTime(new Date());
         job = getLogic().createBackupJob(job);
 
-//        if(vn.getValidationEntries().size() > 0) {
-//            List<ValidationEntry> entries = vn.getValidationEntries();
-//            throw new WebApplicationException("Validation threw " + entries.size() + " errors", Status.INTERNAL_SERVER_ERROR);
-//        } 
-//
-//        job = vn.getJob();
         return getMapper().map(job, BackupJobDTO.class);
 
     }
