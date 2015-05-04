@@ -1,6 +1,6 @@
 package org.backmeup.rest.converters;
 
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.constants.JobFrequency;
 import org.dozer.CustomConverter;
 import org.dozer.MappingException;
 
@@ -18,16 +18,16 @@ public class BackupJobFrequencyConverter implements CustomConverter {
 
             switch (timeExpression) {
             case "daily":
-                return JobFrequency.daily;
+                return JobFrequency.DAILY;
 
             case "weekly":
-                return JobFrequency.weekly;
+                return JobFrequency.WEEKLY;
 
             case "monthly":
-                return JobFrequency.montly;
+                return JobFrequency.MONTHLY;
 
             case "realtime":
-                return JobFrequency.once;
+                return JobFrequency.ONCE;
             default:
                 throw new IllegalStateException();
             }
@@ -35,16 +35,16 @@ public class BackupJobFrequencyConverter implements CustomConverter {
         } else if (source instanceof JobFrequency) {
             JobFrequency jobFrequency = (JobFrequency) source;
             switch (jobFrequency) {
-            case daily:
+            case DAILY:
                 return "daily";
 
-            case weekly:
+            case WEEKLY:
                 return "weekly";
 
-            case montly:
+            case MONTHLY:
                 return "monthly";
 
-            case once:
+            case ONCE:
                 return "realtime";
 
             default:

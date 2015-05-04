@@ -3,10 +3,10 @@ package org.backmeup.rest;
 import java.util.Date;
 
 import org.backmeup.model.api.RequiredInputField.Type;
+import org.backmeup.model.constants.JobFrequency;
+import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
-import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
@@ -96,8 +96,8 @@ public class DummyDataManager {
 		BackupJobDTO job = new BackupJobDTO();
 		job.setJobId(1L);
 		job.setJobTitle("BackupJob1");
-		job.setJobStatus(JobStatus.queued);
-		job.setSchedule(JobFrequency.weekly);
+		job.setJobStatus(JobStatus.ACTIVE);
+		job.setSchedule(JobFrequency.WEEKLY);
 		job.setCreated(new Date(1401201920089L));
 		job.setModified(new Date(1401201921774L));
 		job.setStart(new Date(1401201920087L));

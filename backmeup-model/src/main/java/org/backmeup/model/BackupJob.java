@@ -24,7 +24,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
@@ -81,9 +81,7 @@ public class BackupJob {
 	private Date lastFailed;
 
 	@Enumerated(EnumType.STRING)
-	private BackupJobStatus status;
-
-	private boolean isActive = true;
+	private JobStatus status;
 
 	private UUID validScheduleID = null;
 
@@ -264,11 +262,11 @@ public class BackupJob {
 //		this.reschedule = reschedule;
 //	}
 
-	public BackupJobStatus getStatus() {
+	public JobStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(BackupJobStatus status) {
+	public void setStatus(JobStatus status) {
 		this.status = status;
 	}
 
@@ -293,21 +291,9 @@ public class BackupJob {
 	public void setLastFailed(Date lastFailed) {
 		this.lastFailed = lastFailed;
 	}
-
-//	public boolean isOnHold() {
-//		return isActive;
-//	}
-//
-//	public void setOnHold(boolean onHold) {
-//		this.isActive = onHold;
-//	}
 	
     public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+        return status == JobStatus.ACTIVE;
     }
 
 	public String getTimeExpression() {

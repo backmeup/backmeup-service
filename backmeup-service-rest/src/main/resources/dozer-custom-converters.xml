@@ -7,14 +7,8 @@
 		<custom-converters> 		
 			<converter type="org.backmeup.rest.converters.BackupJobFrequencyConverter">
 				<class-a>java.lang.String</class-a>
-				<class-b>org.backmeup.model.dto.BackupJobDTO.JobFrequency</class-b>
-			</converter>
-			
-			<converter type="org.backmeup.rest.converters.BackupJobStatusConverter">
-				<class-a>org.backmeup.model.constants.BackupJobStatus</class-a>
-				<class-b>org.backmeup.model.dto.BackupJobDTO.JobStatus</class-b>
-			</converter>
-      		
+				<class-b>org.backmeup.model.constants.JobFrequency</class-b>
+			</converter>      		
 		</custom-converters>
 	</configuration>
 	

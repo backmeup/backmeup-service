@@ -25,12 +25,11 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
-import org.backmeup.model.constants.BackupJobStatus;
 import org.backmeup.model.constants.DelayTimes;
+import org.backmeup.model.constants.JobFrequency;
+import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
-import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
@@ -49,16 +48,11 @@ public class BackupJobs extends Base {
     public List<BackupJobDTO> listBackupJobs(@QueryParam("jobStatus") JobStatus jobStatus) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
-        BackupJobStatus status = null;
-        if (jobStatus != null) {
-            status = getMapper().map(jobStatus, BackupJobStatus.class);
-        }
-
         List<BackupJob> allJobsOfUser = getLogic().getBackupJobs(activeUser.getUserId());
         List<BackupJobDTO> jobList = new ArrayList<>();
 
         for(BackupJob job : allJobsOfUser) {
-            if ((status == null) || (status == job.getStatus())) {
+            if ((jobStatus == null) || (jobStatus == job.getStatus())) {
                 BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
                 jobList.add(jobDTO);
             }
@@ -93,21 +87,21 @@ public class BackupJobs extends Base {
         String timeExpression = "monthly";
 //        long nextExecution = new Date().getTime(); 
 
-        if (backupJob.getSchedule().equals(JobFrequency.daily)) {
+        if (backupJob.getSchedule().equals(JobFrequency.DAILY)) {
             delay = DelayTimes.DELAY_DAILY;
             timeExpression = "daily";
             reschedule = true;
-        } else if (backupJob.getSchedule().equals(JobFrequency.weekly)) {
+        } else if (backupJob.getSchedule().equals(JobFrequency.WEEKLY)) {
             delay = DelayTimes.DELAY_WEEKLY;
             timeExpression = "weekly";
             reschedule = true;
 
-        } else if (backupJob.getSchedule().equals(JobFrequency.montly)) {
+        } else if (backupJob.getSchedule().equals(JobFrequency.MONTHLY)) {
             delay = DelayTimes.DELAY_MONTHLY;
             timeExpression = "monthly";
             reschedule = true;
 
-        } else if (backupJob.getSchedule().equals(JobFrequency.once)) {
+        } else if (backupJob.getSchedule().equals(JobFrequency.ONCE)) {
             delay = DelayTimes.DELAY_REALTIME;
             timeExpression = "realtime";
             reschedule = false;
@@ -201,9 +195,7 @@ public class BackupJobs extends Base {
 //        job.getToken().setTokenId(backupjob.getToken().getTokenId());
         job.getToken().setToken(backupjob.getToken().getToken());
         job.getToken().setBackupdate(backupjob.getToken().getValidity());
-
-        BackupJobStatus jobStatus = getMapper().map(backupjob.getJobStatus(), BackupJobStatus.class);
-        job.setStatus(jobStatus);
+        job.setStatus(backupjob.getJobStatus());
 
         // TODO: Job protocol
 
@@ -326,8 +318,8 @@ public class BackupJobs extends Base {
         if (jobExecution.getEnd() != null) {
             jobExec.setEndTime(jobExecution.getEnd());
         }
-        BackupJobStatus jobStatus = getMapper().map(jobExecution.getStatus(), BackupJobStatus.class);
-        jobExec.setStatus(jobStatus);
+
+        jobExec.setStatus(jobExecution.getStatus());
 
         getLogic().updateBackupJobExecution(jobExec);
 

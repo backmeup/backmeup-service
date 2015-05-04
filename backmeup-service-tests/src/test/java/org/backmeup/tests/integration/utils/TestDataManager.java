@@ -3,9 +3,9 @@ package org.backmeup.tests.integration.utils;
 import java.util.Date;
 import java.util.List;
 
+import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
@@ -135,7 +135,7 @@ public class TestDataManager {
 
     public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId) {
         String jobTitle = "BackupJob1";
-        JobFrequency schedule = JobFrequency.weekly;
+        JobFrequency schedule = JobFrequency.WEEKLY;
         Date start = new Date();
 
         BackupJobCreationDTO backupJob = new BackupJobCreationDTO();
@@ -151,7 +151,7 @@ public class TestDataManager {
     public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId,
             List<String> actionProfileIds) {
         String jobTitle = "BackupJob1";
-        JobFrequency schedule = JobFrequency.weekly;
+        JobFrequency schedule = JobFrequency.WEEKLY;
         Date start = new Date();
 
         BackupJobCreationDTO backupJob = new BackupJobCreationDTO();

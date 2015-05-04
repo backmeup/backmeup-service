@@ -6,14 +6,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.dto.BackupJobDTO.JobStatus;
+import org.backmeup.model.constants.JobExecutionStatus;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @XmlRootElement
 public class BackupJobExecutionDTO {
     private Long id;
     private String name;
-    private JobStatus status;
+    private JobExecutionStatus status;
     
     private Date created;
     private Date modified;
@@ -48,11 +48,11 @@ public class BackupJobExecutionDTO {
         this.name = name;
     }
 
-    public JobStatus getStatus() {
+    public JobExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(JobStatus status) {
+    public void setStatus(JobExecutionStatus status) {
         this.status = status;
     }
 

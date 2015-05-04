@@ -7,8 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.backmeup.model.constants.JobExecutionStatus;
 import org.backmeup.model.dto.BackupJobCreationDTO;
-import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
@@ -65,9 +65,9 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                .body("jobStatus", equalTo(JobStatus.queued.toString()))
                 .body("active", equalTo(true))
                 .body("schedule", equalTo(backupJob.getSchedule().toString()))
+                .body(containsString("jobStatus"))
                 .body(containsString("created"))
                 .body(containsString("modified"))
                 .body(containsString("next"))
@@ -120,12 +120,12 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                .body("jobStatus", equalTo(JobStatus.queued.toString()))
                 .body("active", equalTo(true))
                 .body("schedule", equalTo(backupJob.getSchedule().toString()))
                 .body("user.userId", equalTo(Integer.parseInt(userId)))
                 .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
                 .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))
+                .body(containsString("jobStatus"))
                 .body(containsString("created"))
                 .body(containsString("modified"))
                 .body(containsString("next"))
@@ -134,6 +134,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .body(containsString("token"))
                 .body(containsString("source"))
                 .body(containsString("sink"));
+
 
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
@@ -356,7 +357,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .log().all()
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
-                .body("status", equalTo(JobStatus.queued.toString()))
+                .body("status", equalTo(JobExecutionStatus.QUEUED.toString()))
                 .body(containsString("id"))
                 .body(containsString("name"))
                 .body(containsString("created"));
@@ -415,7 +416,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .log().all()
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
-                .body("status", equalTo(JobStatus.queued.toString()))
+                .body("status", equalTo(JobExecutionStatus.QUEUED.toString()))
                 .body("user.userId", equalTo(Integer.parseInt(userId)))
                 .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
                 .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))

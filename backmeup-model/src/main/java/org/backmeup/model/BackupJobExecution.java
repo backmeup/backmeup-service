@@ -21,7 +21,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.constants.JobExecutionStatus;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 /**
@@ -51,7 +51,7 @@ public class BackupJobExecution {
     private Date endTime;
     
     @Enumerated(EnumType.STRING)
-    private BackupJobStatus status;
+    private JobExecutionStatus status;
     
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private BackMeUpUser user;
@@ -90,7 +90,7 @@ public class BackupJobExecution {
 
     public BackupJobExecution(BackupJob job) {
         this.name = job.getJobName() + " Execution";
-        this.status = BackupJobStatus.queued;
+        this.status = JobExecutionStatus.QUEUED;
         this.user = job.getUser();
         this.backupJob = job;
         this.backupJobId = job.getId();
@@ -164,11 +164,11 @@ public class BackupJobExecution {
         this.endTime = (Date) endTime.clone();
     }
 
-    public BackupJobStatus getStatus() {
+    public JobExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(BackupJobStatus status) {
+    public void setStatus(JobExecutionStatus status) {
         this.status = status;
     }
 

@@ -17,10 +17,10 @@ import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.api.RequiredInputField;
-import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.constants.JobExecutionStatus;
+import org.backmeup.model.constants.JobFrequency;
+import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.BackupJobDTO;
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
-import org.backmeup.model.dto.BackupJobDTO.JobStatus;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.PluginConfigurationDTO;
 import org.backmeup.model.dto.PluginDTO;
@@ -275,12 +275,11 @@ public class MappingTest {
     public void testBackupJobMapping() {
         BackupJob job = new BackupJob();
         job.setJobName("BackupJob1");
-        job.setStatus(BackupJobStatus.queued);
+        job.setStatus(JobStatus.ACTIVE);
         job.setId(9L);
         job.setTimeExpression("daily");
         Date next = new Date();
         job.setNextExecutionTime(next);
-        job.setActive(false);
 
         Mapper mapper = getMapper();
 
@@ -288,17 +287,17 @@ public class MappingTest {
 
         assertEquals(job.getId(), jobDTO.getJobId());
         assertEquals(job.getJobName(), jobDTO.getJobTitle());
-        assertEquals(JobStatus.queued, jobDTO.getJobStatus());
-        assertEquals(JobFrequency.daily, jobDTO.getSchedule());
+        assertEquals(job.getStatus(), jobDTO.getJobStatus());
+        assertEquals(JobFrequency.DAILY, jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
         assertEquals(job.isActive(), jobDTO.isActive());
     }
-    
+        
     @Test
     public void testBackupJobExecutionMapping() {
         BackupJob job = new BackupJob();
         job.setId(9L);
-        job.setStatus(BackupJobStatus.queued);
+        job.setStatus(JobStatus.ACTIVE);
                 
         BackupJobExecution jobExec = new BackupJobExecution(job);
         jobExec.setId(1L);
@@ -313,7 +312,7 @@ public class MappingTest {
         assertEquals(jobExec.getName(), jobExecDTO.getName());
         assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
         assertEquals(jobExec.getBackupJobId(), jobExecDTO.getJobId());
-        assertEquals(JobStatus.queued, jobExecDTO.getStatus());  
+        assertEquals(JobExecutionStatus.QUEUED, jobExecDTO.getStatus());  
         assertEquals(jobExec.getStartTime(), jobExecDTO.getStart()); 
         assertEquals(jobExec.getEndTime(), jobExecDTO.getEnd()); 
     }
@@ -333,17 +332,6 @@ public class MappingTest {
         assertEquals(jobExec.getId(), jobExecDTO.getId());
         assertEquals(jobExec.getName(), jobExecDTO.getName());
         assertEquals(jobExec.getBackupJob().getId(), jobExecDTO.getJobId());
-    }
-
-    @Test
-    public void testBackupJobStatusMapping() {
-        JobStatus jobStatus = JobStatus.queued;
-        BackupJobStatus expectetJobStatus = BackupJobStatus.queued;
-
-        Mapper mapper = getMapper();
-        BackupJobStatus actualJobStatus = mapper.map(jobStatus, BackupJobStatus.class);
-
-        assertEquals(expectetJobStatus, actualJobStatus);
     }
 
     private Mapper getMapper() {

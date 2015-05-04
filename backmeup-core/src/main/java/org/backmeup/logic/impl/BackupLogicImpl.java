@@ -16,7 +16,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
-import org.backmeup.model.constants.BackupJobStatus;
+import org.backmeup.model.constants.JobStatus;
 
 @ApplicationScoped
 public class BackupLogicImpl implements BackupLogic {
@@ -44,7 +44,7 @@ public class BackupLogicImpl implements BackupLogic {
 
     @Override
     public BackupJob addBackupJob(BackupJob job) {
-        job.setStatus(BackupJobStatus.queued);
+        job.setStatus(JobStatus.CREATED);
 
         // TODO SP: adding and starting a backup job should be two distinct methods.
         // The following steps are necessary when a job is started and therefore a 

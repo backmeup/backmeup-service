@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.backmeup.model.dto.BackupJobDTO.JobFrequency;
+import org.backmeup.model.constants.JobFrequency;
 
 @XmlRootElement
 public class BackupJobCreationDTO {
