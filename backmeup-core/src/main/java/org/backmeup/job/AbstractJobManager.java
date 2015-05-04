@@ -16,6 +16,7 @@ import org.backmeup.keyserver.client.Keyserver;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Token;
+import org.backmeup.model.constants.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +122,7 @@ public abstract class AbstractJobManager implements JobManager {
             // be possible to check if this job is still valid
             conn.begin();
             job = getBackUpJob(job.getId());
+            job.setStatus(JobStatus.ACTIVE);
             UUID schedulerID = UUID.randomUUID();
             job.setValidScheduleID(schedulerID);
             conn.commit();
