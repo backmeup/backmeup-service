@@ -209,7 +209,12 @@ public class BackupJobs extends Base {
     @POST
     @Path("/{jobId}/executions/")
     public void executeBackupJob(@PathParam("jobId") String jobId) {
-        
+        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
+        if (!activeUser.getUserId().equals(job.getUser().getUserId())) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+        getLogic().startBackupJob(activeUser, job);
     }
     
     @RolesAllowed({"user", "worker"})

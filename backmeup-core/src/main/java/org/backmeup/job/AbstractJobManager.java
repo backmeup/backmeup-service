@@ -13,11 +13,13 @@ import org.backmeup.dal.Connection;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.keyserver.client.AuthDataResult;
 import org.backmeup.keyserver.client.Keyserver;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Token;
 import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.constants.JobStatus;
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,8 +89,14 @@ public abstract class AbstractJobManager implements JobManager {
     // ========================================================================
     
     @Override
-    public void runBackupJob(BackupJob job) {
+    public void scheduleBackupJob(BackupJob job) {
         queueJob(job);
+    }
+    
+    @Override
+    public void executeBackupJob(BackMeUpUser activeUser, BackupJob job) {
+        executeJob(activeUser, job);
+        
     }
 
     protected abstract void runJob(BackupJobExecution job);
@@ -137,6 +145,39 @@ public abstract class AbstractJobManager implements JobManager {
             // TODO there must be error handling defined in the JobManager!^
             LOGGER.error("Error during startup", e);
             // throw new BackMeUpException(e);
+        } finally {
+            conn.rollback();
+        }
+    }
+    
+    private void executeJob(BackMeUpUser activeUser, BackupJob job) {
+        try {
+            conn.begin();
+            job = getBackUpJob(job.getId());
+
+            if (job == null) {
+                throw new BackMeUpException("BackupJob is not available");
+            }
+            
+            if (!job.isActive()) {
+                throw new BackMeUpException("BackupJob is not active");
+            }
+
+            // Overwrite existing token with new one
+            // TODO: SP Change with new keyserver
+            long currentTime = new Date().getTime();
+            Token token = keyserver.getToken(job, activeUser.getPassword(), currentTime, true, null);
+            job.setToken(token);
+            job = dal.createBackupJobDao().save(job);
+
+            // Run the job by creating a JobExecution
+            BackupJobExecution jobExecution = new BackupJobExecution(job);
+            jobExecution = dal.createBackupJobExecutionDao().save(jobExecution);
+            job.getJobExecutions().add(jobExecution);
+
+            runJob(jobExecution);
+
+            conn.commit();
         } finally {
             conn.rollback();
         }

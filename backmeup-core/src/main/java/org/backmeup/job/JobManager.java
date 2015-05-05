@@ -1,5 +1,6 @@
 package org.backmeup.job;
 
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 
 /**
@@ -12,6 +13,8 @@ import org.backmeup.model.BackupJob;
  */
 public interface JobManager {
 
-    void runBackupJob(BackupJob job);
+    void scheduleBackupJob(BackupJob job);
+    
+    void executeBackupJob(BackMeUpUser activeUser, BackupJob job);
 
 }

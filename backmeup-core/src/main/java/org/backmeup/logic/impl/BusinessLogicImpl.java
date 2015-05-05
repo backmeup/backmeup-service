@@ -439,14 +439,14 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
         
-        jobManager.runBackupJob(job);
+        jobManager.scheduleBackupJob(job);
         
         return job;
     }
     
     @Override
-    public void startBackupJob(final BackupJob backupJob) {
-        jobManager.runBackupJob(backupJob);
+    public void startBackupJob(final BackMeUpUser activeUser, final BackupJob backupJob) {
+        jobManager.executeBackupJob(activeUser, backupJob);
         
     }
 
