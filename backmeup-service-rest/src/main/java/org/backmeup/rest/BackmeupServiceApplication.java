@@ -16,6 +16,7 @@ import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Search;
 import org.backmeup.rest.resources.Sharing;
 import org.backmeup.rest.resources.Users;
+import org.backmeup.rest.resources.Workers;
 
 public class BackmeupServiceApplication extends Application {
     private final Set<Class<?>> set = new HashSet<>();
@@ -29,6 +30,7 @@ public class BackmeupServiceApplication extends Application {
         this.set.add(BackupJobs.class);
         this.set.add(Search.class);
         this.set.add(Sharing.class);
+        this.set.add(Workers.class);
 
         // The default life-cycle for providers (registered directly or via a feature) is singleton.
         this.set.add(JacksonJsonConfiguration.class); // provider
