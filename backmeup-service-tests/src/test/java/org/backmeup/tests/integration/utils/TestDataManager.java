@@ -1,13 +1,16 @@
 package org.backmeup.tests.integration.utils;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.backmeup.model.constants.JobFrequency;
 import org.backmeup.model.dto.AuthDataDTO;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
+import org.backmeup.model.dto.WorkerInfoDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class TestDataManager {
@@ -20,7 +23,7 @@ public class TestDataManager {
 
         return new UserDTO(username, firstname, lastname, password, email);
     }
-
+    
     public static AuthDataDTO getAuthDataDummy() {
         String authDataName = "AuthData1";
 
@@ -166,5 +169,21 @@ public class TestDataManager {
         }
 
         return backupJob;
+    }
+    
+    public static WorkerInfoDTO getWorkerInfo() {
+        WorkerInfoDTO workerInfo = new WorkerInfoDTO();
+
+        workerInfo.setWorkerId(UUID.randomUUID());
+        workerInfo.setWorkerName("Hostname");
+        workerInfo.setOsName(System.getProperty("os.name"));
+        workerInfo.setOsVersion(System.getProperty("os.version"));
+        workerInfo.setOsArchitecture(System.getProperty("os.arch"));
+        workerInfo.setTotalMemory(Runtime.getRuntime().totalMemory());
+        workerInfo.setTotalCPUCores(Runtime.getRuntime().availableProcessors());
+        long totalSpace = new File("/").getTotalSpace();
+        workerInfo.setTotalSpace(totalSpace);
+
+        return workerInfo;
     }
 }

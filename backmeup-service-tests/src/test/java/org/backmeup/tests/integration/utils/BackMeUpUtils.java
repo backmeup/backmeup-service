@@ -71,6 +71,10 @@ public class BackMeUpUtils {
 
         return response.extract().path("accessToken");
     }
+    
+    public static String authenticateWorker() {
+        return "BACKMEUPWORKER;mysecret!";
+    }
 
     // ========================================================================
     //  PLUGIN OPERATIONS
