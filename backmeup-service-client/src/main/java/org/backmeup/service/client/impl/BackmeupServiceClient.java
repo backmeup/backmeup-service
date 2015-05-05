@@ -24,6 +24,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
+import org.backmeup.model.dto.WorkerInfoDTO;
+import org.backmeup.model.dto.WorkerInfoResponseDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.service.client.BackmeupService;
 import org.backmeup.service.client.model.auth.AuthInfo;
@@ -203,6 +205,26 @@ public final class BackmeupServiceClient implements BackmeupService {
             LOGGER.error("", e);
             throw new BackMeUpException("Failed to update BackupJobExecution: " + e);
         }
+    }
+    
+    @Override
+    public WorkerInfoResponseDTO updateWorkerInfo(WorkerInfoDTO workerInfo) {
+        try {
+            ObjectMapper mapper = createJsonMapper();
+            String json = mapper.writeValueAsString(workerInfo);
+
+            Result r = execute("/workers/" + workerInfo.getWorkerId(), ReqType.PUT, null, json, accessToken);
+            if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new BackMeUpException("Failed to update WorkerInfo: " + r.content);
+            }
+
+            LOGGER.debug("updateWorkerInfo: " + r.content);
+            return mapper.readValue(r.content, WorkerInfoResponseDTO.class);
+        } catch (IOException e) {
+            LOGGER.error("", e);
+            throw new BackMeUpException("Failed to update WorkerInfo: " + e);
+        }
+        
     }
 
     // Private methods --------------------------------------------------------

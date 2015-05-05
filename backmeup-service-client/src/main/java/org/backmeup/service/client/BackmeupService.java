@@ -2,6 +2,8 @@ package org.backmeup.service.client;
 
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
+import org.backmeup.model.dto.WorkerInfoDTO;
+import org.backmeup.model.dto.WorkerInfoResponseDTO;
 import org.backmeup.service.client.model.auth.AuthInfo;
 
 public interface BackmeupService {
@@ -14,4 +16,6 @@ public interface BackmeupService {
     BackupJobExecutionDTO getBackupJobExecution(Long jobExecId);
     
     BackupJobExecutionDTO updateBackupJobExecution(BackupJobExecutionDTO jobExecution);
+    
+    WorkerInfoResponseDTO updateWorkerInfo(WorkerInfoDTO workerInfo);
 }
