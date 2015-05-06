@@ -652,4 +652,30 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Override
+    public String approveIncomingSharing(final Long currUserId, final Long policyID) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.share.acceptIncomingSharing(user, policyID);
+
+            }
+        });
+    }
+
+    @Override
+    public String declineIncomingSharing(final Long currUserId, final Long policyID) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.share.declineIncomingSharing(user, policyID);
+
+            }
+        });
+    }
+
 }

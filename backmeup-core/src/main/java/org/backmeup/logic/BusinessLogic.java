@@ -76,4 +76,6 @@ public interface BusinessLogic {
     SharingPolicyEntry      createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId, SharingPolicyTypeEntry policy, String sharedElementID, String name, String description);
     String                  removeOwnedSharingPolicy(Long currUserId, Long policyID);
     String                  removeAllOwnedSharingPolicies(Long currUserId);
+    String                  approveIncomingSharing(final Long currUserId, final Long policyID);
+    String                  declineIncomingSharing(final Long currUserId, final Long policyID);
 }

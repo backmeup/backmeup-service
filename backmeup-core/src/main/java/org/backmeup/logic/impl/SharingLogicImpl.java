@@ -69,4 +69,20 @@ public class SharingLogicImpl implements SharingLogic {
         }
     }
 
+    @Override
+    public String acceptIncomingSharing(BackMeUpUser currUser, Long policyID) {
+        try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
+            String result = client.acceptIncomingSharing(policyID);
+            return result;
+        }
+    }
+
+    @Override
+    public String declineIncomingSharing(BackMeUpUser currUser, Long policyID) {
+        try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
+            String result = client.declineIncomingSharing(policyID);
+            return result;
+        }
+    }
+
 }
