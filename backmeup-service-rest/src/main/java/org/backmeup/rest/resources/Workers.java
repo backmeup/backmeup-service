@@ -33,6 +33,10 @@ public class Workers extends Base {
     @Configuration(key = "backmeup.job.backupname")
     private String backupNameTemplate;
     
+    @Inject
+    @Configuration(key = "backmeup.osgi.exportedPackages")
+    private String pluginsExportedPackages;
+    
     @RolesAllowed({"worker"})
     @PUT
     @Path("/hello")
@@ -43,6 +47,7 @@ public class Workers extends Base {
         workerConfig.setDistributionMechanism(DistributionMechanism.QUEUE);
         workerConfig.setConnectionInfo(mqHost + ";" + mqName);
         workerConfig.setBackupNameTemplate(backupNameTemplate);
+        workerConfig.setPluginsExportedPackages(pluginsExportedPackages);
         
         return workerConfig;
     }

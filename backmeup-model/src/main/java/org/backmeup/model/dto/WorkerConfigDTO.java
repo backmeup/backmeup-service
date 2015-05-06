@@ -10,6 +10,7 @@ public class WorkerConfigDTO {
     private DistributionMechanism distributionMechanism;
     private String connectionInfo;
     private String backupNameTemplate;
+    private String pluginsExportedPackages;
     
     public WorkerConfigDTO() {
         
@@ -37,5 +38,13 @@ public class WorkerConfigDTO {
 
     public void setBackupNameTemplate(String backupNameTemplate) {
         this.backupNameTemplate = backupNameTemplate;
+    }
+
+    public String getPluginsExportedPackages() {
+        return pluginsExportedPackages;
+    }
+
+    public void setPluginsExportedPackages(String pluginsExportedPackages) {
+        this.pluginsExportedPackages = pluginsExportedPackages;
     }
 }

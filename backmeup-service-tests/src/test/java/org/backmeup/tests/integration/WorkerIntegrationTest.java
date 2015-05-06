@@ -34,7 +34,9 @@ public class WorkerIntegrationTest extends IntegrationTestBase {
                 .log().all()
                 .statusCode(200)
                 .body("distributionMechanism", equalTo(DistributionMechanism.QUEUE.toString()))
-                .body(containsString("connectionInfo"));
+                .body(containsString("connectionInfo"))
+                .body(containsString("backupNameTemplate"))
+                .body(containsString("pluginsExportedPackages"));
         } finally {
         }
     }
