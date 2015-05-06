@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.backmeup.model.dto.WorkerInfoDTO;
-import org.backmeup.model.dto.WorkerInfoResponseDTO.DistributionMechnaism;
+import org.backmeup.model.dto.WorkerConfigDTO.DistributionMechanism;
 import org.backmeup.tests.IntegrationTest;
 import org.backmeup.tests.integration.utils.BackMeUpUtils;
 import org.backmeup.tests.integration.utils.TestDataManager;
@@ -18,7 +18,7 @@ import com.jayway.restassured.internal.mapper.ObjectMapperType;
 public class WorkerIntegrationTest extends IntegrationTestBase {
 
     @Test
-    public void testupdateWorkerInfo() {
+    public void testInitializeWorker() {
         String accessToken = BackMeUpUtils.authenticateWorker();
         WorkerInfoDTO workerInfo = TestDataManager.getWorkerInfo();
 
@@ -29,11 +29,11 @@ public class WorkerIntegrationTest extends IntegrationTestBase {
                 .header("Authorization", accessToken)
                 .body(workerInfo, ObjectMapperType.JACKSON_1)
             .when()
-                .put("/workers/" + workerInfo.getWorkerId())
+                .put("/workers/hello")
             .then()
                 .log().all()
                 .statusCode(200)
-                .body("distributionMechanism", equalTo(DistributionMechnaism.QUEUE.toString()))
+                .body("distributionMechanism", equalTo(DistributionMechanism.QUEUE.toString()))
                 .body(containsString("connectionInfo"));
         } finally {
         }
