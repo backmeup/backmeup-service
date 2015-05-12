@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import javax.annotation.PreDestroy;
@@ -16,10 +17,12 @@ import org.backmeup.dal.Connection;
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
+import org.backmeup.index.model.tagging.TaggedCollectionEntry;
 import org.backmeup.job.JobManager;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
+import org.backmeup.logic.CollectionLogic;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
@@ -82,6 +85,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private SharingLogic share;
+
+    @Inject
+    private CollectionLogic taggedCollection;
 
     @Inject
     private ProfileLogic profiles;
@@ -724,6 +730,103 @@ public class BusinessLogicImpl implements BusinessLogic {
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 return BusinessLogicImpl.this.share.declineIncomingSharing(user, policyID);
 
+            }
+        });
+    }
+
+    // Tagged Collections =====================================================================
+    @Override
+    public Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId,
+            final List<UUID> lDocumentUUIDs) {
+        return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
+            @Override
+            public Set<TaggedCollectionEntry> call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsContainingDocuments(user,
+                        lDocumentUUIDs);
+            }
+        });
+    }
+
+    @Override
+    public Set<TaggedCollectionEntry> getAllTaggedCollectionsByNameQuery(final Long currUserId, final String name) {
+        return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
+            @Override
+            public Set<TaggedCollectionEntry> call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsByNameQuery(user, name);
+            }
+        });
+    }
+
+    @Override
+    public Set<TaggedCollectionEntry> getAllTaggedCollections(final Long currUserId) {
+        return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
+            @Override
+            public Set<TaggedCollectionEntry> call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollections(user);
+            }
+        });
+    }
+
+    @Override
+    public String removeTaggedCollection(final Long currUserId, final Long collectionID) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.removeTaggedCollection(user, collectionID);
+            }
+        });
+    }
+
+    @Override
+    public String removeAllCollectionsForUser(final Long currUserId) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.removeAllCollectionsForUser(user);
+            }
+        });
+    }
+
+    @Override
+    public TaggedCollectionEntry createAndAddTaggedCollection(final Long currUserId, final String name,
+            final String description, final List<UUID> containedDocumentIDs) {
+        return this.conn.txNew(new Callable<TaggedCollectionEntry>() {
+            @Override
+            public TaggedCollectionEntry call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.createAndAddTaggedCollection(user, name, description,
+                        containedDocumentIDs);
+            }
+        });
+    }
+
+    @Override
+    public String addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID,
+            final List<UUID> containedDocumentIDs) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.addDocumentsToTaggedCollection(user, collectionID,
+                        containedDocumentIDs);
+            }
+        });
+    }
+
+    @Override
+    public String removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID,
+            final List<UUID> containedDocumentIDs) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.taggedCollection.removeDocumentsFromTaggedCollection(user, collectionID,
+                        containedDocumentIDs);
             }
         });
     }
