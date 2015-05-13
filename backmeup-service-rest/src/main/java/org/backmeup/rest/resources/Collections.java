@@ -103,7 +103,7 @@ public class Collections extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public String addDocumentsToTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
 
-        return this.addDocumentsToTaggedCollection(collDocs.getId(), collDocs.getDocumentIds());
+        return this.addDocumentsToTaggedCollection(collDocs.getCollectionId(), collDocs.getDocumentIds());
 
     }
 
@@ -128,7 +128,7 @@ public class Collections extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public String removeDocumentsFromTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
 
-        return this.removeDocumentsFromTaggedCollection(collDocs.getId(), collDocs.getDocumentIds());
+        return this.removeDocumentsFromTaggedCollection(collDocs.getCollectionId(), collDocs.getDocumentIds());
 
     }
 

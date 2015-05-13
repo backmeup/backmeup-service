@@ -10,8 +10,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @SuppressWarnings("unused")
 public class TaggedCollectionDocumentsDTO {
 
-    private Long Id;
+    private Long collectionId;
     private List<UUID> documentIds = new ArrayList<UUID>();
+
+    public Long getCollectionId() {
+        return this.collectionId;
+    }
+
+    public void setCollectionId(Long collectionId) {
+        this.collectionId = collectionId;
+    }
 
     public List<UUID> getDocumentIds() {
         return this.documentIds;
@@ -19,14 +27,6 @@ public class TaggedCollectionDocumentsDTO {
 
     public void setDocumentIds(List<UUID> documentIds) {
         this.documentIds = documentIds;
-    }
-
-    public Long getId() {
-        return this.Id;
-    }
-
-    public void setId(Long id) {
-        this.Id = id;
     }
 
 }
