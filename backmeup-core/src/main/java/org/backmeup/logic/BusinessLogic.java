@@ -2,10 +2,12 @@ package org.backmeup.logic;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
+import org.backmeup.index.model.tagging.TaggedCollectionEntry;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -78,4 +80,14 @@ public interface BusinessLogic {
     String                  removeAllOwnedSharingPolicies(Long currUserId);
     String                  approveIncomingSharing(final Long currUserId, final Long policyID);
     String                  declineIncomingSharing(final Long currUserId, final Long policyID);
+
+    // tagged collections -----------------------------------------------------
+    Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId, final List<UUID> lDocumentUUIDs);
+    Set<TaggedCollectionEntry> getAllTaggedCollectionsByNameQuery(final Long currUserId, final String name);
+    Set<TaggedCollectionEntry> getAllTaggedCollections(final Long currUserId);
+    String                     removeTaggedCollection(final Long currUserId, final Long collectionID);
+    String                     removeAllCollectionsForUser(final Long currUserId);
+    TaggedCollectionEntry      createAndAddTaggedCollection(final Long currUserId, final String name, final String description, final List<UUID> containedDocumentIDs);
+    String                     addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
+    String                     removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
 }
