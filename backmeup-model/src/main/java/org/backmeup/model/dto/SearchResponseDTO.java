@@ -11,6 +11,7 @@ public class SearchResponseDTO {
     private List<CountedEntryDTO> byType;
     private List<CountedEntryDTO> byJob;
     private List<CountedEntryDTO> byOwner;
+    private List<CountedEntryDTO> byTag;
     private String searchQuery;
     private int progress;
 
@@ -68,6 +69,14 @@ public class SearchResponseDTO {
 
     public void setByOwner(List<CountedEntryDTO> byOwner) {
         this.byOwner = byOwner;
+    }
+
+    public List<CountedEntryDTO> getByTag() {
+        return this.byTag;
+    }
+
+    public void setByTag(List<CountedEntryDTO> byTag) {
+        this.byTag = byTag;
     }
 
 }
