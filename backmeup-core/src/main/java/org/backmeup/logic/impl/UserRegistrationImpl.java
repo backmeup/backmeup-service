@@ -17,12 +17,16 @@ import org.apache.commons.codec.binary.Base64;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.UserDao;
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.EmailVerificationException;
+import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
+import org.backmeup.model.exceptions.PasswordTooShortException;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.utilities.mail.Mailer;
 import org.slf4j.Logger;
@@ -54,6 +58,13 @@ public class UserRegistrationImpl implements UserRegistration {
     @Inject
     @Configuration(key = "backmeup.emailVerificationUrl")
     private String verificationUrl;
+    
+    @Inject
+    @Configuration(key = "backmeup.minimalPasswordLength")
+    private Integer minimalPasswordLength;
+
+    @Inject
+    private KeyserverClient keyserverClient;
 
     @Inject
     private DataAccessLayer dal;
@@ -99,10 +110,11 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public BackMeUpUser register(BackMeUpUser user) {
-        if (user.getUsername() == null || user.getEmail() == null) {
+        if (user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
             throw new IllegalArgumentException(textBundle.getString(PARAMETER_NULL));
         }
         throwIfEmailInvalid(user.getEmail());
+        throwIfPasswordInvalid(user.getPassword());
 
         ensureUsernameAvailable(user.getUsername());
         ensureEmailAvailable(user.getEmail());
@@ -111,6 +123,13 @@ public class UserRegistrationImpl implements UserRegistration {
 
         BackMeUpUser newUser = save(user);
         newUser.setPassword(user.getPassword());
+        
+        try {
+            keyserverClient.registerUser(newUser.getUserId().toString(), newUser.getPassword());
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
+        }
+        
         return newUser;
     }
 
@@ -119,6 +138,12 @@ public class UserRegistrationImpl implements UserRegistration {
         Matcher emailMatcher = emailPattern.matcher(email);
         if (!emailMatcher.matches()) {
             throw new NotAnEmailAddressException(emailRegex, email);
+        }
+    }
+    
+    private void throwIfPasswordInvalid(String password) {
+        if (password == null || password.length() < minimalPasswordLength) {
+            throw new PasswordTooShortException(minimalPasswordLength, password == null ? 0 : password.length());
         }
     }
 
@@ -169,7 +194,6 @@ public class UserRegistrationImpl implements UserRegistration {
         String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
         String subject = "";
         try {
-            // TODO remove ISO-8859-1 workarround
             subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
             subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
         } catch (UnsupportedEncodingException e) {
@@ -247,7 +271,20 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public void delete(BackMeUpUser user) {
-        getUserDao().delete(user);
+        try {
+            keyserverClient.removeUser(null);
+            getUserDao().delete(user);
+        } catch (Exception ex) {
+            logger.warn(MessageFormat.format("Couldn't delete user \"{0}\"", user.getUsername()), ex);
+        }
     }
-
+    
+    @Override
+    public void authorize(BackMeUpUser user, String password) {
+        try {
+            keyserverClient.authenticateUserWithPassword(user.getUsername(), password);
+        } catch (KeyserverException ex) {
+            throw new InvalidCredentialsException();
+        }
+    }
 }

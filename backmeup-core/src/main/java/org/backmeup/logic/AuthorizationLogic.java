@@ -10,6 +10,7 @@ import org.backmeup.model.Profile;
  * 
  * @author <a href="http://www.code-cop.org/">Peter Kofler</a>
  */
+@Deprecated
 public interface AuthorizationLogic {
 
     void register(BackMeUpUser user);

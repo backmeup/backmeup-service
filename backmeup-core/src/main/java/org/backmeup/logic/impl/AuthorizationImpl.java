@@ -1,7 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -10,17 +9,18 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.backmeup.configuration.cdi.Configuration;
-import org.backmeup.keyserver.client.AuthDataResult;
-import org.backmeup.keyserver.client.Keyserver;
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
 import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
-import org.backmeup.model.Token;
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.PasswordTooShortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 @ApplicationScoped
 public class AuthorizationImpl implements AuthorizationLogic {
 
@@ -31,12 +31,16 @@ public class AuthorizationImpl implements AuthorizationLogic {
     private Integer minimalPasswordLength;
 
     @Inject
-    private Keyserver keyserverClient;
+    private KeyserverClient keyserverClient;
 
     @Override
     public void register(BackMeUpUser user) {
         throwIfPasswordInvalid(user.getPassword());
-        keyserverClient.registerUser(user.getUserId(), user.getPassword());
+        try {
+            keyserverClient.registerUser(user.getUserId().toString(), user.getPassword());
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
+        }
     }
 
     private void throwIfPasswordInvalid(String password) {
@@ -48,7 +52,7 @@ public class AuthorizationImpl implements AuthorizationLogic {
     @Override
     public void unregister(BackMeUpUser user) {
         try {
-            keyserverClient.deleteUser(user.getUserId());
+            keyserverClient.removeUser(null);
         } catch (Exception ex) {
             logger.warn(MessageFormat.format("Couldn't delete user \"{0}\" from keyserver", user.getUsername()), ex);
         }
@@ -56,7 +60,9 @@ public class AuthorizationImpl implements AuthorizationLogic {
 
     @Override
     public void authorize(BackMeUpUser user, String password) {
-        if (!keyserverClient.validateUser(user.getUserId(), password)) {
+        try {
+            keyserverClient.authenticateUserWithPassword(user.getUsername(), password);
+        } catch (KeyserverException ex) {
             throw new InvalidCredentialsException();
         }
     }
@@ -66,56 +72,36 @@ public class AuthorizationImpl implements AuthorizationLogic {
         if (keyRing == null) {
             return new HashMap<>();
         }
-        if (!keyserverClient.isAuthInformationAvailable(profile, keyRing)) {
-            return new HashMap<>();
-        }
 
-        return fetchFirstAuthenticationData(profile, keyRing);
+        return fetchProfileAuthenticationData(profile, keyRing);
     }
 
     @Override
     public void overwriteProfileAuthInformation(Profile profile, Map<String, String> entries, String keyRing) {
-        if (!keyserverClient.isServiceRegistered(profile.getId())) {
-            keyserverClient.addService(profile.getId());
-        }
-        
-        if (keyserverClient.isAuthInformationAvailable(profile, keyRing)) {
-            keyserverClient.deleteAuthInfo(profile.getId());
-        }
-
         Properties props = new Properties();
         props.putAll(entries);
-        keyserverClient.addAuthInfo(profile, keyRing, props);
-    }
-
-    private Map<String, String> fetchFirstAuthenticationData(Profile profile, String password) {
-        AuthDataResult authData = getAuthDataFor(profile, password);
-
-        Map<String, String> props = new HashMap<>();
-        if (authData.getAuthinfos().length > 0) {
-            props.putAll(authData.getAuthinfos()[0].getAi_data());
-        }
-
-        return props;
+//        keyserverClient.addAuthInfo(profile, keyRing, props);
     }
 
     @Override
     public Map<String, String> fetchProfileAuthenticationData(Profile profile, String keyRingPassword) {
-        AuthDataResult authData = getAuthDataFor(profile, keyRingPassword);
-        Properties entries = authData.getByProfileId(profile.getId());
-        Map<String, String> authProps = new HashMap<>();
-        for (final String key: entries.stringPropertyNames()) {
-            authProps.put(key, entries.getProperty(key));
-        }
+        String authData = getAuthDataFor(profile, keyRingPassword);
+        Map<String, String> authProps = convertToMap(authData);
         return authProps;
     }
 
-    private AuthDataResult getAuthDataFor(Profile profile, String password) {
-        long now = new Date().getTime();
-        boolean reusable = false;
-        Token token = keyserverClient.getToken(profile, password, now, reusable, null);
-
-        return keyserverClient.getData(token);
+    private String getAuthDataFor(Profile profile, String password) {        
+        try {
+            return keyserverClient.getPluginData(null, profile.getPluginId());
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot get plugin data", e);
+        }
     }
-
+    
+    public static Map<String, String> convertToMap(String data) {
+        String[] tokens = data.split(";|=");
+        Map<String, String> map = new HashMap<>();
+        for (int i=0; i<tokens.length-1; ) map.put(tokens[i++], tokens[i++]);
+        return map;
+    }
 }

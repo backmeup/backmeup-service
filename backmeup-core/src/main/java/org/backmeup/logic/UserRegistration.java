@@ -20,6 +20,8 @@ public interface UserRegistration {
     BackMeUpUser update(BackMeUpUser user);
     
     void delete(BackMeUpUser user);
+    
+    void authorize(BackMeUpUser user, String password);
 
     void setNewVerificationKeyTo(BackMeUpUser user);
 
