@@ -4,17 +4,23 @@ import java.util.Date;
 
 public class AuthInfo {
 	private String accessToken;
-	private Date issueDate;
+	private Date expiresAt;
 	
 	public AuthInfo() {
 		
 	}
 	
-	public AuthInfo(String accessToken, Date issueDate) {
-		super();
-		this.accessToken = accessToken;
-		this.issueDate = issueDate;
-	}
+    public AuthInfo(String accessToken, Date expiresAt) {
+        super();
+        this.accessToken = accessToken;
+        this.expiresAt = (Date) expiresAt.clone();
+    }
+
+    public AuthInfo(String accessToken, long expiresAt) {
+        super();
+        this.accessToken = accessToken;
+        this.expiresAt = new Date(expiresAt);
+    }
 
 	public String getAccessToken() {
 		return accessToken;
@@ -24,11 +30,14 @@ public class AuthInfo {
 		this.accessToken = accessToken;
 	}
 
-	public Date getIssueDate() {
-		return issueDate;
-	}
+    public Date getExpiresAt() {
+        if (this.expiresAt == null) {
+            return null;
+        }
+        return (Date) expiresAt.clone();
+    }
 
-	public void setIssueDate(Date issueDate) {
-		this.issueDate = issueDate;
+	public void setExpiresAt(Date expiresAt) {
+	    this.expiresAt = (Date) expiresAt.clone();
 	}
 }
