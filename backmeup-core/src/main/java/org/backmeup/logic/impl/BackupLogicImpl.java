@@ -1,7 +1,8 @@
 package org.backmeup.logic.impl;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,12 +11,13 @@ import javax.inject.Inject;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.keyserver.client.Keyserver;
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.dto.AuthResponseDTO;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
-import org.backmeup.model.Token;
 import org.backmeup.model.constants.JobStatus;
 
 @ApplicationScoped
@@ -28,7 +30,7 @@ public class BackupLogicImpl implements BackupLogic {
     private DataAccessLayer dal;
 
     @Inject
-    private Keyserver keyserverClient;
+    private KeyserverClient keyserverClient;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BackupLogicImpl");
 
@@ -46,18 +48,32 @@ public class BackupLogicImpl implements BackupLogic {
     public BackupJob addBackupJob(BackupJob job) {
         job.setStatus(JobStatus.CREATED);
 
-        // TODO SP: adding and starting a backup job should be two distinct methods.
+        // Adding and starting a backup job are be two distinct methods.
         // The following steps are necessary when a job is started and therefore a 
         // jobexecution is created and scheduled. 
-        Long firstExecutionDate = job.getStartTime().getTime() + job.getDelay();
+        Calendar scheduledExecutionTime = Calendar.getInstance();
+        scheduledExecutionTime.setTimeInMillis(job.getStartTime().getTime() + job.getDelay());
 
-        storePluginConfigOnKeyserver(job);
+//        storePluginConfigOnKeyserver(job);
 
-        // Obtain an access token from the keyserver. We have to do this, because 
-        // the user password is necessary for this step.
-        // reusable=true means, that we can get the data for the token + a new token for the next backup
-        Token t = keyserverClient.getToken(job, job.getUser().getPassword(), firstExecutionDate, true, null);
-        job.setToken(t);
+        // Obtain an access token from the keyserver. 
+        // We have to do this now, because the user password is necessary for this step.
+        // reusable=true means, that we can get the data for the token + a new token for the next backup       
+        //Collect all necessary ids
+        List<String> ids = new ArrayList<String>();
+        collectIdsForKeyserver(job.getSourceProfile(), ids);
+        collectIdsForKeyserver(job.getSinkProfile(), ids);
+        for(Profile actionProfile : job.getActionProfiles()) {
+            collectIdsForKeyserver(actionProfile, ids);
+        }
+        AuthResponseDTO response;
+        try {
+            response = keyserverClient.createOnetime(null, ids.toArray(new String[ids.size()]), scheduledExecutionTime);
+            response.getToken().getB64Token();
+        } catch (KeyserverException e) {
+            
+        }
+
 
         return getBackupJobDao().save(job);
     }
@@ -137,38 +153,41 @@ public class BackupLogicImpl implements BackupLogic {
 
     // Helper methods ---------------------------------------------------------
 
-    private void storePluginConfigOnKeyserver(BackupJob job) {
-        // Active user (password is set) is stored in job.getUser()
-        // profile users (job.getXProfile().getUser() password is null!
-        updateProfileOnKeyserver(job.getSourceProfile(), job.getUser().getPassword());
-        updateProfileOnKeyserver(job.getSinkProfile(), job.getUser().getPassword());
-        for (Profile actionProfile : job.getActionProfiles()) {
-            updateProfileOnKeyserver(actionProfile, job.getUser().getPassword());
-        }
-    }
+//    private void storePluginConfigOnKeyserver(BackupJob job) {
+//        // Active user (password is set) is stored in job.getUser()
+//        // profile users (job.getXProfile().getUser() password is null!
+//        updateProfileOnKeyserver(job.getSourceProfile(), job.getUser().getPassword());
+//        updateProfileOnKeyserver(job.getSinkProfile(), job.getUser().getPassword());
+//        for (Profile actionProfile : job.getActionProfiles()) {
+//            updateProfileOnKeyserver(actionProfile, job.getUser().getPassword());
+//        }
+//    }
 
-    private void updateProfileOnKeyserver(Profile profile, String password) {    
-        if(keyserverClient.isServiceRegistered(profile.getId())){
-            keyserverClient.deleteService(profile.getId());
+//    private void updateProfileOnKeyserver(Profile profile, String password) {    
+//        // Otherwise, we cannot retrieve the token later on.
+//        // If no property is available the keyserver throws internally an IndexOutOfBoundsException
+//        props.put("dummy", "dummy"); 
+//        if (profile.getAuthData() != null && profile.getAuthData().getProperties() != null) {
+//            props.putAll(profile.getAuthData().getProperties());
+//        }
+//        if (profile.getProperties() != null) {
+//            props.putAll(profile.getProperties());
+//        }
+//
+//        keyserverClient.addService(profile.getId());
+//        keyserverClient.addAuthInfo(profile, password, props);
+//        keyserverClient.updatePluginData(null, profile.getPluginId(), data);
+//    }
+    
+    private void collectIdsForKeyserver(Profile profile, List<String> ids) {
+        if (profile.getAuthData() != null) {
+            ids.add(profile.getPluginId() + ".AUTH");
         }
-
-        if (keyserverClient.isAuthInformationAvailable(profile, password)) {
-            keyserverClient.deleteAuthInfo(profile.getId());
+        if(profile.getProperties() != null) {
+            ids.add(profile.getPluginId() + ".PROPS");
         }
-
-        // For now, store auth data and props together
-        Properties props = new Properties();
-        // Otherwise, we cannot retrieve the token later on.
-        // If no property is available the keyserver throws internally an IndexOutOfBoundsException
-        props.put("dummy", "dummy"); 
-        if (profile.getAuthData() != null && profile.getAuthData().getProperties() != null) {
-            props.putAll(profile.getAuthData().getProperties());
+        if(profile.getOptions() != null) {
+            ids.add(profile.getPluginId() + ".OPTIONS");
         }
-        if (profile.getProperties() != null) {
-            props.putAll(profile.getProperties());
-        }
-
-        keyserverClient.addService(profile.getId());
-        keyserverClient.addAuthInfo(profile, password, props);
     }
 }
