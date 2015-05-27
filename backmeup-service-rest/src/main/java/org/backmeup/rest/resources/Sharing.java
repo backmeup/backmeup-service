@@ -92,11 +92,13 @@ public class Sharing extends SecureBase {
             @QueryParam("description") String description) {
 
         if (policyType == SharingPolicyTypeEntry.Backup) {
-            mandatory("policyValue", sharedElementID);
+            mandatoryLong("policyValue", sharedElementID);
         } else if (policyType == SharingPolicyTypeEntry.Document) {
             mandatoryUUID("policyValue", sharedElementID);
         } else if ((policyType == SharingPolicyTypeEntry.DocumentGroup)) {
             mandatoryListFromString("policyValue", sharedElementID);
+        } else if ((policyType == SharingPolicyTypeEntry.TaggedCollection)) {
+            mandatoryLong("policyValue", sharedElementID);
         }
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
@@ -202,12 +204,6 @@ public class Sharing extends SecureBase {
         }
     }
 
-    private void mandatory(String name, String value) {
-        if (value == null || value.isEmpty()) {
-            badRequestMissingParameter(name);
-        }
-    }
-
     private void mandatoryListFromString(String name, String value) {
         if (value == null || value.isEmpty()) {
             badRequestMissingParameter(name);
@@ -224,6 +220,15 @@ public class Sharing extends SecureBase {
             }
         } catch (Exception e) {
             badRequestMalformedListOfUUIDsParameter(name);
+        }
+    }
+
+    public void mandatoryLong(String name, String value) {
+        try {
+            Long l = Long.valueOf(value);
+            mandatory(name, l);
+        } catch (Exception e) {
+            badRequestMissingParameter(name);
         }
     }
 
@@ -277,6 +282,9 @@ public class Sharing extends SecureBase {
         }
         if (entry == SharingPolicyTypeEntryDTO.DocumentGroup) {
             return SharingPolicyTypeEntry.DocumentGroup;
+        }
+        if (entry == SharingPolicyTypeEntryDTO.TaggedCollection) {
+            return SharingPolicyTypeEntry.TaggedCollection;
         }
         return null;
     }
