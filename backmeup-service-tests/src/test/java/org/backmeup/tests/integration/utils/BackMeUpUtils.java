@@ -67,7 +67,7 @@ public class BackMeUpUtils {
 //                .log().all()
                 .statusCode(200)
                 .body(containsString("accessToken"))
-                .body(containsString("issueDate"));
+                .body(containsString("expiresAt"));
 
         return response.extract().path("accessToken");
     }
