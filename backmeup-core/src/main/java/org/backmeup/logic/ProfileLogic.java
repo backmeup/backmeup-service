@@ -12,7 +12,7 @@ import org.backmeup.model.Profile;
  */
 public interface ProfileLogic {
 
-    Profile save(Profile profile);
+    Profile saveProfile(Profile profile);
 
     List<Profile> getProfilesOf(Long userId);
         
