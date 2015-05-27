@@ -14,16 +14,23 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Response.Status;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.UserDTO;
+import org.backmeup.rest.auth.BackmeupPrincipal;
 
 /**
  * All user specific operations will be handled within this class.
  */
 @Path("/users")
 public class Users extends SecureBase {
+    @Context
+    private SecurityContext securityContext;
 
     @RolesAllowed("user")
     @GET
@@ -82,8 +89,11 @@ public class Users extends SecureBase {
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteUser(@PathParam("userId") Long userId) {
-        canOnlyWorkWithMyData(userId);
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        if (!activeUser.getUserId().equals(userId)) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
 
-        getLogic().deleteUser(userId);
+        getLogic().deleteUser(activeUser, userId);
     }
 }

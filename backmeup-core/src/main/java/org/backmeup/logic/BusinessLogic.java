@@ -14,6 +14,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
+import org.backmeup.model.Token;
 import org.backmeup.model.spi.PluginDescribable;
 
 /**
@@ -27,7 +28,7 @@ import org.backmeup.model.spi.PluginDescribable;
  */
 public interface BusinessLogic {
     // authorization ----------------------------------------------------------
-    BackMeUpUser authorize(String username, String password);
+    Token authorize(String username, String password);
 
     // user operations --------------------------------------------------------
     BackMeUpUser addUser(BackMeUpUser user);
@@ -35,6 +36,7 @@ public interface BusinessLogic {
     BackMeUpUser getUserByUserId(Long userId);
     BackMeUpUser updateUser(BackMeUpUser user);
     BackMeUpUser deleteUser(Long userId);
+    BackMeUpUser deleteUser(BackMeUpUser activeUser, Long userId);
 
     // plugin operations ------------------------------------------------------
     boolean                 isPluginAvailable(String pluginId);

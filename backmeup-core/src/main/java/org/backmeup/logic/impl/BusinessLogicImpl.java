@@ -17,7 +17,6 @@ import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
 import org.backmeup.index.model.tagging.TaggedCollectionEntry;
 import org.backmeup.job.JobManager;
-import org.backmeup.logic.AuthorizationLogic;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.CollectionLogic;
@@ -32,6 +31,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
+import org.backmeup.model.Token;
 import org.backmeup.model.ValidationNotes;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
@@ -71,9 +71,6 @@ public class BusinessLogicImpl implements BusinessLogic {
     private UserRegistration registration;
 
     @Inject
-    private AuthorizationLogic authorization;
-
-    @Inject
     private SearchLogic search;
 
     @Inject
@@ -109,13 +106,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     // Authentication ---------------------------------------------------------
 
     @Override
-    public BackMeUpUser authorize(final String username, final String password) {
-        return conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
-            @Override public BackMeUpUser call() {
+    public Token authorize(final String username, final String password) {
+        return conn.txJoinReadOnly(new Callable<Token>() {
+            @Override public Token call() {
 
                 BackMeUpUser user = registration.getUserByUsername(username, true);
-                authorization.authorize(user, password);
-                return user;
+                Token token = registration.authorize(user, password);
+                return token;
             }
         }); 
     }
@@ -152,10 +149,26 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public BackMeUpUser call() {
 
                 BackMeUpUser u = registration.getUserByUserId(userId);
-                authorization.unregister(u);
                 backupJobs.deleteBackupJobsOf(u.getUserId());
                 profiles.deleteProfilesOf(u.getUserId());
                 registration.delete(u); 
+                return u;
+
+            }
+        });
+
+        return user;
+    }
+    
+    @Override
+    public BackMeUpUser deleteUser(final BackMeUpUser activeUser, final Long userId) {
+        BackMeUpUser user = conn.txNew(new Callable<BackMeUpUser>() {
+            @Override public BackMeUpUser call() {
+
+                BackMeUpUser u = registration.getUserByUserId(userId);
+                backupJobs.deleteBackupJobsOf(u.getUserId());
+                profiles.deleteProfilesOf(u.getUserId());
+                registration.delete(activeUser); 
                 return u;
 
             }
@@ -182,7 +195,6 @@ public class BusinessLogicImpl implements BusinessLogic {
         return conn.txNew(new Callable<BackMeUpUser>() {
             @Override public BackMeUpUser call() {
                 BackMeUpUser user = registration.register(newUser);
-                authorization.register(user);
                 if(autoVerifyUser) {
                     registration.activateUserFor(user.getVerificationKey());
                 } else {
@@ -292,7 +304,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 }
 
                 // Everything is in place and valid, now we can store the new profile
-                Profile p = profiles.save(profile);
+                Profile p = profiles.saveProfile(profile);
 
                 return p;
             }
