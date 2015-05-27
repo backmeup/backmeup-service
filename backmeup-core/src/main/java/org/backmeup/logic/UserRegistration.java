@@ -1,6 +1,7 @@
 package org.backmeup.logic;
 
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.Token;
 
 /**
  * User registration related business logic.
@@ -21,7 +22,7 @@ public interface UserRegistration {
     
     void delete(BackMeUpUser user);
     
-    void authorize(BackMeUpUser user, String password);
+    Token authorize(BackMeUpUser user, String password);
 
     void setNewVerificationKeyTo(BackMeUpUser user);
 

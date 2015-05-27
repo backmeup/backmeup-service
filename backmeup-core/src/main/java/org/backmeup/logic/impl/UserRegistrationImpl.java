@@ -19,8 +19,12 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.UserDao;
 import org.backmeup.keyserver.client.KeyserverClient;
 import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.Token.Kind;
+import org.backmeup.keyserver.model.dto.AuthResponseDTO;
+import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.UserRegistration;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.Token;
 import org.backmeup.model.exceptions.AlreadyRegisteredException;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.EmailVerificationException;
@@ -272,7 +276,8 @@ public class UserRegistrationImpl implements UserRegistration {
     @Override
     public void delete(BackMeUpUser user) {
         try {
-            keyserverClient.removeUser(null);
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, user.getPassword());
+            keyserverClient.removeUser(token);
             getUserDao().delete(user);
         } catch (Exception ex) {
             logger.warn(MessageFormat.format("Couldn't delete user \"{0}\"", user.getUsername()), ex);
@@ -280,9 +285,12 @@ public class UserRegistrationImpl implements UserRegistration {
     }
     
     @Override
-    public void authorize(BackMeUpUser user, String password) {
+    public Token authorize(BackMeUpUser user, String password) {
         try {
-            keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
+            AuthResponseDTO response = keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
+            String token = response.getToken().getB64Token();
+            Date ttl = response.getToken().getTtl().getTime();
+            return new Token(token, 1l, ttl.getTime());
         } catch (KeyserverException ex) {
             throw new InvalidCredentialsException();
         }
