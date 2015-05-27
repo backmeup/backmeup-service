@@ -282,7 +282,7 @@ public class UserRegistrationImpl implements UserRegistration {
     @Override
     public void authorize(BackMeUpUser user, String password) {
         try {
-            keyserverClient.authenticateUserWithPassword(user.getUsername(), password);
+            keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
         } catch (KeyserverException ex) {
             throw new InvalidCredentialsException();
         }
