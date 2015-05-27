@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -18,6 +17,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.Token.Kind;
+import org.backmeup.keyserver.model.dto.AuthResponseDTO;
+import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.exceptions.UnknownUserException;
@@ -45,6 +49,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 
     @Inject
     private BusinessLogic logic;
+    
+    @Inject
+    private KeyserverClient keyserverClient;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -70,17 +77,12 @@ public class SecurityInterceptor implements ContainerRequestFilter {
             // Get token from header
             final String accessToken = authorization.get(0);
 
-            //Split username/userId and password tokens
-            final StringTokenizer tokenizer = new StringTokenizer(accessToken, ";");
-            final String userId = tokenizer.nextToken(); // userId can be a String or an Long in this place (see resolveUser)
-            final String password = tokenizer.nextToken();
-
             // Verify token
             if (method.isAnnotationPresent(RolesAllowed.class)) {
                 RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
                 Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
 
-                BackMeUpUser user = resolveUser(userId, password);
+                BackMeUpUser user = resolveUser(accessToken);
                 if(user == null) {
                     requestContext.abortWith(ACCESS_DENIED);
                     return;
@@ -91,20 +93,25 @@ public class SecurityInterceptor implements ContainerRequestFilter {
                     return;
                 }
 
-                user.setPassword(password);
+                user.setPassword(accessToken);
                 requestContext.setSecurityContext(new BackmeupSecurityContext(user));
             }
         }
     }
-
-    private BackMeUpUser resolveUser(final String userId, final String password) {
+    
+    private BackMeUpUser resolveUser(final String accessToken) {
         try {
-            if(userId.equals(BACKMEUP_WORKER_NAME)) {
-                BackMeUpUser worker = new BackMeUpUser(BACKMEUP_WORKER_NAME, "", "", "", password);
+            if(accessToken.startsWith(BACKMEUP_WORKER_NAME)) {
+                BackMeUpUser worker = new BackMeUpUser(BACKMEUP_WORKER_NAME, "", "", "", "");
                 worker.setUserId(BACKMEUP_WORKER_ID);
                 return worker;
             }
-            return logic.getUserByUserId(Long.parseLong(userId));
+            
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, accessToken);
+            AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(token);
+            return logic.getUserByUserId(Long.parseLong(response.getUsername()));
+        } catch (KeyserverException ke) {
+            LOGGER.info("", ke);
         } catch (UnknownUserException uue) {
             LOGGER.info("", uue);
         } catch (UserNotActivatedException una) {
