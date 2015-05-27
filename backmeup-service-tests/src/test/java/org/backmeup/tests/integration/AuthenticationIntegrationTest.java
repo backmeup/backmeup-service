@@ -2,7 +2,6 @@ package org.backmeup.tests.integration;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.tests.IntegrationTest;
@@ -26,8 +25,6 @@ public class AuthenticationIntegrationTest extends IntegrationTestBase {
             ValidatableResponse response = BackMeUpUtils.addUser(user);
             userId = response.extract().path("userId").toString();
 
-            String expectedAccessToken = userId + ";" + user.getPassword();
-
             response = 
             given()
                 .log().all()
@@ -37,8 +34,8 @@ public class AuthenticationIntegrationTest extends IntegrationTestBase {
             .then()
                 .log().all()
                 .statusCode(200)
-                .body("accessToken", equalTo(expectedAccessToken))
-                .body(containsString("issueDate"));
+                .body(containsString("accessToken"))
+                .body(containsString("expiresAt"));
 
             accessToken = response.extract().path("accessToken");
         } finally {
