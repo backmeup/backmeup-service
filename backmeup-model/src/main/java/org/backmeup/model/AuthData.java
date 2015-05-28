@@ -10,18 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.backmeup.model.exceptions.BackMeUpException;
 
@@ -56,15 +54,15 @@ public class AuthData {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date modified;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@MapKeyColumn(name = "authdata_key")
-	@Column(name = "authdata_value", columnDefinition="text")
-	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
+	@Transient
+//	@ElementCollection(fetch = FetchType.EAGER)
+//	@MapKeyColumn(name = "authdata_key")
+//	@Column(name = "authdata_value", columnDefinition="text")
+//	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
 	private Map<String, String> properties;
 
 	public AuthData() {
-		this.created = new Date();
-		this.modified = this.created;
+
 	}
 
 	public AuthData(String name, String pluginId, BackMeUpUser user) {
@@ -77,8 +75,6 @@ public class AuthData {
 		this.pluginId = pluginId;
 		this.user = user;
 		this.properties = properties;
-		this.created = new Date();
-		this.modified = this.created;
 	}
 
 	public Long getId() {
@@ -87,7 +83,6 @@ public class AuthData {
 
 	public void setId(Long id) {
 		this.id = id;
-		this.modified = new Date();
 	}
 
 	public String getName() {
@@ -96,7 +91,6 @@ public class AuthData {
 
 	public void setName(String name) {
 		this.name = name;
-		this.modified = new Date();
 	}
 
 	public String getPluginId() {
@@ -105,7 +99,6 @@ public class AuthData {
 
 	public void setPluginId(String pluginId) {
 		this.pluginId = pluginId;
-		this.modified = new Date();
 	}
 
 	public BackMeUpUser getUser() {
@@ -117,12 +110,28 @@ public class AuthData {
 	}
 
 	public Date getCreated() {
-		return created;
+        if (this.created == null) {
+            return null;
+        }
+        return (Date)created.clone();
 	}
+	
+    @PrePersist
+    protected void onCreate() {
+        this.created = new Date();
+    }
 
 	public Date getModified() {
-		return modified;
+        if (this.modified == null) {
+            return null;
+        }
+        return (Date) modified.clone();
 	}
+	
+    @PreUpdate
+    protected void onUpdate() {
+      this.modified = new Date();
+    }
 
     public String getIdentification() {
         return identification;
@@ -169,5 +178,44 @@ public class AuthData {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s: id=%d Name=%s Plugin=%s", "AuthData", id, name, pluginId);
+    }
+    
+    /**
+     * Attempt to establish identity based on id if both exist. 
+     * If either id does not exist use Object.equals().
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof AuthData)) {
+            return false;
+        }
+        AuthData entity = (AuthData) other;
+        if (id == null || entity.getId() == null) {
+            return false;
+        }
+        return id.equals(entity.getId());
+    }
+    
+    /**
+     * Use ID if it exists to establish hash code, otherwise fall back to
+     * Object.hashCode(). 
+     */
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        }
+        return 17 * id.hashCode();
     }
 }
