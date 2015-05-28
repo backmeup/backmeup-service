@@ -176,7 +176,7 @@ public class AuthData {
             ObjectInputStream si = new ObjectInputStream(bi);
             this.properties = (HashMap<String, String>) si.readObject();
         } catch (Exception e) {
-            System.out.println(e);
+            throw new BackMeUpException("Cannot deserialize auth data properties", e);
         }
     }
     
