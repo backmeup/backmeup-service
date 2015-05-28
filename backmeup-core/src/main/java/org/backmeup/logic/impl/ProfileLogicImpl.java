@@ -1,7 +1,6 @@
 package org.backmeup.logic.impl;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -46,9 +45,10 @@ public class ProfileLogicImpl implements ProfileLogic {
     @Override
     public Profile saveProfile(Profile p) {
         Profile profile = getProfileDao().save(p);
-        
+        profile.setUser(p.getUser());
+        profile.setProperties(p.getProperties());
+        profile.setOptions(p.getOptions());
         storeProfileOnKeyserver(profile);
-        
         return profile;
     }
 
@@ -74,17 +74,19 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void deleteProfilesOf(Long userId) {
+    public void deleteProfilesOf(BackMeUpUser currentUser, Long userId) {
         ProfileDao profileDao = getProfileDao();
         for (Profile p : profileDao.findProfilesByUserId(userId)) {
             profileDao.delete(p);
+            deleteProfileOnKeyserver(currentUser, p);
         }
     }
 
     @Override
-    public void deleteProfile(Long profileId) {
+    public void deleteProfile(BackMeUpUser currentUser, Long profileId) {
         Profile profile = getProfileDao().findById(profileId);
         getProfileDao().delete(profile);
+        deleteProfileOnKeyserver(currentUser, profile);
     }
 
     // AuthData ---------------------------------------------------------------
@@ -155,39 +157,24 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
     
     private void storeProfileOnKeyserver(Profile profile) {
-        StringBuilder sb = null;
-        String data = "";
-        
-        // Store profile properties on keyserver
-        if(profile.getProperties() != null) {
-            sb = new StringBuilder();
-            for (Entry<String,String> entry : profile.getProperties().entrySet()) {
-                sb.append(entry.getKey());
-                sb.append('=');
-                sb.append(entry.getValue());
-                sb.append(';');
-            }
-            data = sb.toString(); 
-            try {
-                keyserverClient.updatePluginData(null, profile.getPluginId() + ".PROPS", data);
-            } catch (KeyserverException e) {
-                throw new BackMeUpException("Canot store auth data on keyserver", e);
-            }
+        if(profile.getProperties() == null && profile.getOptions() == null) {
+            return;
         }
-        
-        // Store profile options on keyserver
-        if(profile.getOptions() != null) {
-            sb = new StringBuilder();
-            for (String entry : profile.getOptions()) {
-                sb.append(entry);
-                sb.append(';');
-            }
-            data = sb.toString(); 
-            try {
-                keyserverClient.updatePluginData(null, profile.getPluginId() + ".OPTIONS", data);
-            } catch (KeyserverException e) {
-                throw new BackMeUpException("Canot store auth data on keyserver", e);
-            }
+                
+        try {
+            String data = profile.getPropertiesAndOptionsAsEncodedString();
+            TokenDTO token = new TokenDTO(Kind.INTERNAL,profile.getUser().getPassword());
+            keyserverClient.createPluginData(token, profile.getId().toString(), data);
+        } catch (KeyserverException e) {
+           throw new BackMeUpException("Canot store profile on keyserver", e);
+        }
+    }
+    
+    private void deleteProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {
+        try {
+            keyserverClient.removePluginData(new TokenDTO(Kind.INTERNAL,currentUser.getPassword()), profile.getId().toString());
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Canot delete profile on keyserver",e);
         }
     }
 }
