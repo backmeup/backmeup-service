@@ -12,6 +12,8 @@ import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.ProfileDao;
 import org.backmeup.keyserver.client.KeyserverClient;
 import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.Token.Kind;
+import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.Profile;
@@ -129,18 +131,11 @@ public class ProfileLogicImpl implements ProfileLogic {
         if(authData.getProperties() == null) {
             return;
         }
-        
-        StringBuilder sb = new StringBuilder();
-        for (Entry<String,String> entry : authData.getProperties().entrySet()) {
-            sb.append(entry.getKey());
-            sb.append('=');
-            sb.append(entry.getValue());
-            sb.append(';');
-        }
-        String data = sb.toString(); 
-        
+                
         try {
-            keyserverClient.updatePluginData(null, authData.getPluginId() + ".AUTH", data);
+            String data = authData.getPropertiesAsEncodedString();
+            TokenDTO token = new TokenDTO(Kind.INTERNAL,authData.getUser().getPassword());
+            keyserverClient.updatePluginData(token, authData.getId().toString(), data);
         } catch (KeyserverException e) {
            throw new BackMeUpException("Canot store auth data on keyserver", e);
         }
