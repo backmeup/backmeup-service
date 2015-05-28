@@ -52,7 +52,7 @@ public interface BusinessLogic {
     AuthData       getPluginAuthData(Long authDataId);
     List<AuthData> listPluginAuthData(Long userId);
     AuthData       updatePluginAuthData(AuthData authData);
-    void           deletePluginAuthData(Long authDataId);
+    void           deletePluginAuthData(BackMeUpUser currentUser, Long authDataId);
 
     Profile         addPluginProfile(Profile profile);
     Profile         getPluginProfile(Long profileId);

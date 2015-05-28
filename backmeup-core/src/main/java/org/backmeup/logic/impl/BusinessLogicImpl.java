@@ -424,11 +424,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public void deletePluginAuthData(final Long authDataId) {
+    public void deletePluginAuthData(final BackMeUpUser currentUser, final Long authDataId) {
         conn.txNew(new Runnable() {
             @Override public void run() {
 
-                profiles.deleteAuthData(authDataId);
+                profiles.deleteAuthData(currentUser, authDataId);
 
             }
         });

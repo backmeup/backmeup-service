@@ -377,7 +377,7 @@ public class Plugins extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        getLogic().deletePluginAuthData(aId);
+        getLogic().deletePluginAuthData(activeUser, aId);
     }
 
     private void throwIfPluginNotAvailable(String pluginId) {

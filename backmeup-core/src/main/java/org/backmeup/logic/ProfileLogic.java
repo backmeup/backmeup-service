@@ -3,6 +3,7 @@ package org.backmeup.logic;
 import java.util.List;
 
 import org.backmeup.model.AuthData;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 
 /**
@@ -31,6 +32,6 @@ public interface ProfileLogic {
     
     List<AuthData> getAuthDataOf(Long userId);
     
-    void deleteAuthData(Long authDataId);
+    void deleteAuthData(BackMeUpUser currentUser, Long authDataId);
     
 }
