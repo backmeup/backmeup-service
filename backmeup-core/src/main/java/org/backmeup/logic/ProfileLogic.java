@@ -21,9 +21,9 @@ public interface ProfileLogic {
     
 	Profile updateProfile(Profile profile);
     
-    void deleteProfilesOf(Long userId);
+    void deleteProfilesOf(BackMeUpUser currentUser, Long userId);
     
-    void deleteProfile(Long profileId);
+    void deleteProfile(BackMeUpUser currentUser, Long profileId);
 
 
     AuthData addAuthData(AuthData authData);

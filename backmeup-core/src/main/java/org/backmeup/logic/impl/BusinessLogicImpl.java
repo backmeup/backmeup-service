@@ -142,23 +142,6 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
-
-    @Override
-    public BackMeUpUser deleteUser(final Long userId) {
-        BackMeUpUser user = conn.txNew(new Callable<BackMeUpUser>() {
-            @Override public BackMeUpUser call() {
-
-                BackMeUpUser u = registration.getUserByUserId(userId);
-                backupJobs.deleteBackupJobsOf(u.getUserId());
-                profiles.deleteProfilesOf(u.getUserId());
-                registration.delete(u); 
-                return u;
-
-            }
-        });
-
-        return user;
-    }
     
     @Override
     public BackMeUpUser deleteUser(final BackMeUpUser activeUser, final Long userId) {
@@ -167,7 +150,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 BackMeUpUser u = registration.getUserByUserId(userId);
                 backupJobs.deleteBackupJobsOf(u.getUserId());
-                profiles.deleteProfilesOf(u.getUserId());
+                profiles.deleteProfilesOf(activeUser, u.getUserId());
                 registration.delete(activeUser); 
                 return u;
 
@@ -247,11 +230,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public void deleteProfile(final Long profileId) {
+    public void deleteProfile(final BackMeUpUser currentUser, final Long profileId) {
         conn.txJoin(new Runnable() {
             @Override public void run() {
 
-                profiles.deleteProfile(profileId);
+                profiles.deleteProfile(currentUser, profileId);
 
             }
         });

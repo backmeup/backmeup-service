@@ -35,7 +35,6 @@ public interface BusinessLogic {
     BackMeUpUser getUserByUsername(String username);
     BackMeUpUser getUserByUserId(Long userId);
     BackMeUpUser updateUser(BackMeUpUser user);
-    BackMeUpUser deleteUser(Long userId);
     BackMeUpUser deleteUser(BackMeUpUser activeUser, Long userId);
 
     // plugin operations ------------------------------------------------------
@@ -57,7 +56,7 @@ public interface BusinessLogic {
     Profile         addPluginProfile(Profile profile);
     Profile         getPluginProfile(Long profileId);
     Profile         updatePluginProfile(Profile profile);
-    void            deleteProfile(Long profileId);
+    void            deleteProfile(BackMeUpUser currentUser, Long profileId);
 
     // backupjob operations ---------------------------------------------------
     BackupJob                createBackupJob(BackupJob backupJob);

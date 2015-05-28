@@ -283,7 +283,7 @@ public class Plugins extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        getLogic().deleteProfile(pId);
+        getLogic().deleteProfile(activeUser, pId);
     }
 
     @RolesAllowed("user")
