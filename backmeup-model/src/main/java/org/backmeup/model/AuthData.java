@@ -130,7 +130,7 @@ public class AuthData {
 	
     @PreUpdate
     protected void onUpdate() {
-      this.modified = new Date();
+        this.modified = new Date();
     }
 
     public String getIdentification() {
