@@ -1,5 +1,6 @@
 package org.backmeup.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,11 +15,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
+import org.backmeup.model.utils.Serialization;
 
 /**
  * 
@@ -32,8 +36,10 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
  * 
  */
 @Entity
-public class Profile {
-	@Id
+public class Profile implements Serializable {
+    private static final long serialVersionUID = 1606660919647823719L;
+
+    @Id
 	@GeneratedValue
 	private Long id;
 
@@ -54,12 +60,14 @@ public class Profile {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
 	private AuthData authData;
 
-	@ElementCollection(fetch=FetchType.EAGER)
-	@OrderColumn(name = "properties_index")
+	@Transient
+//	@ElementCollection(fetch=FetchType.EAGER)
+//	@OrderColumn(name = "properties_index")
 	private Map<String, String> properties;
 
-	@ElementCollection(fetch=FetchType.EAGER)
-	@OrderColumn(name = "options_index")
+	@Transient
+//	@ElementCollection(fetch=FetchType.EAGER)
+//	@OrderColumn(name = "options_index")
 	private List<String> options;
 
 	public Profile() {
@@ -75,8 +83,6 @@ public class Profile {
 		this.user = user;
 		this.pluginId = pluginId;
 		this.pluginType = pluginType;
-		this.created = new Date();
-		this.modified = this.created;
 	}
 
 	public Long getId() {
@@ -115,13 +121,29 @@ public class Profile {
 		this.pluginType = pluginType;
 	}
 
-	public Date getCreated() {
-		return created;
-	}
+    public Date getCreated() {
+        if (this.created == null) {
+            return null;
+        }
+        return (Date)created.clone();
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        this.created = new Date();
+    }
 
-	public Date getModified() {
-		return modified;
-	}
+    public Date getModified() {
+        if (this.modified == null) {
+            return null;
+        }
+        return (Date) modified.clone();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.modified = new Date();
+    }
 
 	public AuthData getAuthData() {
 		return authData;
@@ -131,6 +153,7 @@ public class Profile {
 		if(this.pluginId == null) {
 			throw new IllegalStateException("Cannot set auth data. Profile has to be associated with a plugin");
 		}
+		
 		if(!authData.getPluginId().equals(this.pluginId)){
 			throw new IllegalArgumentException("Auth data is associated with a different plugin");
 		}
@@ -171,4 +194,71 @@ public class Profile {
 		}
 		this.options.add(option);
 	}
+	
+    public String getPropertiesAndOptionsAsEncodedString() {
+        try {            
+            Map<String, String> props = new HashMap<String, String>();
+            if (properties != null) {
+                props.putAll(properties);
+            }
+            props.put(String.valueOf(Profile.serialVersionUID), Serialization.getObjectAsEncodedString(options));
+            return Serialization.getObjectAsEncodedString(props);
+        } catch (Exception e) {
+            throw new BackMeUpException("Cannot serialize profile data", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setPropertiesAndOptionsFromEncodedString(String properpies) {
+        try {
+            Map<String, String> props = Serialization.getEncodedStringAsObject(properpies, HashMap.class);
+            String encodedOptions = props.get(String.valueOf(Profile.serialVersionUID));
+            this.options = Serialization.getEncodedStringAsObject(encodedOptions, ArrayList.class);
+            props.remove(String.valueOf(Profile.serialVersionUID));
+            if (!props.isEmpty()) {
+                this.properties = props;
+            }
+        } catch (Exception e) {
+            throw new BackMeUpException("Cannot deserialize profile data", e);
+        }
+    }
+	
+    @Override
+    public String toString() {
+        return String.format("%s: id=%d Plugin=%s Type=%s", "Profile", id, pluginId, pluginType);
+    }
+    
+    /**
+     * Attempt to establish identity based on id if both exist. 
+     * If either id does not exist use Object.equals().
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof Profile)) {
+            return false;
+        }
+        Profile entity = (Profile) other;
+        if (id == null || entity.getId() == null) {
+            return false;
+        }
+        return id.equals(entity.getId());
+    }
+    
+    /**
+     * Use ID if it exists to establish hash code, otherwise fall back to
+     * Object.hashCode(). 
+     */
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        }
+        return 89 * id.hashCode();
+    }
 }
