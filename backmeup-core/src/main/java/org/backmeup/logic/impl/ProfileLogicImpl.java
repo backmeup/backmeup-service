@@ -16,6 +16,7 @@ import org.backmeup.keyserver.model.Token.Kind;
 import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.model.AuthData;
+import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.Profile;
 import org.backmeup.model.exceptions.BackMeUpException;
 
@@ -94,6 +95,7 @@ public class ProfileLogicImpl implements ProfileLogic {
             throw new IllegalArgumentException("AuthData must not be null");
         }
         AuthData ad = getAuthDataDao().save(authData);
+        ad.setUser(authData.getUser());
         ad.setProperties(authData.getProperties());
         
         storeAuthDataOnKeyserver(ad);
@@ -122,9 +124,11 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public void deleteAuthData(Long authDataId) {
+    public void deleteAuthData(BackMeUpUser currentUser, Long authDataId) {
         AuthData authData = getAuthData(authDataId);
         getAuthDataDao().delete(authData);
+        
+        deleteAuthDataOnKeyserver(currentUser, authData);
     }
     
     private void storeAuthDataOnKeyserver(AuthData authData) {
@@ -135,9 +139,18 @@ public class ProfileLogicImpl implements ProfileLogic {
         try {
             String data = authData.getPropertiesAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL,authData.getUser().getPassword());
-            keyserverClient.updatePluginData(token, authData.getId().toString(), data);
+            keyserverClient.createPluginData(token, authData.getId().toString(), data);
+//            keyserverClient.updatePluginData(token, authData.getId().toString(), data);
         } catch (KeyserverException e) {
            throw new BackMeUpException("Canot store auth data on keyserver", e);
+        }
+    }
+    
+    private void deleteAuthDataOnKeyserver(BackMeUpUser currentUser, AuthData authData) {
+        try {
+            keyserverClient.removePluginData(new TokenDTO(Kind.INTERNAL,currentUser.getPassword()), authData.getId().toString());
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Canot delete auth data on keyserver",e);
         }
     }
     
