@@ -22,7 +22,7 @@ public class BackupJobExecutionDTO {
 
     private Long jobId;
     private UserDTO user;
-    private TokenDTO token;
+    private String token;
 
     private PluginProfileDTO source;
     private List<PluginProfileDTO> actions;
@@ -64,11 +64,11 @@ public class BackupJobExecutionDTO {
         this.user = user;
     }
 
-    public TokenDTO getToken() {
+    public String getToken() {
         return token;
     }
 
-    public void setToken(TokenDTO token) {
+    public void setToken(String token) {
         this.token = token;
     }
 

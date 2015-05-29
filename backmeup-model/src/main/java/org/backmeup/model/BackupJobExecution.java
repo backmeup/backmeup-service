@@ -72,7 +72,7 @@ public class BackupJobExecution {
     private Profile sinkProfile;
     
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Token token;
+    private String token;
     
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
 //    private Set<JobProtocol> jobProtocol = new HashSet<>();
@@ -235,11 +235,11 @@ public class BackupJobExecution {
         this.sinkProfile = sinkProfile;
     }
 
-    public Token getToken() {
+    public String getToken() {
         return token;
     }
 
-    public void setToken(Token token) {
+    public void setToken(String token) {
         this.token = token;
     }
 
