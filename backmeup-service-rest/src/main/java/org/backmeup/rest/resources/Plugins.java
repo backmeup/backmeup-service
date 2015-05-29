@@ -89,7 +89,7 @@ public class Plugins extends Base {
             @PathParam("pluginId") String pluginId,
             @QueryParam("authData") @DefaultValue("-1") Long authDataId,
             @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
-
+        
         PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
         PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
 
@@ -121,12 +121,13 @@ public class Plugins extends Base {
         if(authDataId.equals(-1L)) {
             pluginConfigInfo = getLogic().getPluginConfiguration(pluginId);
         } else {
-            AuthData authData = getLogic().getPluginAuthData(authDataId);
+            BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+            
+            AuthData authData = getLogic().getPluginAuthData(activeUser, authDataId);
             if(!authData.getPluginId().equals(pluginId)){
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
             
-            BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
             if(!authData.getUser().getUserId().equals(activeUser.getUserId())) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
@@ -171,7 +172,7 @@ public class Plugins extends Base {
         profile.setUser(activeUser);
 
         if(pluginProfile.getAuthData() != null) {
-            AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
+            AuthData authData = getLogic().getPluginAuthData(activeUser, pluginProfile.getAuthData().getId());
             profile.setAuthData(authData);
         }
 
@@ -186,7 +187,7 @@ public class Plugins extends Base {
             profile.setOptions(profileOptions);
         }
 
-        profile = getLogic().addPluginProfile(profile);
+        profile = getLogic().addPluginProfile(activeUser, profile);
 
         PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
 
@@ -204,7 +205,7 @@ public class Plugins extends Base {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
-        Profile profile = getLogic().getPluginProfile(Long.parseLong(profileId));
+        Profile profile = getLogic().getPluginProfile(activeUser, Long.parseLong(profileId));
 
         if(!profile.getUser().getUserId().equals(activeUser.getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
@@ -229,7 +230,7 @@ public class Plugins extends Base {
             PluginProfileDTO pluginProfile) {	
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         Long pId = Long.parseLong(profileId);
-        Profile persistentProfile = getLogic().getPluginProfile(pId);
+        Profile persistentProfile = getLogic().getPluginProfile(activeUser, pId);
         if((!activeUser.getUserId().equals(persistentProfile.getUser().getUserId())) && 
                 (pluginProfile.getProfileId() != Long.parseLong(profileId))) {
             throw new WebApplicationException(Status.FORBIDDEN);
@@ -243,7 +244,7 @@ public class Plugins extends Base {
         persistentProfile.setType(pluginProfile.getProfileType());
 
         if (updateAuthData) {
-            AuthData authData = getLogic().getPluginAuthData(pluginProfile.getAuthData().getId());
+            AuthData authData = getLogic().getPluginAuthData(activeUser, pluginProfile.getAuthData().getId());
             persistentProfile.setAuthData(authData);
         }
 
@@ -257,7 +258,7 @@ public class Plugins extends Base {
             persistentProfile.getOptions().addAll(pluginProfile.getOptions());
         }
 
-        persistentProfile = getLogic().updatePluginProfile(persistentProfile);
+        persistentProfile = getLogic().updatePluginProfile(activeUser, persistentProfile);
 
         PluginProfileDTO profileDTO = getMapper().map(persistentProfile, PluginProfileDTO.class);
 
@@ -274,7 +275,7 @@ public class Plugins extends Base {
         throwIfPluginNotAvailable(pluginId);
 
         Long pId = Long.parseLong(profileId);
-        Profile profile = getLogic().getPluginProfile(pId);
+        Profile profile = getLogic().getPluginProfile(activeUser, pId);
         if(!activeUser.getUserId().equals(profile.getUser().getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
@@ -316,7 +317,7 @@ public class Plugins extends Base {
         throwIfPluginNotAvailable(pluginId);
 
         Long aId = Long.parseLong(authDataId);
-        AuthData authDataModel = getLogic().getPluginAuthData(aId);
+        AuthData authDataModel = getLogic().getPluginAuthData(activeUser, aId);
 
         if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
@@ -371,7 +372,7 @@ public class Plugins extends Base {
         throwIfPluginNotAvailable(pluginId);
 
         Long aId = Long.parseLong(authDataId);
-        AuthData authDataModel = getLogic().getPluginAuthData(aId);
+        AuthData authDataModel = getLogic().getPluginAuthData(activeUser, aId);
 
         if(!authDataModel.getUser().getUserId().equals(activeUser.getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);

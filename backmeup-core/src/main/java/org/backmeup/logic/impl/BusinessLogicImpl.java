@@ -219,11 +219,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public Profile getPluginProfile(final Long profileId) {
+    public Profile getPluginProfile(final BackMeUpUser currentUser, final Long profileId) {
         return conn.txNewReadOnly(new Callable<Profile>() {
             @Override public Profile call() {
 
-                return profiles.getProfile(profileId);
+                return profiles.getProfile(currentUser, profileId);
 
             }
         });
@@ -264,13 +264,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public Profile addPluginProfile(final Profile profile) {
+    public Profile addPluginProfile(final BackMeUpUser currentUser, final Profile profile) {
 
         return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
                 // Check if plugin authorization data is required and still valid
                 if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                    AuthData authData = profiles.getAuthData(currentUser, profile.getAuthData().getId());
                     profile.setAuthData(authData);
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
@@ -295,7 +295,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     }
 
-    public ValidationNotes validateProfile(final Profile profile) {
+    public ValidationNotes validateProfile(final BackMeUpUser currentUser, final Profile profile) {
         return conn.txJoinReadOnly(new Callable<ValidationNotes>() {
             @Override public ValidationNotes call() {
                 ValidationNotes notes = new ValidationNotes();
@@ -303,7 +303,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 try {
                     // Check if plugin authorization data is required and still valid
                     if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                        AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                        AuthData authData = profiles.getAuthData(currentUser, profile.getAuthData().getId());
                         profile.setAuthData(authData);
 
                         String identification = plugins.authorizePlugin(profile.getAuthData());
@@ -326,13 +326,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public Profile updatePluginProfile(final Profile profile) {
+    public Profile updatePluginProfile(final BackMeUpUser currentUser, final Profile profile) {
         return conn.txNew(new Callable<Profile>() {
             @Override public Profile call() {
                 // TODO: Refactor (see addPluginProfile method); put validation logic in own method
                 // Check if plugin authorization data is required and still valid
                 if((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                    AuthData authData = profiles.getAuthData(profile.getAuthData().getId());
+                    AuthData authData = profiles.getAuthData(currentUser, profile.getAuthData().getId());
                     profile.setAuthData(authData);
 
                     String identification = plugins.authorizePlugin(profile.getAuthData());
@@ -380,11 +380,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public AuthData getPluginAuthData(final Long authDataId) {
+    public AuthData getPluginAuthData(final BackMeUpUser currentUser, final Long authDataId) {
         return conn.txNewReadOnly(new Callable<AuthData>() {
             @Override public AuthData call() {
 
-                return profiles.getAuthData(authDataId);
+                return profiles.getAuthData(currentUser, authDataId);
 
             }
         });
@@ -433,7 +433,7 @@ public class BusinessLogicImpl implements BusinessLogic {
         BackupJob job = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
 
-                validateBackupJob(backupJob);
+                validateBackupJob(backupJob.getUser(), backupJob);
                 BackupJob job = backupJobs.addBackupJob(backupJob);
                 return job;
 
@@ -544,16 +544,16 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
-    private void validateBackupJob(final BackupJob backupJob) {
+    private void validateBackupJob(final BackMeUpUser currentUser, final BackupJob backupJob) {
         conn.txJoinReadOnly(new Runnable() {
             @Override public void run() {
                 ValidationNotes notes = new ValidationNotes();
                 try {
-                    notes.addAll(validateProfile(backupJob.getSourceProfile()));
-                    notes.addAll(validateProfile(backupJob.getSinkProfile()));
+                    notes.addAll(validateProfile(currentUser, backupJob.getSourceProfile()));
+                    notes.addAll(validateProfile(currentUser, backupJob.getSinkProfile()));
 
                     for(Profile actionProfile : backupJob.getActionProfiles()) {
-                        notes.addAll(validateProfile(actionProfile));
+                        notes.addAll(validateProfile(currentUser, actionProfile));
                     }
 
                 } catch (BackMeUpException bme) {

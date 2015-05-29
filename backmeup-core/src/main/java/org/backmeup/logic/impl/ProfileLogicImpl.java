@@ -60,11 +60,24 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
     
     @Override
-    public Profile getProfile(Long profileId) {
+    public Profile getProfile(BackMeUpUser currentUser, Long profileId) {
+        if (profileId == null) {
+            throw new IllegalArgumentException("ProfileId must not be null");
+        }
+        
         Profile profile = getProfileDao().findById(profileId);
         if (profile == null) {
             throw new IllegalArgumentException(String.format(textBundle.getString(UNKNOWN_PROFILE), profileId));
         }
+        
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            String encodedData = keyserverClient.getPluginData(token, profile.getId().toString());
+            profile.setPropertiesAndOptionsFromEncodedString(encodedData);
+        } catch (KeyserverException e) {
+           throw new BackMeUpException("Canot store auth data on keyserver", e);
+        }
+        
         return profile;
     }
     
@@ -106,7 +119,7 @@ public class ProfileLogicImpl implements ProfileLogic {
     }
 
     @Override
-    public AuthData getAuthData(Long authDataId) {
+    public AuthData getAuthData(BackMeUpUser currentUser, Long authDataId) {
         if (authDataId == null) {
             throw new IllegalArgumentException("AuthDataId must not be null");
         }
@@ -114,6 +127,15 @@ public class ProfileLogicImpl implements ProfileLogic {
         if (authData == null) {
             throw new IllegalArgumentException("No auth data found with id: " + authDataId);
         }
+        
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            String encodedData = keyserverClient.getPluginData(token, authData.getId().toString());
+            authData.setPropertiesFromEncodedString(encodedData);
+        } catch (KeyserverException e) {
+           throw new BackMeUpException("Canot store auth data on keyserver", e);
+        }
+        
         return authData;
     }
 
@@ -127,7 +149,7 @@ public class ProfileLogicImpl implements ProfileLogic {
 
     @Override
     public void deleteAuthData(BackMeUpUser currentUser, Long authDataId) {
-        AuthData authData = getAuthData(authDataId);
+        AuthData authData = getAuthData(currentUser, authDataId);
         getAuthDataDao().delete(authData);
         
         deleteAuthDataOnKeyserver(currentUser, authData);

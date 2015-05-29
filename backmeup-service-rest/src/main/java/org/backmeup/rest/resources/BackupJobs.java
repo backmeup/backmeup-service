@@ -66,12 +66,12 @@ public class BackupJobs extends Base {
     public BackupJobDTO createBackupJob(BackupJobCreationDTO backupJob) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
-        Profile sourceProfile = getLogic().getPluginProfile(backupJob.getSource());
-        Profile sinkProfile = getLogic().getPluginProfile(backupJob.getSink());
+        Profile sourceProfile = getLogic().getPluginProfile(activeUser, backupJob.getSource());
+        Profile sinkProfile = getLogic().getPluginProfile(activeUser, backupJob.getSink());
         List<Profile> actionProfiles = new ArrayList<>();
         if (backupJob.getActions() != null) {
             for (Long actionId : backupJob.getActions()) {
-                Profile actionProfile = getLogic().getPluginProfile(actionId);
+                Profile actionProfile = getLogic().getPluginProfile(activeUser, actionId);
                 actionProfiles.add(actionProfile);
             }
         }
@@ -113,20 +113,20 @@ public class BackupJobs extends Base {
 
         if(expandProfiles) {
             // get source profile
-            Profile sourceProfile = getLogic().getPluginProfile(job.getSourceProfile().getId());
+            Profile sourceProfile = getLogic().getPluginProfile(activeUser, job.getSourceProfile().getId());
             PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
             sourceProfileDTO.setPluginId(sourceProfile.getPluginId());
             jobDTO.setSource(sourceProfileDTO);
 
             // get sink profile
-            Profile sinkProfile = getLogic().getPluginProfile(job.getSinkProfile().getId());		
+            Profile sinkProfile = getLogic().getPluginProfile(activeUser, job.getSinkProfile().getId());		
             PluginProfileDTO sinkProfileDTO = getMapper().map(sinkProfile, PluginProfileDTO.class);
             sinkProfileDTO.setPluginId(sinkProfile.getPluginId());
             jobDTO.setSink(sinkProfileDTO);
 
             // get action profiles
             for(Profile action : job.getActionProfiles()) {
-                Profile actionProfile = getLogic().getPluginProfile(action.getId());
+                Profile actionProfile = getLogic().getPluginProfile(activeUser, action.getId());
                 PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
                 actionProfileDTO.setPluginId(actionProfile.getPluginId());
                 jobDTO.addAction(actionProfileDTO);

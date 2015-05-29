@@ -48,14 +48,14 @@ public interface BusinessLogic {
 
     // profile operations ------------------------------------------------------
     AuthData       addPluginAuthData(AuthData authData);
-    AuthData       getPluginAuthData(Long authDataId);
+    AuthData       getPluginAuthData(BackMeUpUser currentUser, Long authDataId);
     List<AuthData> listPluginAuthData(Long userId);
     AuthData       updatePluginAuthData(AuthData authData);
     void           deletePluginAuthData(BackMeUpUser currentUser, Long authDataId);
 
-    Profile         addPluginProfile(Profile profile);
-    Profile         getPluginProfile(Long profileId);
-    Profile         updatePluginProfile(Profile profile);
+    Profile         addPluginProfile(BackMeUpUser currentUser, Profile profile);
+    Profile         getPluginProfile(BackMeUpUser currentUser, Long profileId);
+    Profile         updatePluginProfile(BackMeUpUser currentUser, Profile profile);
     void            deleteProfile(BackMeUpUser currentUser, Long profileId);
 
     // backupjob operations ---------------------------------------------------

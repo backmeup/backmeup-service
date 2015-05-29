@@ -17,7 +17,7 @@ public interface ProfileLogic {
 
     List<Profile> getProfilesOf(Long userId);
         
-    Profile getProfile(Long profileId);
+    Profile getProfile(BackMeUpUser currentUser, Long profileId);
     
 	Profile updateProfile(Profile profile);
     
@@ -28,7 +28,7 @@ public interface ProfileLogic {
 
     AuthData addAuthData(AuthData authData);
     
-    AuthData getAuthData(Long authDataId);
+    AuthData getAuthData(BackMeUpUser currentUser, Long authDataId);
     
     List<AuthData> getAuthDataOf(Long userId);
     
