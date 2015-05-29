@@ -1,7 +1,6 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -68,10 +67,7 @@ public class BackupJobs extends Base {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
         Profile sourceProfile = getLogic().getPluginProfile(backupJob.getSource());
-        sourceProfile.setOptions(new ArrayList<String>());
-
         Profile sinkProfile = getLogic().getPluginProfile(backupJob.getSink());
-
         List<Profile> actionProfiles = new ArrayList<>();
         if (backupJob.getActions() != null) {
             for (Long actionId : backupJob.getActions()) {
@@ -81,7 +77,6 @@ public class BackupJobs extends Base {
         }
 
         BackupJob job = new BackupJob(activeUser, backupJob.getJobTitle(), sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), backupJob.getSchedule());
-        job.setNextExecutionTime(new Date());
         job = getLogic().createBackupJob(job);
 
         return getMapper().map(job, BackupJobDTO.class);
@@ -157,12 +152,8 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-//        job.getToken().setTokenId(backupjob.getToken().getTokenId());
-        job.getToken().setToken(backupjob.getToken().getToken());
-        job.getToken().setBackupdate(backupjob.getToken().getValidity());
+        // TODO:
         job.setStatus(backupjob.getStatus());
-
-        // TODO: Job protocol
 
         getLogic().updateBackupJob(job.getUser().getUserId(), job);
 

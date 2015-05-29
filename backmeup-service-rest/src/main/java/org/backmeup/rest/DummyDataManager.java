@@ -12,7 +12,6 @@ import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginInputFieldDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
-import org.backmeup.model.dto.TokenDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
@@ -83,14 +82,7 @@ public class DummyDataManager {
 
 		return authData;
 	}
-	
-	public static TokenDTO getTokenDTO() {
-		TokenDTO token = new TokenDTO();
-		token.setTokenId(11254L);
-		token.setToken("Vm9lSEliY...t1S3c9PQ==");
-		return token;
-	}
-		
+			
     public static BackupJobDTO getBackupJobDTO(boolean expandUser,
             boolean expandToken, boolean expandProfiles) {
 		BackupJobDTO job = new BackupJobDTO();
@@ -109,7 +101,7 @@ public class DummyDataManager {
 		}
 
 		if (expandToken) {
-			job.setToken(getTokenDTO());
+			job.setToken("Vm9lSEliY...t1S3c9PQ==");
 		}
 
 		if (expandProfiles) {

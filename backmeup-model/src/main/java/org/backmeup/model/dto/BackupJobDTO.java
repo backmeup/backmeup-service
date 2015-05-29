@@ -19,7 +19,7 @@ public class BackupJobDTO {
 	private boolean isActive = true;
 	
 	private UserDTO user;
-	private TokenDTO token;
+	private String token;
 	private JobFrequency schedule;
 	
 	private Date created;
@@ -76,11 +76,11 @@ public class BackupJobDTO {
 		this.user = user;
 	}
 
-	public TokenDTO getToken() {
+	public String getToken() {
 		return token;
 	}
 
-	public void setToken(TokenDTO token) {
+	public void setToken(String token) {
 		this.token = token;
 	}
 
