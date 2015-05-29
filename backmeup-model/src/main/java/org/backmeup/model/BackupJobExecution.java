@@ -71,7 +71,6 @@ public class BackupJobExecution {
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private Profile sinkProfile;
     
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private String token;
     
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
