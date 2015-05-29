@@ -18,7 +18,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
@@ -57,11 +56,7 @@ public class BackupJob {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Profile sinkProfile;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Token token;
-
-//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
-//	private final Set<JobProtocol> jobProtocols = new HashSet<>();
+	private String token;
 
 	@Enumerated(EnumType.STRING)
 	private JobFrequency jobFrequency;
@@ -197,14 +192,14 @@ public class BackupJob {
 	public void setDelay(long delay) {
 		this.delay = delay;
 	}
+	
+    public String getToken() {
+        return token;
+    }
 
-	public Token getToken() {
-		return token;
-	}
-
-	public void setToken(Token token) {
-		this.token = token;
-	}
+    public void setToken(String token) {
+        this.token = token;
+    }
 
 	public Date getCreateTime() {
         if (this.createTime == null) {
@@ -212,7 +207,7 @@ public class BackupJob {
         }
 		return (Date)createTime.clone();
 	}
-	
+
     @PrePersist
     protected void onCreate() {
         this.createTime = new Date();
@@ -230,17 +225,6 @@ public class BackupJob {
       this.lastUpdatedTime = new Date();
     }
 
-//	public JobProtocol lastProtocol() {
-//		JobProtocol last = null;
-//		for (JobProtocol jp : jobProtocols) {
-//			if (last == null
-//					|| jp.getExecutionTime().compareTo(last.getExecutionTime()) > 0) {
-//				last = jp;
-//			}
-//		}
-//		return last;
-//	}
-
 	public Date getNextExecutionTime() {
         if (this.nextExecutionTime == null) {
             return null;
@@ -251,14 +235,6 @@ public class BackupJob {
 	public void setNextExecutionTime(Date nextExecutionTime) {
 		this.nextExecutionTime = (Date) nextExecutionTime.clone();
 	}
-
-//	public boolean isReschedule() {
-//		return reschedule;
-//	}
-//
-//	public void setReschedule(boolean reschedule) {
-//		this.reschedule = reschedule;
-//	}
 
 	public JobStatus getStatus() {
 		return status;
