@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Base64;
 
 public abstract class Serialization {
     public static String getObjectAsEncodedString(Object obj) throws IOException {
@@ -13,12 +12,14 @@ public abstract class Serialization {
         ObjectOutputStream so = new ObjectOutputStream(bo);
         so.writeObject(obj);
         so.flush();
-        return Base64.getEncoder().encodeToString(bo.toByteArray());
+//        return Base64.getEncoder().encodeToString(bo.toByteArray());
+        return MyBase64.encode(bo.toByteArray());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getEncodedStringAsObject(String properpies, Class<T> type) throws IOException, ClassNotFoundException {
-        byte b[] = Base64.getDecoder().decode(properpies);
+//        byte b[] = Base64.getDecoder().decode(properpies);
+        byte b[] = MyBase64.decode(properpies);
         ByteArrayInputStream bi = new ByteArrayInputStream(b);
         ObjectInputStream si = new ObjectInputStream(bi);
         return (T) si.readObject();
