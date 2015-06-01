@@ -13,7 +13,7 @@ import org.backmeup.model.BackupJob;
  */
 public interface JobManager {
 
-    void scheduleBackupJob(BackupJob job);
+    void scheduleBackupJob(BackMeUpUser activeUser, BackupJob job);
     
     void executeBackupJob(BackMeUpUser activeUser, BackupJob job);
 
