@@ -70,7 +70,7 @@ public interface BusinessLogic {
     void                     deleteBackupJob(Long userId, Long jobId);
     
     // search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner, String taggedCollection);
 
     // sharing operations -----------------------------------------------------
     Set<SharingPolicyEntry> getAllOwnedSharingPolicies(Long currUserId);

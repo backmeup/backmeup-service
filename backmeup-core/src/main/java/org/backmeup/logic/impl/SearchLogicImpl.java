@@ -31,11 +31,11 @@ public class SearchLogicImpl implements SearchLogic {
 
     @Override
     public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job,
-            String owner) {
+            String owner, String tag) {
         try (IndexClient client = getIndexClient(user.getUserId());) {
 
             SearchResponse result = new SearchResponse(query);
-            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, owner, user.getUsername()));
+            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, owner, tag, user.getUsername()));
             return result;
 
         }

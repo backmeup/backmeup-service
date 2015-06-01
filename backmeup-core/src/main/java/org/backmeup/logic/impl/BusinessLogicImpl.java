@@ -567,13 +567,13 @@ public class BusinessLogicImpl implements BusinessLogic {
     // search operations ------------------------------------------------------
     @Override
     public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type,
-            final String job, final String owner) {
+            final String job, final String owner, final String tag) {
         return this.conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override
             public SearchResponse call() {
 
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(userId, true);
-                return BusinessLogicImpl.this.search.runSearch(user, query, source, type, job, owner);
+                return BusinessLogicImpl.this.search.runSearch(user, query, source, type, job, owner, tag);
 
             }
         });

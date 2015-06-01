@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class SharingPolicyDTO {
 
     public enum SharingPolicyTypeEntryDTO {
-        Document, DocumentGroup, Backup, AllFromNow, AllInklOld
+        Document, DocumentGroup, Backup, AllFromNow, AllInklOld, TaggedCollection
     }
 
     private Long withUserId;
