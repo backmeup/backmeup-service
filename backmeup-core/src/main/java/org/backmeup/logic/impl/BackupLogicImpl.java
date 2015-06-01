@@ -1,7 +1,5 @@
 package org.backmeup.logic.impl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -12,17 +10,10 @@ import javax.ws.rs.NotSupportedException;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.keyserver.client.KeyserverClient;
-import org.backmeup.keyserver.model.KeyserverException;
-import org.backmeup.keyserver.model.Token.Kind;
-import org.backmeup.keyserver.model.dto.AuthResponseDTO;
-import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
-import org.backmeup.model.Profile;
 import org.backmeup.model.constants.JobStatus;
-import org.backmeup.model.exceptions.BackMeUpException;
 
 @ApplicationScoped
 public class BackupLogicImpl implements BackupLogic {
@@ -32,9 +23,6 @@ public class BackupLogicImpl implements BackupLogic {
 
     @Inject
     private DataAccessLayer dal;
-
-    @Inject
-    private KeyserverClient keyserverClient;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BackupLogicImpl");
 
@@ -50,33 +38,7 @@ public class BackupLogicImpl implements BackupLogic {
 
     @Override
     public BackupJob addBackupJob(BackupJob job) {
-        // Adding and starting a backup job are be two distinct methods.
-        // The following steps are necessary when a job is started and therefore a 
-        // jobexecution is created and scheduled. 
-        Calendar scheduledExecutionTime = Calendar.getInstance();
-        scheduledExecutionTime.setTimeInMillis(job.getStartTime().getTime() + job.getDelay());
-        
         job.setStatus(JobStatus.CREATED);
-        job.setNextExecutionTime(scheduledExecutionTime.getTime());
-
-        // Obtain an access token from the keyserver.       
-        // Collect all necessary ids
-        List<String> ids = new ArrayList<String>();
-        collectIdsForKeyserver(job.getSourceProfile(), ids);
-        collectIdsForKeyserver(job.getSinkProfile(), ids);
-        for(Profile actionProfile : job.getActionProfiles()) {
-            collectIdsForKeyserver(actionProfile, ids);
-        }
-        
-        try {
-            TokenDTO token = new TokenDTO(Kind.INTERNAL,job.getUser().getPassword());
-            AuthResponseDTO response = keyserverClient.createOnetime(token, ids.toArray(new String[ids.size()]), scheduledExecutionTime);
-            job.setToken(response.getToken().getB64Token());
-        } catch (KeyserverException e) {
-            throw new BackMeUpException("Canot create token on keyserver", e);
-        }
-
-
         return getBackupJobDao().save(job);
     }
     
@@ -145,16 +107,5 @@ public class BackupLogicImpl implements BackupLogic {
         }
 
         return jobExeDao.merge(jobExec);
-    }
-
-    // Helper methods ---------------------------------------------------------
-    
-    private void collectIdsForKeyserver(Profile profile, List<String> ids) {
-        if (profile.getAuthData() != null) {
-            ids.add(profile.getAuthData().getId().toString());
-        }
-        if(profile.getProperties() != null || profile.getOptions() != null) {
-            ids.add(profile.getId().toString());
-        }
     }
 }
