@@ -1,10 +1,5 @@
 package org.backmeup.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +17,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.backmeup.model.exceptions.BackMeUpException;
+import org.backmeup.model.utils.Serialization;
 
 /**
  * 
@@ -158,11 +154,7 @@ public class AuthData {
     
     public String getPropertiesAsEncodedString() {
         try {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            ObjectOutputStream so = new ObjectOutputStream(bo);
-            so.writeObject(properties);
-            so.flush();
-            return Base64.getEncoder().encodeToString(bo.toByteArray());
+            return Serialization.getObjectAsEncodedString(properties);
         } catch (Exception e) {
             throw new BackMeUpException("Cannot serialize auth data properties", e);
         }
@@ -171,10 +163,7 @@ public class AuthData {
     @SuppressWarnings("unchecked")
     public void setPropertiesFromEncodedString(String properpies) {
         try {
-            byte b[] = Base64.getDecoder().decode(properpies);
-            ByteArrayInputStream bi = new ByteArrayInputStream(b);
-            ObjectInputStream si = new ObjectInputStream(bi);
-            this.properties = (HashMap<String, String>) si.readObject();
+            this.properties = Serialization.getEncodedStringAsObject(properpies, HashMap.class);
         } catch (Exception e) {
             throw new BackMeUpException("Cannot deserialize auth data properties", e);
         }
