@@ -724,6 +724,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
     }
 
     @Ignore("truncate db and proper bundle setup required before running this test. No cleanup performed afterwards")
+    @SuppressWarnings("unused")
     @Test
     public void testCreateBackupJobWithActionAndExecuteViaWorker() {
         UserDTO user = TestDataManager.getUser();

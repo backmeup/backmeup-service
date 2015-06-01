@@ -8,7 +8,5 @@ public interface BackupJobDao extends BaseDao<BackupJob> {
 
     List<BackupJob> findByUserId(Long userId);
 
-    BackupJob findLastBackupJob(Long userId);
-
     List<BackupJob> findAll();
 }
