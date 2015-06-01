@@ -77,7 +77,7 @@ public class BackupJobs extends Base {
         }
 
         BackupJob job = new BackupJob(activeUser, backupJob.getJobTitle(), sourceProfile, sinkProfile, actionProfiles, backupJob.getStart(), backupJob.getSchedule());
-        job = getLogic().createBackupJob(job);
+        job = getLogic().createBackupJob(activeUser, job);
 
         return getMapper().map(job, BackupJobDTO.class);
 

@@ -421,14 +421,9 @@ public class BusinessLogicImpl implements BusinessLogic {
     // ========================================================================
 
     // BackupJob operations ---------------------------------------------------
-    
+        
     @Override
-    public BackupJob createBackupJob(final BackupJob backupJob) {
-        return createBackupJob(backupJob, false);
-    }
-    
-    @Override
-    public BackupJob createBackupJob(final BackupJob backupJob, boolean startImmediately) {
+    public BackupJob createBackupJob(final BackMeUpUser activeUser, final BackupJob backupJob) {
         
         BackupJob job = conn.txNew(new Callable<BackupJob>() {
             @Override public BackupJob call() {
@@ -440,7 +435,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
         
-        jobManager.scheduleBackupJob(job);
+        jobManager.scheduleBackupJob(activeUser, job);
         
         return job;
     }

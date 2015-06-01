@@ -632,8 +632,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
             jobId = response.extract().path("jobId").toString();           
             
-            // Wait for 5 seconds to make sure we are not deleting the 
-            // job while creating the job execution
+            // Wait for 5 seconds to make sure job execution is created
             Thread.sleep(5000);
             
             List<BackupJobExecutionDTO> jobExecutions = BackMeUpUtils.getBackupJobExecutions(accessToken, jobId);

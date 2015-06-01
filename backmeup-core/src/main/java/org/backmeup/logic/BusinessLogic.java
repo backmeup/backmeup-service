@@ -59,8 +59,7 @@ public interface BusinessLogic {
     void            deleteProfile(BackMeUpUser currentUser, Long profileId);
 
     // backupjob operations ---------------------------------------------------
-    BackupJob                createBackupJob(BackupJob backupJob);
-    BackupJob                createBackupJob(BackupJob backupJob, boolean startImmediately);
+    BackupJob                createBackupJob(BackMeUpUser activeUser, BackupJob backupJob);
     void                     startBackupJob(BackMeUpUser activeUser, BackupJob backupJob);
     BackupJob                getBackupJob(Long jobId);
     List<BackupJob>          getBackupJobs(Long userId);
