@@ -37,8 +37,8 @@ public class ProfileTest {
         pCopy.setPropertiesAndOptionsFromEncodedString(data);
         
         Assert.assertNotNull(pCopy.getProperties());
-        Assert.assertEquals(pCopy.getProperties().size(), 2);
-        Assert.assertEquals(p.getProperties().toString(), pCopy.getProperties().toString());
+        Assert.assertEquals(pCopy.getProperties().size(), 2);      
+        Assert.assertEquals(p.getProperties(), pCopy.getProperties());
         Assert.assertNull(pCopy.getOptions());
     }
     
@@ -59,7 +59,7 @@ public class ProfileTest {
         
         Assert.assertNotNull(pCopy.getOptions());
         Assert.assertEquals(pCopy.getOptions().size(), 2);
-        Assert.assertEquals(p.getOptions().toString(), pCopy.getOptions().toString());
+        Assert.assertEquals(p.getOptions(), pCopy.getOptions());
         Assert.assertNull(pCopy.getProperties());
     }
     
@@ -83,10 +83,10 @@ public class ProfileTest {
         pCopy.setPropertiesAndOptionsFromEncodedString(data);
         Assert.assertNotNull(pCopy.getProperties());
         Assert.assertEquals(pCopy.getProperties().size(), NUM);
-        Assert.assertEquals(p.getProperties().toString(), pCopy.getProperties().toString());
+        Assert.assertEquals(p.getProperties(), pCopy.getProperties());
         
         Assert.assertNotNull(pCopy.getOptions());
         Assert.assertEquals(pCopy.getOptions().size(), NUM);
-        Assert.assertEquals(p.getOptions().toString(), pCopy.getOptions().toString());
+        Assert.assertEquals(p.getOptions(), pCopy.getOptions());
     }
 }

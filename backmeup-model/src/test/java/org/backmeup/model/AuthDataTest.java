@@ -35,7 +35,7 @@ public class AuthDataTest {
         
         Assert.assertNotNull(adCopy.getProperties());
         Assert.assertEquals(adCopy.getProperties().size(), 2);
-        Assert.assertEquals(ad.getProperties().toString(), adCopy.getProperties().toString());
+        Assert.assertEquals(ad.getProperties(), adCopy.getProperties());
     }
     
     @Test
@@ -55,6 +55,6 @@ public class AuthDataTest {
         adCopy.setPropertiesFromEncodedString(data);
         Assert.assertNotNull(adCopy.getProperties());
         Assert.assertEquals(adCopy.getProperties().size(), NUM);
-        Assert.assertEquals(ad.getProperties().toString(), adCopy.getProperties().toString());
+        Assert.assertEquals(ad.getProperties(), adCopy.getProperties());
     }
 }
