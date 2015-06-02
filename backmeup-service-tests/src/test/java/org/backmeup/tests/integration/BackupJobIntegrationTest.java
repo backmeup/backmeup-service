@@ -412,7 +412,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .header("Accept", "application/json")
                 .header("Authorization", accessToken)
             .when()
-                .get("/backupjobs/" + jobId + "/executions/" + jobExecId  + "?expandUser=true&expandToken=true&expandProfiles=true")
+                .get("/backupjobs/" + jobId + "/executions/" + jobExecId  + "?expand=true")
             .then()
                 .log().all()
                 .statusCode(200)

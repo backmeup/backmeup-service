@@ -10,9 +10,14 @@ import javax.ws.rs.NotSupportedException;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.Token.Kind;
+import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
+import org.backmeup.model.Profile;
 import org.backmeup.model.constants.JobStatus;
 
 @ApplicationScoped
@@ -23,6 +28,9 @@ public class BackupLogicImpl implements BackupLogic {
 
     @Inject
     private DataAccessLayer dal;
+    
+    @Inject
+    private KeyserverClient keyserverClient;
 
     private final ResourceBundle textBundle = ResourceBundle.getBundle("BackupLogicImpl");
 
@@ -90,8 +98,17 @@ public class BackupLogicImpl implements BackupLogic {
     }
     
     @Override
-    public BackupJobExecution getBackupJobExecution(Long jobExecId) {
-        return getBackupJobExecutionDao().findById(jobExecId);
+    public BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileData) {
+        BackupJobExecution exec = getBackupJobExecutionDao().findById(jobExecId);
+        
+        if (loadProfileData) {
+            TokenDTO token = new TokenDTO(Kind.EXTERNAL, exec.getToken());
+            for (Profile profile : exec.getProfileSet()) {
+                loadProfileDataFromKeyserver(token, profile);
+            }
+        }
+        
+        return exec;
     }
     
     @Override
@@ -107,5 +124,26 @@ public class BackupLogicImpl implements BackupLogic {
         }
 
         return jobExeDao.merge(jobExec);
+    }
+    
+    private void loadProfileDataFromKeyserver(TokenDTO token, Profile profile) {
+        if(profile.getAuthData() != null) {
+            try {
+                String encodedAuthData = keyserverClient.getPluginData(token, profile.getId().toString());
+                profile.getAuthData().setPropertiesFromEncodedString(encodedAuthData);
+            } catch (KeyserverException e) {
+                // Nothing to do here.
+                // Indicates that no profile data is stored on keyserver. 
+            }
+            
+        }
+        
+        try {
+            String encodedSource = keyserverClient.getPluginData(token, profile.getId().toString());
+            profile.setPropertiesAndOptionsFromEncodedString(encodedSource);
+        } catch (KeyserverException e) {
+            // Nothing to do here.
+            // Indicates that no profile data is stored on keyserver. 
+        }
     }
 }

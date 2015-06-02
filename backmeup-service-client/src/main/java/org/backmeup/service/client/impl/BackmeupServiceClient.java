@@ -166,9 +166,7 @@ public final class BackmeupServiceClient implements BackmeupService {
         ensureAuthenticated();
         
         Map<String, String> params = new HashMap<>();
-        params.put("expandUser", "true");
-        params.put("expandToken", "true");
-        params.put("expandProfiles", "true");
+        params.put("expand", "true");
         
         Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, params, null, accessToken);
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {

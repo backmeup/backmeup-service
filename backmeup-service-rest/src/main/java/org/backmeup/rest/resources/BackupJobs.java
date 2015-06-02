@@ -215,10 +215,8 @@ public class BackupJobs extends Base {
     public BackupJobExecutionDTO getBackupJobExecution(
             @PathParam("jobId") String jobId, 
             @PathParam("jobExecutionId") String jobExecutionId,
-            @QueryParam("expandUser") @DefaultValue("false") boolean expandUser,
-            @QueryParam("expandToken") @DefaultValue("false") boolean expandToken,
-            @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
-        return getBackupJobExecution(jobExecutionId, expandUser, expandToken, expandProfiles);
+            @QueryParam("expand") @DefaultValue("false") boolean expand) {
+        return getBackupJobExecution(jobExecutionId, expand);
     }
     
     @RolesAllowed({"user", "worker"})
@@ -227,9 +225,7 @@ public class BackupJobs extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(
             @PathParam("jobExecutionId") String jobExecutionId,
-            @QueryParam("expandUser") @DefaultValue("false") boolean expandUser,
-            @QueryParam("expandToken") @DefaultValue("false") boolean expandToken,
-            @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+            @QueryParam("expand") @DefaultValue("false") boolean expand) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId));
@@ -237,21 +233,14 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);
-
-        if (!expandUser) {
-            execDTO.setUser(null);
-        }
-
-        if (!expandToken) {
-            execDTO.setToken(null);
-        }
+        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);   
         
-        if (!expandProfiles) {
+        if(!expand) {
+            execDTO.setUser(null);
             execDTO.setSource(null);
             execDTO.setActions(null);
             execDTO.setSink(null);
-        }
+        }       
         
         return execDTO;
     }
