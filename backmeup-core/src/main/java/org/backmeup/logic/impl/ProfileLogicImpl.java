@@ -155,16 +155,11 @@ public class ProfileLogicImpl implements ProfileLogic {
         deleteAuthDataOnKeyserver(currentUser, authData);
     }
     
-    private void storeAuthDataOnKeyserver(AuthData authData) {
-        if(authData.getProperties() == null) {
-            return;
-        }
-                
+    private void storeAuthDataOnKeyserver(AuthData authData) {                
         try {
             String data = authData.getPropertiesAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL,authData.getUser().getPassword());
             keyserverClient.createPluginData(token, authData.getId().toString(), data);
-//            keyserverClient.updatePluginData(token, authData.getId().toString(), data);
         } catch (KeyserverException e) {
            throw new BackMeUpException("Canot store auth data on keyserver", e);
         }
@@ -178,11 +173,7 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
     }
     
-    private void storeProfileOnKeyserver(Profile profile) {
-        if(profile.getProperties() == null && profile.getOptions() == null) {
-            return;
-        }
-                
+    private void storeProfileOnKeyserver(Profile profile) {                
         try {
             String data = profile.getPropertiesAndOptionsAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL,profile.getUser().getPassword());
