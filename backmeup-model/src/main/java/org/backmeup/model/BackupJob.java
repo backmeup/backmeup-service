@@ -173,6 +173,14 @@ public class BackupJob {
 		}
 		this.actionProfiles = actionProfiles;
 	}
+	
+	public Set<Profile> getProfileSet() {
+	    Set<Profile> profileSet = new HashSet<>();
+	    profileSet.add(sourceProfile);
+	    profileSet.add(sinkProfile);
+	    profileSet.addAll(actionProfiles);
+	    return profileSet;
+	}
 
 	public Date getStartTime() {
         if (this.startTime == null) {

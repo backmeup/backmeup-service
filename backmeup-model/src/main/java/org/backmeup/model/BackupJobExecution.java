@@ -2,7 +2,9 @@ package org.backmeup.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -231,6 +233,14 @@ public class BackupJobExecution {
                             + sinkProfile.getType());
         }
         this.sinkProfile = sinkProfile;
+    }
+    
+    public Set<Profile> getProfileSet() {
+        Set<Profile> profileSet = new HashSet<>();
+        profileSet.add(sourceProfile);
+        profileSet.add(sinkProfile);
+        profileSet.addAll(actionProfiles);
+        return profileSet;
     }
 
     public String getToken() {
