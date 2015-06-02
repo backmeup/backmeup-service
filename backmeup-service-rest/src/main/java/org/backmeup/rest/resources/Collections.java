@@ -1,6 +1,8 @@
 package org.backmeup.rest.resources;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,15 +63,23 @@ public class Collections extends SecureBase {
     @DELETE
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public String removeTaggedCollections(//
+    public Map<String, String> removeTaggedCollections(//
             @QueryParam("collectionId") Long collectionID) {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
 
         if (collectionID != null && collectionID != -1) {
-            return getLogic().removeTaggedCollection(activeUser.getUserId(), collectionID);
+            String response = getLogic().removeTaggedCollection(activeUser.getUserId(), collectionID);
+            //return Map instead of String so that JSON response can be created
+            Map<String, String> ret = new HashMap<String, String>();
+            ret.put("status", response);
+            return ret;
         } else {
-            return getLogic().removeAllCollectionsForUser(activeUser.getUserId());
+            String response = getLogic().removeAllCollectionsForUser(activeUser.getUserId());
+            //return Map instead of String so that JSON response can be created
+            Map<String, String> ret = new HashMap<String, String>();
+            ret.put("status", response);
+            return ret;
         }
     }
 
@@ -101,17 +111,16 @@ public class Collections extends SecureBase {
     @POST
     @Path("/{collId}/adddocuments/json")
     @Produces(MediaType.APPLICATION_JSON)
-    public String addDocumentsToTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
+    public Map<String, String> addDocumentsToTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
 
         return this.addDocumentsToTaggedCollection(collDocs.getCollectionId(), collDocs.getDocumentIds());
-
     }
 
     @RolesAllowed("user")
     @POST
     @Path("/{collId}/adddocuments")
     @Produces(MediaType.APPLICATION_JSON)
-    public String addDocumentsToTaggedCollection(//
+    public Map<String, String> addDocumentsToTaggedCollection(//
             @PathParam("collId") Long collectionID,//
             @QueryParam("documentIds") List<UUID> documentIDs) {
 
@@ -119,24 +128,27 @@ public class Collections extends SecureBase {
         mandatory("documentIds", documentIDs);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        return getLogic().addDocumentsToTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
+        String response = getLogic().addDocumentsToTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
+        //return Map instead of String so that JSON response can be created
+        Map<String, String> ret = new HashMap<String, String>();
+        ret.put("status", response);
+        return ret;
     }
 
     @RolesAllowed("user")
     @DELETE
     @Path("/{collId}/removedocuments/json")
     @Produces(MediaType.APPLICATION_JSON)
-    public String removeDocumentsFromTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
+    public Map<String, String> removeDocumentsFromTaggedCollection(TaggedCollectionDocumentsDTO collDocs) {
 
         return this.removeDocumentsFromTaggedCollection(collDocs.getCollectionId(), collDocs.getDocumentIds());
-
     }
 
     @RolesAllowed("user")
     @DELETE
     @Path("/{collId}/removedocuments")
     @Produces(MediaType.APPLICATION_JSON)
-    public String removeDocumentsFromTaggedCollection(//
+    public Map<String, String> removeDocumentsFromTaggedCollection(//
             @PathParam("collId") Long collectionID,//
             @QueryParam("documentIds") List<UUID> documentIDs) {
 
@@ -144,7 +156,12 @@ public class Collections extends SecureBase {
         mandatory("documentIds", documentIDs);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        return getLogic().removeDocumentsFromTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
+        String response = getLogic().removeDocumentsFromTaggedCollection(activeUser.getUserId(), collectionID,
+                documentIDs);
+        //return Map instead of String so that JSON response can be created
+        Map<String, String> ret = new HashMap<String, String>();
+        ret.put("status", response);
+        return ret;
     }
 
     private void mandatory(String name, Long l) {

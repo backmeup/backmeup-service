@@ -2,7 +2,9 @@ package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -117,14 +119,17 @@ public class Sharing extends SecureBase {
     @DELETE
     @Path("/remove")
     @Produces(MediaType.APPLICATION_JSON)
-    public String removeOwned(//
+    public Map<String, String> removeOwned(//
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             String response = getLogic().removeOwnedSharingPolicy(activeUser.getUserId(), policyID);
-            return response;
+            //return Map instead of String so that JSON response can be created
+            Map<String, String> ret = new HashMap<String, String>();
+            ret.put("status", response);
+            return ret;
         } catch (IllegalArgumentException e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("non existing policy"). //
@@ -136,11 +141,14 @@ public class Sharing extends SecureBase {
     @DELETE
     @Path("/remove/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public String removeAllOwned() {
+    public Map<String, String> removeAllOwned() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
-        return response;
+        //return Map instead of String so that JSON response can be created
+        Map<String, String> ret = new HashMap<String, String>();
+        ret.put("status", response);
+        return ret;
     }
 
     // --------- approve or decline incoming sharings ----------//
@@ -150,7 +158,7 @@ public class Sharing extends SecureBase {
     @Path("/incoming/approval/json")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String approvalOfIncomingSharing(SharingPolicyHandshakeDTO handshake) {
+    public Map<String, String> approvalOfIncomingSharing(SharingPolicyHandshakeDTO handshake) {
         //the UI framework is set to use POST operations with JSON requests and not Query Parameters
         if (handshake.getApprove()) {
             return this.acceptIncomingSharing(handshake.getPolicyID());
@@ -163,14 +171,17 @@ public class Sharing extends SecureBase {
     @POST
     @Path("/incoming/decline")
     @Produces(MediaType.APPLICATION_JSON)
-    public String declineIncomingSharing(//
+    public Map<String, String> declineIncomingSharing(//
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
-            return response;
+            //return Map instead of String so that JSON response can be created
+            Map<String, String> ret = new HashMap<String, String>();
+            ret.put("status", response);
+            return ret;
         } catch (UnknownUserException e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("declining incoming sharing failed"). //
@@ -182,7 +193,7 @@ public class Sharing extends SecureBase {
     @POST
     @Path("/incoming/accept")
     @Produces(MediaType.APPLICATION_JSON)
-    public String acceptIncomingSharing(//
+    public Map<String, String> acceptIncomingSharing(//
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
@@ -190,7 +201,10 @@ public class Sharing extends SecureBase {
 
         try {
             String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);
-            return response;
+            //return Map instead of String so that JSON response can be created
+            Map<String, String> ret = new HashMap<String, String>();
+            ret.put("status", response);
+            return ret;
         } catch (UnknownUserException e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("approving incoming sharing failed"). //
