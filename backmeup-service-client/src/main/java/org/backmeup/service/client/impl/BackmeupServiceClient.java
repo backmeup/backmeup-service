@@ -14,6 +14,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -24,8 +25,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
-import org.backmeup.model.dto.WorkerInfoDTO;
 import org.backmeup.model.dto.WorkerConfigDTO;
+import org.backmeup.model.dto.WorkerInfoDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.service.client.BackmeupService;
 import org.backmeup.service.client.model.auth.AuthInfo;
@@ -62,16 +63,16 @@ public final class BackmeupServiceClient implements BackmeupService {
         this.host = host;
         this.basePath = basePath;
     }
-    
+
     public BackmeupServiceClient(String path) {
         try {
             URIBuilder uriBuilder = new URIBuilder(path);
             URI uri = uriBuilder.build();
-            
+
             this.scheme = uri.getScheme();
-            if(uri.getPort() == -1) {
-                this.host = uri.getHost(); 
-            }else {
+            if (uri.getPort() == -1) {
+                this.host = uri.getHost();
+            } else {
                 this.host = uri.getHost() + ":" + uri.getPort();
             }
             this.basePath = uri.getPath();
@@ -83,11 +84,11 @@ public final class BackmeupServiceClient implements BackmeupService {
     // Properties -------------------------------------------------------------
 
     public String getAccessToken() {
-        return accessToken;
+        return this.accessToken;
     }
 
     public Boolean isAuthenticated() {
-        return !accessToken.isEmpty();
+        return !this.accessToken.isEmpty();
     }
 
     // Public methods ---------------------------------------------------------
@@ -106,9 +107,9 @@ public final class BackmeupServiceClient implements BackmeupService {
         try {
             ObjectMapper mapper = createJsonMapper();
             AuthInfo authInfo = mapper.readValue(r.content, AuthInfo.class);
-            accessToken = authInfo.getAccessToken();
+            this.accessToken = authInfo.getAccessToken();
             return authInfo;
-        }  catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.error("", e);
             throw new BackMeUpException("Bad JSON in auth info: " + e);
         }
@@ -124,7 +125,7 @@ public final class BackmeupServiceClient implements BackmeupService {
         params.put("expandProfiles", "true");
         params.put("expandProtocol", "true");
 
-        Result r = execute("/backupjobs/" + jobId, ReqType.GET, params, null, accessToken);
+        Result r = execute("/backupjobs/" + jobId, ReqType.GET, params, null, this.accessToken);
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             throw new BackMeUpException("Failed to retrieve BackupJob: " + r.content);
         }
@@ -133,21 +134,21 @@ public final class BackmeupServiceClient implements BackmeupService {
         try {
             ObjectMapper mapper = createJsonMapper();
             return mapper.readValue(r.content, BackupJobDTO.class);
-        }  catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.error("", e);
             throw new BackMeUpException("Failed to retrieve BackupJob: " + e);
         }
     }
 
     @Override
-    public BackupJobDTO updateBackupJob(BackupJobDTO backupJob) {	
+    public BackupJobDTO updateBackupJob(BackupJobDTO backupJob) {
         ensureAuthenticated();
 
         try {
             ObjectMapper mapper = createJsonMapper();
             String json = mapper.writeValueAsString(backupJob);
 
-            Result r = execute("/backupjobs/" + backupJob.getJobId(), ReqType.PUT, null, json, accessToken);
+            Result r = execute("/backupjobs/" + backupJob.getJobId(), ReqType.PUT, null, json, this.accessToken);
             if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new BackMeUpException("Failed to update BackupJob: " + r.content);
             }
@@ -160,15 +161,15 @@ public final class BackmeupServiceClient implements BackmeupService {
             throw new BackMeUpException("Failed to update BackupJob: " + e);
         }
     }
-    
+
     @Override
     public BackupJobExecutionDTO getBackupJobExecution(Long jobExecId) {
         ensureAuthenticated();
-        
+
         Map<String, String> params = new HashMap<>();
         params.put("expand", "true");
-        
-        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, params, null, accessToken);
+
+        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, params, null, this.accessToken);
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + r.content);
         }
@@ -177,21 +178,22 @@ public final class BackmeupServiceClient implements BackmeupService {
         try {
             ObjectMapper mapper = createJsonMapper();
             return mapper.readValue(r.content, BackupJobExecutionDTO.class);
-        }  catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.error("", e);
             throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + e);
         }
     }
 
     @Override
-    public BackupJobExecutionDTO updateBackupJobExecution(BackupJobExecutionDTO jobExecution) {   
+    public BackupJobExecutionDTO updateBackupJobExecution(BackupJobExecutionDTO jobExecution) {
         ensureAuthenticated();
 
         try {
             ObjectMapper mapper = createJsonMapper();
             String json = mapper.writeValueAsString(jobExecution);
 
-            Result r = execute("/backupjobs/" + jobExecution.getJobId() + "/executions/" + jobExecution.getId(), ReqType.PUT, null, json, accessToken);
+            Result r = execute("/backupjobs/" + jobExecution.getJobId() + "/executions/" + jobExecution.getId(),
+                    ReqType.PUT, null, json, this.accessToken);
             if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new BackMeUpException("Failed to update BackupJob: " + r.content);
             }
@@ -204,14 +206,14 @@ public final class BackmeupServiceClient implements BackmeupService {
             throw new BackMeUpException("Failed to update BackupJobExecution: " + e);
         }
     }
-    
+
     @Override
     public WorkerConfigDTO initializeWorker(WorkerInfoDTO workerInfo) {
         try {
             ObjectMapper mapper = createJsonMapper();
             String json = mapper.writeValueAsString(workerInfo);
 
-            Result r = execute("/workers/hello", ReqType.PUT, null, json, accessToken);
+            Result r = execute("/workers/hello", ReqType.PUT, null, json, this.accessToken);
             if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new BackMeUpException("Failed to update WorkerInfo: " + r.content);
             }
@@ -222,29 +224,31 @@ public final class BackmeupServiceClient implements BackmeupService {
             LOGGER.error("", e);
             throw new BackMeUpException("Failed to update WorkerInfo: " + e);
         }
-        
+
     }
 
     // Private methods --------------------------------------------------------
 
     private void ensureAuthenticated() {
-        if (accessToken.isEmpty()) {
-            throw new IllegalStateException(
-                    "Client is not authenticated, set access token or call authenticate");
+        if (this.accessToken.isEmpty()) {
+            throw new IllegalStateException("Client is not authenticated, set access token or call authenticate");
         }
     }
 
     private HttpClient createClient() {
-        return HttpClientBuilder.create().build();
+        // set the connection timeout value to 10 seconds (10000 milliseconds)
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).setSocketTimeout(10 * 1000)
+                .build();
+        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
     }
 
     private URI createRequestURI(String path, Map<String, String> queryParams) {
         int rPort = DEFAULT_PORT;
 
-        String rPath = basePath + path;
-        String rHost = host;
-        if (host.contains(":")) {
-            String[] sp = host.split(":");
+        String rPath = this.basePath + path;
+        String rHost = this.host;
+        if (this.host.contains(":")) {
+            String[] sp = this.host.split(":");
             rHost = sp[0];
             try {
                 rPort = Integer.parseInt(sp[1]);
@@ -254,10 +258,10 @@ public final class BackmeupServiceClient implements BackmeupService {
         }
 
         URIBuilder uriBuilder = new URIBuilder();
-        uriBuilder.setScheme(scheme).setHost(rHost).setPort(rPort).setPath(rPath);
+        uriBuilder.setScheme(this.scheme).setHost(rHost).setPort(rPort).setPath(rPath);
 
-        if(queryParams != null && !queryParams.isEmpty()) {
-            for(Entry<String, String> param : queryParams.entrySet()) {
+        if (queryParams != null && !queryParams.isEmpty()) {
+            for (Entry<String, String> param : queryParams.entrySet()) {
                 uriBuilder.addParameter(param.getKey(), param.getValue());
             }
         }
@@ -270,7 +274,8 @@ public final class BackmeupServiceClient implements BackmeupService {
         }
     }
 
-    private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams, String authToken) {
+    private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams,
+            String authToken) {
         HttpClient client = createClient();
 
         try {
@@ -281,7 +286,7 @@ public final class BackmeupServiceClient implements BackmeupService {
             case PUT:
                 HttpPut put = new HttpPut(registerUri);
                 if (jsonParams != null && !jsonParams.isEmpty()) {
-                    StringEntity entity = new StringEntity(jsonParams, StandardCharsets.UTF_8);					
+                    StringEntity entity = new StringEntity(jsonParams, StandardCharsets.UTF_8);
                     put.setEntity(entity);
 
                     put.setHeader("Accept", "application/json");
@@ -298,7 +303,7 @@ public final class BackmeupServiceClient implements BackmeupService {
             default:
                 HttpPost post = new HttpPost(registerUri);
                 if (jsonParams != null && !jsonParams.isEmpty()) {
-                    StringEntity entity = new StringEntity(jsonParams, "UTF-8");					
+                    StringEntity entity = new StringEntity(jsonParams, "UTF-8");
                     post.setEntity(entity);
 
                     post.setHeader("Accept", "application/json");
@@ -308,7 +313,7 @@ public final class BackmeupServiceClient implements BackmeupService {
                 break;
             }
 
-            if(authToken != null && !authToken.isEmpty()) {
+            if (authToken != null && !authToken.isEmpty()) {
                 request.setHeader("Authorization", authToken);
             }
 
