@@ -200,10 +200,8 @@ public abstract class AbstractJobManager implements JobManager {
     
     private List<String> getKeyserverIdsForJob(BackupJob job) {
         List<String> ids = new ArrayList<String>();
-        collectIdsForKeyserver(job.getSourceProfile(), ids);
-        collectIdsForKeyserver(job.getSinkProfile(), ids);
-        for(Profile actionProfile : job.getActionProfiles()) {
-            collectIdsForKeyserver(actionProfile, ids);
+        for(Profile profile : job.getProfileSet()) {
+            collectIdsForKeyserver(profile, ids);
         }
         return ids;
     }
@@ -212,9 +210,7 @@ public abstract class AbstractJobManager implements JobManager {
         if (profile.getAuthData() != null) {
             ids.add(profile.getAuthData().getId().toString());
         }
-        if(profile.getProperties() != null || profile.getOptions() != null) {
-            ids.add(profile.getId().toString());
-        }
+        ids.add(profile.getId().toString());
     }
 
     private class RunAndReschedule implements Runnable {
@@ -250,7 +246,22 @@ public abstract class AbstractJobManager implements JobManager {
 
                     // Run the job by creating a JobExecution
                     if (job.isActive()) {
+                        TokenDTO token = new TokenDTO(Kind.ONETIME,job.getToken());
+                        AuthResponseDTO response;
+                        if(job.getJobFrequency() != JobFrequency.ONCE) {
+                            Calendar nextExecutionTime = Calendar.getInstance();
+                            nextExecutionTime.setTimeInMillis(new Date().getTime() + job.getDelay());
+
+                            // Obtain new access token from the keyserver.                               
+                            response =  keyserverClient.authenticateWithOnetime(token, nextExecutionTime);
+                            job.setToken(response.getNext().getToken().getB64Token());
+                            job.setNextExecutionTime(nextExecutionTime.getTime());
+                        } else {
+                            response =  keyserverClient.authenticateWithOnetime(token);
+                        }
+                        
                         BackupJobExecution jobExecution = new BackupJobExecution(job);
+                        jobExecution.setToken(response.getToken().getB64Token());
                         jobExecution = dal.createBackupJobExecutionDao().save(jobExecution);
                         job.getJobExecutions().add(jobExecution);
                         
@@ -259,15 +270,6 @@ public abstract class AbstractJobManager implements JobManager {
 
                     if(job.getJobFrequency() != JobFrequency.ONCE) {
                         LOGGER.debug(String.format("Rescheduling job: execute in %d ms", job.getDelay()));
-                        
-                        Calendar nextExecutionTime = Calendar.getInstance();
-                        nextExecutionTime.setTimeInMillis(new Date().getTime() + job.getDelay());
-                        job.setNextExecutionTime(nextExecutionTime.getTime());
-                        
-                        // Obtain new access token from the keyserver.                               
-                        TokenDTO token = new TokenDTO(Kind.ONETIME,job.getToken());
-                        AuthResponseDTO response =  keyserverClient.authenticateWithOnetime(token, nextExecutionTime);
-                        job.setToken(response.getToken().getB64Token());
                         
                         SYSTEM.scheduler().scheduleOnce(
                                 Duration.create(job.getDelay(),TimeUnit.MILLISECONDS),
