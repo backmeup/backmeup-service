@@ -543,7 +543,6 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
         }
     }
 
-    @Ignore
     @Test
     public void testCreateBackupJobFilegeneratorToBackmeupStorage() throws InterruptedException {
         UserDTO user = TestDataManager.getUser();

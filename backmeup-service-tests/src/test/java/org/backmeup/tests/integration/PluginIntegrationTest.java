@@ -52,7 +52,6 @@ public class PluginIntegrationTest extends IntegrationTestBase {
         }
     }
 
-    @Ignore
     @Test
     public void testGetPluginBackmeupStorage() {	
         UserDTO user = TestDataManager.getUser();
