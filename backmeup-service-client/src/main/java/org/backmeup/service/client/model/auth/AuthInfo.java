@@ -3,32 +3,41 @@ package org.backmeup.service.client.model.auth;
 import java.util.Date;
 
 public class AuthInfo {
-	private String accessToken;
-	private Date issueDate;
+    private String accessToken;
+    private Date expiresAt;
+    
+    public AuthInfo() {
+        
+    }
+    
+    public AuthInfo(String accessToken, Date expiresAt) {
+        super();
+        this.accessToken = accessToken;
+        this.expiresAt = (Date) expiresAt.clone();
+    }
 
-	public AuthInfo() {
+    public AuthInfo(String accessToken, long expiresAt) {
+        super();
+        this.accessToken = accessToken;
+        this.expiresAt = new Date(expiresAt);
+    }
 
-	}
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-	public AuthInfo(String accessToken, Date issueDate) {
-		super();
-		this.accessToken = accessToken;
-		this.issueDate = issueDate;
-	}
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 
-	public String getAccessToken() {
-		return accessToken;
-	}
+    public Date getExpiresAt() {
+        if (this.expiresAt == null) {
+            return null;
+        }
+        return (Date) expiresAt.clone();
+    }
 
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public Date getIssueDate() {
-		return issueDate;
-	}
-
-	public void setIssueDate(Date issueDate) {
-		this.issueDate = issueDate;
-	}
+    public void setExpiresAt(Date expiresAt) {
+        this.expiresAt = (Date) expiresAt.clone();
+    }
 }
