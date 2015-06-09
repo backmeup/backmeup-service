@@ -100,6 +100,9 @@ public class BackupLogicImpl implements BackupLogic {
     @Override
     public BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileData) {
         BackupJobExecution exec = getBackupJobExecutionDao().findById(jobExecId);
+        if (exec == null) {
+            throw new IllegalArgumentException(String.format("No job execution with id: %d", jobExecId));
+        }
         
         if (loadProfileData) {
             TokenDTO token = new TokenDTO(Kind.EXTERNAL, exec.getToken());
