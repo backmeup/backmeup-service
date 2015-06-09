@@ -293,7 +293,7 @@ public class BackupJob {
 
     public void setJobExecutions(Set<BackupJobExecution> jobExecutions) {
         for (BackupJobExecution jobExecution : jobExecutions) {
-            if (jobExecution.getBackupJob().getId() != this.getId()) {
+            if (!jobExecution.getBackupJob().getId().equals(this.getId())) {
                 throw new IllegalArgumentException(String.format(
                         "JobExecution with id '%s' is attached to another job",
                         jobExecution.getBackupJob().getId()));
