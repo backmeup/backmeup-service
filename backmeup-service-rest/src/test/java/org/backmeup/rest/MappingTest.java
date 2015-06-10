@@ -51,10 +51,8 @@ public class MappingTest {
         BackMeUpUser srcUser = new BackMeUpUser(userId, username, firstname, lastname, email, password);
         srcUser.setActivated(activated);
         srcUser.setVerificationKey(verificationKey);
-
-        Mapper mapper = getMapper();
-
-        UserDTO destUser = mapper.map(srcUser, UserDTO.class);
+        
+        UserDTO destUser = getMapper().map(srcUser, UserDTO.class);
 
         assertEquals(srcUser.getUserId(), destUser.getUserId());
         assertEquals(srcUser.getUsername(), destUser.getUsername());
@@ -69,9 +67,7 @@ public class MappingTest {
         String pluginId = "org.backmeup.dropbox";
         PluginDescribable  pluginModel = createFakeModelFor(pluginId);
 
-        Mapper mapper = getMapper();
-
-        PluginDTO pluginDTO = mapper.map(pluginModel, PluginDTO.class);
+        PluginDTO pluginDTO = getMapper().map(pluginModel, PluginDTO.class);
 
         assertEquals(pluginModel.getId(), pluginDTO.getPluginId());
         assertEquals(pluginModel.getTitle(), pluginDTO.getTitle());
@@ -123,11 +119,8 @@ public class MappingTest {
         profile.addProperty(propKey, propValue);
         profile.addOption(option);
 
-
-        Mapper mapper = getMapper();
-
-        PluginProfileDTO profileDTO = mapper.map(profile, PluginProfileDTO.class);
-        // auth data properties are excluded (jpa lazy init problem with mapping)
+        PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
+        // Auth data properties are excluded (jpa lazy init problem with mapping)
         profileDTO.getAuthData().setProperties(new HashMap<String, String>());
         profileDTO.getAuthData().getProperties().putAll(profile.getAuthData().getProperties());
 
@@ -170,7 +163,6 @@ public class MappingTest {
         RequiredInputField.Type inputType = RequiredInputField.Type.String;
         String inputDefaultValue = "";
 
-
         String redirectUrl = "http://redirecturl";
 
         BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
@@ -183,9 +175,7 @@ public class MappingTest {
 
         AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
 
-        Mapper mapper = getMapper();
-
-        PluginConfigurationDTO pluginConfigDTO = mapper.map(authRequest, PluginConfigurationDTO.class);	
+        PluginConfigurationDTO pluginConfigDTO = getMapper().map(authRequest, PluginConfigurationDTO.class);	
 
         assertEquals(authRequest.getRedirectURL(), pluginConfigDTO.getRedirectURL());
 
@@ -240,10 +230,8 @@ public class MappingTest {
         pluginConfigInfo.setPropertiesDescription(propInputFields);
         pluginConfigInfo.setAvailableOptions(availOption);
 
-        Mapper mapper = getMapper();
-
-        PluginDTO pluginDTO = mapper.map(pluginConfigInfo, PluginDTO.class);
-        PluginConfigurationDTO pluginConfigDTO = mapper.map(pluginConfigInfo, PluginConfigurationDTO.class);
+        PluginDTO pluginDTO = getMapper().map(pluginConfigInfo, PluginDTO.class);
+        PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
         pluginDTO.setAuthDataDescription(pluginConfigDTO);
 
         assertEquals(pluginConfigInfo.getRedirectURL(), pluginDTO.getAuthDataDescription().getRedirectURL());
@@ -281,9 +269,7 @@ public class MappingTest {
         Date next = new Date();
         job.setNextExecutionTime(next);
 
-        Mapper mapper = getMapper();
-
-        BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
+        BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
 
         assertEquals(job.getId(), jobDTO.getJobId());
         assertEquals(job.getJobName(), jobDTO.getJobTitle());
@@ -309,9 +295,7 @@ public class MappingTest {
         job.setSourceProfile(sourceProfile);
         job.setSinkProfile(sinkProfile);
 
-        Mapper mapper = getMapper();
-
-        BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
+        BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
 
         assertEquals(job.getId(), jobDTO.getJobId());
         assertEquals(job.getJobName(), jobDTO.getJobTitle());
@@ -338,8 +322,7 @@ public class MappingTest {
         jobExec.setStartTime(new Date());
         jobExec.setEndTime(new Date());
         
-        Mapper mapper = getMapper();
-        BackupJobExecutionDTO jobExecDTO = mapper.map(jobExec, BackupJobExecutionDTO.class);
+        BackupJobExecutionDTO jobExecDTO = getMapper().map(jobExec, BackupJobExecutionDTO.class);
 
         assertEquals(jobExec.getId(), jobExecDTO.getId());
         assertEquals(jobExec.getName(), jobExecDTO.getName());
@@ -359,8 +342,7 @@ public class MappingTest {
         jobExec.setId(1L);
         jobExec.setName("Execution1");
         
-        Mapper mapper = getMapper();
-        BackupJobExecutionDTO jobExecDTO = mapper.map(jobExec, BackupJobExecutionDTO.class);
+        BackupJobExecutionDTO jobExecDTO = getMapper().map(jobExec, BackupJobExecutionDTO.class);
 
         assertEquals(jobExec.getId(), jobExecDTO.getId());
         assertEquals(jobExec.getName(), jobExecDTO.getName());
