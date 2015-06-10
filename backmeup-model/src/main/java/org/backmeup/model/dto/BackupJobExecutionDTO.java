@@ -81,35 +81,47 @@ public class BackupJobExecutionDTO {
     }
 
     public Date getCreated() {
-        return created;
+        if (this.created == null) {
+            return null;
+        }
+        return (Date) created.clone();
     }
 
     public void setCreated(Date created) {
-        this.created = created;
+        this.created = (Date) created.clone();
     }
 
     public Date getModified() {
-        return modified;
+        if (this.modified == null) {
+            return null;
+        }
+        return (Date) modified.clone();
     }
 
     public void setModified(Date modified) {
-        this.modified = modified;
+        this.modified = (Date) modified.clone();
     }
 
     public Date getStart() {
-        return start;
+        if (this.start == null) {
+            return null;
+        }
+        return (Date) start.clone();
     }
 
     public void setStart(Date start) {
-        this.start = start;
+        this.start = (Date) start.clone();
     }
 
     public Date getEnd() {
-        return end;
+        if (this.end == null) {
+            return null;
+        }
+        return (Date) end.clone();
     }
 
     public void setEnd(Date end) {
-        this.end = end;
+        this.end = (Date) end.clone();
     }
 
     public PluginProfileDTO getSource() {

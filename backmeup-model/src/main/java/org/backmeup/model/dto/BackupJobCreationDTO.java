@@ -38,12 +38,15 @@ public class BackupJobCreationDTO {
 		this.schedule = schedule;
 	}
 
-	public Date getStart() {
-		return start;
-	}
+    public Date getStart() {
+        if (this.start == null) {
+            return null;
+        }
+        return (Date) start.clone();
+    }
 
 	public void setStart(Date start) {
-		this.start = start;
+		this.start = (Date) start.clone();
 	}
 
 	public Long getSource() {

@@ -78,35 +78,47 @@ public class BackupJobDTO {
 	}
 
 	public Date getCreated() {
-		return created;
+        if (this.created == null) {
+            return null;
+        }
+        return (Date) created.clone();
 	}
 
 	public void setCreated(Date created) {
-		this.created = created;
+		this.created = (Date) created.clone();
 	}
 
 	public Date getModified() {
-		return modified;
+        if (this.modified == null) {
+            return null;
+        }
+        return (Date) modified.clone();
 	}
 
 	public void setModified(Date modified) {
-		this.modified = modified;
+		this.modified = (Date) modified.clone();
 	}
 
 	public Date getStart() {
-		return start;
+        if (this.start == null) {
+            return null;
+        }
+        return (Date) start.clone();
 	}
 
 	public void setStart(Date start) {
-		this.start = start;
+		this.start = (Date) start.clone();
 	}
 
 	public Date getNext() {
-		return next;
+        if (this.next == null) {
+            return null;
+        }
+        return (Date) next.clone();
 	}
 
 	public void setNext(Date next) {
-		this.next = next;
+		this.next = (Date) next.clone();
 	}
 
 	public PluginProfileDTO getSource() {
