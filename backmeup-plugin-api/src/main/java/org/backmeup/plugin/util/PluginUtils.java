@@ -18,7 +18,7 @@ public class PluginUtils {
 
         public String getParameter(String key) {
             List<String> values = this.query_pairs.get(key);
-            if (values == null || values.size() < 1) {
+            if (values == null || values.isEmpty()) {
                 return null;
             }
             return values.get(0);
@@ -26,7 +26,7 @@ public class PluginUtils {
 
         public List<String> getMultivalueParameter(String key) {
             List<String> values = this.query_pairs.get(key);
-            if (values == null || values.size() < 1) {
+            if (values == null || values.isEmpty()) {
                 return null;
             }
             return values;

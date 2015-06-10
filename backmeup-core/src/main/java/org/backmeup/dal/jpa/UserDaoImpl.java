@@ -27,7 +27,7 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
 		Query q = em.createQuery("SELECT u FROM BackMeUpUser u WHERE username = :username");
 		q.setParameter("username", username);		
 		List<BackMeUpUser> users = q.getResultList();
-		BackMeUpUser u = users.size() > 0 ? users.get(0) : null;		
+		BackMeUpUser u = !users.isEmpty() ? users.get(0) : null;		
 		return u;
 	}
 
@@ -37,7 +37,7 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
     Query q = em.createQuery("SELECT u FROM BackMeUpUser u WHERE verificationKey = :verificationKey");
     q.setParameter("verificationKey", verificationKey);    
     List<BackMeUpUser> users = q.getResultList();
-    BackMeUpUser u = users.size() > 0 ? users.get(0) : null;    
+    BackMeUpUser u = !users.isEmpty() ? users.get(0) : null;    
     return u;
   }
 
@@ -47,7 +47,7 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
     Query q = em.createQuery("SELECT u FROM BackMeUpUser u WHERE email = :email");
     q.setParameter("email", email);
     List<BackMeUpUser> users = q.getResultList();
-    BackMeUpUser u = users.size() > 0 ? users.get(0) : null;    
+    BackMeUpUser u = !users.isEmpty() ? users.get(0) : null;    
     return u;
   }
 }
