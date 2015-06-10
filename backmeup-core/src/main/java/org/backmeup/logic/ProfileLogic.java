@@ -19,7 +19,7 @@ public interface ProfileLogic {
         
     Profile getProfile(BackMeUpUser currentUser, Long profileId);
     
-	Profile updateProfile(Profile profile);
+	Profile updateProfile(BackMeUpUser currentUser, Profile profile);
     
     void deleteProfilesOf(BackMeUpUser currentUser, Long userId);
     

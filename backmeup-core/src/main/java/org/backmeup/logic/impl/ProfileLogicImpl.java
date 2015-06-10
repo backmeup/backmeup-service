@@ -48,14 +48,14 @@ public class ProfileLogicImpl implements ProfileLogic {
         profile.setUser(p.getUser());
         profile.setProperties(p.getProperties());
         profile.setOptions(p.getOptions());
-        storeProfileOnKeyserver(profile);
+        storeProfileOnKeyserver(p.getUser(), profile);
         return profile;
     }
 
     @Override
-    public Profile updateProfile(Profile p) {
+    public Profile updateProfile(BackMeUpUser currentUser, Profile p) {
         Profile profile =  getProfileDao().merge(p);
-        storeProfileOnKeyserver(profile);
+        updateProfileOnKeyserver(currentUser, profile);
         return profile;
     }
     
@@ -173,13 +173,23 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
     }
     
-    private void storeProfileOnKeyserver(Profile profile) {                
+    private void storeProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {                
         try {
             String data = profile.getPropertiesAndOptionsAsEncodedString();
-            TokenDTO token = new TokenDTO(Kind.INTERNAL,profile.getUser().getPassword());
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
             keyserverClient.createPluginData(token, profile.getId().toString(), data);
         } catch (KeyserverException e) {
            throw new BackMeUpException("Canot store profile on keyserver", e);
+        }
+    }
+    
+    private void updateProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {                
+        try {
+            String data = profile.getPropertiesAndOptionsAsEncodedString();
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            keyserverClient.updatePluginData(token, profile.getId().toString(), data);
+        } catch (KeyserverException e) {
+           throw new BackMeUpException("Canot update profile on keyserver", e);
         }
     }
     

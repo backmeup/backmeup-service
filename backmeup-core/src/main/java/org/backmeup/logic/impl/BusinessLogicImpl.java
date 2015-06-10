@@ -347,7 +347,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                     }
                 }
 
-                return profiles.updateProfile(profile);
+                return profiles.updateProfile(currentUser, profile);
 
             }
         });
