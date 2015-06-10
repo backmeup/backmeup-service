@@ -34,7 +34,6 @@ import org.backmeup.model.dto.PluginConfigurationDTO.PluginConfigurationType;
 import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.spi.PluginDescribable;
-import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
 @Path("/plugins")
@@ -54,8 +53,7 @@ public class Plugins extends Base {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PluginDTO> listPlugins( 
-            @QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType,
-            @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+            @QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType) {
 
         Set<String> pluginIds = new HashSet<>();
 
@@ -75,7 +73,7 @@ public class Plugins extends Base {
 
         List<PluginDTO> pluginList= new ArrayList<>();
         for(String pluginId : pluginIds) {
-            pluginList.add(getPlugin(pluginId, -1L, false));
+            pluginList.add(getPlugin(pluginId, -1L));
         }
 
         return pluginList;
@@ -87,32 +85,10 @@ public class Plugins extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public PluginDTO getPlugin(
             @PathParam("pluginId") String pluginId,
-            @QueryParam("authData") @DefaultValue("-1") Long authDataId,
-            @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles) {
+            @QueryParam("authData") @DefaultValue("-1") Long authDataId) {
         
         PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
         PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
-
-        // TODO: check why id is not mapped automatically
-        pluginDTO.setPluginId(pluginDescribable.getId());
-
-        switch (pluginDescribable.getType()) {
-        case Source:
-            pluginDTO.setPluginType(PluginType.Source);
-            break;
-
-        case Sink:
-            pluginDTO.setPluginType(PluginType.Sink);
-            break;
-
-        case SourceSink:
-            pluginDTO.setPluginType(PluginType.SourceSink);
-            break;
-
-        default:
-            break;
-        }
-        
         pluginDTO.setMetadata(pluginDescribable.getMetadata(new HashMap<String, String>()));
         
         // If authentication data id is passed as query parameter, use it to load
@@ -149,10 +125,6 @@ public class Plugins extends Base {
             getMapper().map(pluginConfigInfo, pluginDTO);
         }
         
-        if(expandProfiles){
-
-        }
-
         return pluginDTO;
     }
 
@@ -200,8 +172,7 @@ public class Plugins extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public PluginProfileDTO getPluginConfiguration(
             @PathParam("pluginId") String pluginId, 
-            @PathParam("profileId") String profileId, 
-            @QueryParam("expandConfig") @DefaultValue("false") boolean expandConfig) {
+            @PathParam("profileId") String profileId) {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
