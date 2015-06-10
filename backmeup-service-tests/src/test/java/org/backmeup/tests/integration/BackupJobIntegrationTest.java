@@ -66,62 +66,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                .body("schedule", equalTo(backupJob.getSchedule().toString()))
-                .body(containsString("status"))
-                .body(containsString("active"))
-                .body(containsString("created"))
-                .body(containsString("modified"))
-                .body(containsString("next"))
-                .body(containsString("delay"));
-        } finally {
-            BackMeUpUtils.deleteBackupJob(accessToken, jobId);
-            BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
-            BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
-            BackMeUpUtils.deleteUser(accessToken, userId);
-        }
-    }
-
-    @Test
-    public void testGetBackupJobDummyAllExpanded() {
-        UserDTO user = TestDataManager.getUser();
-        String userId = "";
-        String accessToken = "";
-
-        PluginProfileDTO sourcePluginProfile = TestDataManager.getProfileFilegenerator();
-        String sourceProfileId = "";
-
-        PluginProfileDTO sinkPluginProfile = TestDataManager.getProfileDummySink();
-        String sinkProfileId = "";
-
-        String jobId = "";
-
-        try {
-            ValidatableResponse response = BackMeUpUtils.addUser(user);
-            userId = response.extract().path("userId").toString();
-            accessToken = BackMeUpUtils.authenticateUser(user);
-
-            response = BackMeUpUtils.addProfile(accessToken, sourcePluginProfile.getPluginId(), sourcePluginProfile);
-            sourceProfileId = response.extract().path("profileId").toString();
-
-            response = BackMeUpUtils.addProfile(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile);
-            sinkProfileId = response.extract().path("profileId").toString();
-
-            BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
-            response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
-            jobId = response.extract().path("jobId").toString();
-
-            given()
-                .log().all()
-                .header("Accept", "application/json")
-                .header("Authorization", accessToken)
-            .when()
-                .get("/backupjobs/" + jobId + "?expandUser=true&expandToken=true&expandProfiles=true&expandProtocol=true")
-            .then()
-                .log().all()
-                .statusCode(200)
-                .body("jobId", equalTo(Integer.parseInt(jobId)))
-                .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                .body("schedule", equalTo(backupJob.getSchedule().toString()))
+                .body("schedule", equalTo(backupJob.getSchedule().toString()))            
                 .body("user.userId", equalTo(Integer.parseInt(userId)))
                 .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
                 .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))
@@ -130,13 +75,9 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .body(containsString("created"))
                 .body(containsString("modified"))
                 .body(containsString("next"))
-                .body(containsString("delay"))
                 .body(containsString("user"))
-                .body(containsString("token"))
                 .body(containsString("source"))
                 .body(containsString("sink"));
-
-
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
             BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -28,7 +27,6 @@ import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
-import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.backmeup.rest.filters.SecurityInterceptor;
 
@@ -88,11 +86,7 @@ public class BackupJobs extends Base {
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobDTO getBackupJob(
-            @PathParam("jobId") String jobId, 
-            @QueryParam("expandUser") @DefaultValue("false") boolean expandUser,
-            @QueryParam("expandToken") @DefaultValue("false") boolean expandToken,
-            @QueryParam("expandProfiles") @DefaultValue("false") boolean expandProfiles,
-            @QueryParam("expandProtocol") @DefaultValue("false") boolean expandProtocol) {
+            @PathParam("jobId") String jobId) {
         
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
@@ -102,37 +96,6 @@ public class BackupJobs extends Base {
         }
 
         BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
-
-        if(!expandUser) {
-            jobDTO.setUser(null);
-        }
-
-        if(!expandToken) {
-            jobDTO.setToken(null);
-        }
-
-        if(expandProfiles) {
-            // get source profile
-            Profile sourceProfile = getLogic().getPluginProfile(activeUser, job.getSourceProfile().getId());
-            PluginProfileDTO sourceProfileDTO = getMapper().map(sourceProfile, PluginProfileDTO.class);
-            sourceProfileDTO.setPluginId(sourceProfile.getPluginId());
-            jobDTO.setSource(sourceProfileDTO);
-
-            // get sink profile
-            Profile sinkProfile = getLogic().getPluginProfile(activeUser, job.getSinkProfile().getId());		
-            PluginProfileDTO sinkProfileDTO = getMapper().map(sinkProfile, PluginProfileDTO.class);
-            sinkProfileDTO.setPluginId(sinkProfile.getPluginId());
-            jobDTO.setSink(sinkProfileDTO);
-
-            // get action profiles
-            for(Profile action : job.getActionProfiles()) {
-                Profile actionProfile = getLogic().getPluginProfile(activeUser, action.getId());
-                PluginProfileDTO actionProfileDTO = getMapper().map(actionProfile, PluginProfileDTO.class);
-                actionProfileDTO.setPluginId(actionProfile.getPluginId());
-                jobDTO.addAction(actionProfileDTO);
-            }
-        }
-
         return jobDTO;
     }
 
@@ -214,9 +177,8 @@ public class BackupJobs extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(
             @PathParam("jobId") String jobId, 
-            @PathParam("jobExecutionId") String jobExecutionId,
-            @QueryParam("expand") @DefaultValue("false") boolean expand) {
-        return getBackupJobExecution(jobExecutionId, expand);
+            @PathParam("jobExecutionId") String jobExecutionId) {
+        return getBackupJobExecution(jobExecutionId);
     }
     
     @RolesAllowed({"user", "worker"})
@@ -224,8 +186,7 @@ public class BackupJobs extends Base {
     @Path("/executions/{jobExecutionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(
-            @PathParam("jobExecutionId") String jobExecutionId,
-            @QueryParam("expand") @DefaultValue("false") boolean expand) {
+            @PathParam("jobExecutionId") String jobExecutionId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId));
@@ -233,15 +194,7 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);   
-        
-        if(!expand) {
-            execDTO.setUser(null);
-            execDTO.setSource(null);
-            execDTO.setActions(null);
-            execDTO.setSink(null);
-        }       
-        
+        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);      
         return execDTO;
     }
     
