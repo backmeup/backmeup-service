@@ -76,8 +76,9 @@ public class MappingTest {
         assertEquals(pluginModel.getId(), pluginDTO.getPluginId());
         assertEquals(pluginModel.getTitle(), pluginDTO.getTitle());
         assertEquals(pluginModel.getDescription(), pluginDTO.getDescription());
-        // TODO metadata
         assertEquals(pluginModel.getImageURL(), pluginDTO.getImageURL());
+        assertEquals(pluginModel.getType(), pluginDTO.getPluginType());
+        // TODO metadata
     }
 
     private PluginDescribable createFakeModelFor(String pluginId) {

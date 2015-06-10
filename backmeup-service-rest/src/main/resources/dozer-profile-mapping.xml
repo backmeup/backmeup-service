@@ -18,6 +18,10 @@
   			<a get-method="getDescription">description</a>
   			<b>description</b>
 		</field>
+		<field>
+  			<a get-method="getType">type</a>
+  			<b>pluginType</b>
+		</field>
 		<!-- 
 		<field>
   			<a get-method="getMetadata">metadata</a>
