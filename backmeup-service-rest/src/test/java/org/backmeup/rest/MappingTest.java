@@ -99,8 +99,7 @@ public class MappingTest {
         Long profileId = 1L;
         String pluginId = "org.backmeup.dummy";
         String identification = "identification";
-        PluginType profileTypeModel = PluginType.Source;
-        PluginType profileTypeDTO = PluginType.Source;
+        PluginType profileType = PluginType.Source;
         String option = "-option1";
         String propKey = "includeAll";
         String propValue = "true";
@@ -117,7 +116,7 @@ public class MappingTest {
         authData.setPluginId(pluginId);
         authData.addProperty(authDataKey, authDataValue);
 
-        Profile profile = new Profile(profileId, user, pluginId, PluginType.Source);
+        Profile profile = new Profile(profileId, user, pluginId, profileType);
         profile.setAuthData(authData);
         profile.getAuthData().setIdentification(identification);
         profile.addProperty(propKey, propValue);
@@ -132,8 +131,8 @@ public class MappingTest {
         profileDTO.getAuthData().getProperties().putAll(profile.getAuthData().getProperties());
 
         assertEquals(profile.getId().longValue(), profileDTO.getProfileId());
-        assertEquals(profile.getType(), profileTypeModel);
-        assertEquals(profileDTO.getProfileType(), profileTypeDTO);
+        assertEquals(profile.getType(), profileType);
+        assertEquals(profileDTO.getProfileType(), profileType);
 
         assertNotNull(profileDTO.getAuthData());
         assertEquals(profile.getAuthData().getId(), profileDTO.getAuthData().getId());
@@ -161,7 +160,7 @@ public class MappingTest {
 
         Long profileId = 1L;
         String description = "Description of test profile";
-
+        
         String inputName = "username";
         String inputLabel = "Username";
         String inputDesc = "Username for the service";
@@ -291,6 +290,39 @@ public class MappingTest {
         assertEquals(job.getJobFrequency(), jobDTO.getSchedule());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
         assertEquals(job.isActive(), jobDTO.isActive());
+    }
+    
+    @Test
+    public void testBackupJobMappingWithProfiles() {
+        BackMeUpUser user = new BackMeUpUser("jd", "john", "doe", "jd@example.com", "");
+        
+        Long profileId = 1L;
+        String pluginId = "dummy";
+        Profile sourceProfile = new Profile(profileId, user, pluginId, PluginType.Source);
+        Profile sinkProfile = new Profile(profileId, user, pluginId, PluginType.Sink);
+        
+        BackupJob job = new BackupJob();
+        job.setId(9L);
+        job.setJobName("BackupJob1");
+        job.setUser(user);
+        job.setSourceProfile(sourceProfile);
+        job.setSinkProfile(sinkProfile);
+
+        Mapper mapper = getMapper();
+
+        BackupJobDTO jobDTO = mapper.map(job, BackupJobDTO.class);
+
+        assertEquals(job.getId(), jobDTO.getJobId());
+        assertEquals(job.getJobName(), jobDTO.getJobTitle());
+        assertNotNull(job.getUser());
+        
+        assertNotNull(job.getSourceProfile());
+        assertEquals(job.getSourceProfile().getId().longValue(), jobDTO.getSource().getProfileId());
+        assertEquals(job.getSourceProfile().getPluginId(), jobDTO.getSource().getPluginId());
+        
+        assertNotNull(job.getSinkProfile());
+        assertEquals(job.getSinkProfile().getId().longValue(), jobDTO.getSink().getProfileId());
+        assertEquals(job.getSinkProfile().getPluginId(), jobDTO.getSink().getPluginId());
     }
         
     @Test
