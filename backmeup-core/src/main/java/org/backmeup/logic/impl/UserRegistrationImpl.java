@@ -47,9 +47,9 @@ public class UserRegistrationImpl implements UserRegistration {
     private static final String VERIFICATION_EMAIL_CONTENT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_CONTENT";
     private static final String VERIFICATION_EMAIL_MIME_TYPE = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_MIME_TYPE";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserRegistrationImpl.class);
+    
     private final ResourceBundle textBundle = ResourceBundle.getBundle("UserRegistrationImpl");
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     @Configuration(key = "backmeup.autoVerifyUser")
@@ -179,7 +179,6 @@ public class UserRegistrationImpl implements UserRegistration {
 
     private String createKey(String tostore) {
         try {
-
             // http://stackoverflow.com/questions/4871094/generate-activation-urls-in-java-ee-6
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(tostore.getBytes("UTF-8"));
@@ -201,7 +200,7 @@ public class UserRegistrationImpl implements UserRegistration {
             subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
             subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
         } catch (UnsupportedEncodingException e) {
-            logger.error("Something went wrong in sendVerificationEmailFor", e);
+            LOGGER.error("Something went wrong in sendVerificationEmailFor", e);
         }
         String text = MessageFormat.format(textBundle.getString(VERIFICATION_EMAIL_CONTENT), verifierUrl, user.getVerificationKey());
         String mimeType = textBundle.getString(VERIFICATION_EMAIL_MIME_TYPE);
@@ -280,7 +279,7 @@ public class UserRegistrationImpl implements UserRegistration {
             keyserverClient.removeUser(token);
             getUserDao().delete(user);
         } catch (Exception ex) {
-            logger.warn(MessageFormat.format("Couldn't delete user \"{0}\"", user.getUsername()), ex);
+            LOGGER.warn(MessageFormat.format("Couldn't delete user \"{0}\"", user.getUsername()), ex);
         }
     }
     
@@ -290,8 +289,9 @@ public class UserRegistrationImpl implements UserRegistration {
             AuthResponseDTO response = keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
             String token = response.getToken().getB64Token();
             Date ttl = response.getToken().getTtl().getTime();
-            return new Token(token, 1l, ttl.getTime());
+            return new Token(token, 1L, ttl.getTime());
         } catch (KeyserverException ex) {
+            LOGGER.warn("Cannot authenticate on keyserver", ex);
             throw new InvalidCredentialsException();
         }
     }

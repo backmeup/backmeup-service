@@ -15,22 +15,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConfigurationFactory {
-	private static final Logger logger = LoggerFactory.getLogger(ConfigurationFactory.class);
-	private static final String mandatoryKeyMissing ="No definition found for mandatory configuration property '{0}'";
-	private static final String propertiesFileName = "backmeup.properties";
-	private static final String propertiesFilePath = "config/"+ propertiesFileName;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationFactory.class);
+	private static final String MANDATORY_KEY_MISSING ="No definition found for mandatory configuration property '{0}'";
+	private static final String PROPERTIES_FILE_NAME = "backmeup.properties";
+	private static final String PROPERTIES_FILE_PATH = "config/"+ PROPERTIES_FILE_NAME;
 	
 	private static volatile Properties properties;
 
 	public synchronized static Properties getProperties() {
 		if (properties == null) {
-			logger.debug("Locate configuration properties file");
+			LOGGER.debug("Locate configuration properties file");
 			
 			properties = new Properties();
             try (InputStream is = propertyFileStream()) {
                 properties.load(is);
 			} catch (IOException e) {
-				logger.error("Failed to load properties file. Add {} or add it to the classpath!", propertiesFilePath);
+				LOGGER.error("Failed to load properties file. Add {} or add it to the classpath!", PROPERTIES_FILE_PATH);
 				throw new RuntimeException("Failed to load properties file", e);
 			} 
 		}
@@ -38,21 +38,21 @@ public class ConfigurationFactory {
 	}
 
     private static InputStream propertyFileStream() {
-        InputStream is = ConfigurationFactory.class.getClassLoader().getResourceAsStream(propertiesFileName);
+        InputStream is = ConfigurationFactory.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME);
 
         if (is == null) {
-        	logger.debug("No properties file ({}) in classpath found",propertiesFileName);
+        	LOGGER.debug("No properties file ({}) in classpath found",PROPERTIES_FILE_NAME);
 
         	try {
-        		is = new FileInputStream(new File(propertiesFilePath));
+        		is = new FileInputStream(new File(PROPERTIES_FILE_PATH));
         	} catch (FileNotFoundException e) {
-        		logger.debug("No properties file found at path: {}",propertiesFilePath);
-        		logger.error("", e);
+        		LOGGER.debug("No properties file found at path: {}",PROPERTIES_FILE_PATH);
+        		LOGGER.error("", e);
         	} 
         }
 
         if (is == null) {
-        	logger.error("No properties file found. Add {} or add it to the classpath!", propertiesFilePath);
+        	LOGGER.error("No properties file found. Add {} or add it to the classpath!", PROPERTIES_FILE_PATH);
         	throw new RuntimeException("No properties file found");
         }
         return is;
@@ -63,7 +63,7 @@ public class ConfigurationFactory {
 	public String getConfiguration(InjectionPoint ip){
 		Configuration param = ip.getAnnotated().getAnnotation(Configuration.class);
 		if(param.key() == null || param.key().length() == 0){
-			logger.debug("Configuration parameter null or empty, returning default value");
+			LOGGER.debug("Configuration parameter null or empty, returning default value");
 			return param.defaultValue();
 		}
 		
@@ -71,14 +71,14 @@ public class ConfigurationFactory {
 		String value = config.getProperty(param.key());
 		
 		if(value == null){
-			logger.debug("No definition found for config parameter '{}'", param.key());
+			LOGGER.debug("No definition found for config parameter '{}'", param.key());
 			if(param.mandatory()){
-				throw new IllegalStateException(MessageFormat.format(mandatoryKeyMissing, new Object[]{param.key()}));
+				throw new IllegalStateException(MessageFormat.format(MANDATORY_KEY_MISSING, new Object[]{param.key()}));
 			}
-            logger.debug("Returning default value for mandatory config parameter '{}'", param.key());
+            LOGGER.debug("Returning default value for mandatory config parameter '{}'", param.key());
             return param.defaultValue();
 		}
-		logger.info("Configuration: key='{}' value='{}'", param.key(), value);
+		LOGGER.info("Configuration: key='{}' value='{}'", param.key(), value);
 		return value;
 	}
 	

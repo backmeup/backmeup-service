@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 @Named("plugin")
 @SuppressWarnings("rawtypes")
 public class PluginImpl implements Plugin {
-	private static final Logger logger = LoggerFactory.getLogger(PluginImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PluginImpl.class);
 
 	@Inject
 	@Configuration(key = "backmeup.osgi.deploymentDirectory")
@@ -101,7 +101,7 @@ public class PluginImpl implements Plugin {
 
 	public PluginImpl(String deploymentDirectory, String temporaryDirectory,
 			String exportedPackages) {
-		logger.debug("********** NEW PLUGINIMPL **********");
+		LOGGER.debug("********** NEW PLUGINIMPL **********");
 		this.deploymentDirPath = deploymentDirectory;
 		this.tempDirPath = temporaryDirectory;
 		this.exportedPackages = exportedPackages;
@@ -112,7 +112,7 @@ public class PluginImpl implements Plugin {
     @PostConstruct
 	public void startup() {
 		if (!started) {
-			logger.debug("Starting up PluginImpl!");
+			LOGGER.debug("Starting up PluginImpl!");
 			this.tempDirPath = this.tempDirPath + "/" + Long.toString(System.nanoTime());
 					
 			this.deploymentDirectory = new File(deploymentDirPath);
@@ -163,7 +163,7 @@ public class PluginImpl implements Plugin {
 			// Constants.FRAMEWORK_BUNDLE_PARENT_APP);
 			config.put(Constants.FRAMEWORK_BOOTDELEGATION, exportedPackages);
 			
-			logger.debug("EXPORTED PACKAGES: " + exportedPackages);
+			LOGGER.debug("EXPORTED PACKAGES: " + exportedPackages);
 			// config.put(Constants.FRAMEWORK_EXECUTIONENVIRONMENT, "J2SE-1.6");
 			// config.put("osgi.shell.telnet", "on");
 			// config.put("osgi.shell.telnet.port", "6666");
@@ -171,7 +171,7 @@ public class PluginImpl implements Plugin {
 			osgiFramework = factory.newFramework(config);
 			osgiFramework.start();
 		} catch (Exception e) {
-			logger.error("", e);
+			LOGGER.error("", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -180,11 +180,11 @@ public class PluginImpl implements Plugin {
 		try {
 			osgiFramework.stop();
 			osgiFramework.waitForStop(0);
-			logger.debug("OsgiFramework stopped.");
+			LOGGER.debug("OsgiFramework stopped.");
 		} catch (InterruptedException e) {
-			logger.error("", e);
+			LOGGER.error("", e);
 		} catch (BundleException e) {
-			logger.error("", e);
+			LOGGER.error("", e);
 		}
 	}
 
@@ -266,7 +266,7 @@ public class PluginImpl implements Plugin {
 			@SuppressWarnings("unchecked")
 			Object instance = context.getService(ref);
 			if (instance == null) {
-				logger.error(
+				LOGGER.error(
 						"FATAL ERROR:\n\tCalling the method \"{}\" of a null-instance from bundle \"{}\"; getService returned null!\n",
 						method.getName(), ref.getBundle().getSymbolicName());
 			}
@@ -331,7 +331,7 @@ public class PluginImpl implements Plugin {
 	@Override
     public void shutdown() {
 		if (started) {
-			logger.debug("Shutting down PluginImpl!");
+			LOGGER.debug("Shutting down PluginImpl!");
 			this.deploymentMonitor.stop();
 			this.stopOSGiFramework();
 			this.started = false;
