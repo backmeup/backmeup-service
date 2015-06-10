@@ -94,14 +94,9 @@ public class DummyDataManager {
 		job.setModified(new Date(1401201921774L));
 		job.setStart(new Date(1401201920087L));
 		job.setNext(new Date(1401806728634L));
-		job.setDelay(604800000);
 		
 		if (expandUser) {
 			job.setUser(getUserDTO());
-		}
-
-		if (expandToken) {
-			job.setToken("Vm9lSEliY...t1S3c9PQ==");
 		}
 
 		if (expandProfiles) {

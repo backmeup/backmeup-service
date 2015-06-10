@@ -16,17 +16,14 @@ public class BackupJobDTO {
 	private Long jobId;
 	private String jobTitle;
 	private JobStatus status;
-	private boolean isActive = true;
 	
 	private UserDTO user;
-	private String token;
 	private JobFrequency schedule;
 	
 	private Date created;
 	private Date modified;
 	private Date start;
 	private Date next;
-	private long delay;
 
 	private PluginProfileDTO source;
 	private List<PluginProfileDTO> actions;
@@ -60,12 +57,8 @@ public class BackupJobDTO {
 		this.status = jobStatus;
 	}
 
-	public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        this.isActive = active;
+    public boolean isActive() {
+        return status == JobStatus.ACTIVE;
     }
 
     public UserDTO getUser() {
@@ -74,14 +67,6 @@ public class BackupJobDTO {
 
 	public void setUser(UserDTO user) {
 		this.user = user;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	public JobFrequency getSchedule() {
@@ -122,14 +107,6 @@ public class BackupJobDTO {
 
 	public void setNext(Date next) {
 		this.next = next;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
 	}
 
 	public PluginProfileDTO getSource() {
