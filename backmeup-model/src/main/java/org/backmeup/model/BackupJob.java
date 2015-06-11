@@ -37,170 +37,170 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
  */
 @Entity
 public class BackupJob {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    private Long id;
 
-	private String jobName;
+    private String jobName;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private BackMeUpUser user;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private BackMeUpUser user;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private Profile sourceProfile;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private Profile sourceProfile;
 
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private List<Profile> actionProfiles = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private List<Profile> actionProfiles = new ArrayList<>();
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private Profile sinkProfile;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private Profile sinkProfile;
 
-	private String token;
+    private String token;
 
-	@Enumerated(EnumType.STRING)
-	private JobFrequency jobFrequency;
+    @Enumerated(EnumType.STRING)
+    private JobFrequency jobFrequency;
 
-	private long delay;
+    private long delay;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date startTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date nextExecutionTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date nextExecutionTime;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastSuccessful;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastSuccessful;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastFailed;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastFailed;
 
-	@Enumerated(EnumType.STRING)
-	private JobStatus status;
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
 
-	private UUID validScheduleID = null;
+    private UUID validScheduleID = null;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastUpdatedTime;
-	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "backupJob")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdatedTime;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "backupJob")
     private Set<BackupJobExecution> jobExecutions = new HashSet<>();
 
-	public BackupJob() {
-		super();
-	}
+    public BackupJob() {
+        super();
+    }
 
-	public BackupJob(BackMeUpUser user, String name, Profile sourceProfile,
-			Profile sinkProfile, List<Profile> actionProfiles, Date start, JobFrequency frequency) {
-		this.user = user;
-		this.jobName = name;
-		this.startTime = start;
-		this.jobFrequency = frequency;
-		this.delay = jobFrequency.getDelayTime();
-	    setSourceProfile(sourceProfile);
-	    setSinkProfile(sinkProfile);
-	    setActionProfiles(actionProfiles);
-	}
+    public BackupJob(BackMeUpUser user, String name, Profile sourceProfile,
+            Profile sinkProfile, List<Profile> actionProfiles, Date start, JobFrequency frequency) {
+        this.user = user;
+        this.jobName = name;
+        this.startTime = start;
+        this.jobFrequency = frequency;
+        this.delay = jobFrequency.getDelayTime();
+        setSourceProfile(sourceProfile);
+        setSinkProfile(sinkProfile);
+        setActionProfiles(actionProfiles);
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getJobName() {
-		return jobName;
-	}
+    public String getJobName() {
+        return jobName;
+    }
 
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
 
-	public BackMeUpUser getUser() {
-		return user;
-	}
+    public BackMeUpUser getUser() {
+        return user;
+    }
 
-	public void setUser(BackMeUpUser user) {
-		this.user = user;
-	}
+    public void setUser(BackMeUpUser user) {
+        this.user = user;
+    }
 
-	public Profile getSourceProfile() {
-		return sourceProfile;
-	}
+    public Profile getSourceProfile() {
+        return sourceProfile;
+    }
 
-	public void setSourceProfile(Profile sourceProfile) {
-		if (sourceProfile.getType() != PluginType.Source) {
-			throw new IllegalArgumentException(
-					"Source profile must be of type Source, but is of type "
-							+ sourceProfile.getType());
-		}
-		this.sourceProfile = sourceProfile;
-	}
+    public void setSourceProfile(Profile sourceProfile) {
+        if (sourceProfile.getType() != PluginType.Source) {
+            throw new IllegalArgumentException(
+                    "Source profile must be of type Source, but is of type "
+                            + sourceProfile.getType());
+        }
+        this.sourceProfile = sourceProfile;
+    }
 
-	public Profile getSinkProfile() {
-		return sinkProfile;
-	}
+    public Profile getSinkProfile() {
+        return sinkProfile;
+    }
 
-	public void setSinkProfile(Profile sinkProfile) {
-		if (sinkProfile.getType() != PluginType.Sink) {
-			throw new IllegalArgumentException(
-					"Sink profile must be of type Sink, but is of type "
-							+ sinkProfile.getType());
-		}
-		this.sinkProfile = sinkProfile;
-	}
+    public void setSinkProfile(Profile sinkProfile) {
+        if (sinkProfile.getType() != PluginType.Sink) {
+            throw new IllegalArgumentException(
+                    "Sink profile must be of type Sink, but is of type "
+                            + sinkProfile.getType());
+        }
+        this.sinkProfile = sinkProfile;
+    }
 
-	public List<Profile> getActionProfiles() {
-		return this.actionProfiles;
-	}
+    public List<Profile> getActionProfiles() {
+        return this.actionProfiles;
+    }
 
-	@Deprecated
-	public List<Profile> getSortedRequiredActions() {
-		return this.actionProfiles;
-	}
+    @Deprecated
+    public List<Profile> getSortedRequiredActions() {
+        return this.actionProfiles;
+    }
 
-	public void setActionProfiles(List<Profile> actionProfiles) {
-		for (Profile actionProfile : actionProfiles) {
-			if (actionProfile.getType() != PluginType.Action) {
-				throw new IllegalArgumentException("Action profile (" + actionProfile.getId()
-				        + ") must be of type Action, but is of type " + actionProfile.getType());
-			}
-		}
-		this.actionProfiles = actionProfiles;
-	}
-	
-	public Set<Profile> getProfileSet() {
-	    Set<Profile> profileSet = new HashSet<>();
-	    profileSet.add(sourceProfile);
-	    profileSet.add(sinkProfile);
-	    profileSet.addAll(actionProfiles);
-	    return profileSet;
-	}
+    public void setActionProfiles(List<Profile> actionProfiles) {
+        for (Profile actionProfile : actionProfiles) {
+            if (actionProfile.getType() != PluginType.Action) {
+                throw new IllegalArgumentException("Action profile (" + actionProfile.getId()
+                        + ") must be of type Action, but is of type " + actionProfile.getType());
+            }
+        }
+        this.actionProfiles = actionProfiles;
+    }
 
-	public Date getStartTime() {
+    public Set<Profile> getProfileSet() {
+        Set<Profile> profileSet = new HashSet<>();
+        profileSet.add(sourceProfile);
+        profileSet.add(sinkProfile);
+        profileSet.addAll(actionProfiles);
+        return profileSet;
+    }
+
+    public Date getStartTime() {
         if (this.startTime == null) {
             return null;
         }
-		return (Date) startTime.clone();
-	}
+        return (Date) startTime.clone();
+    }
 
-	public void setStartTime(Date start) {
-		this.startTime = (Date) start.clone();
-	}
+    public void setStartTime(Date start) {
+        this.startTime = (Date) start.clone();
+    }
 
-	public long getDelay() {
-		return delay;
-	}
+    public long getDelay() {
+        return delay;
+    }
 
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
-	
+    public void setDelay(long delay) {
+        this.delay = delay;
+    }
+
     public String getToken() {
         return token;
     }
@@ -209,12 +209,12 @@ public class BackupJob {
         this.token = token;
     }
 
-	public Date getCreateTime() {
+    public Date getCreateTime() {
         if (this.createTime == null) {
             return null;
         }
-		return (Date)createTime.clone();
-	}
+        return (Date)createTime.clone();
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -227,53 +227,53 @@ public class BackupJob {
         }
         return (Date) lastUpdatedTime.clone();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
-      this.lastUpdatedTime = new Date();
+        this.lastUpdatedTime = new Date();
     }
 
-	public Date getNextExecutionTime() {
+    public Date getNextExecutionTime() {
         if (this.nextExecutionTime == null) {
             return null;
         }
-		return (Date) nextExecutionTime.clone();
-	}
+        return (Date) nextExecutionTime.clone();
+    }
 
-	public void setNextExecutionTime(Date nextExecutionTime) {
-		this.nextExecutionTime = (Date) nextExecutionTime.clone();
-	}
+    public void setNextExecutionTime(Date nextExecutionTime) {
+        this.nextExecutionTime = (Date) nextExecutionTime.clone();
+    }
 
-	public JobStatus getStatus() {
-		return status;
-	}
+    public JobStatus getStatus() {
+        return status;
+    }
 
-	public void setStatus(JobStatus status) {
-		this.status = status;
-	}
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
 
-	public Date getLastSuccessful() {
+    public Date getLastSuccessful() {
         if (this.lastSuccessful == null) {
             return null;
         }
-		return (Date) lastSuccessful.clone();
-	}
+        return (Date) lastSuccessful.clone();
+    }
 
-	public void setLastSuccessful(Date lastSuccessful) {
-		this.lastSuccessful = (Date) lastSuccessful.clone();
-	}
+    public void setLastSuccessful(Date lastSuccessful) {
+        this.lastSuccessful = (Date) lastSuccessful.clone();
+    }
 
-	public Date getLastFailed() {
+    public Date getLastFailed() {
         if (this.lastFailed == null) {
             return null;
         }
-		return (Date) lastFailed.clone();
-	}
+        return (Date) lastFailed.clone();
+    }
 
-	public void setLastFailed(Date lastFailed) {
-		this.lastFailed = lastFailed;
-	}
-	
+    public void setLastFailed(Date lastFailed) {
+        this.lastFailed = lastFailed;
+    }
+
     public boolean isActive() {
         return status == JobStatus.ACTIVE;
     }
@@ -301,21 +301,21 @@ public class BackupJob {
         }
         this.jobExecutions = jobExecutions;
     }
-    
 
-	public UUID getValidScheduleID() {
-		return validScheduleID;
-	}
 
-	public void setValidScheduleID(UUID validScheduleID) {
-		this.validScheduleID = validScheduleID;
-	}
-    
+    public UUID getValidScheduleID() {
+        return validScheduleID;
+    }
+
+    public void setValidScheduleID(UUID validScheduleID) {
+        this.validScheduleID = validScheduleID;
+    }
+
     @Override
     public String toString() {
         return String.format("%s: id=%d Name=%s", "BackupJob", id, jobName);
     }
-    
+
     /**
      * Attempt to establish identity based on id if both exist. 
      * If either id does not exist use Object.equals().
@@ -337,7 +337,7 @@ public class BackupJob {
         }
         return id.equals(entity.getId());
     }
-    
+
     /**
      * Use ID if it exists to establish hash code, otherwise fall back to
      * Object.hashCode(). 
