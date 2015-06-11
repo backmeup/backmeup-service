@@ -7,30 +7,30 @@
 		<class-b>org.backmeup.model.dto.PluginDTO</class-b>
 		
 		<field>
-  			<a get-method="getId">id</a>
-  			<b>pluginId</b>
+			<a get-method="getId">id</a>
+			<b>pluginId</b>
 		</field> 
 		<field>
-  			<a get-method="getTitle">title</a>
-  			<b>title</b>
+			<a get-method="getTitle">title</a>
+			<b>title</b>
 		</field> 
 		<field>
-  			<a get-method="getDescription">description</a>
-  			<b>description</b>
+			<a get-method="getDescription">description</a>
+			<b>description</b>
 		</field>
 		<field>
-  			<a get-method="getType">type</a>
-  			<b>pluginType</b>
+			<a get-method="getType">type</a>
+			<b>pluginType</b>
 		</field>
 		<!-- 
 		<field>
-  			<a get-method="getMetadata">metadata</a>
-  			<b>metadata</b>
+			<a get-method="getMetadata">metadata</a>
+			<b>metadata</b>
 		</field>
 		 -->
 		 <field>
-  			<a get-method="getImageURL">imageURL</a>
-  			<b>imageURL</b>
+			<a get-method="getImageURL">imageURL</a>
+			<b>imageURL</b>
 		</field>
 	</mapping>
 	
@@ -43,9 +43,9 @@
 		<class-a>org.backmeup.model.PluginConfigInfo</class-a>
 		<class-b>org.backmeup.model.dto.PluginConfigurationDTO</class-b>
 		<field>
-  			<a>oAuthProperties</a>
-  			<b>properties</b>
-  		</field>
+			<a>oAuthProperties</a>
+			<b>properties</b>
+		</field>
 	</mapping>
 	
 	<mapping>
@@ -63,13 +63,13 @@
 		<class-b>org.backmeup.model.dto.PluginProfileDTO</class-b>
 		
 		<field>
-  			<a>id</a>
-  			<b>profileId</b>
-  		</field>
-  		
-  		<field>
-  			<a>type</a>
-  			<b>profileType</b>
+			<a>id</a>
+			<b>profileId</b>
+		</field>
+		
+		<field>
+			<a>type</a>
+			<b>profileType</b>
 		</field> 
 	</mapping>
 	
@@ -78,12 +78,12 @@
 		<class-b>org.backmeup.model.dto.AuthDataDTO</class-b>
 		
 		<field>
-  			<a get-method="getId" set-method="setId">id</a>
-  			<b>id</b>
+			<a get-method="getId" set-method="setId">id</a>
+			<b>id</b>
 		</field> 
 		<field>
-  			<a get-method="getName" set-method="setName">name</a>
-  			<b>name</b>
+			<a get-method="getName" set-method="setName">name</a>
+			<b>name</b>
 		</field>
 		<field-exclude type="one-way">
 			<a>properties</a>
