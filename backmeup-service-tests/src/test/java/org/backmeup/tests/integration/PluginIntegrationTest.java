@@ -152,23 +152,6 @@ public class PluginIntegrationTest extends IntegrationTestBase {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
     }
-    
-    @Ignore
-    @Test
-    public void testGetPluginExpandProfiles() {	
-        String pluginId = "backmeupPlugin1";
-        try {
-            given()
-                .log().all()
-                .header("Accept", "application/json")
-            .when()
-                .get("/plugins/" + pluginId + "/?expandProfiles=true")
-            .then()
-                .log().all()
-                .statusCode(200);
-        } finally {
-        }
-    }
 
     @Test
     public void testGetAllPlugins() {	
