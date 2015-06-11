@@ -266,8 +266,8 @@ public class MappingTest {
         job.setStatus(JobStatus.ACTIVE);
         job.setId(9L);
         job.setJobFrequency(JobFrequency.DAILY);
-        Date next = new Date();
-        job.setNextExecutionTime(next);
+        job.setStartTime(new Date());
+        job.setNextExecutionTime(new Date());
 
         BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
 
@@ -275,6 +275,7 @@ public class MappingTest {
         assertEquals(job.getJobName(), jobDTO.getJobTitle());
         assertEquals(job.getStatus(), jobDTO.getStatus());
         assertEquals(job.getJobFrequency(), jobDTO.getSchedule());
+        assertEquals(job.getStartTime(), jobDTO.getStart());
         assertEquals(job.getNextExecutionTime(), jobDTO.getNext());
         assertEquals(job.isActive(), jobDTO.isActive());
     }

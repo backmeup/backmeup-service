@@ -7,42 +7,46 @@
 		<class-b map-null="false">org.backmeup.model.dto.BackupJobDTO</class-b>
 		
 		<field>
-  			<a>id</a>
-  			<b>jobId</b>
+			<a>id</a>
+			<b>jobId</b>
 		</field> 
 		<field>
-  			<a>jobName</a>
-  			<b>jobTitle</b>
+			<a>jobName</a>
+			<b>jobTitle</b>
 		</field> 
 		<field>
-  			<a>createTime</a>
-  			<b>created</b>
+			<a>createTime</a>
+			<b>created</b>
 		</field> 
 		<field>
-  			<a>lastUpdatedTime</a>
-  			<b>modified</b>
+			<a>lastUpdatedTime</a>
+			<b>modified</b>
 		</field> 
 		<field>
-  			<a>jobFrequency</a>
-  			<b>schedule</b>
+			<a>jobFrequency</a>
+			<b>schedule</b>
 		</field> 
 		<field>
-  			<a>nextExecutionTime</a>
-  			<b>next</b>
+			<a>startTime</a>
+			<b>start</b>
 		</field> 
 		<field>
-  			<a>sourceProfile</a>
-  			<b>source</b>
+			<a>nextExecutionTime</a>
+			<b>next</b>
+		</field> 
+		<field>
+			<a>sourceProfile</a>
+			<b>source</b>
 		</field>
 		
 		<field>
-  			<a>actionProfiles</a>
-  			<b>actions</b>
+			<a>actionProfiles</a>
+			<b>actions</b>
 		</field>
 		
 		<field>
-  			<a>sinkProfile</a>
-  			<b>sink</b>
+			<a>sinkProfile</a>
+			<b>sink</b>
 		</field>
 	</mapping>
 	
@@ -51,43 +55,43 @@
 		<class-b map-null="false">org.backmeup.model.dto.BackupJobExecutionDTO</class-b>
 		
 		<field>
-  			<a>backupJobId</a>
-  			<b>jobId</b>
+			<a>backupJobId</a>
+			<b>jobId</b>
 		</field>
 		
 		<field>
-  			<a>createTime</a>
-  			<b>created</b>
+			<a>createTime</a>
+			<b>created</b>
 		</field>
 		
 		<field>
-  			<a>lastUpdated</a>
-  			<b>modified</b>
+			<a>lastUpdated</a>
+			<b>modified</b>
 		</field>
 		
 		<field>
-  			<a>startTime</a>
-  			<b>start</b>
+			<a>startTime</a>
+			<b>start</b>
 		</field>
 		
 		<field>
-  			<a>endTime</a>
-  			<b>end</b>
+			<a>endTime</a>
+			<b>end</b>
 		</field>
 		
 		<field>
-  			<a>sourceProfile</a>
-  			<b>source</b>
+			<a>sourceProfile</a>
+			<b>source</b>
 		</field>
 		
 		<field>
-  			<a>actionProfiles</a>
-  			<b>actions</b>
+			<a>actionProfiles</a>
+			<b>actions</b>
 		</field>
 		
 		<field>
-  			<a>sinkProfile</a>
-  			<b>sink</b>
+			<a>sinkProfile</a>
+			<b>sink</b>
 		</field>
 	</mapping>
 </mappings> 
