@@ -31,7 +31,7 @@ public class Authentication extends Base {
     public AuthInfo authenticate(@QueryParam("username") String username, @QueryParam("password") String password) {
         try {
             Token token = getLogic().authorize(username, password);
-            return new AuthInfo(token.getToken(), token.getBackupdate());
+            return new AuthInfo(token.getToken(), token.getTtl());
         } catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
             LOGGER.info("", ex);
             throw new WebApplicationException(Status.UNAUTHORIZED);

@@ -9,7 +9,6 @@
 		<class>org.backmeup.model.BackMeUpUser</class>
 		<class>org.backmeup.model.Profile</class>
 		<class>org.backmeup.model.BackupJob</class>
-		<class>org.backmeup.model.Token</class>
 		<class>org.backmeup.model.AuthData</class>
 		<class>org.backmeup.model.BackupJobExecution</class>
 		<class>org.backmeup.model.JobProtocol</class>

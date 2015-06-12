@@ -288,7 +288,7 @@ public class UserRegistrationImpl implements UserRegistration {
             AuthResponseDTO response = keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
             String token = response.getToken().getB64Token();
             Date ttl = response.getToken().getTtl().getTime();
-            return new Token(token, 1L, ttl.getTime());
+            return new Token(token, ttl.getTime());
         } catch (KeyserverException ex) {
             LOGGER.warn("Cannot authenticate on keyserver", ex);
             throw new InvalidCredentialsException();

@@ -1,26 +1,20 @@
 package org.backmeup.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
-@Entity
 public class Token {
   private String token;
-  @Id  
-  private Long bmu_token_id;
   
   // the next backup date to use; leave null, if the token is not reusable
-  private Long backupdate;
+  private Long ttl;
   
-  public Token(String token, Long bmu_token_id, Long backupdate) {
+  public Token(String token, Long backupdate) {
     super();
     this.token = token;
-    this.bmu_token_id = bmu_token_id;
-    this.backupdate = backupdate;
+    this.ttl = backupdate;
   }
   
   public Token() {
-    super();
+      
   }
 
   public String getToken() {
@@ -31,19 +25,11 @@ public class Token {
     this.token = token;
   }
 
-  public Long getTokenId() {
-    return bmu_token_id;
+  public Long getTtl() {
+    return ttl;
   }
 
-  public void setTokenId(Long bmu_token_id) {
-    this.bmu_token_id = bmu_token_id;
-  }
-
-  public Long getBackupdate() {
-    return backupdate;
-  }
-
-  public void setBackupdate(Long backupdate) {
-    this.backupdate = backupdate;
+  public void setTtl(Long ttl) {
+    this.ttl = ttl;
   }
 }
