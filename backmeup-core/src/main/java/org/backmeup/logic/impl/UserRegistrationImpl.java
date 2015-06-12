@@ -228,9 +228,8 @@ public class UserRegistrationImpl implements UserRegistration {
         }
         user.ensureNotActivated();
 
-        // Don't delete the key. If the user tries an second verification it should work.
-        // user.setVerificationKey(null);
-
+        // Note: Don't delete the verification key (e.g. set to null). 
+        // If the user tries an second verification it should work.
         user.setActivated(true);
         save(user);
 

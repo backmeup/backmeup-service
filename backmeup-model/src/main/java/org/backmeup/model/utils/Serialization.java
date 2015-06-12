@@ -12,13 +12,11 @@ public abstract class Serialization {
         ObjectOutputStream so = new ObjectOutputStream(bo);
         so.writeObject(obj);
         so.flush();
-//        return Base64.getEncoder().encodeToString(bo.toByteArray());
         return MyBase64.encode(bo.toByteArray());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getEncodedStringAsObject(String properpies, Class<T> type) throws IOException, ClassNotFoundException {
-//        byte b[] = Base64.getDecoder().decode(properpies);
         byte b[] = MyBase64.decode(properpies);
         ByteArrayInputStream bi = new ByteArrayInputStream(b);
         ObjectInputStream si = new ObjectInputStream(bi);

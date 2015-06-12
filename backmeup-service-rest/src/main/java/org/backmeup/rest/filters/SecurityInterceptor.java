@@ -121,14 +121,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     }
 
     private boolean isUserAllowed(final BackMeUpUser user, final Set<String> rolesSet) {
-        boolean isAllowed = true;
-
-        // Verify user role
-        //		if (rolesSet.contains(userRole)) {
-        //			isAllowed = true;
-        //		}
-
-        return isAllowed;
+        return true;
     }
 
 }

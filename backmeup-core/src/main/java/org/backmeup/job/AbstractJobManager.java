@@ -74,16 +74,7 @@ public abstract class AbstractJobManager implements JobManager {
 
     @PostConstruct
     public void start() {
-//        List<BackupJob> jobs = conn.txNewReadOnly(new Callable<List<BackupJob>>() {
-//            @Override
-//            public List<BackupJob> call() {
-//                return getBackupJobDao().findAll();
-//            }
-//        });
-//
-//        for (BackupJob storedJob : jobs) {
-//            queueJob(storedJob);
-//        }
+        
     }
     
     @PreDestroy
