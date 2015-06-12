@@ -199,8 +199,7 @@ public class BackupJobs extends Base {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO updateBackupJobExecution(@PathParam("jobId") String jobId, @PathParam("jobExecutionId") String jobExecutionId, BackupJobExecutionDTO jobExecution) {
-        if ((Long.parseLong(jobId) != jobExecution.getJobId() || 
-                (Long.parseLong(jobExecutionId) != jobExecution.getId()))) {
+        if (Long.parseLong(jobId) != jobExecution.getJobId() || (Long.parseLong(jobExecutionId) != jobExecution.getId())) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();

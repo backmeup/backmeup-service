@@ -97,9 +97,9 @@ public class Sharing extends SecureBase {
             mandatoryLong("policyValue", sharedElementID);
         } else if (policyType == SharingPolicyTypeEntry.Document) {
             mandatoryUUID("policyValue", sharedElementID);
-        } else if ((policyType == SharingPolicyTypeEntry.DocumentGroup)) {
+        } else if (policyType == SharingPolicyTypeEntry.DocumentGroup) {
             mandatoryListFromString("policyValue", sharedElementID);
-        } else if ((policyType == SharingPolicyTypeEntry.TaggedCollection)) {
+        } else if (policyType == SharingPolicyTypeEntry.TaggedCollection) {
             mandatoryLong("policyValue", sharedElementID);
         }
 
