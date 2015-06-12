@@ -22,7 +22,7 @@ public class ConfigurationFactory {
 
     private static volatile Properties properties;
 
-    public synchronized static Properties getProperties() {
+    public static synchronized Properties getProperties() {
         if (properties == null) {
             LOGGER.debug("Locate configuration properties file");
 

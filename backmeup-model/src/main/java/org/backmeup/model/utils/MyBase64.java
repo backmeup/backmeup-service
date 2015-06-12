@@ -8,7 +8,7 @@ package org.backmeup.model.utils;
  */
 public final class MyBase64 {
 
-    private final static char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
+    private static final char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
     private static int[]  toInt   = new int[128];
 

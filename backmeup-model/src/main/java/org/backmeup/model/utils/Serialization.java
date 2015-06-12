@@ -21,7 +21,7 @@ public final class Serialization {
 
     @SuppressWarnings("unchecked")
     public static <T> T getEncodedStringAsObject(String properpies, Class<T> type) throws IOException, ClassNotFoundException {
-        byte b[] = MyBase64.decode(properpies);
+        byte[] b = MyBase64.decode(properpies);
         ByteArrayInputStream bi = new ByteArrayInputStream(b);
         ObjectInputStream si = new ObjectInputStream(bi);
         return (T) si.readObject();
