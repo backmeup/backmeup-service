@@ -1,8 +1,6 @@
 package org.backmeup.rest.resources;
 
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 
 import org.backmeup.logic.BusinessLogic;
 import org.dozer.Mapper;
@@ -18,9 +16,6 @@ public class Base {
 
     @Inject
     private Mapper mapper;
-
-    @Context
-    private ServletContext context;
 
     protected BusinessLogic getLogic() {
         return logic;

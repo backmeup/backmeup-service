@@ -1,16 +1,10 @@
 package org.backmeup.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.backmeup.model.exceptions.UserAlreadyActivatedException;
@@ -44,9 +38,6 @@ public class BackMeUpUser {
 	private boolean activated;
 
 	private String verificationKey;
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "user")
-	private final List<JobProtocol> protocols = new ArrayList<>();
 
 	public BackMeUpUser() {
 

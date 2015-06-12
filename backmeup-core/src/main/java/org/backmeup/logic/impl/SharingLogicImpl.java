@@ -12,13 +12,9 @@ import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
 import org.backmeup.logic.SharingLogic;
 import org.backmeup.model.BackMeUpUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class SharingLogicImpl implements SharingLogic {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     private SharingPolicyClientFactory sharingPolicyClientFactory;

@@ -56,8 +56,7 @@ public class Plugins extends Base {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PluginDTO> listPlugins( 
-            @QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType) {
+    public List<PluginDTO> listPlugins(@QueryParam("types") @DefaultValue("All") PluginSelectionType pluginType) {
 
         Set<String> pluginIds = new HashSet<>();
 

@@ -10,10 +10,8 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
@@ -44,9 +42,6 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     public static final Long BACKMEUP_WORKER_ID = -1L;
     public static final String BACKMEUP_WORKER_NAME = "BACKMEUPWORKER";
 
-    @Context
-    private ServletContext context;
-
     @Inject
     private BusinessLogic logic;
     
@@ -58,7 +53,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
         Method method = methodInvoker.getMethod();
 
-        if( !method.isAnnotationPresent(PermitAll.class)) {
+        if (!method.isAnnotationPresent(PermitAll.class)) {
             if(method.isAnnotationPresent(DenyAll.class)) {
                 requestContext.abortWith(ACCESS_FORBIDDEN);
                 return;
