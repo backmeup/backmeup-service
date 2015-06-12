@@ -160,10 +160,7 @@ public class Plugins extends Base {
         }
 
         profile = getLogic().addPluginProfile(activeUser, profile);
-
-        PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-
-        return profileDTO;
+        return getMapper().map(profile, PluginProfileDTO.class);
     }
 
     @RolesAllowed("user")
@@ -182,9 +179,7 @@ public class Plugins extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-
-        return profileDTO;
+        return getMapper().map(profile, PluginProfileDTO.class);
     }
 
     @RolesAllowed("user")
@@ -230,10 +225,7 @@ public class Plugins extends Base {
         }
 
         persistentProfile = getLogic().updatePluginProfile(activeUser, persistentProfile);
-
-        PluginProfileDTO profileDTO = getMapper().map(persistentProfile, PluginProfileDTO.class);
-
-        return profileDTO;
+        return getMapper().map(persistentProfile, PluginProfileDTO.class);
     }
 
     @RolesAllowed("user")
@@ -273,9 +265,7 @@ public class Plugins extends Base {
         authDataModel.setPluginId(pluginId);
 
         authDataModel = getLogic().addPluginAuthData(authDataModel);
-
-        AuthDataDTO authDataDTO = getMapper().map(authDataModel, AuthDataDTO.class);
-        return authDataDTO;
+        return getMapper().map(authDataModel, AuthDataDTO.class);
     }
 
     @RolesAllowed("user")

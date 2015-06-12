@@ -19,8 +19,7 @@ public class BackupJobExecutionDaoImpl extends BaseDaoImpl<BackupJobExecution> i
         TypedQuery<BackupJobExecution> q = em.createQuery(
                 "SELECT j FROM " + entityClass.getName() + " j WHERE j.user.userId = :userId", entityClass);
         q.setParameter("userId", userId);
-        List<BackupJobExecution> jobs = q.getResultList();
-        return jobs;
+        return q.getResultList();
     }
     
     @Override
@@ -28,15 +27,13 @@ public class BackupJobExecutionDaoImpl extends BaseDaoImpl<BackupJobExecution> i
         TypedQuery<BackupJobExecution> q = em.createQuery(
                 "SELECT j FROM " + entityClass.getName() + " j WHERE j.backupJob.id = :jobId", entityClass);
         q.setParameter("jobId", jobId);
-        List<BackupJobExecution> jobs = q.getResultList();
-        return jobs;
+        return q.getResultList();
     }
     
     @Override
     public List<BackupJobExecution> findAll() {
         TypedQuery<BackupJobExecution> q = em.createQuery(
                 "SELECT j FROM " + entityClass.getName() + " j", entityClass);
-        List<BackupJobExecution> jobs = q.getResultList();
-        return jobs;
+        return q.getResultList();
     }
 }

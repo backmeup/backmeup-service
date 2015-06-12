@@ -429,8 +429,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override public BackupJob call() {
 
                 validateBackupJob(backupJob.getUser(), backupJob);
-                BackupJob job = backupJobs.addBackupJob(backupJob);
-                return job;
+                return backupJobs.addBackupJob(backupJob);
 
             }
         });

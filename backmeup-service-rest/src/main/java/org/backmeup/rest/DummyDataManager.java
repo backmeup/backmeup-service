@@ -17,8 +17,7 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class DummyDataManager {
 	public static UserDTO getUserDTO() {
-		UserDTO user = new UserDTO("john.doe", "John", "Doe", null, "john.doe@example.com");
-		return user;
+		return new UserDTO("john.doe", "John", "Doe", null, "john.doe@example.com");
 	}
 	
 	public static PluginDTO getPluginDTO(boolean expandProfiles) {

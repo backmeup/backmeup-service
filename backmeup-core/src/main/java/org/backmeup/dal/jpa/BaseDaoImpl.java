@@ -33,8 +33,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     @Override
     public T findById(long id) {
-        T item = em.find(entityClass, id);
-        return item;
+        return em.find(entityClass, id);
     }
 
     @Override
@@ -46,14 +45,12 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     @Override
     public T save(T entity) {
-        T savedEntity = em.merge(entity);		
-        return savedEntity;
+        return em.merge(entity);
     } 
 
     @Override
     public long count() {
         Query q = em.createQuery("SELECT COUNT(u) FROM " + entityClass.getName() + " u");
-        Long cnt = (Long) q.getSingleResult();
-        return cnt;
-    } 
+        return (Long) q.getSingleResult();
+    }
 }

@@ -95,8 +95,7 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        BackupJobDTO jobDTO = getMapper().map(job, BackupJobDTO.class);
-        return jobDTO;
+        return getMapper().map(job, BackupJobDTO.class);
     }
 
     @RolesAllowed({"user", "worker"})
@@ -117,11 +116,8 @@ public class BackupJobs extends Base {
 
         // TODO:
         job.setStatus(backupjob.getStatus());
-
         getLogic().updateBackupJob(job.getUser().getUserId(), job);
-
         return backupjob;
-
     }
 
     @RolesAllowed("user")
@@ -194,8 +190,7 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        BackupJobExecutionDTO execDTO = getMapper().map(exec, BackupJobExecutionDTO.class);      
-        return execDTO;
+        return getMapper().map(exec, BackupJobExecutionDTO.class);
     }
     
     @RolesAllowed({"worker"})
@@ -223,10 +218,8 @@ public class BackupJobs extends Base {
         }
 
         jobExec.setStatus(jobExecution.getStatus());
-
         getLogic().updateBackupJobExecution(jobExec);
 
         return jobExecution;
-
     }
 }
