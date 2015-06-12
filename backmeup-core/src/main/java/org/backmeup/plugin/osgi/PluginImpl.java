@@ -228,8 +228,7 @@ public class PluginImpl implements Plugin {
 				new Class[] { service }, new InvocationHandler() {
 
 					@Override
-                    public Object invoke(Object o, Method method, Object[] os)
-							throws Throwable {
+                    public Object invoke(Object o, Method method, Object[] os) throws Throwable {
 						ServiceReference serviceRef = getReference(service, filter);
 						if (serviceRef == null) {
 							throw new PluginUnavailableException(filter);
@@ -239,9 +238,7 @@ public class PluginImpl implements Plugin {
 						try {
 							ret = method.invoke(instance, os);
 						} catch (Exception e) {
-							throw new PluginException(filter,
-									"An exception occured during execution of the method "
-											+ method.getName(), e);
+							throw new PluginException(filter, "An exception occured during execution of the method " + method.getName(), e);
 						} finally {
 							bundleContext().ungetService(serviceRef);
 						}
@@ -294,37 +291,22 @@ public class PluginImpl implements Plugin {
 			@Override
             public Iterator<T> iterator() {
 				try {
-					ServiceReference[] refs = bundleContext()
-							.getServiceReferences(service.getName(), filter);
-					if (refs == null) {
-						return new Iterator<T>() {
-							@Override
-                            public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-                            public T next() {
-								return null;
-							}
-
-							@Override
-                            public void remove() {
-							}
-						};
-					}
-					List<T> services = new ArrayList<>();
-					for (ServiceReference s : refs) {
-						services.add((T) Proxy.newProxyInstance(
-								PluginImpl.class.getClassLoader(),
-								new Class[] { service },
-								new SpecialInvocationHandler(bundleContext(), s)));
+				    List<T> services = new ArrayList<>();
+					ServiceReference[] refs = bundleContext().getServiceReferences(service.getName(), filter);
+					if (refs != null) {
+					    for (ServiceReference s : refs) {
+	                        services.add((T) Proxy.newProxyInstance(
+	                                PluginImpl.class.getClassLoader(),
+	                                new Class[] { service },
+	                                new SpecialInvocationHandler(bundleContext(), s)));
+	                    }
 					}
 					return services.iterator();
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
+			
 		};
 	}
 
