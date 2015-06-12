@@ -8,15 +8,15 @@ import org.backmeup.model.api.RequiredInputField;
 
 public interface Validationable {
 
-    public boolean hasRequiredProperties();
+    boolean hasRequiredProperties();
 
-    public List<RequiredInputField> getRequiredProperties();
+    List<RequiredInputField> getRequiredProperties();
 
-    public ValidationNotes validateProperties(Map<String, String> properties);
+    ValidationNotes validateProperties(Map<String, String> properties);
 
-    public boolean hasAvailableOptions();
+    boolean hasAvailableOptions();
 
-    public List<String> getAvailableOptions(Map<String, String> authData);
+    List<String> getAvailableOptions(Map<String, String> authData);
 
-    public ValidationNotes validateOptions(List<String> options);
+    ValidationNotes validateOptions(List<String> options);
 }

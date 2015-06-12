@@ -8,7 +8,7 @@ import org.backmeup.plugin.api.storage.Storage;
 
 public interface Action {
 
-    public void doAction(Map<String, String> authData, Map<String, String> properties, List<String> options,
-            Storage storage, BackupJobExecutionDTO job, Progressable progressor)
-            throws ActionException;
+    void doAction(Map<String, String> authData, Map<String, String> properties,
+            List<String> options, Storage storage, BackupJobExecutionDTO job,
+            Progressable progressor) throws ActionException;
 }

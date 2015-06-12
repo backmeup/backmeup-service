@@ -48,14 +48,14 @@ public interface PluginDescribable {
         Hidden
     }
 
-    public String getId();
-    public String getTitle();
-    public String getDescription();
+    String getId();
+    String getTitle();
+    String getDescription();
 
-    public PluginType getType();
-    public int getPriority();
-    public PluginVisibility getVisibility();
+    PluginType getType();
+    int getPriority();
+    PluginVisibility getVisibility();
 
-    public String getImageURL();
-    public Map<String, String> getMetadata(Map<String, String> authData);
+    String getImageURL();
+    Map<String, String> getMetadata(Map<String, String> authData);
 }

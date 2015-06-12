@@ -8,10 +8,10 @@ import org.backmeup.model.api.RequiredInputField;
 
 public interface InputBasedAuthorizable extends Authorizable {
 
-	public List<RequiredInputField> getRequiredInputFields();
+	List<RequiredInputField> getRequiredInputFields();
 	
-	public ValidationNotes validateInputFields(Map<String, String> properties);
+	ValidationNotes validateInputFields(Map<String, String> properties);
 
-	public boolean isValid(Map<String, String> properties);
+	boolean isValid(Map<String, String> properties);
 
 }

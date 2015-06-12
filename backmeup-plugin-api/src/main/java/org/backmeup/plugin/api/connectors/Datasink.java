@@ -30,6 +30,7 @@ public interface Datasink {
      *         value for this String
      * @throws StorageException
      */
-    public String upload(Map<String, String> authData, Map<String, String> properties, List<String> options, 
-            Storage storage, Progressable progressor) throws StorageException;
+    String upload(Map<String, String> authData, Map<String, String> properties,
+            List<String> options, Storage storage, Progressable progressor)
+            throws StorageException;
 }

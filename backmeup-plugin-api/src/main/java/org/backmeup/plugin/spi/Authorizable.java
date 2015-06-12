@@ -10,9 +10,9 @@ public interface Authorizable {
 		InputBased
 	}
 	
-	public AuthorizationType getAuthType(); 
+	AuthorizationType getAuthType(); 
 	
 	// updates the authorization data and returns the identification of the account
-	public String authorize(Map<String, String> authData);
+	String authorize(Map<String, String> authData);
 		
 }
