@@ -75,7 +75,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
     @Override
     protected void runJob(BackupJobExecution job) {
         try {
-            this.LOGGER.info(
+            LOGGER.info(
                     String.format("Job execution with id %s started for user %d", 
                             job.getId(), job.getUser().getUserId()));
 
@@ -83,7 +83,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
             this.mqChannel.basicPublish("", this.mqName, null, bytes);
         } catch (IOException e) {
             // Should only happen if message queue is down
-            this.LOGGER.error("message queue down", e);
+            LOGGER.error("message queue down", e);
             throw new RuntimeException(e);
         }
     }
