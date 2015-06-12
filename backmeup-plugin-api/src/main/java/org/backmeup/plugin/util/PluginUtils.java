@@ -14,14 +14,14 @@ public final class PluginUtils {
     }
     
     public static class QueryParameters {
-        private Map<String, List<String>> query_pairs;
+        private Map<String, List<String>> queryPairs;
 
-        public QueryParameters(Map<String, List<String>> query_pairs) {
-            this.query_pairs = query_pairs;
+        public QueryParameters(Map<String, List<String>> queryPairs) {
+            this.queryPairs = queryPairs;
         }
 
         public String getParameter(String key) {
-            List<String> values = this.query_pairs.get(key);
+            List<String> values = this.queryPairs.get(key);
             if (values == null || values.isEmpty()) {
                 return null;
             }
@@ -29,7 +29,7 @@ public final class PluginUtils {
         }
 
         public List<String> getMultivalueParameter(String key) {
-            List<String> values = this.query_pairs.get(key);
+            List<String> values = this.queryPairs.get(key);
             if (values == null || values.isEmpty()) {
                 return null;
             }
@@ -47,20 +47,20 @@ public final class PluginUtils {
             throw new NullPointerException();
         }
 
-        final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<String>> queryPairs = new LinkedHashMap<String, List<String>>();
 
         for (String pair : queryParams.split("&")) {
             final int idx = pair.indexOf("=");
             final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
 
-            if (!query_pairs.containsKey(key)) {
-                query_pairs.put(key, new LinkedList<String>());
+            if (!queryPairs.containsKey(key)) {
+                queryPairs.put(key, new LinkedList<String>());
             }
 
             final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
-            query_pairs.get(key).add(value);
+            queryPairs.get(key).add(value);
         }
 
-        return new QueryParameters(query_pairs);
+        return new QueryParameters(queryPairs);
     }
 }
