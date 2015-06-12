@@ -6,7 +6,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public abstract class Serialization {
+public final class Serialization {
+    private Serialization() {
+        // Utility classes should not have public constructor
+    }
+    
     public static String getObjectAsEncodedString(Object obj) throws IOException {
         ByteArrayOutputStream bo = new ByteArrayOutputStream();
         ObjectOutputStream so = new ObjectOutputStream(bo);

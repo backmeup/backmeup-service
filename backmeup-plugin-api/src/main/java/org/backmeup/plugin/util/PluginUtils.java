@@ -8,7 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class PluginUtils {
+public final class PluginUtils {
+    private PluginUtils() {
+        // Utility classes should not have public constructor
+    }
+    
     public static class QueryParameters {
         private Map<String, List<String>> query_pairs;
 

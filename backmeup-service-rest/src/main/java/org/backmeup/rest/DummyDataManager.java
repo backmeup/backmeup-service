@@ -15,7 +15,11 @@ import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
-public class DummyDataManager {
+public final class DummyDataManager {
+    private DummyDataManager() {
+        // Utility classes should not have public constructor
+    }
+    
     public static UserDTO getUserDTO() {
         return new UserDTO("john.doe", "John", "Doe", null, "john.doe@example.com");
     }

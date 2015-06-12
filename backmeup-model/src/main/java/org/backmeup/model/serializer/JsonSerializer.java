@@ -15,7 +15,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
-public class JsonSerializer {
+public final class JsonSerializer {
+    private JsonSerializer() {
+        // Utility classes should not have public constructor
+    }
   private static class DateSerializer implements com.google.gson.JsonSerializer<Date>, JsonDeserializer<Date> {
 
     @Override

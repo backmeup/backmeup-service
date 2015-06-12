@@ -2,11 +2,11 @@ package org.backmeup.model.utils;
 
 /**
  * Utiltiy class for en/decoding a string to base64.
- * TODO: Remove this class when upgrading to JDK 8 and use java.util.Base64 instead!
+ * Remove this class when upgrading to JDK 8 and use java.util.Base64 instead!
  * Source: https://stackoverflow.com/questions/469695/decode-base64-data-in-java
  *
  */
-public class MyBase64 {
+public final class MyBase64 {
 
     private final static char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
@@ -16,6 +16,10 @@ public class MyBase64 {
         for(int i=0; i< ALPHABET.length; i++){
             toInt[ALPHABET[i]]= i;
         }
+    }
+    
+    private MyBase64() {
+        // Utility classes should not have public constructor
     }
 
     /**
