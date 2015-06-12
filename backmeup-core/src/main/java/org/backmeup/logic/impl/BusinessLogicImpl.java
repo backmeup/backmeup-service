@@ -55,7 +55,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     private static final String SHUTTING_DOWN_BUSINESS_LOGIC = "org.backmeup.logic.impl.BusinessLogicImpl.SHUTTING_DOWN_BUSINESS_LOGIC";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLogicImpl.class);
 
     // There seems to be a problem with weld (can't find resource bundle 
     // with getClass().getSimpleName()). Therefore use class name. 
@@ -98,7 +98,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @PreDestroy
     public void shutdown() {
-        logger.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
+        LOGGER.debug(textBundle.getString(SHUTTING_DOWN_BUSINESS_LOGIC));
     }
 
     // ========================================================================

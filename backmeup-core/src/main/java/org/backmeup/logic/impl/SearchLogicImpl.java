@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class SearchLogicImpl implements SearchLogic {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchLogicImpl.class);
 
     @Inject
     private IndexClientFactory indexClientFactory;
@@ -66,7 +66,7 @@ public class SearchLogicImpl implements SearchLogic {
         try (IndexClient client = getIndexClient(userId)) {
 
             String thumbnailPath = client.getThumbnailPathForFile(fileId);
-            this.logger.debug("Got thumbnail path: " + thumbnailPath);
+            LOGGER.debug("Got thumbnail path: " + thumbnailPath);
             if (thumbnailPath != null) { // NOSONAR can be null!
                 return new File(thumbnailPath);
             }

@@ -35,9 +35,13 @@ import org.backmeup.model.dto.PluginDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.rest.auth.BackmeupPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/plugins")
 public class Plugins extends Base {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Plugins.class);
+    
     public enum PluginSelectionType {
         Source,
         Sink,

@@ -25,7 +25,7 @@ import com.rabbitmq.client.ConnectionFactory;
  */
 @ApplicationScoped
 public class RabbitMQJobManager extends AbstractJobManager {
-    private final Logger logger = LoggerFactory.getLogger(RabbitMQJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQJobManager.class);
 
     @Inject
     @Configuration(key = "backmeup.message.queue.host")
@@ -75,7 +75,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
     @Override
     protected void runJob(BackupJobExecution job) {
         try {
-            this.logger.info(
+            this.LOGGER.info(
                     String.format("Job execution with id %s started for user %d", 
                             job.getId(), job.getUser().getUserId()));
 
@@ -83,7 +83,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
             this.mqChannel.basicPublish("", this.mqName, null, bytes);
         } catch (IOException e) {
             // Should only happen if message queue is down
-            this.logger.error("message queue down", e);
+            this.LOGGER.error("message queue down", e);
             throw new RuntimeException(e);
         }
     }

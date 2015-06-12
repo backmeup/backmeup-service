@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 @ApplicationScoped
 public class ConnectionImpl implements Connection {
-    private final Logger logger = LoggerFactory.getLogger(ConnectionImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionImpl.class);
 
     private EntityManagerFactory emFactory;
     private final ThreadLocal<EntityManager> threadLocalEntityManager;
@@ -61,7 +61,7 @@ public class ConnectionImpl implements Connection {
         EntityManager em = getOrCreateEntityManager(); 
 
         if (em.getTransaction().isActive()) {
-            logger.debug("Warning: Transaction already active! Rolling back");
+            LOGGER.debug("Warning: Transaction already active! Rolling back");
             em.getTransaction().rollback();
         }
 
@@ -99,7 +99,7 @@ public class ConnectionImpl implements Connection {
         EntityManager em = getEntityManager();
 
         if (em == null) {
-            logger.debug("Has already been committed/rolled back!");
+            LOGGER.debug("Has already been committed/rolled back!");
             return;
         }
         if (em.getTransaction().isActive()) {
