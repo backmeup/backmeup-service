@@ -3,6 +3,7 @@ package org.backmeup.plugin.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +31,8 @@ public final class PluginUtils {
 
         public List<String> getMultivalueParameter(String key) {
             List<String> values = this.queryPairs.get(key);
-            if (values == null || values.isEmpty()) {
-                return null;
+            if (values == null) {
+                return new ArrayList<String>();
             }
             return values;
         }
