@@ -38,7 +38,7 @@ public class JobProtocol {
 
   public JobProtocol(Date executionTime, BackMeUpUser user, boolean successful,
       long totalStoredEntries, String sinkTitle, Set<JobProtocolMember> members) {
-    this.executionTime = executionTime;
+    this.executionTime = (Date) executionTime.clone();
     this.user = user;
     this.successful = successful;
     this.totalStoredEntries = totalStoredEntries;
@@ -47,11 +47,14 @@ public class JobProtocol {
   }
   
   public Date getExecutionTime() {
-    return executionTime;
+      if (this.executionTime == null) {
+          return null;
+      }
+      return (Date) executionTime.clone();
   }
 
   public void setExecutionTime(Date executionTime) {
-    this.executionTime = executionTime;
+    this.executionTime = (Date) executionTime.clone();;
   }
 
   public BackMeUpUser getUser() {

@@ -33,11 +33,14 @@ public class SearchEntryDTO {
     }
 
     public Date getTimeStamp() {
-        return this.timeStamp;
+        if (this.timeStamp == null) {
+            return null;
+        }
+        return (Date) timeStamp.clone();
     }
 
     public void setTimeStamp(Date timeStamp) {
-        this.timeStamp = timeStamp;
+        this.timeStamp = (Date) timeStamp.clone();
     }
 
     public String getTitle() {

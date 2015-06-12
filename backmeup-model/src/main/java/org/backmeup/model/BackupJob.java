@@ -97,7 +97,7 @@ public class BackupJob {
             Profile sinkProfile, List<Profile> actionProfiles, Date start, JobFrequency frequency) {
         this.user = user;
         this.jobName = name;
-        this.startTime = start;
+        this.startTime = (Date) start.clone();
         this.jobFrequency = frequency;
         this.delay = jobFrequency.getDelayTime();
         setSourceProfile(sourceProfile);
@@ -271,7 +271,7 @@ public class BackupJob {
     }
 
     public void setLastFailed(Date lastFailed) {
-        this.lastFailed = lastFailed;
+        this.lastFailed = (Date) lastFailed.clone();
     }
 
     public boolean isActive() {
