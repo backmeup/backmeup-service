@@ -82,7 +82,7 @@ public class PluginsLogicImpl implements PluginsLogic {
     @Override 
     public PluginConfigInfo getPluginConfigInfo(String pluginId) {
         return getPluginConfigInfo(pluginId, null);
-    };
+    }
 
     @Override
     public PluginConfigInfo getPluginConfigInfo(String pluginId, AuthData authData) {
