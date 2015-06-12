@@ -116,7 +116,7 @@ public class Plugins extends Base {
         
         if(pluginConfigInfo.hasAuthData()) {
             PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
-            if ((pluginConfigInfo.getRedirectURL() != null) && (pluginConfigInfo.getRedirectURL() != "")) {
+            if ((pluginConfigInfo.getRedirectURL() != null) && (!"".equals(pluginConfigInfo.getRedirectURL()))) {
                 pluginConfigDTO.setConfigType(PluginConfigurationType.oauth);
             } else {
                 pluginConfigDTO.setConfigType(PluginConfigurationType.input);
@@ -136,7 +136,7 @@ public class Plugins extends Base {
     @Path("/{pluginId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {	
+    public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
         throwIfPluginNotAvailable(pluginId);
