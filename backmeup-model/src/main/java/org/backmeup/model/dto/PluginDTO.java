@@ -11,108 +11,108 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @XmlRootElement
 public class PluginDTO {
-	private String pluginId;
-	private String title;
-	private String description;
-	private String imageURL;
-	private PluginType pluginType;
-	private Map<String, String> metadata;
-	private PluginConfigurationDTO authDataDescription;
-	private List<PluginInputFieldDTO> propertiesDescription;
-	private List<String> availableOptions;
-	private List<PluginProfileDTO> profiles;
+    private String pluginId;
+    private String title;
+    private String description;
+    private String imageURL;
+    private PluginType pluginType;
+    private Map<String, String> metadata;
+    private PluginConfigurationDTO authDataDescription;
+    private List<PluginInputFieldDTO> propertiesDescription;
+    private List<String> availableOptions;
+    private List<PluginProfileDTO> profiles;
 
-	public PluginDTO() {
-		
-	}
+    public PluginDTO() {
 
-	public String getPluginId() {
-		return pluginId;
-	}
+    }
 
-	public void setPluginId(String pluginId) {
-		this.pluginId = pluginId;
-	}
+    public String getPluginId() {
+        return pluginId;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getImageURL() {
-		return imageURL;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setImageURL(String imageURL) {
-		this.imageURL = imageURL;
-	}
+    public String getImageURL() {
+        return imageURL;
+    }
 
-	public PluginType getPluginType() {
-		return pluginType;
-	}
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
 
-	public void setPluginType(PluginType pluginType) {
-		this.pluginType = pluginType;
-	}
+    public PluginType getPluginType() {
+        return pluginType;
+    }
 
-	public Map<String, String> getMetadata() {
-		return metadata;
-	}
+    public void setPluginType(PluginType pluginType) {
+        this.pluginType = pluginType;
+    }
 
-	public void setMetadata(Map<String, String> metadata) {
-		this.metadata = metadata;
-	}
-	
-	public void addMetadata(String key, String value) {
-		if(metadata == null) {
-			metadata = new HashMap<>();
-		}
-		this.metadata.put(key, value);
-	}
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
 
-	public PluginConfigurationDTO getAuthDataDescription() {
-		return authDataDescription;
-	}
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
 
-	public void setAuthDataDescription(PluginConfigurationDTO authDataDescription) {
-		this.authDataDescription = authDataDescription;
-	}
-	
-	public List<PluginInputFieldDTO> getPropertiesDescription() {
-		return propertiesDescription;
-	}
+    public void addMetadata(String key, String value) {
+        if(metadata == null) {
+            metadata = new HashMap<>();
+        }
+        this.metadata.put(key, value);
+    }
 
-	public void setPropertiesDescription(
-			List<PluginInputFieldDTO> propertiesDescription) {
-		this.propertiesDescription = propertiesDescription;
-	}
+    public PluginConfigurationDTO getAuthDataDescription() {
+        return authDataDescription;
+    }
 
-	public void addPropertiesDescription(PluginInputFieldDTO desc) {
-		if(propertiesDescription == null) {
-			this.propertiesDescription = new ArrayList<>();
-		}
-		this.propertiesDescription.add(desc);
-	}
+    public void setAuthDataDescription(PluginConfigurationDTO authDataDescription) {
+        this.authDataDescription = authDataDescription;
+    }
 
-	public List<String> getAvailableOptions() {
+    public List<PluginInputFieldDTO> getPropertiesDescription() {
+        return propertiesDescription;
+    }
+
+    public void setPropertiesDescription(
+            List<PluginInputFieldDTO> propertiesDescription) {
+        this.propertiesDescription = propertiesDescription;
+    }
+
+    public void addPropertiesDescription(PluginInputFieldDTO desc) {
+        if(propertiesDescription == null) {
+            this.propertiesDescription = new ArrayList<>();
+        }
+        this.propertiesDescription.add(desc);
+    }
+
+    public List<String> getAvailableOptions() {
         return availableOptions;
     }
 
     public void setAvailableOptions(List<String> availableOptions) {
         this.availableOptions = availableOptions;
     }
-    
+
     public void addAvailableOption(String option) {
         if(availableOptions == null) {
             this.availableOptions = new ArrayList<>();
@@ -121,17 +121,17 @@ public class PluginDTO {
     }
 
     public List<PluginProfileDTO> getProfiles() {
-		return profiles;
-	}
+        return profiles;
+    }
 
-	public void setProfiles(List<PluginProfileDTO> profiles) {
-		this.profiles = profiles;
-	}
-	
-	public void addProfile(PluginProfileDTO profile) {
-		if(profiles == null) {
-			profiles = new ArrayList<>();
-		}
-		profiles.add(profile);
-	}
+    public void setProfiles(List<PluginProfileDTO> profiles) {
+        this.profiles = profiles;
+    }
+
+    public void addProfile(PluginProfileDTO profile) {
+        if(profiles == null) {
+            profiles = new ArrayList<>();
+        }
+        profiles.add(profile);
+    }
 }

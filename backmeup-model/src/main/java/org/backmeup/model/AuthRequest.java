@@ -15,41 +15,41 @@ import org.backmeup.model.api.RequiredInputField;
  * @author fschoeppl
  */
 public class AuthRequest {
-	private List<RequiredInputField> requiredInputs;
-	private String redirectURL;
-	private AuthData authData;
+    private List<RequiredInputField> requiredInputs;
+    private String redirectURL;
+    private AuthData authData;
 
-	public AuthRequest() {
-	}
+    public AuthRequest() {
+    }
 
-	public AuthRequest(List<RequiredInputField> requiredInputs,
-			Map<String, String> typeMapping, String redirectURL, Profile profile) {
-		this.requiredInputs = requiredInputs;
-		this.redirectURL = redirectURL;
-		this.authData = profile.getAuthData();
-	}
+    public AuthRequest(List<RequiredInputField> requiredInputs,
+            Map<String, String> typeMapping, String redirectURL, Profile profile) {
+        this.requiredInputs = requiredInputs;
+        this.redirectURL = redirectURL;
+        this.authData = profile.getAuthData();
+    }
 
-	public List<RequiredInputField> getRequiredInputs() {
-		return requiredInputs;
-	}
+    public List<RequiredInputField> getRequiredInputs() {
+        return requiredInputs;
+    }
 
-	public void setRequiredInputs(List<RequiredInputField> requiredInputs) {
-		this.requiredInputs = requiredInputs;
-	}
+    public void setRequiredInputs(List<RequiredInputField> requiredInputs) {
+        this.requiredInputs = requiredInputs;
+    }
 
-	public String getRedirectURL() {
-		return redirectURL;
-	}
+    public String getRedirectURL() {
+        return redirectURL;
+    }
 
-	public void setRedirectURL(String redirectURL) {
-		this.redirectURL = redirectURL;
-	}
+    public void setRedirectURL(String redirectURL) {
+        this.redirectURL = redirectURL;
+    }
 
-	public AuthData getAuthData() {
-		return authData;
-	}
+    public AuthData getAuthData() {
+        return authData;
+    }
 
-	public void setAuthData(AuthData authData) {
-		this.authData = authData;
-	}
+    public void setAuthData(AuthData authData) {
+        this.authData = authData;
+    }
 }

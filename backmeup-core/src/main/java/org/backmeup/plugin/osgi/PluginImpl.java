@@ -70,341 +70,341 @@ import org.slf4j.LoggerFactory;
 @Named("plugin")
 @SuppressWarnings("rawtypes")
 public class PluginImpl implements Plugin {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PluginImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PluginImpl.class);
 
-	@Inject
-	@Configuration(key = "backmeup.osgi.deploymentDirectory")
-	private String deploymentDirPath;
+    @Inject
+    @Configuration(key = "backmeup.osgi.deploymentDirectory")
+    private String deploymentDirPath;
 
-	@Inject
-	@Configuration(key = "backmeup.osgi.temporaryDirectory")
-	private String tempDirPath;
-	
-	@Inject
-	@Configuration(key = "backmeup.osgi.exportedPackages")
-	private String exportedPackages;
+    @Inject
+    @Configuration(key = "backmeup.osgi.temporaryDirectory")
+    private String tempDirPath;
 
-	private boolean started;
-	
-	private File deploymentDirectory;
-	
-	private File temporaryDirectory;
+    @Inject
+    @Configuration(key = "backmeup.osgi.exportedPackages")
+    private String exportedPackages;
 
-	private Framework osgiFramework;
+    private boolean started;
 
-	private DeployMonitor deploymentMonitor;
+    private File deploymentDirectory;
 
-	
-	public PluginImpl() {
-		
-	}
+    private File temporaryDirectory;
 
-	public PluginImpl(String deploymentDirectory, String temporaryDirectory,
-			String exportedPackages) {
-		LOGGER.debug("********** NEW PLUGINIMPL **********");
-		this.deploymentDirPath = deploymentDirectory;
-		this.tempDirPath = temporaryDirectory;
-		this.exportedPackages = exportedPackages;
-		this.started = false;
-	}
+    private Framework osgiFramework;
 
-	@Override
+    private DeployMonitor deploymentMonitor;
+
+
+    public PluginImpl() {
+
+    }
+
+    public PluginImpl(String deploymentDirectory, String temporaryDirectory,
+            String exportedPackages) {
+        LOGGER.debug("********** NEW PLUGINIMPL **********");
+        this.deploymentDirPath = deploymentDirectory;
+        this.tempDirPath = temporaryDirectory;
+        this.exportedPackages = exportedPackages;
+        this.started = false;
+    }
+
+    @Override
     @PostConstruct
-	public void startup() {
-		if (!started) {
-			LOGGER.debug("Starting up PluginImpl!");
-			this.tempDirPath = this.tempDirPath + "/" + Long.toString(System.nanoTime());
-					
-			this.deploymentDirectory = new File(deploymentDirPath);
-			this.temporaryDirectory = new File(tempDirPath);
-			
-			initOSGiFramework();
-			startDeploymentMonitor();
-			deploymentMonitor.waitForInitialRun();
-			started = true;
-		}
-	}
+    public void startup() {
+        if (!started) {
+            LOGGER.debug("Starting up PluginImpl!");
+            this.tempDirPath = this.tempDirPath + "/" + Long.toString(System.nanoTime());
 
-	public void waitForInitialStartup() {
-		deploymentMonitor.waitForInitialRun();
-	}
+            this.deploymentDirectory = new File(deploymentDirPath);
+            this.temporaryDirectory = new File(tempDirPath);
 
-	private void startDeploymentMonitor() {
-		this.deploymentMonitor = new DeployMonitor(bundleContext(), deploymentDirectory);
-		this.deploymentMonitor.start();
-	}
+            initOSGiFramework();
+            startDeploymentMonitor();
+            deploymentMonitor.waitForInitialRun();
+            started = true;
+        }
+    }
 
-	public static boolean deleteDir(File dir) {
-		if (dir.isDirectory()) {
-			String[] children = dir.list();
-			for (String element : children) {
-				boolean success = deleteDir(new File(dir, element));
-				if (!success) {
-					return false;
-				}
-			}
-		}
-		// The directory is now empty so delete it
-		return dir.delete();
-	}
+    public void waitForInitialStartup() {
+        deploymentMonitor.waitForInitialRun();
+    }
 
-	public void initOSGiFramework() {
-		try {
-			FrameworkFactory factory = new FrameworkFactory();
-			if (temporaryDirectory.exists()) {
-				deleteDir(temporaryDirectory);
-			}
-			Map<String, String> config = new HashMap<>();
-			
-			config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exportedPackages);
-			config.put(Constants.FRAMEWORK_STORAGE, temporaryDirectory.getAbsolutePath());
-			config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
-			config.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
-			// Constants.FRAMEWORK_BUNDLE_PARENT_APP);
-			config.put(Constants.FRAMEWORK_BOOTDELEGATION, exportedPackages);
-			
-			LOGGER.debug("EXPORTED PACKAGES: " + exportedPackages);
-			// config.put(Constants.FRAMEWORK_EXECUTIONENVIRONMENT, "J2SE-1.6");
-			// config.put("osgi.shell.telnet", "on");
-			// config.put("osgi.shell.telnet.port", "6666");
-			
-			osgiFramework = factory.newFramework(config);
-			osgiFramework.start();
-		} catch (Exception e) {
-			LOGGER.error("", e);
-			throw new RuntimeException(e);
-		}
-	}
+    private void startDeploymentMonitor() {
+        this.deploymentMonitor = new DeployMonitor(bundleContext(), deploymentDirectory);
+        this.deploymentMonitor.start();
+    }
 
-	public void stopOSGiFramework() {
-		try {
-			osgiFramework.stop();
-			osgiFramework.waitForStop(0);
-			LOGGER.debug("OsgiFramework stopped.");
-		} catch (InterruptedException e) {
-			LOGGER.error("", e);
-		} catch (BundleException e) {
-			LOGGER.error("", e);
-		}
-	}
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (String element : children) {
+                boolean success = deleteDir(new File(dir, element));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
 
-	public BundleContext bundleContext() {
-		return osgiFramework.getBundleContext();
-	}
+    public void initOSGiFramework() {
+        try {
+            FrameworkFactory factory = new FrameworkFactory();
+            if (temporaryDirectory.exists()) {
+                deleteDir(temporaryDirectory);
+            }
+            Map<String, String> config = new HashMap<>();
 
-	public <T> T service(final Class<T> service) {
-		return service(service, null);
-	}
+            config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exportedPackages);
+            config.put(Constants.FRAMEWORK_STORAGE, temporaryDirectory.getAbsolutePath());
+            config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
+            config.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
+            // Constants.FRAMEWORK_BUNDLE_PARENT_APP);
+            config.put(Constants.FRAMEWORK_BOOTDELEGATION, exportedPackages);
 
-	private <T> ServiceReference getReference(final Class<T> service,
-			final String filter) {
-		ServiceReference ref = null;
-		if (filter == null) {
-			ref = bundleContext().getServiceReference(service.getName());
+            LOGGER.debug("EXPORTED PACKAGES: " + exportedPackages);
+            // config.put(Constants.FRAMEWORK_EXECUTIONENVIRONMENT, "J2SE-1.6");
+            // config.put("osgi.shell.telnet", "on");
+            // config.put("osgi.shell.telnet.port", "6666");
 
-		} else {
-			ServiceReference[] refs;
-			try {
-				refs = bundleContext().getServiceReferences(service.getName(),
-						filter);
-			} catch (InvalidSyntaxException e) {
-				throw new IllegalArgumentException(String.format("The filter '%s' is mallformed.", filter), e);
-			}
-			if (refs != null && refs.length > 0) {
-				ref = refs[0];
-			}
-		}
-		return ref;
-	}
+            osgiFramework = factory.newFramework(config);
+            osgiFramework.start();
+        } catch (Exception e) {
+            LOGGER.error("", e);
+            throw new RuntimeException(e);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T service(final Class<T> service, final String filter) {
-		ServiceReference ref = getReference(service, filter);
-		if (ref == null) {
-			throw new PluginUnavailableException(filter);
-		}
-		bundleContext().ungetService(ref);
-		return (T) Proxy.newProxyInstance(PluginImpl.class.getClassLoader(),
-				new Class[] { service }, new InvocationHandler() {
+    public void stopOSGiFramework() {
+        try {
+            osgiFramework.stop();
+            osgiFramework.waitForStop(0);
+            LOGGER.debug("OsgiFramework stopped.");
+        } catch (InterruptedException e) {
+            LOGGER.error("", e);
+        } catch (BundleException e) {
+            LOGGER.error("", e);
+        }
+    }
 
-					@Override
-                    public Object invoke(Object o, Method method, Object[] os) throws Throwable {
-						ServiceReference serviceRef = getReference(service, filter);
-						if (serviceRef == null) {
-							throw new PluginUnavailableException(filter);
-						}
-						Object instance = bundleContext().getService(serviceRef);
-						Object ret = null;
-						try {
-							ret = method.invoke(instance, os);
-						} catch (Exception e) {
-							throw new PluginException(filter, "An exception occured during execution of the method " + method.getName(), e);
-						} finally {
-							bundleContext().ungetService(serviceRef);
-						}
-						return ret;
-					}
-				});
-	}
+    public BundleContext bundleContext() {
+        return osgiFramework.getBundleContext();
+    }
 
-	private static class SpecialInvocationHandler implements InvocationHandler {
-		private final ServiceReference reference;
-		private final BundleContext context;
+    public <T> T service(final Class<T> service) {
+        return service(service, null);
+    }
 
-		public SpecialInvocationHandler(BundleContext context, ServiceReference reference) {
-			this.reference = reference;
-			this.context = context;
-		}
+    private <T> ServiceReference getReference(final Class<T> service,
+            final String filter) {
+        ServiceReference ref = null;
+        if (filter == null) {
+            ref = bundleContext().getServiceReference(service.getName());
 
-		@Override
+        } else {
+            ServiceReference[] refs;
+            try {
+                refs = bundleContext().getServiceReferences(service.getName(),
+                        filter);
+            } catch (InvalidSyntaxException e) {
+                throw new IllegalArgumentException(String.format("The filter '%s' is mallformed.", filter), e);
+            }
+            if (refs != null && refs.length > 0) {
+                ref = refs[0];
+            }
+        }
+        return ref;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T service(final Class<T> service, final String filter) {
+        ServiceReference ref = getReference(service, filter);
+        if (ref == null) {
+            throw new PluginUnavailableException(filter);
+        }
+        bundleContext().ungetService(ref);
+        return (T) Proxy.newProxyInstance(PluginImpl.class.getClassLoader(),
+                new Class[] { service }, new InvocationHandler() {
+
+            @Override
+            public Object invoke(Object o, Method method, Object[] os) throws Throwable {
+                ServiceReference serviceRef = getReference(service, filter);
+                if (serviceRef == null) {
+                    throw new PluginUnavailableException(filter);
+                }
+                Object instance = bundleContext().getService(serviceRef);
+                Object ret = null;
+                try {
+                    ret = method.invoke(instance, os);
+                } catch (Exception e) {
+                    throw new PluginException(filter, "An exception occured during execution of the method " + method.getName(), e);
+                } finally {
+                    bundleContext().ungetService(serviceRef);
+                }
+                return ret;
+            }
+        });
+    }
+
+    private static class SpecialInvocationHandler implements InvocationHandler {
+        private final ServiceReference reference;
+        private final BundleContext context;
+
+        public SpecialInvocationHandler(BundleContext context, ServiceReference reference) {
+            this.reference = reference;
+            this.context = context;
+        }
+
+        @Override
         public Object invoke(Object o, Method method, Object[] os) throws Throwable {
-			ServiceReference ref = reference;
-			Object ret = null;
-			@SuppressWarnings("unchecked")
-			Object instance = context.getService(ref);
-			if (instance == null) {
-				LOGGER.error(
-						"FATAL ERROR:\n\tCalling the method \"{}\" of a null-instance from bundle \"{}\"; getService returned null!\n",
-						method.getName(), ref.getBundle().getSymbolicName());
-			}
-			try {
-				boolean acc = method.isAccessible();
-				method.setAccessible(true);
+            ServiceReference ref = reference;
+            Object ret = null;
+            @SuppressWarnings("unchecked")
+            Object instance = context.getService(ref);
+            if (instance == null) {
+                LOGGER.error(
+                        "FATAL ERROR:\n\tCalling the method \"{}\" of a null-instance from bundle \"{}\"; getService returned null!\n",
+                        method.getName(), ref.getBundle().getSymbolicName());
+            }
+            try {
+                boolean acc = method.isAccessible();
+                method.setAccessible(true);
 
-				if (os == null) {
-					ret = method.invoke(instance);
-				} else {
-					ret = method.invoke(instance, os);
-				}
-				method.setAccessible(acc);
-			} finally {
-				context.ungetService(ref);
-			}
-			return ret;
-		}
-	}
+                if (os == null) {
+                    ret = method.invoke(instance);
+                } else {
+                    ret = method.invoke(instance, os);
+                }
+                method.setAccessible(acc);
+            } finally {
+                context.ungetService(ref);
+            }
+            return ret;
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> Iterable<T> services(final Class<T> service, final String filter) {
-		return new Iterable<T>() {
+    @SuppressWarnings("unchecked")
+    public <T> Iterable<T> services(final Class<T> service, final String filter) {
+        return new Iterable<T>() {
 
-			@Override
+            @Override
             public Iterator<T> iterator() {
-				try {
-				    List<T> services = new ArrayList<>();
-					ServiceReference[] refs = bundleContext().getServiceReferences(service.getName(), filter);
-					if (refs != null) {
-					    for (ServiceReference s : refs) {
-	                        services.add((T) Proxy.newProxyInstance(
-	                                PluginImpl.class.getClassLoader(),
-	                                new Class[] { service },
-	                                new SpecialInvocationHandler(bundleContext(), s)));
-	                    }
-					}
-					return services.iterator();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-			
-		};
-	}
+                try {
+                    List<T> services = new ArrayList<>();
+                    ServiceReference[] refs = bundleContext().getServiceReferences(service.getName(), filter);
+                    if (refs != null) {
+                        for (ServiceReference s : refs) {
+                            services.add((T) Proxy.newProxyInstance(
+                                    PluginImpl.class.getClassLoader(),
+                                    new Class[] { service },
+                                    new SpecialInvocationHandler(bundleContext(), s)));
+                        }
+                    }
+                    return services.iterator();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
-	@Override
+        };
+    }
+
+    @Override
     public void shutdown() {
-		if (started) {
-			LOGGER.debug("Shutting down PluginImpl!");
-			this.deploymentMonitor.stop();
-			this.stopOSGiFramework();
-			this.started = false;
-		}
-	}
+        if (started) {
+            LOGGER.debug("Shutting down PluginImpl!");
+            this.deploymentMonitor.stop();
+            this.stopOSGiFramework();
+            this.started = false;
+        }
+    }
 
-	protected List<PluginDescribable> getDescribableForType(PluginType...pluginTypes) {
-		List<PluginType> lpluginTypes = Arrays.asList(pluginTypes);
-		Iterable<PluginDescribable> descs = services(
-				PluginDescribable.class, null);
-		List<PluginDescribable> result = new ArrayList<>();
-		for (PluginDescribable d : descs) {
-			if (lpluginTypes.contains(d.getType())) {
-				result.add(d);
-			}
-		}
-		return result;
-	}
-	
-	@Override
-	public boolean isPluginAvailable(String pluginId) {
-		ServiceReference ref = getReference(PluginDescribable.class, "(name=" + pluginId + ")");
-		return ref != null;
-	}
-	
-	@Override
-	public boolean hasAuthorizable(String pluginId) {
-		ServiceReference ref = getReference(Authorizable.class, "(name=" + pluginId + ")");
-		return ref != null;
-	}
-	
-	@Override
-	public boolean hasValidator(String pluginId) {
-		ServiceReference ref = getReference(Validationable.class, "(name=" + pluginId + ")");
-		return ref != null;
-	}
-	
-	@Override
+    protected List<PluginDescribable> getDescribableForType(PluginType...pluginTypes) {
+        List<PluginType> lpluginTypes = Arrays.asList(pluginTypes);
+        Iterable<PluginDescribable> descs = services(
+                PluginDescribable.class, null);
+        List<PluginDescribable> result = new ArrayList<>();
+        for (PluginDescribable d : descs) {
+            if (lpluginTypes.contains(d.getType())) {
+                result.add(d);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isPluginAvailable(String pluginId) {
+        ServiceReference ref = getReference(PluginDescribable.class, "(name=" + pluginId + ")");
+        return ref != null;
+    }
+
+    @Override
+    public boolean hasAuthorizable(String pluginId) {
+        ServiceReference ref = getReference(Authorizable.class, "(name=" + pluginId + ")");
+        return ref != null;
+    }
+
+    @Override
+    public boolean hasValidator(String pluginId) {
+        ServiceReference ref = getReference(Validationable.class, "(name=" + pluginId + ")");
+        return ref != null;
+    }
+
+    @Override
     public List<PluginDescribable> getActions() {
-		return this.getDescribableForType(PluginType.Action);
-	}
-	
-	@Override
+        return this.getDescribableForType(PluginType.Action);
+    }
+
+    @Override
     public List<PluginDescribable> getDatasinks() {
-		return this.getDescribableForType(PluginType.Sink, PluginType.SourceSink);
-	}
-	
-	@Override
+        return this.getDescribableForType(PluginType.Sink, PluginType.SourceSink);
+    }
+
+    @Override
     public List<PluginDescribable> getDatasources() {
-		return this.getDescribableForType(PluginType.Source, PluginType.SourceSink);
-	}
-	
-	@Override
+        return this.getDescribableForType(PluginType.Source, PluginType.SourceSink);
+    }
+
+    @Override
     public PluginDescribable getPluginDescribableById(String sourceSinkId) {
-		return service(PluginDescribable.class, "(name=" + sourceSinkId + ")");
-	}
-	
-	@Override
+        return service(PluginDescribable.class, "(name=" + sourceSinkId + ")");
+    }
+
+    @Override
     public Datasource getDatasource(String sourceId) {
-		return service(Datasource.class, "(name=" + sourceId + ")");
-	}
+        return service(Datasource.class, "(name=" + sourceId + ")");
+    }
 
-	@Override
+    @Override
     public Datasink getDatasink(String sinkId) {
-		return service(Datasink.class, "(name=" + sinkId + ")");
-	}
-	
-	@Override
-    public Action getAction(String actionId) {
-		return service(Action.class, "(name=" + actionId + ")");
-	}
-	
-	@Override
-    public Authorizable getAuthorizable(String sourceSinkId) {
-		return service(Authorizable.class, "(name=" + sourceSinkId + ")");
-	}
-	
-	@Override
-    public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
-		 switch (authType) {
-	        case OAuth:
-	        	return service(OAuthBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
-	        case InputBased:
-	        	return service(InputBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
-	        default:
-	            throw new IllegalArgumentException("unknown authorization type " + authType);
-		 }
-	}
+        return service(Datasink.class, "(name=" + sinkId + ")");
+    }
 
-	@Override
-	public Validationable getValidator(String sourceSinkId) {
-		return service(Validationable.class, "(name=" + sourceSinkId + ")");
-	}
+    @Override
+    public Action getAction(String actionId) {
+        return service(Action.class, "(name=" + actionId + ")");
+    }
+
+    @Override
+    public Authorizable getAuthorizable(String sourceSinkId) {
+        return service(Authorizable.class, "(name=" + sourceSinkId + ")");
+    }
+
+    @Override
+    public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
+        switch (authType) {
+        case OAuth:
+            return service(OAuthBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
+        case InputBased:
+            return service(InputBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
+        default:
+            throw new IllegalArgumentException("unknown authorization type " + authType);
+        }
+    }
+
+    @Override
+    public Validationable getValidator(String sourceSinkId) {
+        return service(Validationable.class, "(name=" + sourceSinkId + ")");
+    }
 }

@@ -9,16 +9,16 @@ package org.backmeup.model.exceptions;
  *
  */
 public class AlreadyRegisteredException extends BackMeUpException {
-	private static final long serialVersionUID = 1L;
-	private final String username;
-	
-	public AlreadyRegisteredException(String username) {
-		super("The user has already been registered!");
-		this.username = username;
-		
-	}
+    private static final long serialVersionUID = 1L;
+    private final String username;
 
-	public String getUsername() {
-		return username;
-	}
+    public AlreadyRegisteredException(String username) {
+        super("The user has already been registered!");
+        this.username = username;
+
+    }
+
+    public String getUsername() {
+        return username;
+    }
 }

@@ -16,22 +16,22 @@ public interface ProfileLogic {
     Profile saveProfile(Profile profile);
 
     List<Profile> getProfilesOf(Long userId);
-        
+
     Profile getProfile(BackMeUpUser currentUser, Long profileId);
-    
-	Profile updateProfile(BackMeUpUser currentUser, Profile profile);
-    
+
+    Profile updateProfile(BackMeUpUser currentUser, Profile profile);
+
     void deleteProfilesOf(BackMeUpUser currentUser, Long userId);
-    
+
     void deleteProfile(BackMeUpUser currentUser, Long profileId);
 
 
     AuthData addAuthData(AuthData authData);
-    
+
     AuthData getAuthData(BackMeUpUser currentUser, Long authDataId);
-    
+
     List<AuthData> getAuthDataOf(Long userId);
-    
+
     void deleteAuthData(BackMeUpUser currentUser, Long authDataId);
-    
+
 }

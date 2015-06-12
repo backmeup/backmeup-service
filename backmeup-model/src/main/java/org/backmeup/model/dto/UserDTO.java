@@ -12,73 +12,73 @@ public class UserDTO {
     private String password;
     private String email;
     private boolean activated;
-    
+
     public UserDTO() {
-    	
+
     }
 
     public UserDTO(String username, String firstname, String lastname, String password, String email) {
-    	this.username = username;
-    	this.firstname = firstname;
-    	this.lastname = lastname;
-    	this.password = password;
-    	this.email = email;
-    	this.activated = false;
+        this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.password = password;
+        this.email = email;
+        this.activated = false;
     }
-    
-	public Long getUserId() {
-		return userId;
-	}
 
-	private void setUserId(Long userId) {
-		this.userId = userId;
-	}    
+    public Long getUserId() {
+        return userId;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    private void setUserId(Long userId) {
+        this.userId = userId;
+    }    
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getFirstname() {
-		return firstname;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
+    public String getFirstname() {
+        return firstname;
+    }
 
-	public String getLastname() {
-		return lastname;
-	}
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
 
-	public void setLastname(String name) {
-		this.lastname = name;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
-	
-	private void setPassword(String password) {
-		this.password = password;
-	}
+    public String getLastname() {
+        return lastname;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setLastname(String name) {
+        this.lastname = name;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public boolean isActivated() {
-		return activated;
-	}
+    private void setPassword(String password) {
+        this.password = password;
+    }
 
-	private void setActivated(Boolean activated) {
-		this.activated = activated;
-	}
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    private void setActivated(Boolean activated) {
+        this.activated = activated;
+    }
 }

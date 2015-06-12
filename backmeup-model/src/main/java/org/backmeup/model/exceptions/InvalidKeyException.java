@@ -9,33 +9,33 @@ package org.backmeup.model.exceptions;
  *
  */
 public class InvalidKeyException extends PluginException {
-  private static final long serialVersionUID = 1L;
-  private final String plugin;
-  private final String keyType;
-  private final String value;
-  private final String configFile;
+    private static final long serialVersionUID = 1L;
+    private final String plugin;
+    private final String keyType;
+    private final String value;
+    private final String configFile;
 
-  public InvalidKeyException(String plugin, String keyType, String value, String configFile) {    
-    super(plugin, "Invalid app key / secret!");
-    this.plugin = plugin;
-    this.keyType = keyType;
-    this.value = value;
-    this.configFile = configFile;
-  }
+    public InvalidKeyException(String plugin, String keyType, String value, String configFile) {    
+        super(plugin, "Invalid app key / secret!");
+        this.plugin = plugin;
+        this.keyType = keyType;
+        this.value = value;
+        this.configFile = configFile;
+    }
 
-  public String getPlugin() {
-    return plugin;
-  }
+    public String getPlugin() {
+        return plugin;
+    }
 
-  public String getKeyType() {
-    return keyType;
-  }
+    public String getKeyType() {
+        return keyType;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public String getValue() {
+        return value;
+    }
 
-  public String getConfigFile() {
-    return configFile;
-  }
+    public String getConfigFile() {
+        return configFile;
+    }
 }

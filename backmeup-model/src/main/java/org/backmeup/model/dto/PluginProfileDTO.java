@@ -11,90 +11,90 @@ import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 @XmlRootElement
 public class PluginProfileDTO {
-	private long profileId;
-	private String pluginId;
-	private PluginType profileType;
-	private long modified;
-	private AuthDataDTO authData;
-	// Init with HashMap is necessary as long as the props are 
-	// stored within the service db (jpa mapping). Otherwise, 
-	// dozer maps the persistentmap from the domain model
-	// which results in a lazyinitexception in dozer. 
-	private Map<String, String> properties = new HashMap<>();
-	private List<String> options;
-	
-	public PluginProfileDTO() {
-		
-	}
+    private long profileId;
+    private String pluginId;
+    private PluginType profileType;
+    private long modified;
+    private AuthDataDTO authData;
+    // Init with HashMap is necessary as long as the props are 
+    // stored within the service db (jpa mapping). Otherwise, 
+    // dozer maps the persistentmap from the domain model
+    // which results in a lazyinitexception in dozer. 
+    private Map<String, String> properties = new HashMap<>();
+    private List<String> options;
 
-	public long getProfileId() {
-		return profileId;
-	}
+    public PluginProfileDTO() {
 
-	public void setProfileId(long profileId) {
-		this.profileId = profileId;
-	}
+    }
 
-	public String getPluginId() {
-		return pluginId;
-	}
+    public long getProfileId() {
+        return profileId;
+    }
 
-	public void setPluginId(String pluginId) {
-		this.pluginId = pluginId;
-	}
+    public void setProfileId(long profileId) {
+        this.profileId = profileId;
+    }
 
-	public PluginType getProfileType() {
-		return profileType;
-	}
+    public String getPluginId() {
+        return pluginId;
+    }
 
-	public void setProfileType(PluginType profileType) {
-		this.profileType = profileType;
-	}
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
 
-	public long getModified() {
-		return modified;
-	}
+    public PluginType getProfileType() {
+        return profileType;
+    }
 
-	public void setModified(long modified) {
-		this.modified = modified;
-	}
+    public void setProfileType(PluginType profileType) {
+        this.profileType = profileType;
+    }
 
-	public AuthDataDTO getAuthData() {
-		return authData;
-	}
+    public long getModified() {
+        return modified;
+    }
 
-	public void setAuthData(AuthDataDTO authData) {
-		this.authData = authData;
-	}
+    public void setModified(long modified) {
+        this.modified = modified;
+    }
 
-	public Map<String, String> getProperties() {
-		return properties;
-	}
+    public AuthDataDTO getAuthData() {
+        return authData;
+    }
 
-	public void setProperties(Map<String, String> configProperties) {
-		this.properties = configProperties;
-	}
-	
-	public void addProperty(String key, String value) {
-		if(properties == null) {
-			properties = new HashMap<>();
-		}
-		properties.put(key, value);
-	}
+    public void setAuthData(AuthDataDTO authData) {
+        this.authData = authData;
+    }
 
-	public List<String> getOptions() {
-		return options;
-	}
+    public Map<String, String> getProperties() {
+        return properties;
+    }
 
-	public void setOptions(List<String> options) {
-		this.options = options;
-	}
-	
-	public void addOption(String option) {
-		if(options == null) {
-			options = new ArrayList<>();
-		}
-		options.add(option);
-	}
-	
+    public void setProperties(Map<String, String> configProperties) {
+        this.properties = configProperties;
+    }
+
+    public void addProperty(String key, String value) {
+        if(properties == null) {
+            properties = new HashMap<>();
+        }
+        properties.put(key, value);
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public void addOption(String option) {
+        if(options == null) {
+            options = new ArrayList<>();
+        }
+        options.add(option);
+    }
+
 }

@@ -9,20 +9,20 @@ package org.backmeup.model.exceptions;
  *
  */
 public class UnknownUserException extends BackMeUpException {
-	private static final long serialVersionUID = 1L;
-  private final String username;
+    private static final long serialVersionUID = 1L;
+    private final String username;
 
-	public UnknownUserException(String username) {
-		super("Unknown user");
-		this.username = username;
-	}
-	
-	public UnknownUserException(Long userId) {
-		super("Unknown user");
-		this.username = Long.toString(userId);
-	}
-	
-	public String getUsername() {
-	  return this.username;
-	}
+    public UnknownUserException(String username) {
+        super("Unknown user");
+        this.username = username;
+    }
+
+    public UnknownUserException(Long userId) {
+        super("Unknown user");
+        this.username = Long.toString(userId);
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
 }

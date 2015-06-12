@@ -7,30 +7,30 @@ import javax.ws.rs.core.SecurityContext;
 import org.backmeup.model.BackMeUpUser;
 
 public class BackmeupSecurityContext implements SecurityContext{
-	private final BackmeupPrincipal user;
-	
-	public BackmeupSecurityContext(BackMeUpUser user) {
-		this.user = new BackmeupPrincipal(user.getUserId().toString(), user);
-	}
+    private final BackmeupPrincipal user;
 
-	@Override
-	public Principal getUserPrincipal() {
-		return user;
-	}
+    public BackmeupSecurityContext(BackMeUpUser user) {
+        this.user = new BackmeupPrincipal(user.getUserId().toString(), user);
+    }
 
-	@Override
-	public boolean isUserInRole(String role) {
-		return true;
-	}
+    @Override
+    public Principal getUserPrincipal() {
+        return user;
+    }
 
-	@Override
-	public boolean isSecure() {
-		return false;
-	}
+    @Override
+    public boolean isUserInRole(String role) {
+        return true;
+    }
 
-	@Override
-	public String getAuthenticationScheme() {
-		return null;
-	}
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getAuthenticationScheme() {
+        return null;
+    }
 
 }

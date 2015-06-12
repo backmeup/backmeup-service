@@ -40,86 +40,86 @@ public class Profile implements Serializable {
     private static final long serialVersionUID = 1606660919647823719L;
 
     @Id
-	@GeneratedValue
-	private Long id;
+    @GeneratedValue
+    private Long id;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
-	private BackMeUpUser user;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
+    private BackMeUpUser user;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modified;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date modified;
 
-	private String pluginId;
+    private String pluginId;
 
-	@Enumerated(EnumType.STRING)
-	private PluginType pluginType;
+    @Enumerated(EnumType.STRING)
+    private PluginType pluginType;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
-	private AuthData authData;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
+    private AuthData authData;
 
-	@Transient
-//	@ElementCollection(fetch=FetchType.EAGER)
-//	@OrderColumn(name = "properties_index")
-	private Map<String, String> properties;
+    @Transient
+    //	@ElementCollection(fetch=FetchType.EAGER)
+    //	@OrderColumn(name = "properties_index")
+    private Map<String, String> properties;
 
-	@Transient
-//	@ElementCollection(fetch=FetchType.EAGER)
-//	@OrderColumn(name = "options_index")
-	private List<String> options;
+    @Transient
+    //	@ElementCollection(fetch=FetchType.EAGER)
+    //	@OrderColumn(name = "options_index")
+    private List<String> options;
 
-	public Profile() {
+    public Profile() {
 
-	}
+    }
 
-	public Profile(BackMeUpUser user, String pluginId, PluginType pluginType) {
-		this(null, user, pluginId, pluginType);
-	}
+    public Profile(BackMeUpUser user, String pluginId, PluginType pluginType) {
+        this(null, user, pluginId, pluginType);
+    }
 
-	public Profile(Long id, BackMeUpUser user, String pluginId, PluginType pluginType) {
-		this.id = id;
-		this.user = user;
-		this.pluginId = pluginId;
-		this.pluginType = pluginType;
-	}
+    public Profile(Long id, BackMeUpUser user, String pluginId, PluginType pluginType) {
+        this.id = id;
+        this.user = user;
+        this.pluginId = pluginId;
+        this.pluginType = pluginType;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long profileId) {
-		this.id = profileId;
-		this.modified = new Date();
-	}
+    public void setId(Long profileId) {
+        this.id = profileId;
+        this.modified = new Date();
+    }
 
-	public BackMeUpUser getUser() {
-		return user;
-	}
+    public BackMeUpUser getUser() {
+        return user;
+    }
 
-	public void setUser(BackMeUpUser user) {
-		this.user = user;
-		this.modified = new Date();
-	}
+    public void setUser(BackMeUpUser user) {
+        this.user = user;
+        this.modified = new Date();
+    }
 
-	public String getPluginId() {
-		return pluginId;
-	}
+    public String getPluginId() {
+        return pluginId;
+    }
 
-	public void setPluginId(String pluginId) {
-		this.modified = new Date();
-		this.pluginId = pluginId;
-	}
+    public void setPluginId(String pluginId) {
+        this.modified = new Date();
+        this.pluginId = pluginId;
+    }
 
-	public PluginType getType() {
-		return pluginType;
-	}
+    public PluginType getType() {
+        return pluginType;
+    }
 
-	public void setType(PluginType pluginType) {
-		this.modified = new Date();
-		this.pluginType = pluginType;
-	}
+    public void setType(PluginType pluginType) {
+        this.modified = new Date();
+        this.pluginType = pluginType;
+    }
 
     public Date getCreated() {
         if (this.created == null) {
@@ -127,7 +127,7 @@ public class Profile implements Serializable {
         }
         return (Date)created.clone();
     }
-    
+
     @PrePersist
     protected void onCreate() {
         this.created = new Date();
@@ -145,56 +145,56 @@ public class Profile implements Serializable {
         this.modified = new Date();
     }
 
-	public AuthData getAuthData() {
-		return authData;
-	}
+    public AuthData getAuthData() {
+        return authData;
+    }
 
-	public void setAuthData(AuthData authData) {
-		if(this.pluginId == null) {
-			throw new IllegalStateException("Cannot set auth data. Profile has to be associated with a plugin");
-		}
-		
-		if(!authData.getPluginId().equals(this.pluginId)){
-			throw new IllegalArgumentException("Auth data is associated with a different plugin");
-		}
-		
-		if (!authData.getUser().getUserId().equals(this.getUser().getUserId())) {
-			throw new IllegalArgumentException("Auth data is associated with a different user");
-		}
-		
-		this.authData = authData;
-	}
+    public void setAuthData(AuthData authData) {
+        if(this.pluginId == null) {
+            throw new IllegalStateException("Cannot set auth data. Profile has to be associated with a plugin");
+        }
 
-	public Map<String, String> getProperties() {
-		return properties;
-	}
+        if(!authData.getPluginId().equals(this.pluginId)){
+            throw new IllegalArgumentException("Auth data is associated with a different plugin");
+        }
 
-	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
-	}
-	
-	public void addProperty(String key, String value) {
-		if(this.properties == null) {
-			this.properties = new HashMap<>();
-		}
-		this.properties.put(key, value);
-	}
+        if (!authData.getUser().getUserId().equals(this.getUser().getUserId())) {
+            throw new IllegalArgumentException("Auth data is associated with a different user");
+        }
 
-	public List<String> getOptions() {
-		return options;
-	}
+        this.authData = authData;
+    }
 
-	public void setOptions(List<String> options) {
-		this.options = options;
-	}
-	
-	public void addOption(String option) {
-		if(this.options == null) {
-			this.options = new ArrayList<>();
-		}
-		this.options.add(option);
-	}
-	
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    public void addProperty(String key, String value) {
+        if(this.properties == null) {
+            this.properties = new HashMap<>();
+        }
+        this.properties.put(key, value);
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public void addOption(String option) {
+        if(this.options == null) {
+            this.options = new ArrayList<>();
+        }
+        this.options.add(option);
+    }
+
     public String getPropertiesAndOptionsAsEncodedString() {
         try {            
             Map<String, String> props = new HashMap<String, String>();
@@ -222,12 +222,12 @@ public class Profile implements Serializable {
             throw new BackMeUpException("Cannot deserialize profile data", e);
         }
     }
-	
+
     @Override
     public String toString() {
         return String.format("%s: id=%d Plugin=%s Type=%s", "Profile", id, pluginId, pluginType);
     }
-    
+
     /**
      * Attempt to establish identity based on id if both exist. 
      * If either id does not exist use Object.equals().
@@ -249,7 +249,7 @@ public class Profile implements Serializable {
         }
         return id.equals(entity.getId());
     }
-    
+
     /**
      * Use ID if it exists to establish hash code, otherwise fall back to
      * Object.hashCode(). 

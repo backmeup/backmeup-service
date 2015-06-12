@@ -10,33 +10,33 @@ import org.backmeup.model.constants.JobFrequency;
 
 @XmlRootElement
 public class BackupJobCreationDTO {
-	private String jobTitle;
-	private JobFrequency schedule;
-	private Date start;
+    private String jobTitle;
+    private JobFrequency schedule;
+    private Date start;
 
-	private Long source;
-	private List<Long> actions;
-	private Long sink;
+    private Long source;
+    private List<Long> actions;
+    private Long sink;
 
-	public BackupJobCreationDTO() {
+    public BackupJobCreationDTO() {
 
-	}
+    }
 
-	public String getJobTitle() {
-		return jobTitle;
-	}
+    public String getJobTitle() {
+        return jobTitle;
+    }
 
-	public void setJobTitle(String jobTitle) {
-		this.jobTitle = jobTitle;
-	}
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
 
-	public JobFrequency getSchedule() {
-		return schedule;
-	}
+    public JobFrequency getSchedule() {
+        return schedule;
+    }
 
-	public void setSchedule(JobFrequency schedule) {
-		this.schedule = schedule;
-	}
+    public void setSchedule(JobFrequency schedule) {
+        this.schedule = schedule;
+    }
 
     public Date getStart() {
         if (this.start == null) {
@@ -45,38 +45,38 @@ public class BackupJobCreationDTO {
         return (Date) start.clone();
     }
 
-	public void setStart(Date start) {
-		this.start = (Date) start.clone();
-	}
+    public void setStart(Date start) {
+        this.start = (Date) start.clone();
+    }
 
-	public Long getSource() {
-		return source;
-	}
+    public Long getSource() {
+        return source;
+    }
 
-	public void setSource(Long source) {
-		this.source = source;
-	}
+    public void setSource(Long source) {
+        this.source = source;
+    }
 
-	public List<Long> getActions() {
-		return actions;
-	}
+    public List<Long> getActions() {
+        return actions;
+    }
 
-	public void setActions(List<Long> actions) {
-		this.actions = actions;
-	}
-	
-	public void addAction(Long action) {
-		if(actions == null) {
-			actions = new ArrayList<>();
-		}
-		actions.add(action);
-	}
+    public void setActions(List<Long> actions) {
+        this.actions = actions;
+    }
 
-	public Long getSink() {
-		return sink;
-	}
+    public void addAction(Long action) {
+        if(actions == null) {
+            actions = new ArrayList<>();
+        }
+        actions.add(action);
+    }
 
-	public void setSink(Long sink) {
-		this.sink = sink;
-	}
+    public Long getSink() {
+        return sink;
+    }
+
+    public void setSink(Long sink) {
+        this.sink = sink;
+    }
 }

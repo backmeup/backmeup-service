@@ -29,101 +29,101 @@ import org.backmeup.model.utils.Serialization;
  */
 @Entity
 public class AuthData {
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	private String name;
+    private String name;
 
-	private String pluginId;
-	
+    private String pluginId;
+
     // The username that has been used for a certain profile, 
     // e.g. the dropbox username or facebook username
     private String identification;
-	
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-	private BackMeUpUser user;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date created;
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private BackMeUpUser user;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modified;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
 
-	@Transient
-//	@ElementCollection(fetch = FetchType.EAGER)
-//	@MapKeyColumn(name = "authdata_key")
-//	@Column(name = "authdata_value", columnDefinition="text")
-//	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
-	private Map<String, String> properties;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date modified;
 
-	public AuthData() {
+    @Transient
+    //	@ElementCollection(fetch = FetchType.EAGER)
+    //	@MapKeyColumn(name = "authdata_key")
+    //	@Column(name = "authdata_value", columnDefinition="text")
+    //	@CollectionTable(name = "AuthDataProperties", joinColumns = @JoinColumn(name = "id"))
+    private Map<String, String> properties;
 
-	}
+    public AuthData() {
 
-	public AuthData(String name, String pluginId, BackMeUpUser user) {
-		this(name, pluginId, user, new HashMap<String, String>());
-	}
+    }
 
-	public AuthData(String name, String pluginId, BackMeUpUser user, Map<String, String> properties) {
-		super();
-		this.name = name;
-		this.pluginId = pluginId;
-		this.user = user;
-		this.properties = properties;
-	}
+    public AuthData(String name, String pluginId, BackMeUpUser user) {
+        this(name, pluginId, user, new HashMap<String, String>());
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public AuthData(String name, String pluginId, BackMeUpUser user, Map<String, String> properties) {
+        super();
+        this.name = name;
+        this.pluginId = pluginId;
+        this.user = user;
+        this.properties = properties;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPluginId() {
-		return pluginId;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPluginId(String pluginId) {
-		this.pluginId = pluginId;
-	}
+    public String getPluginId() {
+        return pluginId;
+    }
 
-	public BackMeUpUser getUser() {
-		return user;
-	}
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
 
-	public void setUser(BackMeUpUser user) {
-		this.user = user;
-	}
+    public BackMeUpUser getUser() {
+        return user;
+    }
 
-	public Date getCreated() {
+    public void setUser(BackMeUpUser user) {
+        this.user = user;
+    }
+
+    public Date getCreated() {
         if (this.created == null) {
             return null;
         }
         return (Date)created.clone();
-	}
-	
+    }
+
     @PrePersist
     protected void onCreate() {
         this.created = new Date();
     }
 
-	public Date getModified() {
+    public Date getModified() {
         if (this.modified == null) {
             return null;
         }
         return (Date) modified.clone();
-	}
-	
+    }
+
     @PreUpdate
     protected void onUpdate() {
         this.modified = new Date();
@@ -136,14 +136,14 @@ public class AuthData {
     public void setIdentification(String identification) {
         this.identification = identification;
     }
-	
-	public Map<String, String> getProperties() {
-		return properties;
-	}
 
-	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
-	}
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
 
     public void addProperty(String key, String value) {
         if (this.properties == null) {
@@ -151,7 +151,7 @@ public class AuthData {
         }
         this.properties.put(key, value);
     }
-    
+
     public String getPropertiesAsEncodedString() {
         try {
             return Serialization.getObjectAsEncodedString(properties);
@@ -168,12 +168,12 @@ public class AuthData {
             throw new BackMeUpException("Cannot deserialize auth data properties", e);
         }
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s: id=%d Name=%s Plugin=%s", "AuthData", id, name, pluginId);
     }
-    
+
     /**
      * Attempt to establish identity based on id if both exist. 
      * If either id does not exist use Object.equals().
@@ -195,7 +195,7 @@ public class AuthData {
         }
         return id.equals(entity.getId());
     }
-    
+
     /**
      * Use ID if it exists to establish hash code, otherwise fall back to
      * Object.hashCode(). 
