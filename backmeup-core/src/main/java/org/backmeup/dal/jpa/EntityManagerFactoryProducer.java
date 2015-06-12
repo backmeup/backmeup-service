@@ -35,7 +35,8 @@ public class EntityManagerFactoryProducer {
     }
 
     public void destroy(@Disposes EntityManagerFactory factory) {
-        if (factory.isOpen())
+        if (factory.isOpen()) {
             factory.close();
+        }
     }
 }
