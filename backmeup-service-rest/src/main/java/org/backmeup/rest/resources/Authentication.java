@@ -14,12 +14,15 @@ import org.backmeup.model.exceptions.InvalidCredentialsException;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.model.exceptions.UserNotActivatedException;
 import org.backmeup.rest.auth.AuthInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Authenticate users and manage access tokens.
  */
 @Path("/authenticate")
-public class Authentication extends Base {	
+public class Authentication extends Base {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Authentication.class);
 
     @PermitAll
     @GET
