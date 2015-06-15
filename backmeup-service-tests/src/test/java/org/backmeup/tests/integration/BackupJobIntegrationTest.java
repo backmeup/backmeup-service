@@ -66,7 +66,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .statusCode(200)
                 .body("jobId", equalTo(Integer.parseInt(jobId)))
                 .body("jobTitle", equalTo(backupJob.getJobTitle()))
-                .body("schedule", equalTo(backupJob.getSchedule().toString()))            
+                .body("schedule", equalTo(backupJob.getSchedule().toString()))
                 .body("user.userId", equalTo(Integer.parseInt(userId)))
                 .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
                 .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))

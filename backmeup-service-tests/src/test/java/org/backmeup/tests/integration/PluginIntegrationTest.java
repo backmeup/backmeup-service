@@ -20,7 +20,7 @@ import com.jayway.restassured.response.ValidatableResponse;
 public class PluginIntegrationTest extends IntegrationTestBase {
 
     @Test
-    public void testGetPluginFilegenerator() {	
+    public void testGetPluginFilegenerator() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -53,7 +53,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetPluginBackmeupStorage() {	
+    public void testGetPluginBackmeupStorage() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -86,7 +86,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetPluginDummy() {	
+    public void testGetPluginDummy() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -121,7 +121,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     
     @Ignore
     @Test
-    public void testGetPluginEmailWithOptions() {  
+    public void testGetPluginEmailWithOptions() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -154,7 +154,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetAllPlugins() {	
+    public void testGetAllPlugins() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -179,7 +179,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetAllDatasourcePlugins() {	
+    public void testGetAllDatasourcePlugins() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -206,7 +206,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetAllDatasinkPlugins() {	
+    public void testGetAllDatasinkPlugins() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
@@ -233,7 +233,7 @@ public class PluginIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetAllActionPlugins() {	
+    public void testGetAllActionPlugins() {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
