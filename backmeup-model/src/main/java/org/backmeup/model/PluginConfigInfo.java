@@ -60,7 +60,7 @@ public class PluginConfigInfo {
         this.availableOptions = availableOptions;
     }
 
-    public boolean hasAuthData() {		
+    public boolean hasAuthData() {
         return redirectURL != null || requiredInputs != null;
     }
 

@@ -54,7 +54,7 @@ public class JobProtocol {
     }
 
     public void setExecutionTime(Date executionTime) {
-        this.executionTime = (Date) executionTime.clone();;
+        this.executionTime = (Date) executionTime.clone();
     }
 
     public BackMeUpUser getUser() {

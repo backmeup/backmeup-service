@@ -10,15 +10,17 @@ package org.backmeup.model.exceptions;
  */
 public class UnknownUserException extends BackMeUpException {
     private static final long serialVersionUID = 1L;
+    private static final String UNKNOWN_USER = "Unknown user";
+    
     private final String username;
 
     public UnknownUserException(String username) {
-        super("Unknown user");
+        super(UNKNOWN_USER);
         this.username = username;
     }
 
     public UnknownUserException(Long userId) {
-        super("Unknown user");
+        super(UNKNOWN_USER);
         this.username = Long.toString(userId);
     }
 

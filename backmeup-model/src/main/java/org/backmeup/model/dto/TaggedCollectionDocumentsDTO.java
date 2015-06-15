@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@SuppressWarnings("unused")
 public class TaggedCollectionDocumentsDTO {
 
     private Long collectionId;

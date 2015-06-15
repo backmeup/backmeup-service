@@ -53,5 +53,5 @@ public class AuthDataDTO {
             properties = new HashMap<>();
         }
         properties.put(key, value);
-    }	
+    }
 }

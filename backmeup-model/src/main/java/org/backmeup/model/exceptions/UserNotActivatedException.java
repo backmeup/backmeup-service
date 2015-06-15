@@ -1,15 +1,15 @@
 package org.backmeup.model.exceptions;
 
 public class UserNotActivatedException extends BackMeUpException {
-  private static final long serialVersionUID = 1L;
-  private final String username;
+    private static final long serialVersionUID = 1L;
+    private final String username;
 
-  public UserNotActivatedException(String username) {
-    super("User has not been activated!");
-    this.username = username;
-  }
+    public UserNotActivatedException(String username) {
+        super("User has not been activated!");
+        this.username = username;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public String getUsername() {
+        return username;
+    }
 }

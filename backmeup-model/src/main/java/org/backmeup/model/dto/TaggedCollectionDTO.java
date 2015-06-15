@@ -7,9 +7,7 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@SuppressWarnings("unused")
 public class TaggedCollectionDTO {
-
     private String name;
     private String description;
     private List<UUID> documentIds = new ArrayList<UUID>();
@@ -37,5 +35,4 @@ public class TaggedCollectionDTO {
     public void setDocumentIds(List<UUID> documentIds) {
         this.documentIds = documentIds;
     }
-
 }

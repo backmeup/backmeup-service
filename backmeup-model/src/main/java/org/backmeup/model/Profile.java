@@ -61,13 +61,13 @@ public class Profile implements Serializable {
     private AuthData authData;
 
     @Transient
-    //	@ElementCollection(fetch=FetchType.EAGER)
-    //	@OrderColumn(name = "properties_index")
+//    @ElementCollection(fetch=FetchType.EAGER)
+//    @OrderColumn(name = "properties_index")
     private Map<String, String> properties;
 
     @Transient
-    //	@ElementCollection(fetch=FetchType.EAGER)
-    //	@OrderColumn(name = "options_index")
+//    @ElementCollection(fetch=FetchType.EAGER)
+//    @OrderColumn(name = "options_index")
     private List<String> options;
 
     public Profile() {

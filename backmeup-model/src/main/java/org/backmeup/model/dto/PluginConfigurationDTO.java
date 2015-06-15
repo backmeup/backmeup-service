@@ -63,7 +63,7 @@ public class PluginConfigurationDTO {
 
     public void setRequiredInputs(List<PluginInputFieldDTO> requiredInputs) {
         this.requiredInputs = requiredInputs;
-    }	
+    }
 
     public void addRequiredInput(PluginInputFieldDTO requiredInput) {
         if(requiredInputs == null) {

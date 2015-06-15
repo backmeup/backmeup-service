@@ -3,7 +3,6 @@ package org.backmeup.model.dto;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@SuppressWarnings("unused")
 public class SharingPolicyDTO {
 
     public enum SharingPolicyTypeEntryDTO {
@@ -55,5 +54,4 @@ public class SharingPolicyDTO {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }
