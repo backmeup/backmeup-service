@@ -19,6 +19,7 @@ import javax.inject.Named;
 
 import org.apache.felix.framework.FrameworkFactory;
 import org.backmeup.configuration.cdi.Configuration;
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.spi.PluginDescribable;
@@ -71,6 +72,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("rawtypes")
 public class PluginImpl implements Plugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginImpl.class);
+    private static final String PLUGIN_FILTER_FORMAT = "(name=%s)";
 
     @Inject
     @Configuration(key = "backmeup.osgi.deploymentDirectory")
@@ -99,9 +101,8 @@ public class PluginImpl implements Plugin {
 
     }
 
-    public PluginImpl(String deploymentDirectory, String temporaryDirectory,
-            String exportedPackages) {
-        LOGGER.debug("********** NEW PLUGINIMPL **********");
+    public PluginImpl(String deploymentDirectory, String temporaryDirectory, String exportedPackages) {
+        LOGGER.debug("Creating PluginImpl");
         this.deploymentDirPath = deploymentDirectory;
         this.tempDirPath = temporaryDirectory;
         this.exportedPackages = exportedPackages;
@@ -112,8 +113,8 @@ public class PluginImpl implements Plugin {
     @PostConstruct
     public void startup() {
         if (!started) {
-            LOGGER.debug("Starting up PluginImpl!");
-            this.tempDirPath = this.tempDirPath + "/" + Long.toString(System.nanoTime());
+            LOGGER.debug("Starting up PluginImpl");
+            this.tempDirPath = this.tempDirPath + File.separator + Long.toString(System.nanoTime());
 
             this.deploymentDirectory = new File(deploymentDirPath);
             this.temporaryDirectory = new File(tempDirPath);
@@ -154,25 +155,21 @@ public class PluginImpl implements Plugin {
             if (temporaryDirectory.exists()) {
                 deleteDir(temporaryDirectory);
             }
+            
             Map<String, String> config = new HashMap<>();
-
             config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exportedPackages);
             config.put(Constants.FRAMEWORK_STORAGE, temporaryDirectory.getAbsolutePath());
             config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
             config.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
-            // Constants.FRAMEWORK_BUNDLE_PARENT_APP);
             config.put(Constants.FRAMEWORK_BOOTDELEGATION, exportedPackages);
 
             LOGGER.debug("EXPORTED PACKAGES: " + exportedPackages);
-            // config.put(Constants.FRAMEWORK_EXECUTIONENVIRONMENT, "J2SE-1.6");
-            // config.put("osgi.shell.telnet", "on");
-            // config.put("osgi.shell.telnet.port", "6666");
 
             osgiFramework = factory.newFramework(config);
             osgiFramework.start();
         } catch (Exception e) {
             LOGGER.error("", e);
-            throw new RuntimeException(e);
+            throw new BackMeUpException(e);
         }
     }
 
@@ -196,17 +193,15 @@ public class PluginImpl implements Plugin {
         return service(service, null);
     }
 
-    private <T> ServiceReference getReference(final Class<T> service,
-            final String filter) {
+    private <T> ServiceReference getReference(final Class<T> service, final String pluginId) {
         ServiceReference ref = null;
-        if (filter == null) {
+        if (pluginId == null) {
             ref = bundleContext().getServiceReference(service.getName());
-
         } else {
             ServiceReference[] refs;
+            String filter = String.format(PLUGIN_FILTER_FORMAT, pluginId);
             try {
-                refs = bundleContext().getServiceReferences(service.getName(),
-                        filter);
+                refs = bundleContext().getServiceReferences(service.getName(), filter);
             } catch (InvalidSyntaxException e) {
                 throw new IllegalArgumentException(String.format("The filter '%s' is mallformed.", filter), e);
             }
@@ -218,10 +213,10 @@ public class PluginImpl implements Plugin {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T service(final Class<T> service, final String filter) {
-        ServiceReference ref = getReference(service, filter);
+    public <T> T service(final Class<T> service, final String pluginId) {
+        ServiceReference ref = getReference(service, pluginId);
         if (ref == null) {
-            throw new PluginUnavailableException(filter);
+            throw new PluginUnavailableException(pluginId);
         }
         bundleContext().ungetService(ref);
         return (T) Proxy.newProxyInstance(PluginImpl.class.getClassLoader(),
@@ -229,16 +224,16 @@ public class PluginImpl implements Plugin {
 
             @Override
             public Object invoke(Object o, Method method, Object[] os) throws Throwable {
-                ServiceReference serviceRef = getReference(service, filter);
+                ServiceReference serviceRef = getReference(service, pluginId);
                 if (serviceRef == null) {
-                    throw new PluginUnavailableException(filter);
+                    throw new PluginUnavailableException(pluginId);
                 }
                 Object instance = bundleContext().getService(serviceRef);
                 Object ret = null;
                 try {
                     ret = method.invoke(instance, os);
                 } catch (Exception e) {
-                    throw new PluginException(filter, "An exception occured during execution of the method " + method.getName(), e);
+                    throw new PluginException(pluginId, "An exception occured during execution of the method " + method.getName(), e);
                 } finally {
                     bundleContext().ungetService(serviceRef);
                 }
@@ -320,7 +315,7 @@ public class PluginImpl implements Plugin {
         }
     }
 
-    protected List<PluginDescribable> getDescribableForType(PluginType...pluginTypes) {
+    protected List<PluginDescribable> getDescribableForType(PluginType... pluginTypes) {
         List<PluginType> lpluginTypes = Arrays.asList(pluginTypes);
         Iterable<PluginDescribable> descs = services(
                 PluginDescribable.class, null);
@@ -335,19 +330,19 @@ public class PluginImpl implements Plugin {
 
     @Override
     public boolean isPluginAvailable(String pluginId) {
-        ServiceReference ref = getReference(PluginDescribable.class, "(name=" + pluginId + ")");
+        ServiceReference ref = getReference(PluginDescribable.class, pluginId);
         return ref != null;
     }
 
     @Override
     public boolean hasAuthorizable(String pluginId) {
-        ServiceReference ref = getReference(Authorizable.class, "(name=" + pluginId + ")");
+        ServiceReference ref = getReference(Authorizable.class, pluginId);
         return ref != null;
     }
 
     @Override
     public boolean hasValidator(String pluginId) {
-        ServiceReference ref = getReference(Validationable.class, "(name=" + pluginId + ")");
+        ServiceReference ref = getReference(Validationable.class, pluginId);
         return ref != null;
     }
 
@@ -368,36 +363,36 @@ public class PluginImpl implements Plugin {
 
     @Override
     public PluginDescribable getPluginDescribableById(String sourceSinkId) {
-        return service(PluginDescribable.class, "(name=" + sourceSinkId + ")");
+        return service(PluginDescribable.class, sourceSinkId);
     }
 
     @Override
     public Datasource getDatasource(String sourceId) {
-        return service(Datasource.class, "(name=" + sourceId + ")");
+        return service(Datasource.class, sourceId);
     }
 
     @Override
     public Datasink getDatasink(String sinkId) {
-        return service(Datasink.class, "(name=" + sinkId + ")");
+        return service(Datasink.class, sinkId);
     }
 
     @Override
     public Action getAction(String actionId) {
-        return service(Action.class, "(name=" + actionId + ")");
+        return service(Action.class, actionId);
     }
 
     @Override
     public Authorizable getAuthorizable(String sourceSinkId) {
-        return service(Authorizable.class, "(name=" + sourceSinkId + ")");
+        return service(Authorizable.class, sourceSinkId);
     }
 
     @Override
     public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
         switch (authType) {
         case OAuth:
-            return service(OAuthBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
+            return service(OAuthBasedAuthorizable.class, sourceSinkId);
         case InputBased:
-            return service(InputBasedAuthorizable.class, "(name=" + sourceSinkId + ")");
+            return service(InputBasedAuthorizable.class, sourceSinkId);
         default:
             throw new IllegalArgumentException("unknown authorization type " + authType);
         }
@@ -405,6 +400,6 @@ public class PluginImpl implements Plugin {
 
     @Override
     public Validationable getValidator(String sourceSinkId) {
-        return service(Validationable.class, "(name=" + sourceSinkId + ")");
+        return service(Validationable.class, sourceSinkId);
     }
 }

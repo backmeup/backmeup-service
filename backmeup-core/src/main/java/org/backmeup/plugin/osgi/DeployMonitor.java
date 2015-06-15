@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -24,15 +25,16 @@ import org.slf4j.LoggerFactory;
  * @author fschoeppl
  */
 public class DeployMonitor implements Runnable {
-  private final Logger logger = LoggerFactory.getLogger(DeployMonitor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeployMonitor.class);
 
   private final Map<File, Bundle> deployed = new HashMap<>();
-  private ScheduledExecutorService executor;
   private final List<Bundle> newlyInstalledBundles = new LinkedList<>();
   private final List<File> toBeRemovedBundles = new LinkedList<>();
   private final BundleContext context;
   private final File deploymentDirectory;
   private final Object monitor = new Object();
+  
+  private ScheduledExecutorService executor;
   private boolean firstRun = false;
 
   public DeployMonitor(BundleContext context, File deploymentDirectory) {
@@ -51,13 +53,13 @@ public class DeployMonitor implements Runnable {
 
   public void waitForInitialRun() {
     try {
-      while (!firstRun) {
         synchronized (monitor) {
-          monitor.wait();
+            while (!firstRun) {
+                monitor.wait();
+            }
         }
-      }
     } catch (InterruptedException e) {
-    	logger.error("", e);
+    	LOGGER.error("", e);
     }
   }
 
@@ -66,47 +68,35 @@ public class DeployMonitor implements Runnable {
     executor.shutdownNow();
     try {
       executor.awaitTermination(1, TimeUnit.MINUTES);
-      logger.error("Awaited termination of executor!");
+      LOGGER.error("Awaited termination of executor!");
       synchronized (monitor) {
         firstRun = true;
         monitor.notifyAll();
       }
     } catch (InterruptedException e) {
-    	logger.error("", e);
+    	LOGGER.error("", e);
     }
   }
 
   @Override
   public void run() {
-    if (!deploymentDirectory.exists()) {
-      deploymentDirectory.mkdirs();
-    }
-
-    for (File f : deploymentDirectory.listFiles()) {
-      if (f.getName().endsWith(".jar")) {
-        if (!deployed.containsKey(f)) {
-          try {
-            Bundle b = context.installBundle("file:" + f.getAbsolutePath());
-            deployed.put(f, b);
-            newlyInstalledBundles.add(b);
-          } catch (Exception e) {
-        	  logger.error("", e);
-          }
+        if (!deploymentDirectory.exists() && !deploymentDirectory.mkdirs()) {
+            throw new BackMeUpException("Cannot create deployment directory");
         }
+
+    installBundles();
+
+    removeBundles();
+   
+    if (!firstRun) {        
+      synchronized(monitor) {
+        firstRun = true;
+        monitor.notifyAll();
       }
     }
+  }
 
-    for (Bundle newlyInstalledBundle : newlyInstalledBundles) {
-      try {
-        if (newlyInstalledBundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
-          newlyInstalledBundle.start();
-        }
-      } catch (Exception e) {
-    	  logger.error("", e);
-      }
-    }
-    newlyInstalledBundles.clear();
-
+private void removeBundles() {
     for (File f : deployed.keySet()) {
       if (!f.exists() || deployed.get(f).getState() == Bundle.UNINSTALLED) {
         try {
@@ -119,7 +109,7 @@ public class DeployMonitor implements Runnable {
           }
           toBeRemovedBundles.add(f);
         } catch (Exception e) {
-          logger.error("", e);
+          LOGGER.error("", e);
         }
       }
     }
@@ -128,12 +118,30 @@ public class DeployMonitor implements Runnable {
       deployed.remove(toBeRemovedFile);
     }
     toBeRemovedBundles.clear();
-   
-    if (!firstRun) {        
-      synchronized(monitor) {
-        firstRun = true;
-        monitor.notifyAll();
+}
+
+private void installBundles() {
+    for (File f : deploymentDirectory.listFiles()) {
+      if ((f.getName().endsWith(".jar")) && (!deployed.containsKey(f))) {
+          try {
+            Bundle b = context.installBundle("file:" + f.getAbsolutePath());
+            deployed.put(f, b);
+            newlyInstalledBundles.add(b);
+          } catch (Exception e) {
+        	  LOGGER.error("", e);
+          }
       }
     }
-  }
+
+    for (Bundle newlyInstalledBundle : newlyInstalledBundles) {
+      try {
+        if (newlyInstalledBundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
+          newlyInstalledBundle.start();
+        }
+      } catch (Exception e) {
+    	  LOGGER.error("", e);
+      }
+    }
+    newlyInstalledBundles.clear();
+}
 }
