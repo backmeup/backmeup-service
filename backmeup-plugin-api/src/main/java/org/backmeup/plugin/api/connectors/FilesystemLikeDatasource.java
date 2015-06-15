@@ -18,48 +18,48 @@ import org.slf4j.LoggerFactory;
  * @author Rainer Simon <rainer.simon@ait.ac.at>
  */
 public abstract class FilesystemLikeDatasource implements Datasource { 
-	
-	private final Logger logger = LoggerFactory.getLogger(FilesystemLikeDatasource.class);
-	
-	@Override
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilesystemLikeDatasource.class);
+
+    @Override
     public void downloadAll(Map<String, String> authData, Map<String, String> properties, List<String> options, Storage storage, Progressable progressor) throws StorageException {
-		List<FilesystemURI> files = list(authData, options);
-		for (int i=0; i < files.size(); i++) {
-			FilesystemURI uri = files.get(i);			
-			download(authData, properties, options, uri, storage, progressor);			
-		}
-	}
-	
-	private void download(Map<String, String> authData, Map<String, String> properties, List<String> options, FilesystemURI uri, Storage storage, Progressable progressor) throws StorageException {
-	  MetainfoContainer metainfo = uri.getMetainfoContainer();	  
-		if (uri.isDirectory()) {
-			logger.info("Downloading contents of directory " + uri);
-			for (FilesystemURI child : list(authData, options, uri)) {
-				download(authData, properties, options, child, storage, progressor);
-			}
-		} else {
-			logger.info("Downloading file " + uri);
-			progressor.progress(String.format("Downloading file %s ...", uri.toString()));
-			InputStream is = getFile(authData, options, uri);
-			if (is == null) {
-				logger.warn("Got a null input stream for " + uri.getUri().getPath().toString());
-				progressor.progress(String.format("Downloading file %s failed!", uri.toString()));
-			} else {
-			  URI destination = uri.getMappedUri();
-			  if (destination == null) {
-			    destination = uri.getUri();
-			  }
-			  storage.addFile(is, destination.getPath().toString(), metainfo);
-			}
-		}
-	}
-	
-	public List<FilesystemURI> list(Map<String, String> accessData, List<String> options) {
-		return list(accessData, options, null);
-	}
-	
-	public abstract List<FilesystemURI> list(Map<String, String> accessData, List<String> options, FilesystemURI uri);
-	
-	public abstract InputStream getFile(Map<String, String> accessData, List<String> options, FilesystemURI uri);
-	
+        List<FilesystemURI> files = list(authData, options);
+        for (int i=0; i < files.size(); i++) {
+            FilesystemURI uri = files.get(i);			
+            download(authData, properties, options, uri, storage, progressor);			
+        }
+    }
+
+    private void download(Map<String, String> authData, Map<String, String> properties, List<String> options, FilesystemURI uri, Storage storage, Progressable progressor) throws StorageException {
+        MetainfoContainer metainfo = uri.getMetainfoContainer();	  
+        if (uri.isDirectory()) {
+            LOGGER.info("Downloading contents of directory " + uri);
+            for (FilesystemURI child : list(authData, options, uri)) {
+                download(authData, properties, options, child, storage, progressor);
+            }
+        } else {
+            LOGGER.info("Downloading file " + uri);
+            progressor.progress(String.format("Downloading file %s ...", uri.toString()));
+            InputStream is = getFile(authData, options, uri);
+            if (is == null) {
+                LOGGER.warn("Got a null input stream for " + uri.getUri().getPath().toString());
+                progressor.progress(String.format("Downloading file %s failed!", uri.toString()));
+            } else {
+                URI destination = uri.getMappedUri();
+                if (destination == null) {
+                    destination = uri.getUri();
+                }
+                storage.addFile(is, destination.getPath().toString(), metainfo);
+            }
+        }
+    }
+
+    public List<FilesystemURI> list(Map<String, String> accessData, List<String> options) {
+        return list(accessData, options, null);
+    }
+
+    public abstract List<FilesystemURI> list(Map<String, String> accessData, List<String> options, FilesystemURI uri);
+
+    public abstract InputStream getFile(Map<String, String> accessData, List<String> options, FilesystemURI uri);
+
 }

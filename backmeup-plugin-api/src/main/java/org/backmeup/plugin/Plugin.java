@@ -21,41 +21,39 @@ import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
  *
  */
 public interface Plugin {
-	
-	boolean isPluginAvailable(String pluginId);
-	
-	PluginDescribable getPluginDescribableById(String pluginId);	
-	
-	
 
-	List<PluginDescribable> getDatasources();
-	
-	List<PluginDescribable> getDatasinks();
-	
-	List<PluginDescribable> getActions();
-	
-	
-	
-	Datasink getDatasink(String sinkId);
-	
-	Datasource getDatasource(String sourceId);
-	
-	Action getAction(String actionId);
-	
-	
-	boolean hasAuthorizable(String pluginId);
-	
-	Authorizable getAuthorizable(String sourceSinkId);
-	
-	Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType);
-	
-	
-	boolean hasValidator(String pluginId);
-	
-	Validationable getValidator(String sourceSinkId);
-	
-	
-	void shutdown();
+    boolean isPluginAvailable(String pluginId);
 
-	void startup();
+    PluginDescribable getPluginDescribableById(String pluginId);	
+
+
+    List<PluginDescribable> getDatasources();
+
+    List<PluginDescribable> getDatasinks();
+
+    List<PluginDescribable> getActions();
+
+
+    Datasink getDatasink(String sinkId);
+
+    Datasource getDatasource(String sourceId);
+
+    Action getAction(String actionId);
+
+
+    boolean hasAuthorizable(String pluginId);
+
+    Authorizable getAuthorizable(String sourceSinkId);
+
+    Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType);
+
+
+    boolean hasValidator(String pluginId);
+
+    Validationable getValidator(String sourceSinkId);
+
+
+    void shutdown();
+
+    void startup();
 }

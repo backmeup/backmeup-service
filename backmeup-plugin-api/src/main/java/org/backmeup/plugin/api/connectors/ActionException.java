@@ -2,14 +2,13 @@ package org.backmeup.plugin.api.connectors;
 
 public class ActionException extends Exception {
 
-	private static final long serialVersionUID = 5407871689527845897L;
+    private static final long serialVersionUID = 5407871689527845897L;
 
-	public ActionException (String msg) {
-		super(msg);
-	}
-	
-	public ActionException (Throwable t) {
-		super(t);
-	}
+    public ActionException (String msg) {
+        super(msg);
+    }
 
+    public ActionException (Throwable t) {
+        super(t);
+    }
 }

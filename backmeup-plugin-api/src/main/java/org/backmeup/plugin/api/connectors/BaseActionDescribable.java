@@ -10,74 +10,74 @@ import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.spi.PluginDescribable;
 
 public abstract class BaseActionDescribable implements PluginDescribable {
+    private static final String UNKNOWN_PLUGIN = "UNKNOWN";
+    
+    private final String propertyFilename;
+    private Properties descriptionEntries;
 
-	private Properties descriptionEntries;
+    public BaseActionDescribable() {
+        this.propertyFilename = "action.properties";
+    }
+    
+    public BaseActionDescribable(String propertyFilename) {
+        this.propertyFilename = propertyFilename;
+    }
 
-	private final String propertyFilename;
+    private Properties getDescriptionEntries() throws PluginException {
+        if (descriptionEntries == null) {
+            try (InputStream  is = getClass().getClassLoader().getResourceAsStream(propertyFilename)) {
+                if (is == null) {
+                    throw new PluginException(UNKNOWN_PLUGIN, "Please provide "
+                            + propertyFilename + " for your plugins!");
+                }
+                descriptionEntries = new Properties();
+                descriptionEntries.load(is);
+            } catch (IOException e) {
+                throw new PluginException(UNKNOWN_PLUGIN, "Unable to load from "
+                        + propertyFilename + " stream!", e);
+            }
+        }
+        return descriptionEntries;
+    }
 
-	public BaseActionDescribable(String propertyFilename) {
-		this.propertyFilename = propertyFilename;
-	}
+    @Override
+    public String getId() {
+        return getDescriptionEntries().getProperty("actionId");
+    }
 
-	public BaseActionDescribable() {
-		this.propertyFilename = "action.properties";
-	}
+    @Override
+    public String getTitle() {
+        return getDescriptionEntries().getProperty("actionTitle");
+    }
 
-	private Properties getDescriptionEntries() throws PluginException {
-		if (descriptionEntries == null) {
-			try (InputStream  is = getClass().getClassLoader().getResourceAsStream(propertyFilename)) {
-				if (is == null) {
-					throw new PluginException("UNKWN", "Please provide "
-							+ propertyFilename + " for your plugins!");
-				}
-				descriptionEntries = new Properties();
-				descriptionEntries.load(is);
-			} catch (IOException e) {
-				throw new PluginException("UNKWN", "Unable to load from "
-						+ propertyFilename + " stream!", e);
-			}
-		}
-		return descriptionEntries;
-	}
+    @Override
+    public String getDescription() {
+        return getDescriptionEntries().getProperty("actionDescription");
+    }
 
-	@Override
-	public String getId() {
-		return getDescriptionEntries().getProperty("actionId");
-	}
+    @Override
+    public int getPriority() {
+        return Integer.parseInt(getDescriptionEntries().getProperty("actionPriority"));
+    }
 
-	@Override
-	public String getTitle() {
-		return getDescriptionEntries().getProperty("actionTitle");
-	}
+    @Override
+    public Map<String, String> getMetadata(Map<String, String> authData) {
+        return new HashMap<>();
+    }
 
-	@Override
-	public String getDescription() {
-		return getDescriptionEntries().getProperty("actionDescription");
-	}
+    @Override
+    public PluginVisibility getVisibility() {
+        String visibility = getDescriptionEntries().getProperty("actionVisibility");
+        return PluginVisibility.valueOf(visibility);
+    }
 
-	@Override
-	public int getPriority() {
-		return Integer.parseInt(getDescriptionEntries().getProperty("actionPriority"));
-	}
+    @Override
+    public PluginType getType() {
+        return PluginType.Action;
+    }
 
-	@Override
-	public Map<String, String> getMetadata(Map<String, String> authData) {
-		return new HashMap<>();
-	}
-
-	@Override
-	public PluginVisibility getVisibility() {
-		String visibility = getDescriptionEntries().getProperty("actionVisibility");
-		return PluginVisibility.valueOf(visibility);
-	}
-
-	@Override
-	public PluginType getType() {
-		return PluginType.Action;
-	}
-
-	@Override
-	public String getImageURL() {
-		return null;
-	}
+    @Override
+    public String getImageURL() {
+        return null;
+    }
 }

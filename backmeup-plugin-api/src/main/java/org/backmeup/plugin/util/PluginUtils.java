@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class PluginUtils {
+    private static final String CHAR_ENCODING = "UTF-8";
+
     private PluginUtils() {
         // Utility classes should not have public constructor
     }
@@ -45,20 +47,20 @@ public final class PluginUtils {
 
     public static QueryParameters splitQuery(String queryParams) throws UnsupportedEncodingException {
         if (queryParams == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter queryParams must not be null");
         }
 
         final Map<String, List<String>> queryPairs = new LinkedHashMap<String, List<String>>();
 
         for (String pair : queryParams.split("&")) {
             final int idx = pair.indexOf("=");
-            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), CHAR_ENCODING) : pair;
 
             if (!queryPairs.containsKey(key)) {
                 queryPairs.put(key, new LinkedList<String>());
             }
 
-            final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+            final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), CHAR_ENCODING) : null;
             queryPairs.get(key).add(value);
         }
 
