@@ -11,56 +11,22 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
 public final class JsonSerializer {
-    private JsonSerializer() {
-        // Utility classes should not have public constructor
-    }
-
-    private static class DateSerializer implements com.google.gson.JsonSerializer<Date>, JsonDeserializer<Date> {
-
-        @Override
-        public Date deserialize(JsonElement json, Type typeOfT,
-                JsonDeserializationContext context) throws JsonParseException {
-            long time = json.getAsLong();
-            return new Date(time);
-        }
-
-        @Override
-        public JsonElement serialize(Date src, Type typeOfSrc,
-                JsonSerializationContext context) {
-            return new JsonPrimitive(src.getTime());
-        }
-    }
-
-    // We have to manually prevent the recursion between protocol <-> user <-> job
-    private static class JobProtocolSerializer implements com.google.gson.JsonSerializer<JobProtocol>, JsonDeserializer<JobProtocol> {
-        @Override
-        public JobProtocol deserialize(JsonElement json, Type typeOfT,
-                JsonDeserializationContext context) throws JsonParseException {
-            // as we don't need the object, we simply return an emtpy element
-            return new JobProtocol();
-        }
-
-        @Override
-        public JsonElement serialize(JobProtocol src, Type typeOfSrc,
-                JsonSerializationContext context) {
-            // as we don't need the object, we simply return an emtpy element
-            return new JsonObject();
-        }
-    }
-
     private static GsonBuilder builder;
-
+    
     static {
         builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateSerializer());
         builder.registerTypeAdapter(JobProtocol.class, new JobProtocolSerializer());
     }
-
+    
+    private JsonSerializer() {
+        // Utility classes should not have public constructor
+    }
+    
     public static <T> String serialize(T entry) {
         Gson gson = builder.create();
         return gson.toJson(entry);
@@ -69,5 +35,34 @@ public final class JsonSerializer {
     public static <T> T deserialize(String entry, Class<T> clazz) {
         Gson gson = builder.create();
         return gson.fromJson(entry, clazz);
+    }
+
+    private static class DateSerializer implements com.google.gson.JsonSerializer<Date>, JsonDeserializer<Date> {
+
+        @Override
+        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+            long time = json.getAsLong();
+            return new Date(time);
+        }
+
+        @Override
+        public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.getTime());
+        }
+    }
+
+    // We have to manually prevent the recursion between protocol <-> user <-> job
+    private static class JobProtocolSerializer implements com.google.gson.JsonSerializer<JobProtocol>, JsonDeserializer<JobProtocol> {
+        @Override
+        public JobProtocol deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+            // as we don't need the object, we simply return an emtpy element
+            return new JobProtocol();
+        }
+
+        @Override
+        public JsonElement serialize(JobProtocol src, Type typeOfSrc, JsonSerializationContext context) {
+            // as we don't need the object, we simply return an emtpy element
+            return new JsonObject();
+        }
     }
 }
