@@ -75,7 +75,7 @@ public class ProfileLogicImpl implements ProfileLogic {
             String encodedData = keyserverClient.getPluginData(token, profile.getId().toString());
             profile.setPropertiesAndOptionsFromEncodedString(encodedData);
         } catch (KeyserverException e) {
-           throw new BackMeUpException("Canot store auth data on keyserver", e);
+           throw new BackMeUpException("Canot load profile data from keyserver", e);
         }
         
         return profile;
@@ -133,7 +133,7 @@ public class ProfileLogicImpl implements ProfileLogic {
             String encodedData = keyserverClient.getPluginData(token, authData.getId().toString());
             authData.setPropertiesFromEncodedString(encodedData);
         } catch (KeyserverException e) {
-           throw new BackMeUpException("Canot store auth data on keyserver", e);
+           throw new BackMeUpException("Cannot load auth data from keyserver", e);
         }
         
         return authData;

@@ -11,17 +11,17 @@ import org.backmeup.model.Token;
 public interface UserRegistration {
 
     BackMeUpUser getUserByUsername(String username, boolean ensureActivated);
-	
-	BackMeUpUser getUserByUserId(Long userId);
-    
+
+    BackMeUpUser getUserByUserId(Long userId);
+
     BackMeUpUser getUserByUserId(Long userId, boolean ensureActivated);
-    
+
     BackMeUpUser register(BackMeUpUser user);
-    
+
     BackMeUpUser update(BackMeUpUser user);
-    
+
     void delete(BackMeUpUser user);
-    
+
     Token authorize(BackMeUpUser user, String password);
 
     void setNewVerificationKeyTo(BackMeUpUser user);

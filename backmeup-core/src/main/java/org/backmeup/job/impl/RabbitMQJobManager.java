@@ -68,7 +68,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
                 this.mqConnection.close();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BackMeUpException(e);
         }
     }
 
@@ -84,7 +84,7 @@ public class RabbitMQJobManager extends AbstractJobManager {
         } catch (IOException e) {
             // Should only happen if message queue is down
             LOGGER.error("message queue down", e);
-            throw new RuntimeException(e);
+            throw new BackMeUpException(e);
         }
     }
 

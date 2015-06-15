@@ -177,10 +177,8 @@ public class PluginsLogicImpl implements PluginsLogic {
             notes.addAll(validator.validateProperties(properties));
         }
 
-        if (validator.hasAvailableOptions()) {
-            if ((options != null) && !options.isEmpty()) {
-                notes.addAll(validator.validateOptions(options));
-            }
+        if (validator.hasAvailableOptions() && (options != null) && !options.isEmpty()) {
+            notes.addAll(validator.validateOptions(options));
         }
 
         return notes;

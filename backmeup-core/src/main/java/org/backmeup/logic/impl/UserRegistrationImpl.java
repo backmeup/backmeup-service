@@ -46,6 +46,8 @@ public class UserRegistrationImpl implements UserRegistration {
     private static final String VERIFICATION_EMAIL_SUBJECT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_SUBJECT";
     private static final String VERIFICATION_EMAIL_CONTENT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_CONTENT";
     private static final String VERIFICATION_EMAIL_MIME_TYPE = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_MIME_TYPE";
+    
+    private static final String CHARSET_NAME_UTF8 = "UTF-8";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRegistrationImpl.class);
     
@@ -181,7 +183,7 @@ public class UserRegistrationImpl implements UserRegistration {
         try {
             // http://stackoverflow.com/questions/4871094/generate-activation-urls-in-java-ee-6
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(tostore.getBytes("UTF-8"));
+            digest.update(tostore.getBytes(CHARSET_NAME_UTF8));
             String base64 = Base64.encodeBase64String(digest.digest());
             return base64.replaceAll("/", "_").replaceAll("\\+", "D").replaceAll("=", "A").trim();
 
@@ -197,8 +199,8 @@ public class UserRegistrationImpl implements UserRegistration {
         String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
         String subject = "";
         try {
-            subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), "UTF-8");
-            subject = MimeUtility.encodeText(subject, "UTF-8", "Q");
+            subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), CHARSET_NAME_UTF8);
+            subject = MimeUtility.encodeText(subject, CHARSET_NAME_UTF8, "Q");
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Something went wrong in sendVerificationEmailFor", e);
         }

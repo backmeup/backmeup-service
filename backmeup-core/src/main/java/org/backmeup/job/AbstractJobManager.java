@@ -110,7 +110,7 @@ public abstract class AbstractJobManager implements JobManager {
             scheduledExecutionTime.setTimeInMillis(job.getStartTime().getTime());
             long executeIn = calcNextExecutionTime(job);
             
-            // Obtain an access token from the keyserver.       
+            // Obtain an access token from the keyserver.
             List<String> ids = getKeyserverIdsForJob(job);
             TokenDTO token = new TokenDTO(Kind.INTERNAL, activeUser.getPassword());
             AuthResponseDTO response = keyserverClient.createOnetime(token, ids.toArray(new String[ids.size()]), scheduledExecutionTime);
@@ -118,17 +118,17 @@ public abstract class AbstractJobManager implements JobManager {
             // Add the scheduler id to the job. If the job gets executed it will
             // be possible to check if this job is still valid
             conn.begin();
-            job = getBackUpJob(job.getId());
-            job.setStatus(JobStatus.ACTIVE);
-            job.setValidScheduleID(UUID.randomUUID());
-            job.setNextExecutionTime(scheduledExecutionTime.getTime());
-            job.setToken(response.getToken().getB64Token());
+            BackupJob backupJob = getBackUpJob(job.getId());
+            backupJob.setStatus(JobStatus.ACTIVE);
+            backupJob.setValidScheduleID(UUID.randomUUID());
+            backupJob.setNextExecutionTime(scheduledExecutionTime.getTime());
+            backupJob.setToken(response.getToken().getB64Token());
             conn.commit();
 
             // We can use the 'cancellable' to terminate later on
             SYSTEM.scheduler().scheduleOnce(
                     Duration.create(executeIn, TimeUnit.MILLISECONDS),
-                    new RunAndReschedule(job.getId(), dal, job.getValidScheduleID()));
+                    new JobExecutor(backupJob.getId(), dal, backupJob.getValidScheduleID()));
 
         } catch (Exception e) {
             throw new BackMeUpException("Cannot schedule backupjob", e);
@@ -164,7 +164,7 @@ public abstract class AbstractJobManager implements JobManager {
 
                 runJob(jobExecution);
             } catch (KeyserverException e) {
-               throw new BackMeUpException("Cannot create backup token");
+               throw new BackMeUpException("Cannot create backup token", e);
             }
 
             conn.commit();
@@ -204,14 +204,14 @@ public abstract class AbstractJobManager implements JobManager {
         ids.add(profile.getId().toString());
     }
 
-    private class RunAndReschedule implements Runnable {
-        private final Logger LOGGER = LoggerFactory.getLogger(RunAndReschedule.class);
+    private class JobExecutor implements Runnable {
+        private final Logger LOGGER = LoggerFactory.getLogger(JobExecutor.class);
 
         private final Long jobId;
         private final DataAccessLayer dal;
         private final UUID schedulerID;
 
-        RunAndReschedule(Long jobId, DataAccessLayer dal, UUID schedulerID) {
+        JobExecutor(Long jobId, DataAccessLayer dal, UUID schedulerID) {
             this.jobId = jobId;
             this.dal = dal;
             this.schedulerID = schedulerID;
@@ -219,59 +219,61 @@ public abstract class AbstractJobManager implements JobManager {
 
         @Override
         public void run() {
-            if (!shutdownInProgress) {
-                try {
-                    conn.begin();
-                    BackupJob job = dal.createBackupJobDao().findById(jobId);
-                    
-                    // Check if job still exists. Could be deleted in the meantime. 
-                    if(job == null) {
-                        return;
-                    }
-                    
-                    // check if the scheduler is still valid. If not a new scheduler
-                    // was created and this one should not be executed
-                    if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
-                        return;
-                    }
-
-                    // Run the job by creating a JobExecution
-                    if (job.isActive()) {
-                        TokenDTO token = new TokenDTO(Kind.ONETIME,job.getToken());
-                        AuthResponseDTO response;
-                        if(job.getJobFrequency() != JobFrequency.ONCE) {
-                            Calendar nextExecutionTime = Calendar.getInstance();
-                            nextExecutionTime.setTimeInMillis(new Date().getTime() + job.getDelay());
-
-                            // Obtain new access token from the keyserver.                               
-                            response =  keyserverClient.authenticateWithOnetime(token, nextExecutionTime);
-                            job.setToken(response.getNext().getToken().getB64Token());
-                            job.setNextExecutionTime(nextExecutionTime.getTime());
-                        } else {
-                            response =  keyserverClient.authenticateWithOnetime(token);
-                        }
-                        
-                        BackupJobExecution jobExecution = new BackupJobExecution(job);
-                        jobExecution.setToken(response.getToken().getB64Token());
-                        jobExecution = dal.createBackupJobExecutionDao().save(jobExecution);
-                        job.getJobExecutions().add(jobExecution);
-                        
-                        runJob(jobExecution);
-                    }
-
-                    if(job.getJobFrequency() != JobFrequency.ONCE) {
-                        LOGGER.debug(String.format("Rescheduling job: execute in %d ms", job.getDelay()));
-                        
-                        SYSTEM.scheduler().scheduleOnce(
-                                Duration.create(job.getDelay(),TimeUnit.MILLISECONDS),
-                                new RunAndReschedule(job.getId(), dal,schedulerID));
-                    }
-                    conn.commit();
-                } catch (Exception e) {
-                    throw new BackMeUpException("Cannot schedule backupjob", e);
-                } finally {
-                    conn.rollback();
+            try {
+                if (shutdownInProgress) {
+                    return;
                 }
+
+                conn.begin();
+                BackupJob job = dal.createBackupJobDao().findById(jobId);
+
+                // Check if job still exists. Could be deleted in the meantime. 
+                if(job == null) {
+                    return;
+                }
+
+                // check if the scheduler is still valid. If not a new scheduler
+                // was created and this one should not be executed
+                if (job.getValidScheduleID().compareTo(schedulerID) != 0) {
+                    return;
+                }
+
+                // Run the job by creating a JobExecution
+                if (job.isActive()) {
+                    TokenDTO token = new TokenDTO(Kind.ONETIME,job.getToken());
+                    AuthResponseDTO response;
+                    if(job.getJobFrequency() != JobFrequency.ONCE) {
+                        Calendar nextExecutionTime = Calendar.getInstance();
+                        nextExecutionTime.setTimeInMillis(new Date().getTime() + job.getDelay());
+
+                        // Obtain new access token from the keyserver
+                        response =  keyserverClient.authenticateWithOnetime(token, nextExecutionTime);
+                        job.setToken(response.getNext().getToken().getB64Token());
+                        job.setNextExecutionTime(nextExecutionTime.getTime());
+                    } else {
+                        response =  keyserverClient.authenticateWithOnetime(token);
+                    }
+
+                    BackupJobExecution jobExecution = new BackupJobExecution(job);
+                    jobExecution.setToken(response.getToken().getB64Token());
+                    jobExecution = dal.createBackupJobExecutionDao().save(jobExecution);
+                    job.getJobExecutions().add(jobExecution);
+
+                    runJob(jobExecution);
+                }
+
+                if(job.getJobFrequency() != JobFrequency.ONCE) {
+                    LOGGER.debug(String.format("Rescheduling job: execute in %d ms", job.getDelay()));
+
+                    SYSTEM.scheduler().scheduleOnce(
+                            Duration.create(job.getDelay(),TimeUnit.MILLISECONDS),
+                            new JobExecutor(job.getId(), dal,schedulerID));
+                }
+                conn.commit();
+            } catch (Exception e) {
+                throw new BackMeUpException("Cannot run backupjob", e);
+            } finally {
+                conn.rollback();
             }
         }
     }

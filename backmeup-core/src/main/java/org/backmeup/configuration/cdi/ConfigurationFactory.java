@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class ConfigurationFactory {
                 properties.load(is);
             } catch (IOException e) {
                 LOGGER.error("Failed to load properties file. Add {} or add it to the classpath!", PROPERTIES_FILE_PATH);
-                throw new RuntimeException("Failed to load properties file", e);
+                throw new BackMeUpException("Failed to load properties file", e);
             } 
         }
         return properties;
@@ -53,7 +54,7 @@ public class ConfigurationFactory {
 
         if (is == null) {
             LOGGER.error("No properties file found. Add {} or add it to the classpath!", PROPERTIES_FILE_PATH);
-            throw new RuntimeException("No properties file found");
+            throw new BackMeUpException("No properties file found");
         }
         return is;
     }

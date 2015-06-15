@@ -24,7 +24,7 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Profile> findDatasourceProfilesByUserId(Long userId) {		
+    public List<Profile> findDatasourceProfilesByUserId(Long userId) {
         Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userId = :userId AND p.sourceAndOrSink IN ('Source', 'SourceSink')");
         q.setParameter("userId", userId);
         return q.getResultList();
@@ -32,7 +32,7 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Profile> findDatasinkProfilesByUserId(Long userId) {    
+    public List<Profile> findDatasinkProfilesByUserId(Long userId) {
         Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userId = :userId AND p.sourceAndOrSink IN ('Sink', 'SourceSink')");
         q.setParameter("userId", userId);
         return q.getResultList();
@@ -40,8 +40,7 @@ public class ProfileDaoImpl extends BaseDaoImpl<Profile> implements ProfileDao {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Profile> findProfilesByUserIdAndService(Long userId,
-            String sourceSinkId) {
+    public List<Profile> findProfilesByUserIdAndService(Long userId, String sourceSinkId) {
         Query q = em.createQuery("SELECT p FROM " + entityClass.getName() +" p WHERE p.user.userId = :userId AND p.desc = :id ");
         q.setParameter("userId", userId);
         q.setParameter("id", sourceSinkId);
