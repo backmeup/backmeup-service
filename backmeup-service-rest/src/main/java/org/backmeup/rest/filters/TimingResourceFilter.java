@@ -32,7 +32,6 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         try {
             long reqProcessingTimeInMs = TIMER.stop();
-//            LOGGER.info("Request processing time: " + reqProcessingTimeInMs + "ms");
             
             StringBuilder sb = new StringBuilder();
             sb.append(request.getMethod());

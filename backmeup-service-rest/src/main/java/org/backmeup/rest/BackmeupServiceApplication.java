@@ -35,11 +35,11 @@ public class BackmeupServiceApplication extends Application {
         this.set.add(Collections.class);
 
         // The default life-cycle for providers (registered directly or via a feature) is singleton.
-        this.set.add(JacksonJsonConfiguration.class); // provider
+        this.set.add(JacksonJsonConfiguration.class);
         this.set.add(ValidationExceptionMapper.class);
         this.set.add(BackMeUpExceptionMapper.class);
-        this.set.add(TimingResourceFilter.class); // filter = provider
-        this.set.add(SecurityInterceptor.class); // filter = provider
+        this.set.add(TimingResourceFilter.class);
+        this.set.add(SecurityInterceptor.class);
     }
 
     @Override
