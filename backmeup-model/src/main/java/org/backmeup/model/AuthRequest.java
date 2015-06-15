@@ -1,7 +1,6 @@
 package org.backmeup.model;
 
 import java.util.List;
-import java.util.Map;
 
 import org.backmeup.model.api.RequiredInputField;
 
@@ -22,8 +21,7 @@ public class AuthRequest {
     public AuthRequest() {
     }
 
-    public AuthRequest(List<RequiredInputField> requiredInputs,
-            Map<String, String> typeMapping, String redirectURL, Profile profile) {
+    public AuthRequest(List<RequiredInputField> requiredInputs, String redirectURL, Profile profile) {
         this.requiredInputs = requiredInputs;
         this.redirectURL = redirectURL;
         this.authData = profile.getAuthData();

@@ -173,7 +173,7 @@ public class MappingTest {
         List<RequiredInputField> inputFields = new ArrayList<>();
         inputFields.add(inputModel);
 
-        AuthRequest authRequest = new AuthRequest(inputFields, null, redirectUrl, profile);
+        AuthRequest authRequest = new AuthRequest(inputFields, redirectUrl, profile);
 
         PluginConfigurationDTO pluginConfigDTO = getMapper().map(authRequest, PluginConfigurationDTO.class);	
 
