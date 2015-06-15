@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.backmeup.model.exceptions.BackMeUpException;
+
 public final class Serialization {
     private Serialization() {
         // Utility classes should not have public constructor
@@ -20,10 +22,14 @@ public final class Serialization {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getEncodedStringAsObject(String properpies, Class<T> type) throws IOException, ClassNotFoundException {
+    public static <T> T getEncodedStringAsObject(String properpies, Class<T> type) throws IOException {
         byte[] b = MyBase64.decode(properpies);
         ByteArrayInputStream bi = new ByteArrayInputStream(b);
         ObjectInputStream si = new ObjectInputStream(bi);
-        return (T) si.readObject();
+        try {
+            return (T) si.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new BackMeUpException(e);
+        }
     }
 }
