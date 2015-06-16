@@ -24,7 +24,7 @@ public interface Plugin {
 
     boolean isPluginAvailable(String pluginId);
 
-    PluginDescribable getPluginDescribableById(String pluginId);	
+    PluginDescribable getPluginDescribableById(String pluginId);
 
 
     List<PluginDescribable> getDatasources();

@@ -25,13 +25,13 @@ public abstract class FilesystemLikeDatasource implements Datasource {
     public void downloadAll(Map<String, String> authData, Map<String, String> properties, List<String> options, Storage storage, Progressable progressor) throws StorageException {
         List<FilesystemURI> files = list(authData, options);
         for (int i=0; i < files.size(); i++) {
-            FilesystemURI uri = files.get(i);			
-            download(authData, properties, options, uri, storage, progressor);			
+            FilesystemURI uri = files.get(i);
+            download(authData, properties, options, uri, storage, progressor);
         }
     }
 
     private void download(Map<String, String> authData, Map<String, String> properties, List<String> options, FilesystemURI uri, Storage storage, Progressable progressor) throws StorageException {
-        MetainfoContainer metainfo = uri.getMetainfoContainer();	  
+        MetainfoContainer metainfo = uri.getMetainfoContainer();
         if (uri.isDirectory()) {
             LOGGER.info("Downloading contents of directory " + uri);
             for (FilesystemURI child : list(authData, options, uri)) {

@@ -23,7 +23,7 @@ public abstract class BaseActionDescribable implements PluginDescribable {
         this.propertyFilename = propertyFilename;
     }
 
-    private Properties getDescriptionEntries() throws PluginException {
+    private Properties getDescriptionEntries() {
         if (descriptionEntries == null) {
             try (InputStream  is = getClass().getClassLoader().getResourceAsStream(propertyFilename)) {
                 if (is == null) {

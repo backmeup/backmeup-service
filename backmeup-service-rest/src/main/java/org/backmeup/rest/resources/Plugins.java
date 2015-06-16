@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 @Path("/plugins")
 public class Plugins extends Base {
     private static final Logger LOGGER = LoggerFactory.getLogger(Plugins.class);
-    
+
     public enum PluginSelectionType {
         Source,
         Sink,
@@ -89,11 +89,11 @@ public class Plugins extends Base {
     public PluginDTO getPlugin(
             @PathParam("pluginId") String pluginId,
             @QueryParam("authData") @DefaultValue("-1") Long authDataId) {
-        
+
         PluginDescribable pluginDescribable =  getLogic().getPluginDescribable(pluginId);
         PluginDTO pluginDTO = getMapper().map(pluginDescribable, PluginDTO.class);
         pluginDTO.setMetadata(pluginDescribable.getMetadata(new HashMap<String, String>()));
-        
+
         // If authentication data id is passed as query parameter, use it to load
         // user account specific plugin information (e.g. dynamic options like email folders). 
         PluginConfigInfo pluginConfigInfo = null;
@@ -101,19 +101,19 @@ public class Plugins extends Base {
             pluginConfigInfo = getLogic().getPluginConfiguration(pluginId);
         } else {
             BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
-            
+
             AuthData authData = getLogic().getPluginAuthData(activeUser, authDataId);
             if(!authData.getPluginId().equals(pluginId)){
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
-            
+
             if(!authData.getUser().getUserId().equals(activeUser.getUserId())) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
             pluginConfigInfo = getLogic().getPluginConfiguration(pluginId, authData);
         }
-        
+
         if(pluginConfigInfo.hasAuthData()) {
             PluginConfigurationDTO pluginConfigDTO = getMapper().map(pluginConfigInfo, PluginConfigurationDTO.class);
             if ((pluginConfigInfo.getRedirectURL() != null) && (!"".equals(pluginConfigInfo.getRedirectURL()))) {
@@ -127,7 +127,7 @@ public class Plugins extends Base {
         if(pluginConfigInfo.hasConfigData()) {
             getMapper().map(pluginConfigInfo, pluginDTO);
         }
-        
+
         return pluginDTO;
     }
 
@@ -196,7 +196,7 @@ public class Plugins extends Base {
             @QueryParam("updateAuthData") @DefaultValue("false") boolean updateAuthData,
             @QueryParam("updateProperties") @DefaultValue("false") boolean updateProperties,
             @QueryParam("updateOptions") @DefaultValue("false") boolean updateOptions,
-            PluginProfileDTO pluginProfile) {	
+            PluginProfileDTO pluginProfile) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         Long pId = Long.parseLong(profileId);
         Profile persistentProfile = getLogic().getPluginProfile(activeUser, pId);
@@ -330,7 +330,7 @@ public class Plugins extends Base {
     @DELETE
     @Path("/{pluginId}/authdata/{authdataId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteAuthData(@PathParam("pluginId") String pluginId,	@PathParam("authdataId") String authDataId) {
+    public void deleteAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
         throwIfPluginNotAvailable(pluginId);

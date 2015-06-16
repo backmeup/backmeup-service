@@ -57,7 +57,7 @@ public class ConnectionImpl implements Connection {
     }
 
     @Override
-    public void begin() {	  
+    public void begin() {
         EntityManager em = getOrCreateEntityManager(); 
 
         if (em.getTransaction().isActive()) {
@@ -65,9 +65,9 @@ public class ConnectionImpl implements Connection {
             em.getTransaction().rollback();
         }
 
-        if (!em.getTransaction().isActive()) {		
+        if (!em.getTransaction().isActive()) {
             em.setFlushMode(FlushModeType.COMMIT);
-            em.getTransaction().begin();		
+            em.getTransaction().begin();
         }
     }
 
@@ -75,7 +75,7 @@ public class ConnectionImpl implements Connection {
     public void rollback() {
         EntityManager em = getEntityManager();
 
-        if (em == null) {		  
+        if (em == null) {
             return;
         }
 
@@ -121,7 +121,7 @@ public class ConnectionImpl implements Connection {
     public void beginOrJoin() {
         EntityManager em = getOrCreateEntityManager();
 
-        if (!em.getTransaction().isActive()) {    
+        if (!em.getTransaction().isActive()) {
             em.setFlushMode(FlushModeType.COMMIT);
             em.getTransaction().begin();
         } else {
