@@ -3,6 +3,7 @@ package org.backmeup.tests.integration;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -537,6 +538,77 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             jobExecutions = BackMeUpUtils.getBackupJobExecutions(accessToken, jobId);
             Assert.assertEquals(2, jobExecutions.size());
             
+            
+        } finally {
+            BackMeUpUtils.deleteBackupJob(accessToken, jobId);
+            BackMeUpUtils.deleteProfile(accessToken, sourcePluginProfile.getPluginId(), sourceProfileId);
+            BackMeUpUtils.deleteProfile(accessToken, sinkPluginProfile.getPluginId(), sinkProfileId);
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
+    
+    @Test
+    public void testGetBackupJobExecutionRedeemToken() throws InterruptedException {
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        PluginProfileDTO sourcePluginProfile = TestDataManager.getProfileFilegenerator();
+        String sourceProfileId = "";
+
+        PluginProfileDTO sinkPluginProfile = TestDataManager.getProfileDummySink();
+        String sinkProfileId = "";
+
+        String jobId = "";
+
+        try {
+            ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            response = BackMeUpUtils.addProfile(accessToken, sourcePluginProfile.getPluginId(), sourcePluginProfile);
+            sourceProfileId = response.extract().path("profileId").toString();
+
+            response = BackMeUpUtils.addProfile(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile);
+            sinkProfileId = response.extract().path("profileId").toString();
+
+            BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId);
+
+            response = BackMeUpUtils.addBackupJob(accessToken, backupJob);
+            jobId = response.extract().path("jobId").toString();
+            
+            // Wait for 5 seconds to make sure the job execution is created. 
+            Thread.sleep(5000);
+
+            List<BackupJobExecutionDTO> jobExecutions = BackMeUpUtils.getBackupJobExecutions(accessToken, jobId);
+            String jobExecId = jobExecutions.get(0).getId().toString();
+            
+            String workerAccessToken = BackMeUpUtils.authenticateWorker();
+            
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+                .header("Authorization", workerAccessToken)
+            .when()
+                .put("/backupjobs/executions/" + jobExecId + "/redeem-token")
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body("jobId", equalTo(Integer.parseInt(jobId)))
+                .body("status", equalTo(JobExecutionStatus.QUEUED.toString()))
+                .body("user.userId", equalTo(Integer.parseInt(userId)))
+                .body("source.profileId", equalTo(Integer.parseInt(sourceProfileId)))
+                .body("source.properties", notNullValue())
+                .body("sink.profileId", equalTo(Integer.parseInt(sinkProfileId)))
+                .body(containsString("id"))
+                .body(containsString("name"))
+                .body(containsString("created"))
+                .body(containsString("modified"))
+                .body(containsString("user"))
+                .body(containsString("token"))
+                .body(containsString("source"))
+                .body(containsString("actions"))
+                .body(containsString("sink"));
             
         } finally {
             BackMeUpUtils.deleteBackupJob(accessToken, jobId);
