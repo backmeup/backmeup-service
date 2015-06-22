@@ -19,6 +19,7 @@ import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
 import org.backmeup.model.constants.JobStatus;
+import org.backmeup.model.exceptions.BackMeUpException;
 
 @ApplicationScoped
 public class BackupLogicImpl implements BackupLogic {
@@ -98,17 +99,22 @@ public class BackupLogicImpl implements BackupLogic {
     }
     
     @Override
-    public BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileData) {
+    public BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileDataWithToken) {
         BackupJobExecution exec = getBackupJobExecutionDao().findById(jobExecId);
         if (exec == null) {
             throw new IllegalArgumentException(String.format("No job execution with id: %d", jobExecId));
         }
         
-        if (loadProfileData) {
-            TokenDTO token = new TokenDTO(Kind.EXTERNAL, exec.getToken());
+        if(loadProfileDataWithToken && exec.isTokenRedeemed()) {
+            throw new BackMeUpException("Token already redeemed");
+        }
+        
+        if (loadProfileDataWithToken) {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, exec.getToken());
             for (Profile profile : exec.getProfileSet()) {
                 loadProfileDataFromKeyserver(token, profile);
             }
+            exec.setTokenRedeemed(true);
         }
         
         return exec;
@@ -137,8 +143,9 @@ public class BackupLogicImpl implements BackupLogic {
             } catch (KeyserverException e) {
                 // Nothing to do here.
                 // Indicates that no profile data is stored on keyserver. 
+            } catch (Exception e) {
+                throw new BackMeUpException("Cannot load profile auth data", e);
             }
-            
         }
         
         try {
@@ -147,6 +154,8 @@ public class BackupLogicImpl implements BackupLogic {
         } catch (KeyserverException e) {
             // Nothing to do here.
             // Indicates that no profile data is stored on keyserver. 
+        } catch (Exception e) {
+            throw new BackMeUpException("Cannot load profile data", e);
         }
     }
 }

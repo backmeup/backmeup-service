@@ -488,11 +488,11 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
     
     @Override
-    public BackupJobExecution getBackupJobExecution(final Long jobExecId) {
-        return conn.txNewReadOnly(new Callable<BackupJobExecution>() {
+    public BackupJobExecution getBackupJobExecution(final Long jobExecId, final Boolean loadProfileDataWithToken) {
+        return conn.txNew(new Callable<BackupJobExecution>() {
             @Override public BackupJobExecution call() {
 
-                return backupJobs.getBackupJobExecution(jobExecId, false);
+                return backupJobs.getBackupJobExecution(jobExecId, loadProfileDataWithToken);
 
             }
         });

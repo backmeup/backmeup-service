@@ -81,17 +81,15 @@ public class BackupJobs extends Base {
 
     }
 
-    @RolesAllowed({"user", "worker"})
+    @RolesAllowed("user")
     @GET
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public BackupJobDTO getBackupJob(
-            @PathParam("jobId") String jobId) {
-        
+    public BackupJobDTO getBackupJob(@PathParam("jobId") String jobId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
         BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
-        if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+        if (!activeUser.getUserId().equals(job.getUser().getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
@@ -177,16 +175,30 @@ public class BackupJobs extends Base {
         return getBackupJobExecution(jobExecutionId);
     }
     
-    @RolesAllowed({"user", "worker"})
+    @RolesAllowed("user")
     @GET
     @Path("/executions/{jobExecutionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public BackupJobExecutionDTO getBackupJobExecution(
-            @PathParam("jobExecutionId") String jobExecutionId) {
+    public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobExecutionId") String jobExecutionId) {
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
         
-        BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId));
-        if ((!activeUser.getUserId().equals(exec.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+        BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId), false);
+        if (!activeUser.getUserId().equals(exec.getUser().getUserId())) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
+        return getMapper().map(exec, BackupJobExecutionDTO.class);
+    }
+    
+    @RolesAllowed("worker")
+    @PUT
+    @Path("/executions/{jobExecutionId}/redeem-token")
+    @Produces(MediaType.APPLICATION_JSON)
+    public BackupJobExecutionDTO getBackupJobExecutionWithProfileData(@PathParam("jobExecutionId") String jobExecutionId) {
+        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        
+        BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId), true);
+        if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
@@ -204,7 +216,7 @@ public class BackupJobs extends Base {
         }
         BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
 
-        BackupJobExecution jobExec = getLogic().getBackupJobExecution(jobExecution.getId());
+        BackupJobExecution jobExec = getLogic().getBackupJobExecution(jobExecution.getId(), false);
         if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }

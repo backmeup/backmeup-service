@@ -63,7 +63,7 @@ public interface BusinessLogic {
     void                     startBackupJob(BackMeUpUser activeUser, BackupJob backupJob);
     BackupJob                getBackupJob(Long jobId);
     List<BackupJob>          getBackupJobs(Long userId);
-    BackupJobExecution       getBackupJobExecution(Long jobExecId);
+    BackupJobExecution       getBackupJobExecution(Long jobExecId, Boolean loadProfileWithToken);
     List<BackupJobExecution> getBackupJobExecutions(Long jobId);
     BackupJob                updateBackupJob(Long userId, BackupJob backupJob);
     BackupJobExecution       updateBackupJobExecution(BackupJobExecution jobExecution);

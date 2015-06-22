@@ -22,7 +22,7 @@ public interface BackupLogic {
     void deleteBackupJobsOf(Long userId);
     
 
-    BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileData);
+    BackupJobExecution getBackupJobExecution(Long jobExecId, boolean loadProfileDataWithToken);
 
     List<BackupJobExecution> getBackupJobExecutionsOfBackup(Long jobId);
     

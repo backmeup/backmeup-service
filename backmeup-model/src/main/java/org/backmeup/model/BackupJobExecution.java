@@ -74,6 +74,8 @@ public class BackupJobExecution {
     
     private String token;
     
+    private boolean tokenRedeemed;
+    
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "job")
 //    private Set<JobProtocol> jobProtocol = new HashSet<>();
     
@@ -100,6 +102,7 @@ public class BackupJobExecution {
             actionProfiles.add(action);
         }
         this.token = job.getToken();
+        this.tokenRedeemed = false;
     }
 
     public Long getId() {
@@ -258,12 +261,20 @@ public class BackupJobExecution {
 //    public void setJobProtocol(Set<JobProtocol> jobProtocol) {
 //        this.jobProtocol = jobProtocol;
 //    }
+    
+    public boolean isTokenRedeemed() {
+        return tokenRedeemed;
+    }
+
+    public void setTokenRedeemed(boolean tokenRedeemed) {
+        this.tokenRedeemed = tokenRedeemed;
+    }
 
     @Override
     public String toString() {
         return String.format("%s: id=%d Name=%s", "BackupJobExecution", id, name);
     }
-    
+
     /**
      * Attempt to establish identity based on id if both exist. 
      * If either id does not exist use Object.equals().
