@@ -32,7 +32,6 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         try {
             long reqProcessingTimeInMs = TIMER.stop();
-            
             StringBuilder sb = new StringBuilder();
             sb.append(request.getMethod());
             sb.append(" ");
@@ -43,13 +42,14 @@ public class TimingResourceFilter implements ContainerRequestFilter, ContainerRe
             sb.append(response.getStatus());
             sb.append(" ");
             sb.append(reqProcessingTimeInMs);
-            
+
             LOGGER.info(sb.toString());
+        } catch (Exception e) {
+            LOGGER.debug("", e);
         } finally {
             TIMER.remove();
         }
     }
-
 }
 
 final class TimerThreadLocal extends ThreadLocal<Long> {
