@@ -298,7 +298,7 @@ public class PluginImpl implements Plugin {
                     }
                     return services.iterator();
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new BackMeUpException(e);
                 }
             }
 
