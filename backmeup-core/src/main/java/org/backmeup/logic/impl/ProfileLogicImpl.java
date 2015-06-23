@@ -155,7 +155,7 @@ public class ProfileLogicImpl implements ProfileLogic {
         deleteAuthDataOnKeyserver(currentUser, authData);
     }
     
-    private void storeAuthDataOnKeyserver(AuthData authData) {                
+    private void storeAuthDataOnKeyserver(AuthData authData) {
         try {
             String data = authData.getPropertiesAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL,authData.getUser().getPassword());
@@ -173,7 +173,7 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
     }
     
-    private void storeProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {                
+    private void storeProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {
         try {
             String data = profile.getPropertiesAndOptionsAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
@@ -183,7 +183,7 @@ public class ProfileLogicImpl implements ProfileLogic {
         }
     }
     
-    private void updateProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {                
+    private void updateProfileOnKeyserver(BackMeUpUser currentUser, Profile profile) {
         try {
             String data = profile.getPropertiesAndOptionsAsEncodedString();
             TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
