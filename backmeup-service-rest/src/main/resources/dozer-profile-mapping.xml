@@ -85,9 +85,9 @@
 			<a get-method="getName" set-method="setName">name</a>
 			<b>name</b>
 		</field>
-		<field-exclude type="one-way">
+		<field>
 			<a>properties</a>
 			<b>properties</b>
-		</field-exclude> 
+		</field> 
 	</mapping>
 </mappings> 

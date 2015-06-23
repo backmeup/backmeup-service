@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.backmeup.model.AuthData;
@@ -120,9 +119,6 @@ public class MappingTest {
         profile.addOption(option);
 
         PluginProfileDTO profileDTO = getMapper().map(profile, PluginProfileDTO.class);
-        // Auth data properties are excluded (jpa lazy init problem with mapping)
-        profileDTO.getAuthData().setProperties(new HashMap<String, String>());
-        profileDTO.getAuthData().getProperties().putAll(profile.getAuthData().getProperties());
 
         assertEquals(profile.getId().longValue(), profileDTO.getProfileId());
         assertEquals(profile.getType(), profileType);
