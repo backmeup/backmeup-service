@@ -138,7 +138,7 @@ public class BackupLogicImpl implements BackupLogic {
     private void loadProfileDataFromKeyserver(TokenDTO token, Profile profile) {
         if(profile.getAuthData() != null) {
             try {
-                String encodedAuthData = keyserverClient.getPluginData(token, profile.getId().toString());
+                String encodedAuthData = keyserverClient.getPluginData(token, profile.getAuthData().getId().toString());
                 profile.getAuthData().setPropertiesFromEncodedString(encodedAuthData);
             } catch (KeyserverException e) {
                 // Nothing to do here.
