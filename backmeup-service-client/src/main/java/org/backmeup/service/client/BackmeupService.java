@@ -12,10 +12,12 @@ public interface BackmeupService {
     BackupJobDTO getBackupJob(Long jobId);
 
     BackupJobDTO updateBackupJob(BackupJobDTO backupJob);
-    
+
     BackupJobExecutionDTO getBackupJobExecution(Long jobExecId);
-    
+
+    BackupJobExecutionDTO getBackupJobExecution(Long jobExecId, boolean redeemToken);
+
     BackupJobExecutionDTO updateBackupJobExecution(BackupJobExecutionDTO jobExecution);
-    
+
     WorkerConfigDTO initializeWorker(WorkerInfoDTO workerInfo);
 }

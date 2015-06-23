@@ -63,6 +63,11 @@ public final class BackmeupServiceClient implements BackmeupService {
         this.host = host;
         this.basePath = basePath;
     }
+    
+    public BackmeupServiceClient(String path, String accessToken) {
+        this(path);
+        this.accessToken = accessToken;
+    }
 
     public BackmeupServiceClient(String path) {
         try {
@@ -119,13 +124,7 @@ public final class BackmeupServiceClient implements BackmeupService {
     public BackupJobDTO getBackupJob(Long jobId) {
         ensureAuthenticated();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("expandUser", "true");
-        params.put("expandToken", "true");
-        params.put("expandProfiles", "true");
-        params.put("expandProtocol", "true");
-
-        Result r = execute("/backupjobs/" + jobId, ReqType.GET, params, null, this.accessToken);
+        Result r = execute("/backupjobs/" + jobId, ReqType.GET, null, null, this.accessToken);
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             throw new BackMeUpException("Failed to retrieve BackupJob: " + r.content);
         }
@@ -164,12 +163,20 @@ public final class BackmeupServiceClient implements BackmeupService {
 
     @Override
     public BackupJobExecutionDTO getBackupJobExecution(Long jobExecId) {
+        return getBackupJobExecution(jobExecId, false);
+    }
+    
+    @Override
+    public BackupJobExecutionDTO getBackupJobExecution(Long jobExecId, boolean redeemToken) {
         ensureAuthenticated();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("expand", "true");
-
-        Result r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, params, null, this.accessToken);
+        Result r;
+        if(!redeemToken) {
+            r = execute("/backupjobs/executions/" + jobExecId, ReqType.GET, null, null, this.accessToken);
+        } else {
+            r = execute("/backupjobs/executions/" + jobExecId + "/redeem-token", ReqType.PUT, null, null, this.accessToken);
+        }
+        
         if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             throw new BackMeUpException("Failed to retrieve BackupJobExecution: " + r.content);
         }
