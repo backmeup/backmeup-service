@@ -249,7 +249,6 @@ public class ProfileIntegrationTest extends IntegrationTestBase {
     }
 
 
-    @Ignore
     @Test
     public void testAddProfileSinkBackmeupStorage() {	
         UserDTO user = TestDataManager.getUser();
