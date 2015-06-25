@@ -3,14 +3,11 @@ package org.backmeup.model.serializer;
 import java.lang.reflect.Type;
 import java.util.Date;
 
-import org.backmeup.model.JobProtocol;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
@@ -20,7 +17,6 @@ public final class JsonSerializer {
     static {
         builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateSerializer());
-        builder.registerTypeAdapter(JobProtocol.class, new JobProtocolSerializer());
     }
     
     private JsonSerializer() {
@@ -48,21 +44,6 @@ public final class JsonSerializer {
         @Override
         public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(src.getTime());
-        }
-    }
-
-    // We have to manually prevent the recursion between protocol <-> user <-> job
-    private static class JobProtocolSerializer implements com.google.gson.JsonSerializer<JobProtocol>, JsonDeserializer<JobProtocol> {
-        @Override
-        public JobProtocol deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-            // as we don't need the object, we simply return an emtpy element
-            return new JobProtocol();
-        }
-
-        @Override
-        public JsonElement serialize(JobProtocol src, Type typeOfSrc, JsonSerializationContext context) {
-            // as we don't need the object, we simply return an emtpy element
-            return new JsonObject();
         }
     }
 }

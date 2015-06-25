@@ -7,7 +7,6 @@ import org.backmeup.dal.AuthDataDao;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
-import org.backmeup.dal.JobProtocolDao;
 import org.backmeup.dal.ProfileDao;
 import org.backmeup.dal.UserDao;
 
@@ -41,11 +40,6 @@ public class DataAccessLayerImpl implements DataAccessLayer {
     
     public BackupJobExecutionDao createBackupJobExecutionDao() {
         return new BackupJobExecutionDaoImpl(threadLocalEntityManager.get());
-    }
-
-    @Override
-    public JobProtocolDao createJobProtocolDao() {
-        return new JobProtocolDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override

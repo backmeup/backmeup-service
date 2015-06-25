@@ -13,11 +13,9 @@ public interface DataAccessLayer {
     ProfileDao createProfileDao();
 
     BackupJobDao createBackupJobDao();
-    
+
     BackupJobExecutionDao createBackupJobExecutionDao();
 
-    JobProtocolDao createJobProtocolDao();
-    
     AuthDataDao createAuthDataDao();
 
     void setConnection(Object connection);
