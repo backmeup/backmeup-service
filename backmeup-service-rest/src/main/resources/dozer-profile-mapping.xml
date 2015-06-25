@@ -49,11 +49,6 @@
 	</mapping>
 	
 	<mapping>
-		<class-a>org.backmeup.model.AuthRequest</class-a>
-		<class-b>org.backmeup.model.dto.PluginConfigurationDTO</class-b>
-	</mapping>
-	
-	<mapping>
 		<class-a>org.backmeup.model.api.RequiredInputField</class-a>
 		<class-b>org.backmeup.model.dto.PluginInputFieldDTO</class-b>
 	</mapping>

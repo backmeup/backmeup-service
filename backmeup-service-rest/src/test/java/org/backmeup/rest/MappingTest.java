@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.backmeup.model.AuthData;
-import org.backmeup.model.AuthRequest;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
@@ -140,17 +139,7 @@ public class MappingTest {
     }
 
     @Test
-    public void testPluginConfigurationMapping() {
-        String username = "johndoe";
-        String firstname = "John";
-        String lastname = "Doe";
-        String email = "johndoe@example.com";
-        String password = "john123!#";
-
-
-        Long profileId = 1L;
-        String description = "Description of test profile";
-        
+    public void testPluginInputFieldMapping() {
         String inputName = "username";
         String inputLabel = "Username";
         String inputDesc = "Username for the service";
@@ -159,23 +148,10 @@ public class MappingTest {
         RequiredInputField.Type inputType = RequiredInputField.Type.String;
         String inputDefaultValue = "";
 
-        String redirectUrl = "http://redirecturl";
-
-        BackMeUpUser user = new BackMeUpUser(username, firstname, lastname, email, password);
-
-        Profile profile = new Profile(profileId, user, description, PluginType.Source);
-
         RequiredInputField inputModel = new RequiredInputField(inputName, inputLabel, inputDesc, inputRequired, inputOrder, inputType, inputDefaultValue);
-        List<RequiredInputField> inputFields = new ArrayList<>();
-        inputFields.add(inputModel);
 
-        AuthRequest authRequest = new AuthRequest(inputFields, redirectUrl, profile);
+        PluginInputFieldDTO inputDTO = getMapper().map(inputModel, PluginInputFieldDTO.class);
 
-        PluginConfigurationDTO pluginConfigDTO = getMapper().map(authRequest, PluginConfigurationDTO.class);	
-
-        assertEquals(authRequest.getRedirectURL(), pluginConfigDTO.getRedirectURL());
-
-        PluginInputFieldDTO inputDTO = pluginConfigDTO.getRequiredInputs().get(0);
         assertEquals(inputModel.getLabel(), inputDTO.getLabel());
         assertEquals(inputModel.getName(), inputDTO.getName());
         assertEquals(inputModel.getDescription(), inputDTO.getDescription());
