@@ -90,6 +90,7 @@
 	<modules>
 		<module>backmeup-model</module>
 		<module>backmeup-plugin-api</module>
+		<module>backmeup-plugin-infrastructure</module>
 		<module>backmeup-core</module>
 		<module>backmeup-service-client</module>
 		<module>backmeup-service-rest</module>
