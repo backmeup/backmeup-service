@@ -1,4 +1,4 @@
-package org.backmeup.plugin.osgi;
+package org.backmeup.plugin.infrastructure;
 
 import java.io.File;
 import java.util.HashMap;
@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author fschoeppl
  */
-public class DeployMonitor implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeployMonitor.class);
+public class DeploymentMonitor implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeploymentMonitor.class);
 
     private final Map<File, Bundle> deployed = new HashMap<>();
     private final List<Bundle> newlyInstalledBundles = new LinkedList<>();
@@ -37,7 +37,7 @@ public class DeployMonitor implements Runnable {
     private ScheduledExecutorService executor;
     private boolean firstRun = false;
 
-    public DeployMonitor(BundleContext context, File deploymentDirectory) {
+    public DeploymentMonitor(BundleContext context, File deploymentDirectory) {
         this.context = context;
         this.deploymentDirectory = deploymentDirectory;
     }

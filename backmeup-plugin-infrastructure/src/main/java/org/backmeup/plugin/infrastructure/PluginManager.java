@@ -1,4 +1,4 @@
-package org.backmeup.plugin.osgi;
+package org.backmeup.plugin.infrastructure;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
@@ -11,21 +11,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.felix.framework.FrameworkFactory;
-import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.PluginUnavailableException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 import org.backmeup.model.spi.Validationable;
-import org.backmeup.plugin.Plugin;
 import org.backmeup.plugin.api.connectors.Action;
 import org.backmeup.plugin.api.connectors.Datasink;
 import org.backmeup.plugin.api.connectors.Datasource;
@@ -61,29 +53,18 @@ import org.slf4j.LoggerFactory;
  * it invokes the method with all necessary parameters and finally it releases
  * the ServiceReference and returns the result of the method call.
  * 
- * 
- * 
  * @author fschoeppl
  * 
  */
-@ApplicationScoped
-@Default
-@Named("plugin")
 @SuppressWarnings("rawtypes")
-public class PluginImpl implements Plugin {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PluginImpl.class);
+public class PluginManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PluginManager.class);
     private static final String PLUGIN_FILTER_FORMAT = "(name=%s)";
 
-    @Inject
-    @Configuration(key = "backmeup.osgi.deploymentDirectory")
     private String deploymentDirPath;
 
-    @Inject
-    @Configuration(key = "backmeup.osgi.temporaryDirectory")
     private String tempDirPath;
 
-    @Inject
-    @Configuration(key = "backmeup.osgi.exportedPackages")
     private String exportedPackages;
 
     private boolean started;
@@ -94,14 +75,14 @@ public class PluginImpl implements Plugin {
 
     private Framework osgiFramework;
 
-    private DeployMonitor deploymentMonitor;
+    private DeploymentMonitor deploymentMonitor;
 
 
-    public PluginImpl() {
+    public PluginManager() {
 
     }
 
-    public PluginImpl(String deploymentDirectory, String temporaryDirectory, String exportedPackages) {
+    public PluginManager(String deploymentDirectory, String temporaryDirectory, String exportedPackages) {
         LOGGER.debug("Creating PluginImpl");
         this.deploymentDirPath = deploymentDirectory;
         this.tempDirPath = temporaryDirectory;
@@ -109,8 +90,6 @@ public class PluginImpl implements Plugin {
         this.started = false;
     }
 
-    @Override
-    @PostConstruct
     public void startup() {
         if (!started) {
             LOGGER.debug("Starting up PluginImpl");
@@ -131,7 +110,7 @@ public class PluginImpl implements Plugin {
     }
 
     private void startDeploymentMonitor() {
-        this.deploymentMonitor = new DeployMonitor(bundleContext(), deploymentDirectory);
+        this.deploymentMonitor = new DeploymentMonitor(bundleContext(), deploymentDirectory);
         this.deploymentMonitor.start();
     }
 
@@ -219,7 +198,7 @@ public class PluginImpl implements Plugin {
             throw new PluginUnavailableException(pluginId);
         }
         bundleContext().ungetService(ref);
-        return (T) Proxy.newProxyInstance(PluginImpl.class.getClassLoader(),
+        return (T) Proxy.newProxyInstance(PluginManager.class.getClassLoader(),
                 new Class[] { service }, new InvocationHandler() {
 
             @Override
@@ -291,7 +270,7 @@ public class PluginImpl implements Plugin {
                     if (refs != null) {
                         for (ServiceReference s : refs) {
                             services.add((T) Proxy.newProxyInstance(
-                                    PluginImpl.class.getClassLoader(),
+                                    PluginManager.class.getClassLoader(),
                                     new Class[] { service },
                                     new SpecialInvocationHandler(bundleContext(), s)));
                         }
@@ -305,7 +284,6 @@ public class PluginImpl implements Plugin {
         };
     }
 
-    @Override
     public void shutdown() {
         if (started) {
             LOGGER.debug("Shutting down PluginImpl!");
@@ -328,65 +306,53 @@ public class PluginImpl implements Plugin {
         return result;
     }
 
-    @Override
     public boolean isPluginAvailable(String pluginId) {
         ServiceReference ref = getReference(PluginDescribable.class, pluginId);
         return ref != null;
     }
 
-    @Override
     public boolean hasAuthorizable(String pluginId) {
         ServiceReference ref = getReference(Authorizable.class, pluginId);
         return ref != null;
     }
 
-    @Override
     public boolean hasValidator(String pluginId) {
         ServiceReference ref = getReference(Validationable.class, pluginId);
         return ref != null;
     }
 
-    @Override
     public List<PluginDescribable> getActions() {
         return this.getDescribableForType(PluginType.Action);
     }
 
-    @Override
     public List<PluginDescribable> getDatasinks() {
         return this.getDescribableForType(PluginType.Sink, PluginType.SourceSink);
     }
 
-    @Override
     public List<PluginDescribable> getDatasources() {
         return this.getDescribableForType(PluginType.Source, PluginType.SourceSink);
     }
 
-    @Override
     public PluginDescribable getPluginDescribableById(String sourceSinkId) {
         return service(PluginDescribable.class, sourceSinkId);
     }
 
-    @Override
     public Datasource getDatasource(String sourceId) {
         return service(Datasource.class, sourceId);
     }
 
-    @Override
     public Datasink getDatasink(String sinkId) {
         return service(Datasink.class, sinkId);
     }
 
-    @Override
     public Action getAction(String actionId) {
         return service(Action.class, actionId);
     }
 
-    @Override
     public Authorizable getAuthorizable(String sourceSinkId) {
         return service(Authorizable.class, sourceSinkId);
     }
 
-    @Override
     public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
         switch (authType) {
         case OAuth:
@@ -398,7 +364,6 @@ public class PluginImpl implements Plugin {
         }
     }
 
-    @Override
     public Validationable getValidator(String sourceSinkId) {
         return service(Validationable.class, sourceSinkId);
     }
