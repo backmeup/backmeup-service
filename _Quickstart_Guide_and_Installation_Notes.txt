@@ -17,7 +17,7 @@ The following document contains a 'quickstart' guide for setting up the BackMeUp
 
  optional
  - Thumbnails-Plugin please make sure you've installed GraphicsMagick as external dependency
- - Indexing-Plugin please make sure you've installed a Tika-Server runninng on localhost:99998 [see hint G]
+ - Indexing-Plugin please make sure you've installed a Tika-Server runninng on localhost:9998 [see hint G]
 
  
  For implicitly required software artefacts and version see the project's pom.xml files
@@ -76,49 +76,44 @@ BackMeUp's maven configuration autodeploys servlets to Tomcat.
 </server>
 
 
-C) create public, private keys
-TODO add link on howto
-
 
 D) Building the backmeup-keyserver component
 --------------------------------------------
-D1. adjust src/main/resources/keyserver.properties
-and make sure keyserver.publickey und keyserver.privatekey point to the proper location
-created in step [C] as well as that keysrv.log is available.
+D1. adjust backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
+here you can decide either to use the embedded Derby database or postgres configuration for running the keyserver. Default is Derby. To use postgres:
+# BACKMEUP KEYSERVER ----------------------------------------------------------
 
-# KEYSERVER ------------------------------------------------------------------
-keyserver.logfile = C:/Temp/data/backmeup-keyserver/log/keysrv/keysrv.log
-keyserver.publickey = C:/Temp/data/backmeup-keyserver/public.key
-keyserver.privatekey = C:/Temp/data/backmeup-keyserver/private.key
+#backmeup.keyserver.db.connector = org.backmeup.keyserver.core.db.derby.DerbyDatabaseImpl
+#backmeup.keyserver.db.driver_name = org.apache.derby.jdbc.EmbeddedDriver
+#backmeup.keyserver.db.connection_string = jdbc:derby:keyserver;create=true
 
-keyserver.queue.host = localhost
-keyserver.queue.name = keysrv
-keyserver.queue.receivers = 0
+# for postgres:
+backmeup.keyserver.db.connector = org.backmeup.keyserver.core.db.sql.SQLDatabaseImpl
+backmeup.keyserver.db.driver_name = org.postgresql.Driver
+backmeup.keyserver.db.connection_string = jdbc:postgresql:keyserver?user=keyserver_user&password=keyserver
 
-keyserver.charset = UTF-8
-# -----------------------------------------------------------------------------
+and do not modify the other lines within the properties file.
+
+If you're using postgres copy the contents from backmeup-keyserver-sql-postgres.properties (template file) into 
+backmeup-keyserver-sql.properties
 
 D2. connect to postgres on port 5432 and create the keyserver's database + db user
-create a database user called 'dbu_srv' (pw 'dbu_srv')
-create a database called 'db_keysrv' and assign the dbu_srv user as owner
+create a database user called 'keyserver_user' (pw 'keyserver')
+create a database called 'keyserver' and assign the keyserver_user as owner
+
+D3. configuring setup for integration tests
+Wihin backmeup-keyserver-tests/src/test/resources/integrationtests.properties the backmeup.keyserver.integration.baseuri is required.
+backmeup.keyserver.integration.baseuri = http://localhost:8080/backmeup-keyserver-rest
+Make sure the configuration (port!) matches your local installation or specify a different instance for running the integration tests. 
+
+D4. Allow Oracle JDK to support AES 265 bit encryption. See FAQ>B for further details
+
+D5. make sure tomcat is running. To deploy the keyserver call
+mvn install -DintegrationTests
 
 Info:
-Make sure this information is reflected within src>main>webapp>META-INF/context.xml where the JDBC connection details are contained
+Note that every redeployment a truncate is called on the database and the keyserver's database gets dropped.
 
-D3. Copy src/main/sql/db-keyserver-schema.sql content and execute PGScript to setup the database's schema
-
-Info:
-Note that src/main/sql/db-keyserver-truncate.sql is being called in mavens pre-integration-test phase
-
-D4. make sure tomcat is running. To deploy the keyserver call
-mvn install
-
-Note: Two integration tests still fail
-
-Info:
-To test if the keyserver is properly responsing call
-http://localhost:8080/backmeup-keyserver/users/1
-or check FAQ>E
 
 E) Building the backmeup-indexer component
 ------------------------------------------
@@ -135,16 +130,17 @@ create a database user called 'dbu_core' (pw 'dbu_core')
 create a database called 'bmucore' and assign the dbu_core user as owner
 
 Info:
-Make sure this information is reflected within src>main>resources>META-INF/persistance.xml
+Make sure this information is reflected within src>main>resources>META-INF/persistence.xml
 
-F2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory. All other values default. The database connection properties may stay empty as they are provided within
-src>main>resources>META-INF/persistance.xml
+F2. Modify the properties file in backmeup-service-rest under src/main/resources/backmeup.properties 
+Set the values for the backmeup.osigi.deploymentDirectory, temporaryDirectory and backmeup.job.temporaryDirectory, callbackUrl, backmeup.service.appSecret, etc. 
+For a local installation you're fine to keep all default ones.
 
 # PLUGINS ---------------------------------------------------------------------
 # Location for the backmeup plugin bundles that will be loaded at startup
-backmeup.osgi.deploymentDirectory = C:/Temp/data/backmeup-service/autodeploy
+backmeup.osgi.deploymentDirectory = /data/backmeup-service/autodeploy
 # Temporary directory for OSGi container
-backmeup.osgi.temporaryDirectory = C:/Temp/data/backmeup-service/osgi-tmp
+backmeup.osgi.temporaryDirectory = /data/backmeup-service/osgi-tmp
 backmeup.osgi.exportedPackages = org.backmeup.plugin.spi org.backmeup.model org.backmeup.model.spi org.backmeup.plugin.api.connectors org.backmeup.plugin.api.storage com.google.gson org.backmeup.plugin.api org.backmeup.plugin.api.actions javax.mail com.sun.imap
 # --------
 
@@ -152,24 +148,39 @@ F3. Within backmeup-service-tests check src/test/resources/integrationtest.prope
 
 F4. To deploy the the component switch into backmeup-service root and call
 mvn -DintegrationTests pre-integration-test
+OR
+mvn install -DintegrationTests -DskipTests
+(Note: skipTests is recommended, as most of the integration tests do not properly cleanup and are likely to corrupt the database)
 
 F5. To check if the component is properly working switch to backmeup-service-tests and run the integration tests
 e.g. manually JUnittest in Eclipse
 src/test/java/org.backmeup.tests.integration/UserIntegrationTests.java testAddUser()
+(Note: as most of the integration tests do not properly cleanup and are likely to corrupt the database.)
 
-* within backmeup-service/autodeploy directory you'll find the created osgi bundles + their dependencies which are required to run the plugin-framework. This includes the osgi blueprint bundles, etc.. 
-Copy all bundle jars into data/backmeup-service/autodeploy [according to the configuration in section B] 
+F6.within backmeup-service/autodeploy directory you'll find the created osgi bundles + their dependencies which are required to run the plugin-framework. This includes the osgi blueprint bundles, etc.. 
+Copy all bundle jars into data/backmeup-service/autodeploy and data/backmeup-worker/autodeploy [according to the configuration in section F2] 
 
+J) Building the backmeup-storage component
+-----------------------------------------
+Backmeup Storage provides a central storage location for files and a REST-API to interact with.
+J1. switch to backmeup-storage and edit backmeup-storage-service/src/main/resources/backmeup-storage.properties to match your configuration. 
+
+J2. To deploy the component call 
+mvn install -DintegrationTests
+
+J3. within backmeup-storage/autodeploy directory you'll find the created osgi bundles + their dependencies which are required to run within osgi plugin-framework.
+Copy all bundle jars into data/backmeup-service/autodeploy and data/backmeup-service/autodeploy [according to the configuration in section F2] 
 
 G) Building the backmeup-plugins
 --------------------------------
 To build the plugins call
 mvn install
 
-* within the backmeup-plugins/autodeploy directory you'll find the created osgi bundles + their dependencies. Copy the plugins you want to deploy into data/backmeup-service/autodeploy [according to the configuration in section B] 
+* within the backmeup-plugins/autodeploy directory you'll find the created osgi bundles + their dependencies. 
+Copy the plugins you want to deploy into data/backmeup-service/autodeploy and data/backmeup-worker/autodeploy [according to the configuration in section F2] 
 
 Info:
-It is possible that certain backmeup plugins have osgi bundle dependencies which are not yet pre-installed on the osgi server. -> check the log files after deployment, as some dependencies are exposed for all bundles and some are embedded for the individual plugins.
+Note: all backmeup plugins should have proper osgi bundle dependency resolving. Make sure to copy all dependencies from the autodeplyo folder into the osgi lookup directory -> check the log files after deployment. Some dependencies are exposed for all bundles and some are embedded for the individual plugins.
 Plugins with require app secrets for using the providers API (e.g. as Facebook), you need to manually alter the plugin's .jar file and insert the app secret and keys or use Jenkins for managing the configuration. 
 
 Certain Plugins as e.g. the Facebook Plugin also require to have a Facebook-App registered at developer.facebook.com which manages the Canvas URLS as https://apps.facebook.com/bmu_themis
@@ -177,19 +188,19 @@ Certain Plugins as e.g. the Facebook Plugin also require to have a Facebook-App 
 
 H) Building the backmeup-worker component
 -----------------------------------------
-H1. switch to backmeup-worker-app-servlet and edit src/main/resources/backmeup-worker.properties to match your configuration. 
+H1. switch to backmeup-worke and edit backmeup-worker-app-servlet/src/main/resources/backmeup-worker.properties to match your configuration. 
 
-H2) To deploy the servlet call 
+H2. To deploy the servlet call 
 mvn install -DintegrationTests
 
 Info: to check the worker's proper deployment and status call
 http://localhost:8080/backmeup-worker-app-servlet/
 
 * As abackmeup-worker may run on a seperate machine, it needs to have all plugins + bundles available. 
-Take all jar-files from data/backmeup-service/autodeploy [according to the configuration in section B] and copy them to 
+Take all jar-files from data/backmeup-service/autodeploy [according to the configuration in section F2] and copy them to 
 data/backmeup-worker/plugins which is the autodeploy directory (according to the connfiguration in H1] of the backmeup-worker. 
 
--> check hint F for debugging.
+-> check FAQ hint F for debugging.
 
 
 I) Building the GUI
@@ -200,39 +211,21 @@ Using the UI locally does not require to have a http server up and running.
 
 Configure the UI and select against which Themis backend you want to run it
 
-I1. change into the folder www/js/plugins and open the file pluging.WebServiceClient.json to connect to your local backmeup backend
+I1. change into the folder app.extern.gtn.themis/www_debug/plugin/ and open the file plugin.WebServiceClient.json to connect to your local backmeup backend
 ----------------------------------------------------------------
-"defaultServer":"backmeup",
-	"server":{
-		"backmeup":{
-			...
+"first": 
+			{
+				"scheme": "http",
+				"scheme_specific_part": "://",
+				"host": "localhost",
+				"port": 8080,
+				"path": ""
 			},
-			"first":{
-				"scheme":"http",
-				"scheme_specific_part":"://",
-				"host":"localhost",
-				"port":8080
 ----------------------------------------------------------------
-
-I2. change into the folder www/js and change the settings in lapstone.js config:{min: from true to false. This tells te system to use the local files inc. the plugin.WebServicClient.json instead of the prepackaged ones.
-----------------------------------------------------------------
-var app = {
-	config : {
-		name : "app",
-		min : false,
-		useJQueryMobile : true,
-		apacheCordova : null
-	},
-	addObject : function(name, object) {
-		// alert("Add object to app: " + name);
-		app[name] = object;
-	}
-};
----------------------------------------------------------------
 
 
 I3 To deploy the Themis UI into the / root of your tomcat server simply switch to backmeup-ui and call
-mvn install –dIntegratinTests 
+mvn install –DintegrationTests 
 
 OR
 
@@ -245,6 +238,10 @@ file:///D:/repositories/themis-backmeup/backmeup-ui/app.extern.gtn.themis/www/pa
 
 I4. Within the GUI navigate to Settings > clear appdata to remove all cached entries in the browser's database
 
+===========
+FINALLY
+===========
+Point your browser to localhost:8080 and enjoy Themis/Backmeup
 
 FAQ
 ===
@@ -257,6 +254,7 @@ B) Oracle JDK - AES 265 bit encryption
 Oracle JDK is only able to support encryption up to AES 128 bit by law. As the BackMeUp system relies on AES 265 bit symetric key encryption it is required to download and install updated policy files for the JVM. see:
 http://stackoverflow.com/questions/6538485/java-using-aes-256-and-128-symmetric-key-encryption 
 http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+Hint: How to find out which JRE is beeing used on your system: http://kb.froglogic.com/display/KB/Finding+the+JRE+that+executes+a+Java+application
 
 C) Enabling remote Tomcat server debugging in Eclipse
 ---------------
