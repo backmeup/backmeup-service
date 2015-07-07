@@ -113,7 +113,7 @@ public abstract class AbstractJobManager implements JobManager {
             // Obtain an access token from the keyserver.
             List<String> ids = getKeyserverIdsForJob(job);
             TokenDTO token = new TokenDTO(Kind.INTERNAL, activeUser.getPassword());
-            AuthResponseDTO response = keyserverClient.createOnetime(token, ids.toArray(new String[ids.size()]), scheduledExecutionTime);
+            AuthResponseDTO response = keyserverClient.createOnetimeForBackup(token, ids.toArray(new String[ids.size()]), scheduledExecutionTime);
             
             // Add the scheduler id to the job. If the job gets executed it will
             // be possible to check if this job is still valid
@@ -154,7 +154,7 @@ public abstract class AbstractJobManager implements JobManager {
                 Calendar currentTime = Calendar.getInstance();
                 List<String> ids = getKeyserverIdsForJob(job);
                 TokenDTO token = new TokenDTO(Kind.INTERNAL, activeUser.getPassword());
-                AuthResponseDTO response = keyserverClient.createOnetime(token, ids.toArray(new String[ids.size()]), currentTime);
+                AuthResponseDTO response = keyserverClient.createOnetimeForBackup(token, ids.toArray(new String[ids.size()]), currentTime);
                 
                 // Run the job by creating a JobExecution
                 BackupJobExecution jobExecution = new BackupJobExecution(job);
@@ -247,7 +247,7 @@ public abstract class AbstractJobManager implements JobManager {
                         nextExecutionTime.setTimeInMillis(new Date().getTime() + job.getDelay());
 
                         // Obtain new access token from the keyserver
-                        response =  keyserverClient.authenticateWithOnetime(token, nextExecutionTime);
+                        response =  keyserverClient.authenticateWithOnetime(token, true, nextExecutionTime);
                         job.setToken(response.getNext().getToken().getB64Token());
                         job.setNextExecutionTime(nextExecutionTime.getTime());
                     } else {
