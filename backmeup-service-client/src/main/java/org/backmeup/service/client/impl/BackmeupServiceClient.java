@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -27,6 +28,7 @@ import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.model.dto.WorkerConfigDTO;
 import org.backmeup.model.dto.WorkerInfoDTO;
+import org.backmeup.model.dto.WorkerMetricDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.service.client.BackmeupService;
 import org.backmeup.service.client.model.auth.AuthInfo;
@@ -232,6 +234,21 @@ public final class BackmeupServiceClient implements BackmeupService {
             throw new BackMeUpException("Failed to update WorkerInfo: " + e);
         }
 
+    }
+    
+    @Override
+    public void addWorkerMetrics(List<WorkerMetricDTO> workerMetrics) {
+        try {
+            ObjectMapper mapper = createJsonMapper();
+            String json = mapper.writeValueAsString(workerMetrics);
+            Result r = execute("/workers/metrics", ReqType.POST, null, json, this.accessToken);
+            if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) {
+                throw new BackMeUpException("Failed to send metrics");
+            }
+        } catch (IOException e) {
+            LOGGER.error("", e);
+            throw new BackMeUpException("Failed to update WorkerInfo: " + e);
+        }
     }
 
     // Private methods --------------------------------------------------------
