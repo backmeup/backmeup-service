@@ -9,6 +9,8 @@ import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.ProfileDao;
 import org.backmeup.dal.UserDao;
+import org.backmeup.dal.WorkerInfoDao;
+import org.backmeup.dal.WorkerMetricDao;
 
 /**
  * The DataAccessLayerImpl uses JPA to interact with the underlying database.
@@ -38,6 +40,7 @@ public class DataAccessLayerImpl implements DataAccessLayer {
         return new BackupJobDaoImpl(threadLocalEntityManager.get());
     }
     
+    @Override
     public BackupJobExecutionDao createBackupJobExecutionDao() {
         return new BackupJobExecutionDaoImpl(threadLocalEntityManager.get());
     }
@@ -45,6 +48,16 @@ public class DataAccessLayerImpl implements DataAccessLayer {
     @Override
     public AuthDataDao createAuthDataDao() {
         return new AuthDataDaoImpl(threadLocalEntityManager.get());
+    }
+    
+    @Override
+    public WorkerInfoDao createWorkerInfoDao() {
+        return new WorkerInfoDaoImpl(threadLocalEntityManager.get());
+    }
+    
+    @Override
+    public WorkerMetricDao createWorkerMetricDao() {
+        return new WorkerMetricDaoImpl(threadLocalEntityManager.get());
     }
 
     @Override
