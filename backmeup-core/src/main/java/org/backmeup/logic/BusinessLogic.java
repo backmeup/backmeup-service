@@ -15,6 +15,9 @@ import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
+import org.backmeup.model.WorkerInfo;
+import org.backmeup.model.WorkerMetric;
+import org.backmeup.model.dto.WorkerConfigDTO;
 import org.backmeup.model.spi.PluginDescribable;
 
 /**
@@ -68,7 +71,7 @@ public interface BusinessLogic {
     BackupJob                updateBackupJob(Long userId, BackupJob backupJob);
     BackupJobExecution       updateBackupJobExecution(BackupJobExecution jobExecution);
     void                     deleteBackupJob(Long userId, Long jobId);
-    
+
     // search operations ------------------------------------------------------
     SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner, String taggedCollection);
 
@@ -90,4 +93,9 @@ public interface BusinessLogic {
     TaggedCollectionEntry      createAndAddTaggedCollection(final Long currUserId, final String name, final String description, final List<UUID> containedDocumentIDs);
     String                     addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
     String                     removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
+
+    // worker operations ------------------------------------------------------
+    WorkerConfigDTO initializeWorker(WorkerInfo workerInfo);
+    void            addWorkerMetrics(List<WorkerMetric> workerMetrics);
+
 }

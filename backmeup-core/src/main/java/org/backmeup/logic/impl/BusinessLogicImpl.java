@@ -25,6 +25,7 @@ import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.logic.SharingLogic;
 import org.backmeup.logic.UserRegistration;
+import org.backmeup.logic.WorkerLogic;
 import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
@@ -33,6 +34,9 @@ import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
 import org.backmeup.model.ValidationNotes;
+import org.backmeup.model.WorkerInfo;
+import org.backmeup.model.WorkerMetric;
+import org.backmeup.model.dto.WorkerConfigDTO;
 import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.model.exceptions.PluginException;
 import org.backmeup.model.exceptions.ValidationException;
@@ -87,6 +91,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private PluginsLogic plugins; 
+
+    @Inject
+    private WorkerLogic workers;
 
     @Inject
     @Configuration(key = "backmeup.autoVerifyUser")
@@ -769,5 +776,33 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    // ========================================================================
+    
+    // worker operations ------------------------------------------------------
+    
+    public WorkerConfigDTO initializeWorker(final WorkerInfo workerInfo) {
+        
+        return this.conn.txNew(new Callable<WorkerConfigDTO>() {
+            @Override
+            public WorkerConfigDTO call() {
+                return BusinessLogicImpl.this.workers.initializeWorker(workerInfo);
+            }
+        });
+        
+    }
+    
+    public void addWorkerMetrics(final List<WorkerMetric> workerMetrics) {
+        
+        this.conn.txNew(new Runnable() {
+            @Override
+            public void run() {
+                BusinessLogicImpl.this.workers.addWorkerMetrics(workerMetrics);
+            }
+        });
+        
+    }
+    
+    // ========================================================================
 
 }
