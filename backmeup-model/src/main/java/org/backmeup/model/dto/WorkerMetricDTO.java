@@ -26,11 +26,14 @@ public class WorkerMetricDTO {
     }
 
     public Date getTimestamp() {
-        return timestamp;
+        if (this.timestamp == null) {
+            return null;
+        }
+        return (Date) timestamp.clone();
     }
 
     public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = (Date) timestamp.clone();
     }
 
     public String getMetric() {
@@ -56,7 +59,7 @@ public class WorkerMetricDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof WorkerMetricDTO)) {
+        if (!(obj instanceof WorkerMetricDTO)) {
             return false;
         }
         WorkerMetricDTO m = (WorkerMetricDTO) obj;

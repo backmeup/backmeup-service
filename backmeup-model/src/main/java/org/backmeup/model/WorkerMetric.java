@@ -45,11 +45,14 @@ public class WorkerMetric {
     }
     
     public Date getTimestamp() {
-        return timestamp;
+        if (this.timestamp == null) {
+            return null;
+        }
+        return (Date) timestamp.clone();
     }
 
     public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = (Date) timestamp.clone();
     }
 
     public String getMetric() {
