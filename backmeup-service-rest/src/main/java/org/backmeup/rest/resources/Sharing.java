@@ -21,7 +21,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.backmeup.index.model.sharing.SharingPolicyEntry;
 import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntry;
@@ -31,6 +30,8 @@ import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
 import org.backmeup.model.dto.SharingPolicyHandshakeDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains sharing policy specific operations.
@@ -38,12 +39,10 @@ import org.backmeup.rest.auth.BackmeupPrincipal;
  */
 @Path("sharing")
 public class Sharing extends SecureBase {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(Sharing.class);
+    
     @Context
     private SecurityContext securityContext;
-
-    @Context
-    private UriInfo info;
 
     @RolesAllowed("user")
     @GET
@@ -109,6 +108,7 @@ public class Sharing extends SecureBase {
                     sharingWithUserId, policyType, sharedElementID, name, description);
             return response;
         } catch (UnknownUserException e) {
+            LOGGER.error("", e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("non existing sharing partner"). //
                     build());
@@ -131,6 +131,7 @@ public class Sharing extends SecureBase {
             ret.put("status", response);
             return ret;
         } catch (IllegalArgumentException e) {
+            LOGGER.error("", e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("non existing policy"). //
                     build());
@@ -183,6 +184,7 @@ public class Sharing extends SecureBase {
             ret.put("status", response);
             return ret;
         } catch (UnknownUserException e) {
+            LOGGER.error("", e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("declining incoming sharing failed"). //
                     build());
@@ -206,6 +208,7 @@ public class Sharing extends SecureBase {
             ret.put("status", response);
             return ret;
         } catch (UnknownUserException e) {
+            LOGGER.error("", e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
                     entity("approving incoming sharing failed"). //
                     build());
@@ -233,6 +236,7 @@ public class Sharing extends SecureBase {
                 UUID.fromString(lArr.get(i));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             badRequestMalformedListOfUUIDsParameter(name);
         }
     }
@@ -242,6 +246,7 @@ public class Sharing extends SecureBase {
             Long l = Long.valueOf(value);
             mandatory(name, l);
         } catch (Exception e) {
+            LOGGER.error("", e);
             badRequestMissingParameter(name);
         }
     }
@@ -253,6 +258,7 @@ public class Sharing extends SecureBase {
         try {
             UUID.fromString(value);
         } catch (Exception e) {
+            LOGGER.error("", e);
             throw new WebApplicationException(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity(name + " parameter is malformed. Expecting UUID of syntax: "
