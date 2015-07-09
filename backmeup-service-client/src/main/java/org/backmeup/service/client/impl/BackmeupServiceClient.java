@@ -370,9 +370,8 @@ public final class BackmeupServiceClient implements BackmeupService {
     // Private classes and enums ----------------------------------------------
 
     private static class Result {
-        public HttpResponse response;
-
-        public String content;
+        private HttpResponse response;
+        private String content;
     }
 
     private enum ReqType {
