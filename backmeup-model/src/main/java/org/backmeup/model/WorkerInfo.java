@@ -146,7 +146,7 @@ public class WorkerInfo {
         if (other == null) {
             return false;
         }
-        if (!(other instanceof BackupJob)) {
+        if (!(other instanceof WorkerInfo)) {
             return false;
         }
         WorkerInfo entity = (WorkerInfo) other;
