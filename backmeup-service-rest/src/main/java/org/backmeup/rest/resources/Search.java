@@ -10,7 +10,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.backmeup.index.model.SearchResponse;
 import org.backmeup.model.BackMeUpUser;
@@ -27,9 +26,6 @@ public class Search extends SecureBase {
 
     @Context
     private SecurityContext securityContext;
-
-    @Context
-    private UriInfo info;
 
     @RolesAllowed("user")
     @GET

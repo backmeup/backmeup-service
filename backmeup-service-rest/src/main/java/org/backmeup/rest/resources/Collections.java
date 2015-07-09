@@ -19,7 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.backmeup.index.model.tagging.TaggedCollectionEntry;
 import org.backmeup.model.BackMeUpUser;
@@ -36,9 +35,6 @@ public class Collections extends SecureBase {
 
     @Context
     private SecurityContext securityContext;
-
-    @Context
-    private UriInfo info;
 
     @RolesAllowed("user")
     @GET
