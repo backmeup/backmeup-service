@@ -15,6 +15,7 @@ target/
 .pydevproject
 .settings/
 RemoteSystemsTempFiles/
+.recommenders
 
 # Mac OS X
 .DS_Store
