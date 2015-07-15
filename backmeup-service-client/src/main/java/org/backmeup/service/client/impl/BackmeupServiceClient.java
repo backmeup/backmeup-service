@@ -14,7 +14,6 @@ import java.util.Scanner;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -23,6 +22,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
@@ -52,19 +52,6 @@ public final class BackmeupServiceClient implements BackmeupService {
     private String accessToken;
 
     // Constructors -----------------------------------------------------------
-
-    public BackmeupServiceClient(String scheme, String host, String basePath, String accessToken) {
-        this.scheme = scheme;
-        this.host = host;
-        this.basePath = basePath;
-        this.accessToken = accessToken;
-    }
-
-    public BackmeupServiceClient(String scheme, String host, String basePath) {
-        this.scheme = scheme;
-        this.host = host;
-        this.basePath = basePath;
-    }
     
     public BackmeupServiceClient(String path, String accessToken) {
         this(path);
@@ -259,10 +246,9 @@ public final class BackmeupServiceClient implements BackmeupService {
         }
     }
 
-    private HttpClient createClient() {
+    private CloseableHttpClient createClient() {
         // set the connection timeout value to 10 seconds (10000 milliseconds)
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).setSocketTimeout(10 * 1000)
-                .build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).setSocketTimeout(10 * 1000).setConnectionRequestTimeout(200).build();
         return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
     }
 
@@ -300,7 +286,7 @@ public final class BackmeupServiceClient implements BackmeupService {
 
     private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams,
             String authToken) {
-        HttpClient client = createClient();
+        CloseableHttpClient client = createClient();
 
         try {
             URI registerUri = createRequestURI(path, queryParams);
@@ -346,7 +332,10 @@ public final class BackmeupServiceClient implements BackmeupService {
             r.response = response;
             if (response.getEntity() != null) {
                 try {
-                    r.content = new Scanner(response.getEntity().getContent()).useDelimiter("\\A").next();
+                    Scanner scanner = new Scanner(response.getEntity().getContent());
+                    scanner.useDelimiter("\\A");
+                    r.content = scanner.next();
+                    scanner.close();
                 } catch (NoSuchElementException nee) {
                     LOGGER.debug("", nee);
                 }
