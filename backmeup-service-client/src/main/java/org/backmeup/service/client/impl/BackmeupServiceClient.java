@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -286,9 +287,8 @@ public final class BackmeupServiceClient implements BackmeupService {
 
     private Result execute(String path, ReqType type, Map<String, String> queryParams, String jsonParams,
             String authToken) {
-        CloseableHttpClient client = createClient();
-
-        try {
+        
+        try (CloseableHttpClient client = createClient()) {
             URI registerUri = createRequestURI(path, queryParams);
             HttpUriRequest request;
 
@@ -327,7 +327,7 @@ public final class BackmeupServiceClient implements BackmeupService {
                 request.setHeader("Authorization", authToken);
             }
 
-            HttpResponse response = client.execute(request);
+            CloseableHttpResponse response = client.execute(request);
             Result r = new Result();
             r.response = response;
             if (response.getEntity() != null) {
