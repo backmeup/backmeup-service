@@ -1,9 +1,6 @@
-package org.backmeup.plugin.api.connectors;
+package org.backmeup.plugin.api;
 
 import java.net.URI;
-
-import org.backmeup.plugin.api.Metainfo;
-import org.backmeup.plugin.api.MetainfoContainer;
 
 public class FilesystemURI {
     private final URI uri;

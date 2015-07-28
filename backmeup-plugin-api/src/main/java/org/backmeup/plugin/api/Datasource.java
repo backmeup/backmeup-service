@@ -1,4 +1,4 @@
-package org.backmeup.plugin.api.connectors;
+package org.backmeup.plugin.api;
 
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.plugin.api.storage.Storage;

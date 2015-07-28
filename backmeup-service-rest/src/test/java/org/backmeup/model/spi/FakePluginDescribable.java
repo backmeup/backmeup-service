@@ -3,8 +3,8 @@ package org.backmeup.model.spi;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.backmeup.plugin.api.BaseSourceSinkDescribable;
 import org.backmeup.plugin.api.Metadata;
-import org.backmeup.plugin.api.connectors.BaseSourceSinkDescribable;
 
 public class FakePluginDescribable extends BaseSourceSinkDescribable {
     private final String pluginId;

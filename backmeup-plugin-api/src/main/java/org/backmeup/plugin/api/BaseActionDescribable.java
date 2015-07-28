@@ -1,4 +1,4 @@
-package org.backmeup.plugin.api.connectors;
+package org.backmeup.plugin.api;
 
 import java.io.IOException;
 import java.io.InputStream;

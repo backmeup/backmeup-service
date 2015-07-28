@@ -1,11 +1,10 @@
-package org.backmeup.plugin.api.connectors;
+package org.backmeup.plugin.api;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
 import org.backmeup.model.dto.PluginProfileDTO;
-import org.backmeup.plugin.api.MetainfoContainer;
 import org.backmeup.plugin.api.storage.Storage;
 import org.backmeup.plugin.api.storage.StorageException;
 import org.slf4j.Logger;
