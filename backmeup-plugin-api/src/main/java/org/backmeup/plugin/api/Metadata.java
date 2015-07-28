@@ -1,14 +1,15 @@
 package org.backmeup.plugin.api;
 
 public class Metadata {
+    
+    private Metadata() {
+        // Utility classes should not have public constructor
+    }
+    
     /**
      * Valid values are: DAILY, MONTHLY, WEEKLY
      */
     public static final String BACKUP_FREQUENCY = "META_BACKUP_FREQUENCY";
-
-    /**
-     * Datasink specific Metadata
-     */
 
     /**
      * The file size limit in MB (e.g. "100")
