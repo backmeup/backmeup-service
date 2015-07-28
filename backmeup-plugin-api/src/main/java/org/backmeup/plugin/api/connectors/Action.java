@@ -1,14 +1,18 @@
 package org.backmeup.plugin.api.connectors;
 
-import java.util.List;
-import java.util.Map;
-
-import org.backmeup.model.dto.BackupJobExecutionDTO;
+import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.plugin.api.storage.Storage;
+import org.backmeup.plugin.api.storage.StorageException;
 
 public interface Action {
-
-    void doAction(Map<String, String> authData, Map<String, String> properties,
-            List<String> options, Storage storage, BackupJobExecutionDTO job,
-            Progressable progressor) throws ActionException;
+    /**
+     * Execute an action on all elements passed in the storage.
+     * 
+     * @param profile
+     * @param storage
+     * @param progressor
+     * @throws DatasinkException,
+     *             StorageException
+     */
+    void doAction(PluginProfileDTO profile, Storage storage, Progressable progressor) throws ActionException, StorageException;
 }
