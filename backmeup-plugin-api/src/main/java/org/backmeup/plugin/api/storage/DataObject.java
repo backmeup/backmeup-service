@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.plugin.api.MetainfoContainer;
 
 public abstract class DataObject {
@@ -26,8 +27,7 @@ public abstract class DataObject {
             BigInteger bigInt = new BigInteger(1, md5);
             return bigInt.toString(16);
         } catch (NoSuchAlgorithmException e) {
-            // Should never happen
-            throw new RuntimeException(e);
+            throw new BackMeUpException(e);
         }
     }
 }
