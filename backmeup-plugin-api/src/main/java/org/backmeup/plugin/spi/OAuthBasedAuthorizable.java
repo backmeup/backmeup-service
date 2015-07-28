@@ -4,8 +4,6 @@ import java.util.Map;
 
 public interface OAuthBasedAuthorizable extends Authorizable {
 
-    public static final String QUERY_PARAM_PROPERTY = "oAuthQuery";
-
     String createRedirectURL(Map<String, String> authData, String callbackUrl);
 
 }
