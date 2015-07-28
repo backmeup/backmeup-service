@@ -172,9 +172,9 @@ public class PluginManager {
 
     public Authorizable getAuthorizable(String sourceSinkId, AuthorizationType authType) {
         switch (authType) {
-        case OAuth:
+        case OAUTH:
             return service(OAuthBasedAuthorizable.class, sourceSinkId);
-        case InputBased:
+        case INPUTBASED:
             return service(InputBasedAuthorizable.class, sourceSinkId);
         default:
             throw new IllegalArgumentException("unknown authorization type " + authType);

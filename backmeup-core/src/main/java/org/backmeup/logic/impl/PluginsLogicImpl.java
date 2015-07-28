@@ -98,7 +98,7 @@ public class PluginsLogicImpl implements PluginsLogic {
             auth = pluginManager.getAuthorizable(pluginId, auth.getAuthType()); 
 
             switch (auth.getAuthType()) {
-            case OAuth:
+            case OAUTH:
                 OAuthBasedAuthorizable oauth = (OAuthBasedAuthorizable) auth;
                 Map<String, String> oauthProps = new HashMap<>();
                 String redirectUrl = oauth.createRedirectURL(oauthProps, callbackUrl);
@@ -106,7 +106,7 @@ public class PluginsLogicImpl implements PluginsLogic {
                 // save oauth properties for later use in authorize method
                 pluginConfigInfo.setOAuthProperties(oauthProps);
                 break;
-            case InputBased:
+            case INPUTBASED:
                 InputBasedAuthorizable ibased = (InputBasedAuthorizable) auth;
                 pluginConfigInfo.setRequiredInputs(ibased.getRequiredInputFields());
                 break;
@@ -148,7 +148,7 @@ public class PluginsLogicImpl implements PluginsLogic {
         Authorizable auth = pluginManager.getAuthorizable(authData.getPluginId());
         auth = pluginManager.getAuthorizable(authData.getPluginId(), auth.getAuthType()); 
         
-        if (auth.getAuthType() == AuthorizationType.InputBased) {
+        if (auth.getAuthType() == AuthorizationType.INPUTBASED) {
             InputBasedAuthorizable inputBasedService = (InputBasedAuthorizable) auth;
             if (!inputBasedService.isValid(authData.getProperties())) {
                 throw new ValidationException(ValidationExceptionType.AuthException, textBundle.getString(VALIDATION_OF_ACCESS_DATA_FAILED));

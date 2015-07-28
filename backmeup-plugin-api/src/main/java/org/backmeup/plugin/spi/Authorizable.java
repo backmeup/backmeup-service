@@ -6,8 +6,8 @@ import java.util.Map;
 public interface Authorizable {
 
     public enum AuthorizationType {
-        OAuth,
-        InputBased
+        OAUTH,
+        INPUTBASED
     }
 
     AuthorizationType getAuthType(); 
