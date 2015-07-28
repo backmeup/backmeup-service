@@ -1,4 +1,4 @@
-package org.backmeup.plugin.spi;
+package org.backmeup.plugin.api;
 
 public final class OAuthBasedConstants {
     private OAuthBasedConstants() {

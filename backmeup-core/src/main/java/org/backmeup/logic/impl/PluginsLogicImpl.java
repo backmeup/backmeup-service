@@ -20,11 +20,11 @@ import org.backmeup.model.exceptions.ValidationException;
 import org.backmeup.model.spi.PluginDescribable;
 import org.backmeup.model.spi.ValidationExceptionType;
 import org.backmeup.model.spi.Validationable;
+import org.backmeup.plugin.api.Authorizable;
+import org.backmeup.plugin.api.InputBasedAuthorizable;
+import org.backmeup.plugin.api.OAuthBasedAuthorizable;
+import org.backmeup.plugin.api.Authorizable.AuthorizationType;
 import org.backmeup.plugin.infrastructure.PluginManager;
-import org.backmeup.plugin.spi.Authorizable;
-import org.backmeup.plugin.spi.Authorizable.AuthorizationType;
-import org.backmeup.plugin.spi.InputBasedAuthorizable;
-import org.backmeup.plugin.spi.OAuthBasedAuthorizable;
 
 @ApplicationScoped
 public class PluginsLogicImpl implements PluginsLogic {
