@@ -1,10 +1,10 @@
-package org.backmeup.plugin.util;
+package org.backmeup.plugin.api.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.backmeup.plugin.util.PluginUtils.QueryParameters;
+import org.backmeup.plugin.api.util.PluginUtils.QueryParameters;
 import org.junit.Assert;
 import org.junit.Test;
 

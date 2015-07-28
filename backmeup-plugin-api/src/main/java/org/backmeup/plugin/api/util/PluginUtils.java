@@ -1,4 +1,4 @@
-package org.backmeup.plugin.util;
+package org.backmeup.plugin.api.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;

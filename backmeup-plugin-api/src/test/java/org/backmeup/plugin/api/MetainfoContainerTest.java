@@ -1,4 +1,4 @@
-package org.backmeup.plugin.api.storage;
+package org.backmeup.plugin.api;
 
 import java.util.ArrayList;
 import java.util.Iterator;
