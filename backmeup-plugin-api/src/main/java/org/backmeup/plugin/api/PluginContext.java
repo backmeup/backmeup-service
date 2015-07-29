@@ -27,6 +27,20 @@ public class PluginContext {
     public Object getAttribute(String name) {
         return (attributes.get(name));
     }
+    
+    /**
+     * Return the value of the specified context attribute, if any; otherwise
+     * return <code>null</code>.
+     *
+     * @param name
+     *            Name of the context attribute to return
+     * @param type
+     *            Cast return value to this type
+     */
+    public <T> T getAttribute(String name, Class<T> type) {
+        return type.cast(attributes.get(name));
+    }
+    
 
     /**
      * Return an enumeration of the names of the attributes associated with this
