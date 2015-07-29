@@ -18,31 +18,31 @@
 			<artifactId>backmeup-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.backmeup</groupId>
 			<artifactId>backmeup-plugin-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
-      		<groupId>org.apache.felix</groupId>
-      		<artifactId>org.apache.felix.framework</artifactId>
-      		<version>${version.org.apache.felix}</version>
-    	</dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
+			<version>${version.org.apache.felix}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${version.org.slf4j}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${version.ch.qos.logback}</version>
 			<scope>test</scope>
-		</dependency> 
+		</dependency>
 	</dependencies>
 
 </project>
