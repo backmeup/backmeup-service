@@ -1,5 +1,7 @@
 package org.backmeup.model.dto;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -14,6 +16,8 @@ public class SharingPolicyDTO {
     private String policyValue;
     private String name;
     private String description;
+    private Date lifespanstart;
+    private Date lifespanend;
 
     public Long getWithUserId() {
         return this.withUserId;
@@ -53,5 +57,21 @@ public class SharingPolicyDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getLifespanstart() {
+        return this.lifespanstart;
+    }
+
+    public void setLifespanstart(Date lifespanstart) {
+        this.lifespanstart = lifespanstart;
+    }
+
+    public Date getLifespanend() {
+        return this.lifespanend;
+    }
+
+    public void setLifespanend(Date lifespanend) {
+        this.lifespanend = lifespanend;
     }
 }

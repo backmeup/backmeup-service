@@ -1,5 +1,6 @@
 package org.backmeup.logic.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -650,15 +651,29 @@ public class BusinessLogicImpl implements BusinessLogic {
     @Override
     public SharingPolicyEntry createAndAddSharingPolicy(final Long currUserId, final Long sharingWithUserId,
             final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
-            final String description) {
+            final String description, final Date lifespanstart, final Date lifespanend) {
         return this.conn.txNew(new Callable<SharingPolicyEntry>() {
             @Override
             public SharingPolicyEntry call() {
 
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
-                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID, name, description);
+                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID, name, description,
+                        lifespanstart, lifespanend);
+            }
+        });
+    }
 
+    @Override
+    public SharingPolicyEntry updateExistingSharingPolicy(final Long currUserId, final Long policyID,
+            final String name, final String description, final Date lifespanstart, final Date lifespanend) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.share.updateOwnedSharingPolicy(user, policyID, name, description,
+                        lifespanstart, lifespanend);
             }
         });
     }

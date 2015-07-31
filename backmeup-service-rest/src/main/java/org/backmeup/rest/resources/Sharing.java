@@ -2,6 +2,7 @@ package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
 @Path("sharing")
 public class Sharing extends SecureBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(Sharing.class);
-    
+
     @Context
     private SecurityContext securityContext;
 
@@ -78,7 +79,8 @@ public class Sharing extends SecureBase {
                 convert(sharingRequest.getPolicyType()),//
                 sharingRequest.getPolicyValue(),//
                 sharingRequest.getName(), //
-                sharingRequest.getDescription());
+                sharingRequest.getDescription(),//
+                sharingRequest.getLifespanstart(), sharingRequest.getLifespanend());
     }
 
     @RolesAllowed("user")
@@ -90,7 +92,9 @@ public class Sharing extends SecureBase {
             @QueryParam("policyType") SharingPolicyTypeEntry policyType,//
             @QueryParam("policyValue") String sharedElementID,//
             @QueryParam("name") String name,//
-            @QueryParam("description") String description) {
+            @QueryParam("description") String description,//
+            @QueryParam("lifespanstart") Date lifespanStart,//
+            @QueryParam("lifespanend") Date lifespanEnd) {
 
         if (policyType == SharingPolicyTypeEntry.Backup) {
             mandatoryLong("policyValue", sharedElementID);
@@ -105,7 +109,32 @@ public class Sharing extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
-                    sharingWithUserId, policyType, sharedElementID, name, description);
+                    sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
+            return response;
+        } catch (UnknownUserException e) {
+            LOGGER.error("", e);
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
+                    entity("non existing sharing partner"). //
+                    build());
+        }
+    }
+
+    @RolesAllowed("user")
+    @POST
+    @Path("/update")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SharingPolicyEntry update(//
+            @QueryParam("policyID") Long policyID,//
+            @QueryParam("name") String name,//
+            @QueryParam("description") String description,//
+            @QueryParam("lifespanstart") Date lifespanStart,//
+            @QueryParam("lifespanend") Date lifespanEnd) {
+
+        mandatory("policyID", policyID);
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        try {
+            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID,
+                    name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);

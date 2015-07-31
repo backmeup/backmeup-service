@@ -1,5 +1,6 @@
 package org.backmeup.logic.impl;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -41,10 +42,19 @@ public class SharingLogicImpl implements SharingLogic {
 
     @Override
     public SharingPolicyEntry add(BackMeUpUser currUser, BackMeUpUser sharingWith, SharingPolicyTypeEntry policy,
-            String sharedElementID, String name, String description) {
+            String sharedElementID, String name, String description, Date lifespanstart, Date lifespanend) {
         try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
             SharingPolicyEntry result = client.add(new User(sharingWith.getUserId()), policy, sharedElementID, name,
-                    description);
+                    description, lifespanstart, lifespanend);
+            return result;
+        }
+    }
+
+    @Override
+    public SharingPolicyEntry updateOwnedSharingPolicy(BackMeUpUser currUser, Long policyID, String name,
+            String description, Date lifespanstart, Date lifespanend) {
+        try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
+            SharingPolicyEntry result = client.update(policyID, name, description, lifespanstart, lifespanend);
             return result;
         }
     }

@@ -1,5 +1,6 @@
 package org.backmeup.logic;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -107,7 +108,11 @@ public interface BusinessLogic {
     Set<SharingPolicyEntry> getAllIncomingSharingPolicies(Long currUserId);
 
     SharingPolicyEntry createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId,
-            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description);
+            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description, Date lifespanstart,
+            Date lifespanend);
+
+    SharingPolicyEntry updateExistingSharingPolicy(Long currUserId, Long policyID, String name, String description,
+            Date lifespanstart, Date lifespanend);
 
     String removeOwnedSharingPolicy(Long currUserId, Long policyID);
 
