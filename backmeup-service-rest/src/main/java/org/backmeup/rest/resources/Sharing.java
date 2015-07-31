@@ -29,6 +29,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.SharingPolicyDTO;
 import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
 import org.backmeup.model.dto.SharingPolicyHandshakeDTO;
+import org.backmeup.model.dto.SharingPolicyUpdateDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.slf4j.Logger;
@@ -142,6 +143,21 @@ public class Sharing extends SecureBase {
                     entity("non existing sharing partner"). //
                     build());
         }
+    }
+
+    @RolesAllowed("user")
+    @POST
+    @Path("/update/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public SharingPolicyEntry update(SharingPolicyUpdateDTO policyUpdateRequest) {
+        //the UI framework is set to use POST operations with JSON requests and not Query Parameters
+        return this.update(//
+                policyUpdateRequest.getPolicyID(),//
+                policyUpdateRequest.getName(), //
+                policyUpdateRequest.getDescription(),//
+                policyUpdateRequest.getLifespanstart(),//
+                policyUpdateRequest.getLifespanend());
     }
 
     @RolesAllowed("user")
