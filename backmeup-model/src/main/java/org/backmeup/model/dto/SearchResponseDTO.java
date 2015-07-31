@@ -14,6 +14,9 @@ public class SearchResponseDTO {
     private List<CountedEntryDTO> byTag;
     private String searchQuery;
     private int progress;
+    //elements that are related to the paging and offset for search results
+    private Long offsetStart;
+    private Long offsetEnd;
 
     public List<CountedEntryDTO> getBySource() {
         return this.bySource;
@@ -77,6 +80,22 @@ public class SearchResponseDTO {
 
     public void setByTag(List<CountedEntryDTO> byTag) {
         this.byTag = byTag;
+    }
+
+    public Long getOffsetStart() {
+        return this.offsetStart;
+    }
+
+    public void setOffsetStart(Long offsetStart) {
+        this.offsetStart = offsetStart;
+    }
+
+    public Long getOffsetEnd() {
+        return this.offsetEnd;
+    }
+
+    public void setOffsetEnd(Long offsetEnd) {
+        this.offsetEnd = offsetEnd;
     }
 
 }

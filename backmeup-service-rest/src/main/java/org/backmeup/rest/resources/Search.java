@@ -37,11 +37,14 @@ public class Search extends SecureBase {
             @QueryParam("type") String type, //
             @QueryParam("job") String job,//
             @QueryParam("owner") String owner,//
-            @QueryParam("tag") String tag) {
+            @QueryParam("tag") String tag, //
+            @QueryParam("offset") Long offSetStart, //
+            @QueryParam("maxresults") Long maxResults) {
 
         mandatory("query", query);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job, owner, tag);
+        SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job, owner, tag,
+                offSetStart, maxResults);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }
@@ -57,5 +60,4 @@ public class Search extends SecureBase {
                 entity(name + " parameter is mandatory"). //
                 build());
     }
-
 }

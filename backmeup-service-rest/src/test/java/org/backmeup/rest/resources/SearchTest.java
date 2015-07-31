@@ -40,7 +40,7 @@ public class SearchTest {
         protected BusinessLogic getLogic() {
             BusinessLogic logic = mock(BusinessLogic.class);
             SearchResponse sr = FakeSearchResponse.oneFile();
-            when(logic.queryBackup(USER, "find_me", null, null, null, null, null)).thenReturn(sr);
+            when(logic.queryBackup(USER, "find_me", null, null, null, null, null, null, null)).thenReturn(sr);
             return logic;
         }
 
