@@ -15,4 +15,8 @@ public interface FriendlistLogic {
 
     List<FriendlistUser> getFriends(BackMeUpUser currUser);
 
+    void removeFriend(BackMeUpUser currUser, Long friendId);
+
+    FriendlistUser updateFriend(BackMeUpUser currUser, FriendlistUser friend);
+
 }

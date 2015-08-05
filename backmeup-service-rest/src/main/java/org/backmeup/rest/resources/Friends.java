@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.BackMeUpUser;
@@ -58,20 +59,27 @@ public class Friends extends SecureBase {
     }
 
     @RolesAllowed("user")
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public FriendlistUserDTO updateFriend(FriendlistUserDTO userDTO) {
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        FriendlistUser user = getMapper().map(userDTO, FriendlistUser.class);
+        user = getLogic().updateFriend(activeUser.getUserId(), user);
+        return getMapper().map(user, FriendlistUserDTO.class);
+    }
+
+    @RolesAllowed("user")
     @DELETE
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteFriend(@QueryParam("friendId") Long friendId) {
+    public String deleteFriend(@QueryParam("friendId") Long friendId) {
+        mandatory("friendId", friendId);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        List<FriendlistUser> lFriends = getLogic().getFriends(activeUser.getUserId());
-        //build the return list
-        List<FriendlistUserDTO> friendsDTOs = new ArrayList<>();
-        for (FriendlistUser friend : lFriends) {
-            FriendlistUserDTO friendDTO = getMapper().map(friend, FriendlistUserDTO.class);
-            friendsDTOs.add(friendDTO);
-        }
-        return friendsDTOs;
+        getLogic().removeFriend(activeUser.getUserId(), friendId);
+        return "friend deleted";
     }
 
     private void mandatory(String name, Long l) {

@@ -885,6 +885,29 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
 
+    @Override
+    public FriendlistUser updateFriend(final Long currUserId, final FriendlistUser friend) {
+        return this.conn.txNew(new Callable<FriendlistUser>() {
+            @Override
+            public FriendlistUser call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.friends.updateFriend(user, friend);
+            }
+        });
+    }
+
+    @Override
+    public void removeFriend(final Long currUserId, final Long friendId) {
+        this.conn.txNew(new Runnable() {
+            @Override
+            public void run() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                BusinessLogicImpl.this.friends.removeFriend(user, friendId);
+            }
+        });
+
+    }
+
     // ========================================================================
 
 }

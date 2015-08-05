@@ -14,9 +14,14 @@ import org.backmeup.logic.FriendlistLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FriendlistUser;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
+import org.backmeup.model.exceptions.UnknownFriendException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class FriendlistLogicImpl implements FriendlistLogic {
+
+    private static final Logger log = LoggerFactory.getLogger(FriendlistLogicImpl.class);
 
     @Inject
     @Configuration(key = "backmeup.emailRegex")
@@ -37,6 +42,7 @@ public class FriendlistLogicImpl implements FriendlistLogic {
             friend.setOwnerId(currUser.getUserId());
         }
         friend = this.getFriendlistDao().save(friend);
+        log.debug("added and persisted friend for userId: " + currUser.getUserId() + " " + friend.toString());
 
         //add the bmu user id for the friend if he's a BMU user - field is transient
         setFriendsBMUUserId(friend);
@@ -50,6 +56,45 @@ public class FriendlistLogicImpl implements FriendlistLogic {
         return ret;
     }
 
+    @Override
+    public void removeFriend(BackMeUpUser currUser, Long friendId) {
+        FriendlistUser friend = getFriendFromDB(currUser, friendId);
+        this.getFriendlistDao().delete(friend);
+        log.debug("deleted friend for userId: " + currUser.getUserId() + " and friendId:" + friendId);
+    }
+
+    @Override
+    public FriendlistUser updateFriend(BackMeUpUser currUser, FriendlistUser friendUpdate) {
+        //we only allow updating name and description for friends
+        if (friendUpdate.getEntityId() == null) {
+            throw new UnknownFriendException("entityId required");
+        }
+        FriendlistUser dbFriend = getFriendFromDB(currUser, friendUpdate.getEntityId());
+        if (friendUpdate.getName() != null) {
+            dbFriend.setName(friendUpdate.getName());
+        }
+        if (friendUpdate.getDescription() != null) {
+            dbFriend.setDescription(friendUpdate.getDescription());
+        }
+        dbFriend = this.getFriendlistDao().merge(dbFriend);
+        log.debug("updated friend for userId: " + currUser.getUserId() + " " + dbFriend.toString());
+        return dbFriend;
+    }
+
+    //---------------------------private helpers -----------------------------//
+
+    private FriendlistUser getFriendFromDB(BackMeUpUser currUser, Long friendId) {
+        if (friendId == null) {
+            throw new UnknownFriendException("friendId not provided");
+        }
+        //check if the provided friendId is 'owned' by this backmeup user
+        FriendlistUser friend = this.getFriendlistDao().getFriend(currUser.getUserId(), friendId);
+        if (friend == null) {
+            throw new UnknownFriendException(friendId);
+        }
+        return friend;
+    }
+
     private void throwIfEmailInvalid(String email) {
         Pattern emailPattern = Pattern.compile(this.emailRegex, Pattern.CASE_INSENSITIVE);
         Matcher emailMatcher = emailPattern.matcher(email);
@@ -57,8 +102,6 @@ public class FriendlistLogicImpl implements FriendlistLogic {
             throw new NotAnEmailAddressException(this.emailRegex, email);
         }
     }
-
-    //---------------------------private helpers -----------------------------//
 
     private void setFriendsBMUUserId(FriendlistUser friend) {
         //lookup if this friend is registered at BMU and add his BMUUserId if so

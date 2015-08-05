@@ -150,8 +150,12 @@ public interface BusinessLogic {
     void addWorkerMetrics(List<WorkerMetric> workerMetrics);
 
     // friendlist operations --------------------------------------------------------
-    FriendlistUser addFriend(Long currUserId, FriendlistUser user);
+    FriendlistUser addFriend(Long currUserId, FriendlistUser friend);
 
     List<FriendlistUser> getFriends(Long currUserId);
+
+    FriendlistUser updateFriend(Long currUserId, FriendlistUser friend);
+
+    void removeFriend(Long currUserId, Long friendId);
 
 }
