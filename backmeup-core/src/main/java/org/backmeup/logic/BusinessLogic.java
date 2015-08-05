@@ -13,6 +13,7 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
+import org.backmeup.model.FriendlistUser;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
@@ -147,5 +148,10 @@ public interface BusinessLogic {
     WorkerConfigDTO initializeWorker(WorkerInfo workerInfo);
 
     void addWorkerMetrics(List<WorkerMetric> workerMetrics);
+
+    // friendlist operations --------------------------------------------------------
+    FriendlistUser addFriend(Long currUserId, FriendlistUser user);
+
+    List<FriendlistUser> getFriends(Long currUserId);
 
 }

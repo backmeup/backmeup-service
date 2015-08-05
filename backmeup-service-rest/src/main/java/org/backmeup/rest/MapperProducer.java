@@ -15,20 +15,22 @@ public class MapperProducer {
     private static final String DOZER_PROFILE_MAPPING = "dozer-profile-mapping.xml";
     private static final String DOZER_BACKUPJOB_MAPPING = "dozer-backupjob-mapping.xml";
     private static final String DOZER_SEARCH_MAPPING = "dozer-search-mapping.xml";
+    private static final String DOZER_FRIENDS_MAPPING = "dozer-friends-mapping.xml";
 
     private Mapper mapper;
 
     @Produces
     @ApplicationScoped
     public Mapper getMapper() {
-        if (mapper == null) {
+        if (this.mapper == null) {
             List<String> configList = new ArrayList<>();
             configList.add(DOZER_USER_MAPPING);
             configList.add(DOZER_PROFILE_MAPPING);
             configList.add(DOZER_BACKUPJOB_MAPPING);
             configList.add(DOZER_SEARCH_MAPPING);
-            mapper = new DozerBeanMapper(configList);
+            configList.add(DOZER_FRIENDS_MAPPING);
+            this.mapper = new DozerBeanMapper(configList);
         }
-        return mapper;
+        return this.mapper;
     }
 }

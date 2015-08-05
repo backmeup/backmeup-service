@@ -21,6 +21,7 @@ import org.backmeup.job.JobManager;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.CollectionLogic;
+import org.backmeup.logic.FriendlistLogick;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
@@ -31,6 +32,7 @@ import org.backmeup.model.AuthData;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
+import org.backmeup.model.FriendlistUser;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
@@ -95,6 +97,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private WorkerLogic workers;
+
+    @Inject
+    private FriendlistLogick friends;
 
     @Inject
     @Configuration(key = "backmeup.autoVerifyUser")
@@ -853,6 +858,31 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
 
+    }
+
+    // ========================================================================
+
+    // friendlist operations ------------------------------------------------------
+    @Override
+    public FriendlistUser addFriend(final Long currUserId, final FriendlistUser friend) {
+        return this.conn.txNew(new Callable<FriendlistUser>() {
+            @Override
+            public FriendlistUser call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.friends.addFriend(user, friend);
+            }
+        });
+    }
+
+    @Override
+    public List<FriendlistUser> getFriends(final Long currUserId) {
+        return this.conn.txNew(new Callable<List<FriendlistUser>>() {
+            @Override
+            public List<FriendlistUser> call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.friends.getFriends(user);
+            }
+        });
     }
 
     // ========================================================================

@@ -13,6 +13,7 @@ import org.backmeup.rest.provider.ValidationExceptionMapper;
 import org.backmeup.rest.resources.Authentication;
 import org.backmeup.rest.resources.BackupJobs;
 import org.backmeup.rest.resources.Collections;
+import org.backmeup.rest.resources.Friends;
 import org.backmeup.rest.resources.Plugins;
 import org.backmeup.rest.resources.Search;
 import org.backmeup.rest.resources.Sharing;
@@ -33,6 +34,7 @@ public class BackmeupServiceApplication extends Application {
         this.set.add(Sharing.class);
         this.set.add(Workers.class);
         this.set.add(Collections.class);
+        this.set.add(Friends.class);
 
         // The default life-cycle for providers (registered directly or via a feature) is singleton.
         this.set.add(JacksonJsonConfiguration.class);
