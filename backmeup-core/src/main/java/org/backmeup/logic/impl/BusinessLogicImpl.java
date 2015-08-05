@@ -21,7 +21,7 @@ import org.backmeup.job.JobManager;
 import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.CollectionLogic;
-import org.backmeup.logic.FriendlistLogick;
+import org.backmeup.logic.FriendlistLogic;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
@@ -99,7 +99,7 @@ public class BusinessLogicImpl implements BusinessLogic {
     private WorkerLogic workers;
 
     @Inject
-    private FriendlistLogick friends;
+    private FriendlistLogic friends;
 
     @Inject
     @Configuration(key = "backmeup.autoVerifyUser")

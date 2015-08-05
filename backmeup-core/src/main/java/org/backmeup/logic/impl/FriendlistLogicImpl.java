@@ -10,13 +10,13 @@ import javax.inject.Inject;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.FriendlistDao;
-import org.backmeup.logic.FriendlistLogick;
+import org.backmeup.logic.FriendlistLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FriendlistUser;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
 
 @ApplicationScoped
-public class FriendlistLogickImpl implements FriendlistLogick {
+public class FriendlistLogicImpl implements FriendlistLogic {
 
     @Inject
     @Configuration(key = "backmeup.emailRegex")

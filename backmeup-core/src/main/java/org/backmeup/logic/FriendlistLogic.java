@@ -9,7 +9,7 @@ import org.backmeup.model.FriendlistUser;
  * Friendlist related business logic.
  * 
  */
-public interface FriendlistLogick {
+public interface FriendlistLogic {
 
     FriendlistUser addFriend(BackMeUpUser currUser, FriendlistUser friend);
 

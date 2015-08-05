@@ -5,10 +5,13 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
@@ -52,6 +55,35 @@ public class Friends extends SecureBase {
             friendsDTOs.add(friendDTO);
         }
         return friendsDTOs;
+    }
+
+    @RolesAllowed("user")
+    @DELETE
+    @Path("/delete")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteFriend(@QueryParam("friendId") Long friendId) {
+
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        List<FriendlistUser> lFriends = getLogic().getFriends(activeUser.getUserId());
+        //build the return list
+        List<FriendlistUserDTO> friendsDTOs = new ArrayList<>();
+        for (FriendlistUser friend : lFriends) {
+            FriendlistUserDTO friendDTO = getMapper().map(friend, FriendlistUserDTO.class);
+            friendsDTOs.add(friendDTO);
+        }
+        return friendsDTOs;
+    }
+
+    private void mandatory(String name, Long l) {
+        if (l == null || l == 0) {
+            badRequestMissingParameter(name);
+        }
+    }
+
+    private void badRequestMissingParameter(String name) {
+        throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
+                entity(name + " parameter is mandatory"). //
+                build());
     }
 
 }
