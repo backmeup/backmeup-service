@@ -184,7 +184,7 @@ public class Heritage extends SecureBase {
 
     @RolesAllowed("user")
     @POST
-    @Path("/deadmannswitch/activate")
+    @Path("/deadmanswitch/activate")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> activateDeadMannSwitchAndImport() {
 
