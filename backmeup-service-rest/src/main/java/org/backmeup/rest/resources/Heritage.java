@@ -29,6 +29,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.SharingPolicyDTO;
 import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
 import org.backmeup.model.dto.SharingPolicyUpdateDTO;
+import org.backmeup.model.dto.TokenDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.slf4j.Logger;
@@ -186,10 +187,12 @@ public class Heritage extends SecureBase {
     @POST
     @Path("/deadmanswitch/activate")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> activateDeadMannSwitchAndImport() {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Map<String, String> activateDeadMannSwitchAndImport(TokenDTO token) {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
+            //TODO Ignoring the token for now - later: check with keyserver 
             //Trigger data import of all owned heritage policies for this user
             String response = getLogic().activateDeadMannSwitchAndImport(activeUser.getUserId());
             //TODO AL lock the account of the sharing providing user
