@@ -28,7 +28,6 @@ import org.backmeup.index.model.sharing.SharingPolicyEntry.SharingPolicyTypeEntr
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.SharingPolicyDTO;
 import org.backmeup.model.dto.SharingPolicyDTO.SharingPolicyTypeEntryDTO;
-import org.backmeup.model.dto.SharingPolicyHandshakeDTO;
 import org.backmeup.model.dto.SharingPolicyUpdateDTO;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
@@ -36,11 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class contains sharing policy specific operations.
+ * This class contains heritage sharing policy specific operations.
  * 
  */
-@Path("/sharing")
-public class Sharing extends SecureBase {
+@Path("/heritage")
+public class Heritage extends SecureBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(Sharing.class);
 
     @Context
@@ -53,7 +52,7 @@ public class Sharing extends SecureBase {
     public Set<SharingPolicyEntry> getAllOwned() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser.getUserId());
         return response;
     }
 
@@ -64,7 +63,7 @@ public class Sharing extends SecureBase {
     public Set<SharingPolicyEntry> getAllIncoming() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser.getUserId());
         return response;
     }
 
@@ -109,7 +108,7 @@ public class Sharing extends SecureBase {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
+            SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser.getUserId(),
                     sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -134,7 +133,7 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID,
+            SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser.getUserId(), policyID,
                     name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -170,7 +169,7 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            String response = getLogic().removeOwnedSharingPolicy(activeUser.getUserId(), policyID);
+            String response = getLogic().removeOwnedHeritagePolicy(activeUser.getUserId(), policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -184,46 +183,17 @@ public class Sharing extends SecureBase {
     }
 
     @RolesAllowed("user")
-    @DELETE
-    @Path("/remove/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> removeAllOwned() {
-
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
-        //return Map instead of String so that JSON response can be created
-        Map<String, String> ret = new HashMap<String, String>();
-        ret.put("status", response);
-        return ret;
-    }
-
-    // --------- approve or decline incoming sharings ----------//
-
-    @RolesAllowed("user")
     @POST
-    @Path("/incoming/approval/json")
+    @Path("/deadmannswitch/activate")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Map<String, String> approvalOfIncomingSharing(SharingPolicyHandshakeDTO handshake) {
-        //the UI framework is set to use POST operations with JSON requests and not Query Parameters
-        if (handshake.getApprove()) {
-            return this.acceptIncomingSharing(handshake.getPolicyID());
-        } else {
-            return this.declineIncomingSharing(handshake.getPolicyID());
-        }
-    }
+    public Map<String, String> activateDeadMannSwitchAndImport() {
 
-    @RolesAllowed("user")
-    @POST
-    @Path("/incoming/decline")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> declineIncomingSharing(//
-            @QueryParam("policyID") Long policyID) {
-
-        mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
+            //Trigger data import of all owned heritage policies for this user
+            String response = getLogic().activateDeadMannSwitchAndImport(activeUser.getUserId());
+            //TODO AL lock the account of the sharing providing user
+
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -231,31 +201,7 @@ public class Sharing extends SecureBase {
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
-                    entity("declining incoming sharing failed"). //
-                    build());
-        }
-    }
-
-    @RolesAllowed("user")
-    @POST
-    @Path("/incoming/accept")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> acceptIncomingSharing(//
-            @QueryParam("policyID") Long policyID) {
-
-        mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-
-        try {
-            String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);
-            //return Map instead of String so that JSON response can be created
-            Map<String, String> ret = new HashMap<String, String>();
-            ret.put("status", response);
-            return ret;
-        } catch (UnknownUserException e) {
-            LOGGER.error("", e);
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST). //
-                    entity("approving incoming sharing failed"). //
+                    entity("activating dead man switch failed"). //
                     build());
         }
     }

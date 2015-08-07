@@ -123,6 +123,22 @@ public interface BusinessLogic {
 
     String declineIncomingSharing(final Long currUserId, final Long policyID);
 
+    // heritage sharing operations -----------------------------------------------------
+    Set<SharingPolicyEntry> getAllOwnedHeritagePolicies(Long currUserId);
+
+    Set<SharingPolicyEntry> getAllIncomingHeritagePolicies(Long currUserId);
+
+    SharingPolicyEntry createAndAddHeritagePolicy(Long currUserId, Long sharingWithUserId,
+            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description, Date lifespanstart,
+            Date lifespanend);
+
+    SharingPolicyEntry updateExistingHeritagePolicy(Long currUserId, Long policyID, String name, String description,
+            Date lifespanstart, Date lifespanend);
+
+    String removeOwnedHeritagePolicy(Long currUserId, Long policyID);
+
+    String activateDeadMannSwitchAndImport(Long currUserId);
+
     // tagged collections -----------------------------------------------------
     Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId,
             final List<UUID> lDocumentUUIDs);

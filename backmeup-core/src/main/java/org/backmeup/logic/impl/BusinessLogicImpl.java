@@ -22,6 +22,7 @@ import org.backmeup.logic.BackupLogic;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.logic.CollectionLogic;
 import org.backmeup.logic.FriendlistLogic;
+import org.backmeup.logic.HeritageLogic;
 import org.backmeup.logic.PluginsLogic;
 import org.backmeup.logic.ProfileLogic;
 import org.backmeup.logic.SearchLogic;
@@ -82,6 +83,9 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     @Inject
     private SharingLogic share;
+
+    @Inject
+    private HeritageLogic heritage;
 
     @Inject
     private CollectionLogic taggedCollection;
@@ -677,8 +681,8 @@ public class BusinessLogicImpl implements BusinessLogic {
             public SharingPolicyEntry call() {
 
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.updateOwnedSharingPolicy(user, policyID, name, description,
-                        lifespanstart, lifespanend);
+                return BusinessLogicImpl.this.share.updateOwned(user, policyID, name, description, lifespanstart,
+                        lifespanend);
             }
         });
     }
@@ -730,6 +734,89 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 return BusinessLogicImpl.this.share.declineIncomingSharing(user, policyID);
+
+            }
+        });
+    }
+
+    // heritage sharing operations======================================================
+    @Override
+    public Set<SharingPolicyEntry> getAllOwnedHeritagePolicies(final Long ownerId) {
+        return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
+            @Override
+            public Set<SharingPolicyEntry> call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
+                return BusinessLogicImpl.this.heritage.getAllOwned(user);
+
+            }
+        });
+    }
+
+    @Override
+    public Set<SharingPolicyEntry> getAllIncomingHeritagePolicies(final Long ownerId) {
+        return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
+            @Override
+            public Set<SharingPolicyEntry> call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
+                return BusinessLogicImpl.this.heritage.getAllIncoming(user);
+
+            }
+        });
+    }
+
+    @Override
+    public SharingPolicyEntry createAndAddHeritagePolicy(final Long currUserId, final Long sharingWithUserId,
+            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
+            final String description, final Date lifespanstart, final Date lifespanend) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
+                return BusinessLogicImpl.this.heritage.add(user, sharingWith, policy, sharedElementID, name,
+                        description, lifespanstart, lifespanend);
+            }
+        });
+    }
+
+    @Override
+    public SharingPolicyEntry updateExistingHeritagePolicy(final Long currUserId, final Long policyID,
+            final String name, final String description, final Date lifespanstart, final Date lifespanend) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.heritage.updateOwned(user, policyID, name, description, lifespanstart,
+                        lifespanend);
+            }
+        });
+    }
+
+    @Override
+    public String removeOwnedHeritagePolicy(final Long currUserId, final Long policyID) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.heritage.removeOwned(user, policyID);
+
+            }
+        });
+    }
+
+    @Override
+    public String activateDeadMannSwitchAndImport(final Long currUserId) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+
+                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                return BusinessLogicImpl.this.heritage.activateDeadMannSwitchAndImport(user);
 
             }
         });
