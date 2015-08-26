@@ -25,23 +25,13 @@ public class FriendlistDaoImpl extends BaseDaoImpl<FriendlistUser> implements Fr
     }
 
     @Override
-    public List<FriendlistUser> getFriends(Long ownerId) {
-        return getFriendsOfType(ownerId, FriendListType.SHARING);
+    public List<FriendlistUser> getFriends(Long ownerId, FriendListType friendlist) {
+        return getFriendsOfType(ownerId, friendlist);
     }
 
     @Override
-    public List<FriendlistUser> getHeritageFriends(Long ownerId) {
-        return getFriendsOfType(ownerId, FriendListType.HERITAGE);
-    }
-
-    @Override
-    public FriendlistUser getFriend(Long ownerId, Long friendId) {
-        return getFriendOfType(ownerId, friendId, FriendListType.SHARING);
-    }
-
-    @Override
-    public FriendlistUser getHeritageFriend(Long ownerId, Long friendId) {
-        return getFriendOfType(ownerId, friendId, FriendListType.HERITAGE);
+    public FriendlistUser getFriend(Long ownerId, Long friendId, FriendListType friendlist) {
+        return getFriendOfType(ownerId, friendId, friendlist);
     }
 
     private List<FriendlistUser> getFriendsOfType(Long ownerId, FriendListType... types) {

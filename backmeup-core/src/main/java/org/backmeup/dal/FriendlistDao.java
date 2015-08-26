@@ -3,6 +3,7 @@ package org.backmeup.dal;
 import java.util.List;
 
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 
 /**
  * The FriendlistDao contains database relevant operations for the model class FriendlistUser.
@@ -10,12 +11,8 @@ import org.backmeup.model.FriendlistUser;
  */
 public interface FriendlistDao extends BaseDao<FriendlistUser> {
 
-    List<FriendlistUser> getFriends(Long ownerId);
+    List<FriendlistUser> getFriends(Long ownerId, FriendListType friendlist);
 
-    FriendlistUser getFriend(Long ownerId, Long friendId);
-
-    List<FriendlistUser> getHeritageFriends(Long ownerId);
-
-    FriendlistUser getHeritageFriend(Long ownerId, Long friendId);
+    FriendlistUser getFriend(Long ownerId, Long friendId, FriendListType friendlist);
 
 }

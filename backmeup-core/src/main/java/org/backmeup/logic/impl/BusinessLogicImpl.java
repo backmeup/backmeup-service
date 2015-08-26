@@ -34,6 +34,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
@@ -962,12 +963,12 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public List<FriendlistUser> getFriends(final Long currUserId) {
+    public List<FriendlistUser> getFriends(final Long currUserId, final FriendListType friendlist) {
         return this.conn.txNew(new Callable<List<FriendlistUser>>() {
             @Override
             public List<FriendlistUser> call() {
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.friends.getFriends(user);
+                return BusinessLogicImpl.this.friends.getFriends(user, friendlist);
             }
         });
     }
@@ -984,12 +985,12 @@ public class BusinessLogicImpl implements BusinessLogic {
     }
 
     @Override
-    public void removeFriend(final Long currUserId, final Long friendId) {
+    public void removeFriend(final Long currUserId, final Long friendId, final FriendListType friendlist) {
         this.conn.txNew(new Runnable() {
             @Override
             public void run() {
                 BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                BusinessLogicImpl.this.friends.removeFriend(user, friendId);
+                BusinessLogicImpl.this.friends.removeFriend(user, friendId, friendlist);
             }
         });
 

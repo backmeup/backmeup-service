@@ -13,6 +13,7 @@ import org.backmeup.dal.FriendlistDao;
 import org.backmeup.logic.FriendlistLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 import org.backmeup.model.exceptions.NotAnEmailAddressException;
 import org.backmeup.model.exceptions.UnknownFriendException;
 import org.slf4j.Logger;
@@ -50,15 +51,15 @@ public class FriendlistLogicImpl implements FriendlistLogic {
     }
 
     @Override
-    public List<FriendlistUser> getFriends(BackMeUpUser currUser) {
-        List<FriendlistUser> ret = this.getFriendlistDao().getFriends(currUser.getUserId());
+    public List<FriendlistUser> getFriends(BackMeUpUser currUser, FriendListType friendlist) {
+        List<FriendlistUser> ret = this.getFriendlistDao().getFriends(currUser.getUserId(), friendlist);
         setFriendsBMUUserId(ret);
         return ret;
     }
 
     @Override
-    public void removeFriend(BackMeUpUser currUser, Long friendId) {
-        FriendlistUser friend = getFriendFromDB(currUser, friendId);
+    public void removeFriend(BackMeUpUser currUser, Long friendId, FriendListType friendlist) {
+        FriendlistUser friend = getFriendFromDB(currUser, friendId, friendlist);
         this.getFriendlistDao().delete(friend);
         log.debug("deleted friend for userId: " + currUser.getUserId() + " and friendId:" + friendId);
     }
@@ -69,7 +70,8 @@ public class FriendlistLogicImpl implements FriendlistLogic {
         if (friendUpdate.getEntityId() == null) {
             throw new UnknownFriendException("entityId required");
         }
-        FriendlistUser dbFriend = getFriendFromDB(currUser, friendUpdate.getEntityId());
+        FriendlistUser dbFriend = getFriendFromDB(currUser, friendUpdate.getEntityId(),
+                friendUpdate.getFriendListType());
         if (friendUpdate.getName() != null) {
             dbFriend.setName(friendUpdate.getName());
         }
@@ -83,12 +85,12 @@ public class FriendlistLogicImpl implements FriendlistLogic {
 
     //---------------------------private helpers -----------------------------//
 
-    private FriendlistUser getFriendFromDB(BackMeUpUser currUser, Long friendId) {
+    private FriendlistUser getFriendFromDB(BackMeUpUser currUser, Long friendId, FriendListType friendlist) {
         if (friendId == null) {
             throw new UnknownFriendException("friendId not provided");
         }
         //check if the provided friendId is 'owned' by this backmeup user
-        FriendlistUser friend = this.getFriendlistDao().getFriend(currUser.getUserId(), friendId);
+        FriendlistUser friend = this.getFriendlistDao().getFriend(currUser.getUserId(), friendId, friendlist);
         if (friend == null) {
             throw new UnknownFriendException(friendId);
         }

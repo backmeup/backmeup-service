@@ -19,6 +19,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 import org.backmeup.model.dto.FriendlistUserDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
 
@@ -29,6 +30,8 @@ import org.backmeup.rest.auth.BackmeupPrincipal;
 public class Friends extends SecureBase {
     @Context
     private SecurityContext securityContext;
+
+    //TODO AL: ADD METHOD TO CREATE NEW HERITAGE USER AND ADD HIM TO THE LIST
 
     @RolesAllowed("user")
     @POST
@@ -46,9 +49,11 @@ public class Friends extends SecureBase {
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<FriendlistUserDTO> getFriends() {
+    public List<FriendlistUserDTO> getFriends(//
+            @QueryParam("list") FriendListType listType) {
+        mandatory("list", listType);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        List<FriendlistUser> lFriends = getLogic().getFriends(activeUser.getUserId());
+        List<FriendlistUser> lFriends = getLogic().getFriends(activeUser.getUserId(), listType);
         //build the return list
         List<FriendlistUserDTO> friendsDTOs = new ArrayList<>();
         for (FriendlistUser friend : lFriends) {
@@ -74,16 +79,25 @@ public class Friends extends SecureBase {
     @DELETE
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteFriend(@QueryParam("friendId") Long friendId) {
+    public String deleteFriend(//
+            @QueryParam("friendId") Long friendId, //
+            @QueryParam("list") FriendListType listType) {
         mandatory("friendId", friendId);
+        mandatory("list", listType);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        getLogic().removeFriend(activeUser.getUserId(), friendId);
+        getLogic().removeFriend(activeUser.getUserId(), friendId, listType);
         return "friend deleted";
     }
 
     private void mandatory(String name, Long l) {
         if (l == null || l == 0) {
+            badRequestMissingParameter(name);
+        }
+    }
+
+    private void mandatory(String name, FriendListType t) {
+        if (t == null) {
             badRequestMissingParameter(name);
         }
     }

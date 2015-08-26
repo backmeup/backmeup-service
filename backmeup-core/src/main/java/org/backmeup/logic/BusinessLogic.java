@@ -14,6 +14,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 import org.backmeup.model.PluginConfigInfo;
 import org.backmeup.model.Profile;
 import org.backmeup.model.Token;
@@ -168,10 +169,10 @@ public interface BusinessLogic {
     // friendlist operations --------------------------------------------------------
     FriendlistUser addFriend(Long currUserId, FriendlistUser friend);
 
-    List<FriendlistUser> getFriends(Long currUserId);
+    List<FriendlistUser> getFriends(Long currUserId, FriendListType friendlist);
 
     FriendlistUser updateFriend(Long currUserId, FriendlistUser friend);
 
-    void removeFriend(Long currUserId, Long friendId);
+    void removeFriend(Long currUserId, Long friendId, FriendListType friendlist);
 
 }

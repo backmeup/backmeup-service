@@ -23,29 +23,30 @@ public class FriendlistDaoTest {
 
     @Test
     public void getFriendLists() {
-        List<FriendlistUser> friends = this.database.friendlistDao.getFriends(1L);
+        List<FriendlistUser> friends = this.database.friendlistDao.getFriends(1L, FriendListType.SHARING);
         assertNotNull(friends);
         assertTrue(friends.size() == 2);
 
-        friends = this.database.friendlistDao.getFriends(2L);
+        friends = this.database.friendlistDao.getFriends(2L, FriendListType.SHARING);
         assertNotNull(friends);
         assertTrue(friends.size() == 1);
     }
 
     @Test
     public void getHeritageFriendLists() {
-        List<FriendlistUser> friends = this.database.friendlistDao.getHeritageFriends(1L);
+        List<FriendlistUser> friends = this.database.friendlistDao.getFriends(1L, FriendListType.HERITAGE);
         assertNotNull(friends);
         assertTrue(friends.size() == 0);
 
-        friends = this.database.friendlistDao.getHeritageFriends(2L);
+        friends = this.database.friendlistDao.getFriends(2L, FriendListType.HERITAGE);
         assertNotNull(friends);
         assertTrue(friends.size() == 1);
     }
 
     @Test
     public void getFriend() {
-        FriendlistUser friend = this.database.friendlistDao.getFriend(1L, this.user1.getEntityId());
+        FriendlistUser friend = this.database.friendlistDao.getFriend(1L, this.user1.getEntityId(),
+                FriendListType.SHARING);
         assertNotNull(friend);
         assertEquals("Name1", friend.getName());
         assertEquals("Description1", friend.getDescription());
@@ -55,22 +56,40 @@ public class FriendlistDaoTest {
 
     @Test
     public void getHeritageFriend() {
-        FriendlistUser friend = this.database.friendlistDao.getHeritageFriend(2L, this.user4.getEntityId());
+        FriendlistUser friend = this.database.friendlistDao.getFriend(2L, this.user4.getEntityId(),
+                FriendListType.HERITAGE);
         assertNotNull(friend);
         assertEquals(FriendListType.HERITAGE, friend.getFriendListType());
 
-        friend = this.database.friendlistDao.getHeritageFriend(2L, this.user3.getEntityId());
+        friend = this.database.friendlistDao.getFriend(2L, this.user3.getEntityId(), FriendListType.HERITAGE);
+        assertNull(friend);
+    }
+
+    @Test
+    public void updateAndDeleteHeritageFriend() {
+        FriendlistUser friend = this.database.friendlistDao.getFriend(2L, this.user4.getEntityId(),
+                FriendListType.HERITAGE);
+        assertNotNull(friend);
+        assertEquals(FriendListType.HERITAGE, friend.getFriendListType());
+
+        friend.setName("UpdatedName");
+        friend = this.mergeInTransaction(friend);
+        assertEquals("UpdatedName", friend.getName());
+
+        boolean b = this.deleteInTransaction(friend);
+        friend = this.database.friendlistDao.getFriend(2L, this.user4.getEntityId(), FriendListType.HERITAGE);
         assertNull(friend);
     }
 
     @Test
     public void getBMUUserIdOfFriend() {
-        FriendlistUser friend = this.database.friendlistDao.getFriend(1L, this.user1.getEntityId());
+        FriendlistUser friend = this.database.friendlistDao.getFriend(1L, this.user1.getEntityId(),
+                FriendListType.SHARING);
         assertNotNull(friend);
         BackMeUpUser foundUser = this.database.userDao.findByEmail(this.user1.getEmail());
         assertNotNull(foundUser);
 
-        friend = this.database.friendlistDao.getFriend(1L, this.user2.getEntityId());
+        friend = this.database.friendlistDao.getFriend(1L, this.user2.getEntityId(), FriendListType.SHARING);
         assertNotNull(friend);
         foundUser = this.database.userDao.findByEmail(this.user2.getEmail());
         assertNull(foundUser);
@@ -100,6 +119,22 @@ public class FriendlistDaoTest {
         friend = this.database.friendlistDao.save(friend);
         this.database.entityManager.getTransaction().commit();
         return friend;
+    }
+
+    private FriendlistUser mergeInTransaction(FriendlistUser friend) {
+        // need manual transaction in test because transactional interceptor is not installed in tests
+        this.database.entityManager.getTransaction().begin();
+        friend = this.database.friendlistDao.merge(friend);
+        this.database.entityManager.getTransaction().commit();
+        return friend;
+    }
+
+    private boolean deleteInTransaction(FriendlistUser friend) {
+        // need manual transaction in test because transactional interceptor is not installed in tests
+        this.database.entityManager.getTransaction().begin();
+        boolean b = this.database.friendlistDao.delete(friend);
+        this.database.entityManager.getTransaction().commit();
+        return b;
     }
 
     private BackMeUpUser persistInTransaction(BackMeUpUser user) {

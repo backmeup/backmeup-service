@@ -2,6 +2,8 @@ package org.backmeup.model.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.backmeup.model.FriendlistUser.FriendListType;
+
 @XmlRootElement
 @SuppressWarnings("unused")
 public class FriendlistUserDTO {
@@ -10,18 +12,20 @@ public class FriendlistUserDTO {
     private String description;
     private String email;
     private Long bmuUserId;
+    private FriendListType friendListType;
 
     public FriendlistUserDTO() {
 
     }
 
     public FriendlistUserDTO(Long friendId, String name, String description, String email, boolean bmuUser,
-            Long bmuUserId) {
+            Long bmuUserId, FriendListType friendListType) {
         this.friendId = friendId;
         this.name = name;
         this.description = description;
         this.email = email;
         this.bmuUserId = bmuUserId;
+        this.friendListType = friendListType;
     }
 
     public String getName() {
@@ -69,6 +73,14 @@ public class FriendlistUserDTO {
 
     public void setBmuUserId(Long bmuUserId) {
         this.bmuUserId = bmuUserId;
+    }
+
+    public FriendListType getFriendListType() {
+        return this.friendListType;
+    }
+
+    public void setFriendListType(FriendListType friendListType) {
+        this.friendListType = friendListType;
     }
 
 }
