@@ -14,4 +14,8 @@ public interface FriendlistDao extends BaseDao<FriendlistUser> {
 
     FriendlistUser getFriend(Long ownerId, Long friendId);
 
+    List<FriendlistUser> getHeritageFriends(Long ownerId);
+
+    FriendlistUser getHeritageFriend(Long ownerId, Long friendId);
+
 }

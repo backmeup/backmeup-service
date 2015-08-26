@@ -15,6 +15,12 @@ import javax.persistence.Transient;
  */
 @Entity
 public class FriendlistUser {
+
+    public enum FriendListType {
+        SHARING, //user for sharing friends list
+        HERITAGE; //user for heritage friends list for use case 'vererben'
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -31,6 +37,9 @@ public class FriendlistUser {
     @Column(unique = false, nullable = false)
     private String email;
 
+    @Column(unique = false, nullable = false)
+    private FriendListType friendListType;
+
     @Transient
     private Long friendsBmuUserId; //the user id if the friend is on bmu. Not persisted, lookup via email if bmu user
 
@@ -39,15 +48,25 @@ public class FriendlistUser {
     }
 
     public FriendlistUser(Long ownerId, String name, String description, String email) {
-        this(ownerId, name, description, email, null);
+        this(ownerId, name, description, email, null, null);
     }
 
-    public FriendlistUser(Long ownerId, String name, String description, String email, Long friendsBmuUserId) {
+    public FriendlistUser(Long ownerId, String name, String description, String email, FriendListType friendListType) {
+        this(ownerId, name, description, email, null, friendListType);
+    }
+
+    public FriendlistUser(Long ownerId, String name, String description, String email, Long friendsBmuUserId,
+            FriendListType friendListType) {
         this.ownerId = ownerId;
         this.name = name;
         this.description = description;
         this.email = email;
         this.friendsBmuUserId = friendsBmuUserId;
+        if (friendListType == null) {
+            this.friendListType = FriendListType.SHARING;
+        } else {
+            this.friendListType = friendListType;
+        }
     }
 
     public Long getEntityId() {
@@ -94,7 +113,7 @@ public class FriendlistUser {
     public String toString() {
         return "entityId: '" + this.entityId + "', name: '" + this.name + "', description: '" + this.description
                 + "', email: '" + this.email + "', ownerId: '" + this.ownerId + "', friendsBMUUserId: '"
-                + this.friendsBmuUserId + "'";
+                + this.friendsBmuUserId + "', friendListType: '" + this.friendListType + "'";
     }
 
     public Long getFriendsBmuUserId() {
@@ -103,6 +122,14 @@ public class FriendlistUser {
 
     public void setFriendsBmuUserId(Long friendsBmuUserId) {
         this.friendsBmuUserId = friendsBmuUserId;
+    }
+
+    public FriendListType getFriendListType() {
+        return this.friendListType;
+    }
+
+    public void setFriendListType(FriendListType friendListType) {
+        this.friendListType = friendListType;
     }
 
 }

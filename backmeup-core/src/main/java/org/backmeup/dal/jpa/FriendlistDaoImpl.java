@@ -1,6 +1,7 @@
 package org.backmeup.dal.jpa;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,6 +9,7 @@ import javax.persistence.TypedQuery;
 
 import org.backmeup.dal.FriendlistDao;
 import org.backmeup.model.FriendlistUser;
+import org.backmeup.model.FriendlistUser.FriendListType;
 
 /**
  * Implementation of the FriendlistDao interface
@@ -24,18 +26,41 @@ public class FriendlistDaoImpl extends BaseDaoImpl<FriendlistUser> implements Fr
 
     @Override
     public List<FriendlistUser> getFriends(Long ownerId) {
-        TypedQuery<FriendlistUser> q = createTypedQuery("SELECT u FROM " + TABLENAME
-                + " u WHERE u.ownerId = :ownerID ORDER BY u.entityId ASC");
-        q.setParameter("ownerID", ownerId);
-        return executeQuery(q);
+        return getFriendsOfType(ownerId, FriendListType.SHARING);
+    }
+
+    @Override
+    public List<FriendlistUser> getHeritageFriends(Long ownerId) {
+        return getFriendsOfType(ownerId, FriendListType.HERITAGE);
     }
 
     @Override
     public FriendlistUser getFriend(Long ownerId, Long friendId) {
+        return getFriendOfType(ownerId, friendId, FriendListType.SHARING);
+    }
+
+    @Override
+    public FriendlistUser getHeritageFriend(Long ownerId, Long friendId) {
+        return getFriendOfType(ownerId, friendId, FriendListType.HERITAGE);
+    }
+
+    private List<FriendlistUser> getFriendsOfType(Long ownerId, FriendListType... types) {
+        List<FriendListType> lTypes = Arrays.asList(types);
         TypedQuery<FriendlistUser> q = createTypedQuery("SELECT u FROM " + TABLENAME
-                + " u WHERE u.ownerId = :ownerID and u.entityId = :friendID ORDER BY u.entityId ASC");
+                + " u WHERE u.ownerId = :ownerID and u.friendListType IN (:statusTypes) ORDER BY u.entityId ASC");
+        q.setParameter("ownerID", ownerId);
+        q.setParameter("statusTypes", lTypes);
+        return executeQuery(q);
+    }
+
+    private FriendlistUser getFriendOfType(Long ownerId, Long friendId, FriendListType... types) {
+        List<FriendListType> lTypes = Arrays.asList(types);
+        TypedQuery<FriendlistUser> q = createTypedQuery("SELECT u FROM "
+                + TABLENAME
+                + " u WHERE u.ownerId = :ownerID and u.entityId = :friendID and u.friendListType IN (:statusTypes) ORDER BY u.entityId ASC");
         q.setParameter("ownerID", ownerId);
         q.setParameter("friendID", friendId);
+        q.setParameter("statusTypes", lTypes);
         return executeQuerySelectLast(q);
     }
 
