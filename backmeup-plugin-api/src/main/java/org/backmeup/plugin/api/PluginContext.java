@@ -132,9 +132,10 @@ public class PluginContext {
     }
 
     /**
-     * Clear all created attributes.
+     * Clear all created attributes, but read only attributes will be left in
+     * place.
      */
-    public void clearAttributes() {
+    public void clear() {
 
         // Create list of attributes to be removed
         ArrayList<String> list = new ArrayList<>();
@@ -150,5 +151,13 @@ public class PluginContext {
             String key = keys.next();
             removeAttribute(key);
         }
+    }
+    
+    /**
+     * Clear all attributes.
+     */
+    public void clearAll() {
+        attributes.clear();
+        readOnlyAttributes.clear();
     }
 }
