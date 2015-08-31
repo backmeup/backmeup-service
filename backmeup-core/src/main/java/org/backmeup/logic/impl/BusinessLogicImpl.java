@@ -135,6 +135,17 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+	@Override
+	public Token authorize(String activationCode) {
+		 return this.conn.txJoinReadOnly(new Callable<Token>() {
+	            @Override
+	            public Token call() {
+	            	//TODO
+	            	return null;
+	            }
+	        });
+	}
 
     // ========================================================================
 
@@ -212,6 +223,24 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+	@Override
+	public BackMeUpUser addAnonymousUser(BackMeUpUser currentUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getAnonymousUserActivationCode(String anonymousUserId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BackMeUpUser deleteAnonymousUser(BackMeUpUser activeUser, String activationCode) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     // ========================================================================
 

@@ -35,6 +35,8 @@ import org.backmeup.model.spi.PluginDescribable;
 public interface BusinessLogic {
     // authorization ----------------------------------------------------------
     Token authorize(String username, String password);
+    
+    Token authorize(String activationCode);
 
     // user operations --------------------------------------------------------
     BackMeUpUser addUser(BackMeUpUser user);
@@ -46,6 +48,13 @@ public interface BusinessLogic {
     BackMeUpUser updateUser(BackMeUpUser user);
 
     BackMeUpUser deleteUser(BackMeUpUser activeUser, Long userId);
+    
+    
+    BackMeUpUser addAnonymousUser(BackMeUpUser currentUser);
+    
+    String getAnonymousUserActivationCode(String anonymousUserId);
+    
+    BackMeUpUser deleteAnonymousUser(BackMeUpUser activeUser, String activationCode);
 
     // plugin operations ------------------------------------------------------
     boolean isPluginAvailable(String pluginId);
