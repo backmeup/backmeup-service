@@ -46,6 +46,7 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
         return !users.isEmpty() ? users.get(0) : null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public BackMeUpUser findByKeyserverId(String keyserverUserId) {
         Query q = this.em.createQuery("SELECT u FROM BackMeUpUser u WHERE keyserverId = :keyserverId");
