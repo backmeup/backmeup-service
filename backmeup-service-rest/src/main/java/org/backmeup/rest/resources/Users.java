@@ -86,9 +86,9 @@ public class Users extends SecureBase {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public UserDTO addAnonymousUser() {
-//    	BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+//        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
 //        BackMeUpUser userModel = getLogic().addAnonymousUser(activeUser);
-        BackMeUpUser userModel = new BackMeUpUser("Anonymous", null, null, null, null);
+        BackMeUpUser userModel = new BackMeUpUser(4711L, "Anonymous", null, null, null, null);
         userModel.setAnonymous(true);
         return getMapper().map(userModel, UserDTO.class);
     }
@@ -97,9 +97,9 @@ public class Users extends SecureBase {
     @GET
     @Path("/{userId}/activationCode")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAnonymousUserActivationCode(@PathParam("anonymousUserId") String anonymousUserId) {
+    public String getAnonymousUserActivationCode(@PathParam("userId") String userId) {
 //        String activationCode = getLogic().getAnonymousUserActivationCode(anonymousUserId);
 //        return activationCode;
-    	return "Wuj0vGuZLmMIpshJjkm2QvLVbhT4NFXjf55mIgnTj10";
+        return "Wuj0vGuZLmMIpshJjkm2QvLVbhT4NFXjf55mIgnTj10";
     }
 }
