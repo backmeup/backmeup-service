@@ -1,7 +1,9 @@
 package org.backmeup.rest.resources;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -77,7 +79,7 @@ public class Friends extends SecureBase {
     @DELETE
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteFriend(//
+    public Map<String, String> deleteFriend(//
             @QueryParam("friendId") Long friendId, //
             @QueryParam("list") FriendListType listType) {
         mandatory("friendId", friendId);
@@ -86,7 +88,9 @@ public class Friends extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         getLogic().removeFriend(activeUser.getUserId(), friendId, listType);
         //TODO need to delete anonymous heritage user account when removing from friends list
-        return "friend deleted";
+        Map<String, String> ret = new HashMap<String, String>();
+        ret.put("status", "friend deleted");
+        return ret;
     }
 
     private void mandatory(String name, Long l) {
