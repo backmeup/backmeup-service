@@ -31,7 +31,7 @@ public class AccessTokenPdfQRCodeGenerator {
     Font titleFont, bodyFont, codeFont;
     Document document;
 
-    public AccessTokenPdfQRCodeGenerator(String Base64Token) {
+    public AccessTokenPdfQRCodeGenerator() {
         this.titleFont = new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD);
         this.bodyFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
         this.codeFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);

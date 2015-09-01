@@ -42,7 +42,7 @@ public class QRCodeGeneratorTest {
 
     @Test
     public void createSamplePDFQRCodeGeneration() throws IOException {
-        AccessTokenPdfQRCodeGenerator pdfGen = new AccessTokenPdfQRCodeGenerator("Hello World");
+        AccessTokenPdfQRCodeGenerator pdfGen = new AccessTokenPdfQRCodeGenerator();
         InputStream inStream = pdfGen.generateQRCodePDF("ABC123TOKEN");
 
         File f = File.createTempFile("QRCodePDFTest", ".pdf");
