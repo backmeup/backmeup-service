@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,7 +147,8 @@ public class UserRegistrationImpl implements UserRegistration {
             AuthResponseDTO response = keyserverClient.registerAnonymousUser(token);
             String anonServiceUserId = response.getServiceUserId();
             
-            BackMeUpUser anonUser = new BackMeUpUser(anonServiceUserId, null, null, anonServiceUserId, null);
+            String uuid = UUID.randomUUID().toString();
+            BackMeUpUser anonUser = new BackMeUpUser(uuid, null, null, uuid + "@backmeup", null);
             anonUser.setAnonymous(true);
             anonUser.setKeyserverId(anonServiceUserId);
             BackMeUpUser newUser = save(anonUser);
