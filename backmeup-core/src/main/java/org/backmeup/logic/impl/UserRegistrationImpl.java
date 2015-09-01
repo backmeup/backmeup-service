@@ -160,6 +160,7 @@ public class UserRegistrationImpl implements UserRegistration {
             String uuid = UUID.randomUUID().toString();
             BackMeUpUser anonUser = new BackMeUpUser(uuid, null, null, uuid + "@backmeup", null);
             anonUser.setAnonymous(true);
+            anonUser.setActivated(true);
             anonUser.setKeyserverId(anonServiceUserId);
             BackMeUpUser newUser = save(anonUser);
             
