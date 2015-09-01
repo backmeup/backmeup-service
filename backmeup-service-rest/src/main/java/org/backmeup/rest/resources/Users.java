@@ -112,7 +112,7 @@ public class Users extends SecureBase {
     
     @RolesAllowed("user")
     @GET
-    @Path("/{userId}/activationCode/pdf")
+    @Path("/{userId}/activationCode")
     @Produces("application/pdf")
     public Response getAnonymousUserActivationCodeAsPdf(@PathParam("userId") Long userId) {
         try {
