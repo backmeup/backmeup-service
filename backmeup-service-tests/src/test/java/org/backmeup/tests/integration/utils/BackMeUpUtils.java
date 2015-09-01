@@ -65,14 +65,18 @@ public class BackMeUpUtils {
     }
     
     public static String getActivationCode(String accessToken, String userId){
-        Response response = 
+        ValidatableResponse response = 
             given()
                 .log().all()
                 .header("Authorization", accessToken)
             .when()
-                .get("/users/" + userId + "/activationCode");
+                .get("/users/" + userId + "/activationCode")
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body(containsString("activationCode"));
 
-        return response.getBody().asString();
+        return response.extract().path("activationCode").toString();
     }
 
     public static void deleteUser(String accessToken, String userId){

@@ -1,5 +1,8 @@
 package org.backmeup.rest.resources;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -95,9 +98,12 @@ public class Users extends SecureBase {
     @GET
     @Path("/{userId}/activationCode")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAnonymousUserActivationCode(@PathParam("userId") Long userId) {
+    public Map<String, String> getAnonymousUserActivationCodeAsText(@PathParam("userId") Long userId) {
     	BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         String activationCode = getLogic().getAnonymousUserActivationCode(activeUser, userId);
-        return activationCode;
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("activationCode", activationCode);
+        return map;
     }
+    
 }

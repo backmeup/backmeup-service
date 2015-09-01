@@ -258,7 +258,8 @@ public class UserIntegrationTest extends IntegrationTestBase {
                 .get("/users/" + anonymousUserId + "/activationCode")
              .then()
                 .log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .body(containsString("activationCode"));
              
          } finally {
              BackMeUpUtils.deleteUser(accessToken, userId);
