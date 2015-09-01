@@ -62,6 +62,17 @@ public class BackMeUpUtils {
 
         return response;
     }
+    
+    public static String getActivationCode(String accessToken, String userId){
+        Response response = 
+            given()
+                .log().all()
+                .header("Authorization", accessToken)
+            .when()
+                .get("/users/" + userId + "/activationCode");
+
+        return response.getBody().asString();
+    }
 
     public static void deleteUser(String accessToken, String userId){
         given()

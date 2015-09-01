@@ -42,4 +42,36 @@ public class AuthenticationIntegrationTest extends IntegrationTestBase {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
     }
+    
+    @Test
+    public void testAuthenticateAnonymousUserWithActivationCode() {
+        UserDTO user = TestDataManager.getUser();
+        String userId = "";
+        String accessToken = "";
+
+        try {
+        	ValidatableResponse response = BackMeUpUtils.addUser(user);
+            userId = response.extract().path("userId").toString();
+            accessToken = BackMeUpUtils.authenticateUser(user);
+
+            response = BackMeUpUtils.addAnonymousUser(accessToken);
+            String anonymousUserId = response.extract().path("userId").toString();
+            
+            String activationCode = BackMeUpUtils.getActivationCode(accessToken, anonymousUserId);
+            
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+            .when()
+                .get("/authenticate/anonymous?activationCode=" + activationCode)
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body(containsString("accessToken"))
+                .body(containsString("expiresAt"));
+            
+        } finally {
+            BackMeUpUtils.deleteUser(accessToken, userId);
+        }
+    }
 }
