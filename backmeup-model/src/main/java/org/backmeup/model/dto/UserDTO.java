@@ -12,6 +12,7 @@ public class UserDTO {
     private String password;
     private String email;
     private boolean activated;
+    private boolean anonymous;
 
     public UserDTO() {
 
@@ -24,6 +25,7 @@ public class UserDTO {
         this.password = password;
         this.email = email;
         this.activated = false;
+        this.anonymous = false;
     }
 
     public Long getUserId() {
@@ -81,4 +83,9 @@ public class UserDTO {
     private void setActivated(Boolean activated) {
         this.activated = activated;
     }
+
+	public boolean isAnonymous() {
+		return anonymous;
+	}
+    
 }

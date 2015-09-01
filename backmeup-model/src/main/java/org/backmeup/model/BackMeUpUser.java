@@ -38,6 +38,9 @@ public class BackMeUpUser {
     private boolean activated;
 
     private String verificationKey;
+    
+    private boolean anonymous;
+    private String keyserverId;
 
     public BackMeUpUser() {
 
@@ -57,6 +60,7 @@ public class BackMeUpUser {
         this.email = email;
         this.password = password;
         this.activated = false;
+        this.anonymous = false;
     }
 
     public Long getUserId() {
@@ -135,7 +139,23 @@ public class BackMeUpUser {
         }
     }
 
-    @Override
+    public boolean isAnonymous() {
+		return anonymous;
+	}
+
+	public void setAnonymous(boolean anonymous) {
+		this.anonymous = anonymous;
+	}
+
+	public String getKeyserverId() {
+		return keyserverId;
+	}
+
+	public void setKeyserverId(String keyserverId) {
+		this.keyserverId = keyserverId;
+	}
+
+	@Override
     public String toString() {
         return username;
     }
