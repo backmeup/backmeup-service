@@ -1,5 +1,6 @@
 package org.backmeup.rest.resources;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +17,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.dto.UserDTO;
+import org.backmeup.model.exceptions.BackMeUpException;
 import org.backmeup.rest.auth.BackmeupPrincipal;
+import org.backmeup.utilities.qrcode.AccessTokenPdfQRCodeGenerator;
 
 /**
  * All user specific operations will be handled within this class.
@@ -106,4 +110,21 @@ public class Users extends SecureBase {
         return map;
     }
     
+    @RolesAllowed("user")
+    @GET
+    @Path("/{userId}/activationCode/pdf")
+    @Produces("application/pdf")
+    public Response getAnonymousUserActivationCodeAsPdf(@PathParam("userId") Long userId) {
+        try {
+            BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+            String activationCode = getLogic().getAnonymousUserActivationCode(activeUser, userId);
+            InputStream pdf = new AccessTokenPdfQRCodeGenerator().generateQRCodePDF(activationCode);
+            return Response
+                    .ok(pdf)
+                    .header("Content-Disposition",
+                            "attachment; filename=" + "Backmeup_ActivationCode").build();
+        } catch (Exception e) {
+            throw new BackMeUpException("Cannot generate activation code document");
+        }
+    }
 }

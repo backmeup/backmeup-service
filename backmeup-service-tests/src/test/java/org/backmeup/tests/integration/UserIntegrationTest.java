@@ -265,4 +265,35 @@ public class UserIntegrationTest extends IntegrationTestBase {
              BackMeUpUtils.deleteUser(accessToken, userId);
          }
     }
+    
+    @Test
+    public void testGetActivationCodeForAnonymousUserAsPdf() {
+         UserDTO user = TestDataManager.getUser();
+
+         String userId = "";
+         String accessToken = "";
+
+         try {
+             ValidatableResponse response = BackMeUpUtils.addUser(user);
+             userId = response.extract().path("userId").toString();
+             accessToken = BackMeUpUtils.authenticateUser(user);
+
+             response = BackMeUpUtils.addAnonymousUser(accessToken);
+             String anonymousUserId = response.extract().path("userId").toString();
+             
+             given()
+                .log().all()
+                .header("Authorization", accessToken)
+                .header("accept", "application/pdf")
+                .header("Content-Type", "application/pdf") 
+             .when()
+                .get("/users/" + anonymousUserId + "/activationCode")
+             .then()
+                .log().all()
+                .statusCode(200);
+             
+         } finally {
+             BackMeUpUtils.deleteUser(accessToken, userId);
+         }
+    }
 }
