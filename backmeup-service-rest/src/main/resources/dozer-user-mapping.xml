@@ -14,5 +14,9 @@
   			<a>activated</a>
   			<b is-accessible="true">activated</b>
 		</field> 
+		<field>
+  			<a>anonymous</a>
+  			<b is-accessible="true">anonymous</b>
+		</field> 
 	</mapping>
 </mappings> 

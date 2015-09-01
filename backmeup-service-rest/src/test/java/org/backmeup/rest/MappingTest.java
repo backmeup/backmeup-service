@@ -59,6 +59,25 @@ public class MappingTest {
         assertEquals(srcUser.getEmail(), destUser.getEmail());
         assertEquals(srcUser.isActivated(), destUser.isActivated());
     }
+    
+    @Test
+    public void testAnonymousUserMapping() {
+        Long userId = 4711L;
+        String username = "Anonymous";
+        boolean activated = false;
+        boolean anonymous = true;
+        
+        BackMeUpUser srcUser = new BackMeUpUser(userId, username, null, null, null, null);
+        srcUser.setActivated(activated);
+        srcUser.setAnonymous(anonymous);
+        
+        UserDTO destUser = getMapper().map(srcUser, UserDTO.class);
+
+        assertEquals(srcUser.getUserId(), destUser.getUserId());
+        assertEquals(srcUser.getUsername(), destUser.getUsername());
+        assertEquals(srcUser.isAnonymous(), destUser.isAnonymous());
+        assertEquals(srcUser.isActivated(), destUser.isActivated());
+    }
 
     @Test
     public void testPluginMapping() {
