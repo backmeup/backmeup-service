@@ -205,4 +205,62 @@ public class UserIntegrationTest extends IntegrationTestBase {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
     }
+    
+    @Test
+    public void testAddAnonymousUser() {
+         UserDTO user = TestDataManager.getUser();
+
+         String userId = "";
+         String accessToken = "";
+
+         try {
+             ValidatableResponse response = BackMeUpUtils.addUser(user);
+             userId = response.extract().path("userId").toString();
+             accessToken = BackMeUpUtils.authenticateUser(user);
+
+             given()
+                 .log().all()
+                 .header("Authorization", accessToken)
+             .when()
+                 .post("/users/anonymous")
+             .then()
+                 .log().all()
+                 .statusCode(200)
+                 .body("username", equalTo("Anonymous"))
+                 .body("activated", equalTo(false))
+                 .body("anonymous", equalTo(true))
+                 .body(containsString("userId"));
+         } finally {
+             BackMeUpUtils.deleteUser(accessToken, userId);
+         }
+    }
+    
+    @Test
+    public void testGetActivationCodeForAnonymousUser() {
+    	 UserDTO user = TestDataManager.getUser();
+
+         String userId = "";
+         String accessToken = "";
+
+         try {
+             ValidatableResponse response = BackMeUpUtils.addUser(user);
+             userId = response.extract().path("userId").toString();
+             accessToken = BackMeUpUtils.authenticateUser(user);
+
+             response = BackMeUpUtils.addAnonymousUser(accessToken);
+             String anonymousUserId = response.extract().path("userId").toString();
+             
+             given()
+                .log().all()
+                .header("Authorization", accessToken)
+             .when()
+                .get("/users/" + anonymousUserId + "/activationCode")
+             .then()
+                .log().all()
+                .statusCode(200);
+             
+         } finally {
+             BackMeUpUtils.deleteUser(accessToken, userId);
+         }
+    }
 }
