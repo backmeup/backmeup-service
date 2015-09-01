@@ -80,16 +80,14 @@ public class Users extends SecureBase {
         getLogic().deleteUser(activeUser, userId);
     }
     
-    @PermitAll
+    @RolesAllowed("user")
     @POST
     @Path("/anonymous")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public UserDTO addAnonymousUser() {
-//        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-//        BackMeUpUser userModel = getLogic().addAnonymousUser(activeUser);
-        BackMeUpUser userModel = new BackMeUpUser(4711L, "Anonymous", null, null, null, null);
-        userModel.setAnonymous(true);
+        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackMeUpUser userModel = getLogic().addAnonymousUser(activeUser);
         return getMapper().map(userModel, UserDTO.class);
     }
     
@@ -97,9 +95,9 @@ public class Users extends SecureBase {
     @GET
     @Path("/{userId}/activationCode")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAnonymousUserActivationCode(@PathParam("userId") String userId) {
-//        String activationCode = getLogic().getAnonymousUserActivationCode(anonymousUserId);
-//        return activationCode;
-        return "Wuj0vGuZLmMIpshJjkm2QvLVbhT4NFXjf55mIgnTj10";
+    public String getAnonymousUserActivationCode(@PathParam("userId") Long userId) {
+    	BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        String activationCode = getLogic().getAnonymousUserActivationCode(activeUser, userId);
+        return activationCode;
     }
 }

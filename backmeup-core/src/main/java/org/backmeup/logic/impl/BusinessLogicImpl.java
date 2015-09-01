@@ -136,16 +136,16 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
-	@Override
-	public Token authorize(String activationCode) {
-		 return this.conn.txJoinReadOnly(new Callable<Token>() {
-	            @Override
-	            public Token call() {
-	            	//TODO
-	            	return null;
-	            }
-	        });
-	}
+    @Override
+    public Token authorize(final String activationCode) {
+        return this.conn.txJoinReadOnly(new Callable<Token>() {
+            @Override
+            public Token call() {
+                Token token = BusinessLogicImpl.this.registration.authorize(activationCode);
+                return token;
+            }
+        });
+    }
 
     // ========================================================================
 
@@ -224,23 +224,30 @@ public class BusinessLogicImpl implements BusinessLogic {
         });
     }
     
-	@Override
-	public BackMeUpUser addAnonymousUser(BackMeUpUser currentUser) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public BackMeUpUser addAnonymousUser(final BackMeUpUser activeUser) {
+        return this.conn.txNew(new Callable<BackMeUpUser>() {
+            @Override
+            public BackMeUpUser call() {
+                BackMeUpUser user = BusinessLogicImpl.this.registration.registerAnonymous(activeUser);
+                return user;
+            }
+        });
+    }
 
-	@Override
-	public String getAnonymousUserActivationCode(String anonymousUserId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public BackMeUpUser deleteAnonymousUser(BackMeUpUser activeUser, String activationCode) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getAnonymousUserActivationCode(final BackMeUpUser currentUser, final Long userId) {
+        return this.conn.txNew(new Callable<String>() {
+            @Override
+            public String call() {
+                BackMeUpUser anonUser = BusinessLogicImpl.this.registration.getUserByUserId(userId);
+                if(!anonUser.isAnonymous()){
+                    throw new BackMeUpException("Activation code only available for anonymous users");
+                }
+                return BusinessLogicImpl.this.registration.getActivationCode(currentUser, anonUser);
+            }
+        });
+    }
 
     // ========================================================================
 

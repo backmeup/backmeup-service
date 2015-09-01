@@ -49,13 +49,10 @@ public interface BusinessLogic {
 
     BackMeUpUser deleteUser(BackMeUpUser activeUser, Long userId);
     
+    BackMeUpUser addAnonymousUser(BackMeUpUser activeUser);
     
-    BackMeUpUser addAnonymousUser(BackMeUpUser currentUser);
+    String getAnonymousUserActivationCode(BackMeUpUser currentUser, Long userId);
     
-    String getAnonymousUserActivationCode(String anonymousUserId);
-    
-    BackMeUpUser deleteAnonymousUser(BackMeUpUser activeUser, String activationCode);
-
     // plugin operations ------------------------------------------------------
     boolean isPluginAvailable(String pluginId);
 

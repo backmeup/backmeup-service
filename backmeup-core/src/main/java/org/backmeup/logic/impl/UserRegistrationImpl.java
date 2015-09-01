@@ -138,6 +138,24 @@ public class UserRegistrationImpl implements UserRegistration {
         
         return newUser;
     }
+    
+    @Override
+    public BackMeUpUser registerAnonymous(BackMeUpUser currentUser) {
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            AuthResponseDTO response = keyserverClient.registerAnonymousUser(token);
+            String anonServiceUserId = response.getServiceUserId();
+            
+            BackMeUpUser anonUser = new BackMeUpUser(anonServiceUserId, null, null, anonServiceUserId, null);
+            anonUser.setAnonymous(true);
+            anonUser.setKeyserverId(anonServiceUserId);
+            BackMeUpUser newUser = save(anonUser);
+            
+            return newUser;
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
+        }
+    }
 
     private void throwIfEmailInvalid(String email) {
         Pattern emailPattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
@@ -294,6 +312,31 @@ public class UserRegistrationImpl implements UserRegistration {
         } catch (KeyserverException ex) {
             LOGGER.warn("Cannot authenticate on keyserver", ex);
             throw new InvalidCredentialsException();
+        }
+    }
+    
+    @Override
+    public Token authorize(String activationCode) {
+        try {
+        	AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(new TokenDTO(Kind.INTERNAL, activationCode));
+            String token = response.getToken().getB64Token();
+            Date ttl = response.getToken().getTtl().getTime();
+            return new Token(token, ttl.getTime());
+        } catch (KeyserverException ex) {
+            LOGGER.warn("Cannot authenticate on keyserver", ex);
+            throw new InvalidCredentialsException();
+        }
+    }
+
+    @Override
+    public String getActivationCode(BackMeUpUser currentUser, BackMeUpUser anonUser) {
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            TokenDTO t = keyserverClient.getInheritanceToken(token, anonUser.getKeyserverId());
+            String activationCode = t.getB64Token();
+            return activationCode;
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
         }
     }
 }

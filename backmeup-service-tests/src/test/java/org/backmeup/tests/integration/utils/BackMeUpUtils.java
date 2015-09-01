@@ -55,7 +55,7 @@ public class BackMeUpUtils {
             .then()
 //                .log().all()
                 .statusCode(200)
-                .body("username", equalTo("Anonymous"))
+//                .body("username", equalTo("Anonymous"))
                 .body("activated", equalTo(false))
                 .body("anonymous", equalTo(true))
                 .body(containsString("userId"));
