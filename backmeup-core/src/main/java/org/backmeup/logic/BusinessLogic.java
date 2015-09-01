@@ -173,7 +173,7 @@ public interface BusinessLogic {
     void addWorkerMetrics(List<WorkerMetric> workerMetrics);
 
     // friendlist operations --------------------------------------------------------
-    FriendlistUser addFriend(Long currUserId, FriendlistUser friend);
+    FriendlistUser addFriend(BackMeUpUser currentUser, FriendlistUser friend);
 
     List<FriendlistUser> getFriends(Long currUserId, FriendListType friendlist);
 

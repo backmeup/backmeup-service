@@ -989,11 +989,10 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // friendlist operations ------------------------------------------------------
     @Override
-    public FriendlistUser addFriend(final Long currUserId, final FriendlistUser friend) {
+    public FriendlistUser addFriend(final BackMeUpUser activeUser, final FriendlistUser friend) {
         return this.conn.txNew(new Callable<FriendlistUser>() {
             @Override
             public FriendlistUser call() {
-                BackMeUpUser activeUser = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 if (friend.getFriendListType() == FriendListType.HERITAGE) {
                     //when adding a heritage sharing with - always create a new user
                     BackMeUpUser anonymUser = BusinessLogicImpl.this.registration.registerAnonymous(activeUser);

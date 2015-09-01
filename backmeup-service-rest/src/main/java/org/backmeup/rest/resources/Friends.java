@@ -41,7 +41,7 @@ public class Friends extends SecureBase {
     public FriendlistUserDTO addFriend(FriendlistUserDTO userDTO) {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         FriendlistUser user = getMapper().map(userDTO, FriendlistUser.class);
-        user = getLogic().addFriend(activeUser.getUserId(), user);
+        user = getLogic().addFriend(activeUser, user);
         return getMapper().map(user, FriendlistUserDTO.class);
     }
 
