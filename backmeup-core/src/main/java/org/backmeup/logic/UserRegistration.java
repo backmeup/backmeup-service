@@ -13,6 +13,8 @@ public interface UserRegistration {
     BackMeUpUser getUserByUsername(String username, boolean ensureActivated);
 
     BackMeUpUser getUserByUserId(Long userId);
+    
+    BackMeUpUser getUserByKeyserverUserId(String keyserverUserId);
 
     BackMeUpUser getUserByUserId(Long userId, boolean ensureActivated);
 

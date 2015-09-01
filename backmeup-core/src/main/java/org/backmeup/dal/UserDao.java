@@ -15,4 +15,6 @@ public interface UserDao extends BaseDao<BackMeUpUser> {
 
     BackMeUpUser findByEmail(String email);
 
+    BackMeUpUser findByKeyserverId(String keyserverUserId);
+
 }

@@ -44,6 +44,8 @@ public interface BusinessLogic {
     BackMeUpUser getUserByUsername(String username);
 
     BackMeUpUser getUserByUserId(Long userId);
+    
+    BackMeUpUser getUserByKeyserverUserId(String keyserverUserId);
 
     BackMeUpUser updateUser(BackMeUpUser user);
 

@@ -45,4 +45,12 @@ public class UserDaoImpl extends BaseDaoImpl<BackMeUpUser> implements UserDao {
         List<BackMeUpUser> users = q.getResultList();
         return !users.isEmpty() ? users.get(0) : null;
     }
+
+    @Override
+    public BackMeUpUser findByKeyserverId(String keyserverUserId) {
+        Query q = this.em.createQuery("SELECT u FROM BackMeUpUser u WHERE keyserverId = :keyserverId");
+        q.setParameter("keyserverId", keyserverUserId);
+        List<BackMeUpUser> users = q.getResultList();
+        return !users.isEmpty() ? users.get(0) : null;
+    }
 }

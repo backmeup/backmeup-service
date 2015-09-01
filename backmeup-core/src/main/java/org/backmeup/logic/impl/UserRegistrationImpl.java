@@ -101,6 +101,16 @@ public class UserRegistrationImpl implements UserRegistration {
         }
         return user;
     }
+    
+    @Override
+    public BackMeUpUser getUserByKeyserverUserId(String keyserverUserId) {
+        BackMeUpUser user = getUserDao().findByKeyserverId(keyserverUserId);
+        if (user == null) {
+            throw new UnknownUserException(keyserverUserId);
+        }
+
+        return user;
+    }
 
     @Override
     public BackMeUpUser getUserByUsername(String username, boolean ensureActivated) {

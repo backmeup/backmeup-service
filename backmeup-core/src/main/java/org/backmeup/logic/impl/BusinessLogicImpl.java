@@ -174,6 +174,18 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Override
+    public BackMeUpUser getUserByKeyserverUserId(final String keyserverUserId) {
+        return this.conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
+            @Override
+            public BackMeUpUser call() {
+
+                return BusinessLogicImpl.this.registration.getUserByKeyserverUserId(keyserverUserId);
+
+            }
+        });
+    }
 
     @Override
     public BackMeUpUser deleteUser(final BackMeUpUser activeUser, final Long userId) {
