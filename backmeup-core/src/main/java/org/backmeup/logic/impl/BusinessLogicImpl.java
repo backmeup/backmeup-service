@@ -135,7 +135,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
-    
+
     @Override
     public Token authorize(final String activationCode) {
         return this.conn.txJoinReadOnly(new Callable<Token>() {
@@ -185,6 +185,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 BusinessLogicImpl.this.backupJobs.deleteBackupJobsOf(u.getUserId());
                 BusinessLogicImpl.this.profiles.deleteProfilesOf(activeUser, u.getUserId());
                 BusinessLogicImpl.this.registration.delete(activeUser);
+                //TODO remove all dependencies, inkl. sharings, anonymous user when removing from friends list, etc.
                 return u;
 
             }
@@ -223,7 +224,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
-    
+
     @Override
     public BackMeUpUser addAnonymousUser(final BackMeUpUser activeUser) {
         return this.conn.txNew(new Callable<BackMeUpUser>() {
@@ -241,7 +242,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             @Override
             public String call() {
                 BackMeUpUser anonUser = BusinessLogicImpl.this.registration.getUserByUserId(userId);
-                if(!anonUser.isAnonymous()){
+                if (!anonUser.isAnonymous()) {
                     throw new BackMeUpException("Activation code only available for anonymous users");
                 }
                 return BusinessLogicImpl.this.registration.getActivationCode(currentUser, anonUser);
@@ -992,8 +993,14 @@ public class BusinessLogicImpl implements BusinessLogic {
         return this.conn.txNew(new Callable<FriendlistUser>() {
             @Override
             public FriendlistUser call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.friends.addFriend(user, friend);
+                BackMeUpUser activeUser = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
+                if (friend.getFriendListType() == FriendListType.HERITAGE) {
+                    //when adding a heritage sharing with - always create a new user
+                    BackMeUpUser anonymUser = BusinessLogicImpl.this.registration.registerAnonymous(activeUser);
+                    friend.setEmail(anonymUser.getEmail());
+                    friend.setFriendsBmuUserId(anonymUser.getUserId());
+                }
+                return BusinessLogicImpl.this.friends.addFriend(activeUser, friend);
             }
         });
     }

@@ -31,8 +31,6 @@ public class Friends extends SecureBase {
     @Context
     private SecurityContext securityContext;
 
-    //TODO AL: ADD METHOD TO CREATE NEW HERITAGE USER AND ADD HIM TO THE LIST
-
     @RolesAllowed("user")
     @POST
     @Path("/add")
@@ -87,6 +85,7 @@ public class Friends extends SecureBase {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         getLogic().removeFriend(activeUser.getUserId(), friendId, listType);
+        //TODO need to delete anonymous heritage user account when removing from friends list
         return "friend deleted";
     }
 
