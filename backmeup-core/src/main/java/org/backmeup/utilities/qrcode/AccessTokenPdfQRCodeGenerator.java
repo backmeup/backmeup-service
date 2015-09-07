@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,8 @@ public class AccessTokenPdfQRCodeGenerator {
     }
 
     private File generateQRCode(String qrCodeData) throws IOException, WriterException {
-        File f = File.createTempFile("QRCode" + Math.random(), ".png");
+        Random randomGenerator = new Random();
+        File f = File.createTempFile("QRCode" + randomGenerator.nextInt(100000), ".png");
         String filePath = f.getAbsolutePath();
         String charset = "UTF-8"; // or "ISO-8859-1"
         Map hintMap = new HashMap();
