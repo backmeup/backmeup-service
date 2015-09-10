@@ -21,7 +21,7 @@ public abstract class FilesystemLikeDatasource implements Datasource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FilesystemLikeDatasource.class);
 
     @Override
-    public void downloadAll(PluginProfileDTO profile, Storage storage, Progressable progressor) throws StorageException {
+    public void downloadAll(PluginProfileDTO profile, PluginContext context, Storage storage, Progressable progressor) throws StorageException {
         List<FilesystemURI> files = list(profile);
         for (int i=0; i < files.size(); i++) {
             FilesystemURI uri = files.get(i);

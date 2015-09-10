@@ -26,7 +26,7 @@ public class FilesystemLikeDatasourceTest {
         MyFilesystemLikeDatasource ds = new MyFilesystemLikeDatasource();
         MyLocalFilesystemStorage storage = new MyLocalFilesystemStorage();
         
-        ds.downloadAll(null, storage, logProgressable);
+        ds.downloadAll(null, null, storage, logProgressable);
         
         Assert.assertEquals(1, storage.getDataObjectCount());
         Assert.assertTrue(storage.getDataObjectSize() > 0);
