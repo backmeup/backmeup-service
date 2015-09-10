@@ -28,6 +28,6 @@ public interface Datasink {
      * @throws DatasinkException,
      *             StorageException
      */
-    String upload(PluginProfileDTO profile, Storage storage, Progressable progressor)
+    String upload(PluginProfileDTO profile, PluginContext context, Storage storage, Progressable progressor)
             throws DatasinkException, StorageException;
 }

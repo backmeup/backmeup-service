@@ -14,5 +14,5 @@ public interface Action {
      * @throws DatasinkException,
      *             StorageException
      */
-    void doAction(PluginProfileDTO profile, Storage storage, Progressable progressor) throws ActionException, StorageException;
+    void doAction(PluginProfileDTO profile, PluginContext context, Storage storage, Progressable progressor) throws ActionException, StorageException;
 }

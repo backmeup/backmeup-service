@@ -20,6 +20,6 @@ public interface Datasource {
      * @throws DatasinkException,
      *             StorageException
      */
-    void downloadAll(PluginProfileDTO profile, Storage storage, Progressable progressor)
+    void downloadAll(PluginProfileDTO profile, PluginContext context, Storage storage, Progressable progressor)
             throws DatasourceException, StorageException;
 }
