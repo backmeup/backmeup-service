@@ -40,4 +40,21 @@ public class Authentication extends Base {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @PermitAll
+    @GET
+    @Path("/anonymous")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthInfo authenticateAnonymousUser(@QueryParam("activationCode") String activationCode) {
+        try {
+            Token token = getLogic().authorize(activationCode);
+            return new AuthInfo(token.getToken(), token.getTtl());
+        } catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        } catch (Exception ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -1,0 +1,17 @@
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+	<mapping>
+		<class-a>org.backmeup.model.FriendlistUser</class-a>
+		<class-b map-null="true">org.backmeup.model.dto.FriendlistUserDTO</class-b>
+		<field>
+			<a>friendsBmuUserId</a>
+			<b>bmuUserId</b>
+		</field>
+		<field>
+			<a>entityId</a>
+			<b>friendId</b>
+		</field>
+	</mapping>
+</mappings> 

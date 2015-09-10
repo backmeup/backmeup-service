@@ -44,6 +44,40 @@ public class BackMeUpUtils {
 
         return response;
     }
+    
+    public static ValidatableResponse addAnonymousUser(String accessToken){
+        ValidatableResponse response = 
+            given()
+//                .log().all()
+                .header("Authorization", accessToken)
+            .when()
+                .post("/users/anonymous")
+            .then()
+//                .log().all()
+                .statusCode(200)
+                .body("activated", equalTo(false))
+                .body("anonymous", equalTo(true))
+                .body(containsString("userId"))
+                .body(containsString("username"))
+                .body(containsString("email"));
+
+        return response;
+    }
+    
+    public static String getActivationCode(String accessToken, String userId){
+        ValidatableResponse response = 
+            given()
+                .log().all()
+                .header("Authorization", accessToken)
+            .when()
+                .get("/users/" + userId + "/activationCode")
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body(containsString("activationCode"));
+
+        return response.extract().path("activationCode").toString();
+    }
 
     public static void deleteUser(String accessToken, String userId){
         given()

@@ -104,7 +104,13 @@ public class SecurityInterceptor implements ContainerRequestFilter {
             
             TokenDTO token = new TokenDTO(Kind.INTERNAL, accessToken);
             AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(token);
-            return logic.getUserByUserId(Long.parseLong(response.getUsername()));
+            
+            if(response.getUsername() != null) {
+                return logic.getUserByUserId(Long.parseLong(response.getUsername()));
+            } else {
+                return logic.getUserByKeyserverUserId(response.getServiceUserId());
+            }
+            
         } catch (KeyserverException ke) {
             LOGGER.info("", ke);
         } catch (UnknownUserException uue) {

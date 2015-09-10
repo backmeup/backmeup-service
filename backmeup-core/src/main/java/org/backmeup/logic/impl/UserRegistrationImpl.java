@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,6 +101,16 @@ public class UserRegistrationImpl implements UserRegistration {
         }
         return user;
     }
+    
+    @Override
+    public BackMeUpUser getUserByKeyserverUserId(String keyserverUserId) {
+        BackMeUpUser user = getUserDao().findByKeyserverId(keyserverUserId);
+        if (user == null) {
+            throw new UnknownUserException(keyserverUserId);
+        }
+
+        return user;
+    }
 
     @Override
     public BackMeUpUser getUserByUsername(String username, boolean ensureActivated) {
@@ -137,6 +148,26 @@ public class UserRegistrationImpl implements UserRegistration {
         }
         
         return newUser;
+    }
+    
+    @Override
+    public BackMeUpUser registerAnonymous(BackMeUpUser currentUser) {
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            AuthResponseDTO response = keyserverClient.registerAnonymousUser(token);
+            String anonServiceUserId = response.getServiceUserId();
+            
+            String uuid = UUID.randomUUID().toString();
+            BackMeUpUser anonUser = new BackMeUpUser(uuid, null, null, uuid + "@backmeup", null);
+            anonUser.setAnonymous(true);
+            anonUser.setActivated(true);
+            anonUser.setKeyserverId(anonServiceUserId);
+            BackMeUpUser newUser = save(anonUser);
+            
+            return newUser;
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
+        }
     }
 
     private void throwIfEmailInvalid(String email) {
@@ -294,6 +325,31 @@ public class UserRegistrationImpl implements UserRegistration {
         } catch (KeyserverException ex) {
             LOGGER.warn("Cannot authenticate on keyserver", ex);
             throw new InvalidCredentialsException();
+        }
+    }
+    
+    @Override
+    public Token authorize(String activationCode) {
+        try {
+        	AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(new TokenDTO(Kind.INTERNAL, activationCode));
+            String token = response.getToken().getB64Token();
+            Date ttl = response.getToken().getTtl().getTime();
+            return new Token(token, ttl.getTime());
+        } catch (KeyserverException ex) {
+            LOGGER.warn("Cannot authenticate on keyserver", ex);
+            throw new InvalidCredentialsException();
+        }
+    }
+
+    @Override
+    public String getActivationCode(BackMeUpUser currentUser, BackMeUpUser anonUser) {
+        try {
+            TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
+            TokenDTO t = keyserverClient.getInheritanceToken(token, anonUser.getKeyserverId());
+            String activationCode = t.getB64Token();
+            return activationCode;
+        } catch (KeyserverException e) {
+            throw new BackMeUpException("Cannot register user", e);
         }
     }
 }

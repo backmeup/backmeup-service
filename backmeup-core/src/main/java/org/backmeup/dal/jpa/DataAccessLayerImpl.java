@@ -7,6 +7,7 @@ import org.backmeup.dal.AuthDataDao;
 import org.backmeup.dal.BackupJobDao;
 import org.backmeup.dal.BackupJobExecutionDao;
 import org.backmeup.dal.DataAccessLayer;
+import org.backmeup.dal.FriendlistDao;
 import org.backmeup.dal.ProfileDao;
 import org.backmeup.dal.UserDao;
 import org.backmeup.dal.WorkerInfoDao;
@@ -27,37 +28,42 @@ public class DataAccessLayerImpl implements DataAccessLayer {
 
     @Override
     public UserDao createUserDao() {
-        return new UserDaoImpl(threadLocalEntityManager.get());
+        return new UserDaoImpl(this.threadLocalEntityManager.get());
     }
 
     @Override
     public ProfileDao createProfileDao() {
-        return new ProfileDaoImpl(threadLocalEntityManager.get());
+        return new ProfileDaoImpl(this.threadLocalEntityManager.get());
     }
 
     @Override
     public BackupJobDao createBackupJobDao() {
-        return new BackupJobDaoImpl(threadLocalEntityManager.get());
+        return new BackupJobDaoImpl(this.threadLocalEntityManager.get());
     }
-    
+
     @Override
     public BackupJobExecutionDao createBackupJobExecutionDao() {
-        return new BackupJobExecutionDaoImpl(threadLocalEntityManager.get());
+        return new BackupJobExecutionDaoImpl(this.threadLocalEntityManager.get());
     }
 
     @Override
     public AuthDataDao createAuthDataDao() {
-        return new AuthDataDaoImpl(threadLocalEntityManager.get());
+        return new AuthDataDaoImpl(this.threadLocalEntityManager.get());
     }
-    
+
     @Override
     public WorkerInfoDao createWorkerInfoDao() {
-        return new WorkerInfoDaoImpl(threadLocalEntityManager.get());
+        return new WorkerInfoDaoImpl(this.threadLocalEntityManager.get());
     }
-    
+
     @Override
     public WorkerMetricDao createWorkerMetricDao() {
-        return new WorkerMetricDaoImpl(threadLocalEntityManager.get());
+        return new WorkerMetricDaoImpl(this.threadLocalEntityManager.get());
+    }
+
+    @Override
+    public FriendlistDao createFriendlistDao() {
+        return new FriendlistDaoImpl(this.threadLocalEntityManager.get());
     }
 
     @Override

@@ -1,9 +1,8 @@
 package org.backmeup.dal;
 
 /**
- * The DataAccessLayer provides access to any kind of database. It uses Data
- * Access Objects (e.g. UserDao) to store, retrieve and delete data of a certain
- * database.
+ * The DataAccessLayer provides access to any kind of database. It uses Data Access Objects (e.g. UserDao) to store,
+ * retrieve and delete data of a certain database.
  * 
  * @author fschoeppl
  */
@@ -22,6 +21,8 @@ public interface DataAccessLayer {
     WorkerInfoDao createWorkerInfoDao();
 
     WorkerMetricDao createWorkerMetricDao();
+
+    FriendlistDao createFriendlistDao();
 
     void setConnection(Object connection);
 

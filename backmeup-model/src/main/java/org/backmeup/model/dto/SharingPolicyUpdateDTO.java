@@ -5,43 +5,13 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class SharingPolicyDTO {
+public class SharingPolicyUpdateDTO {
 
-    public enum SharingPolicyTypeEntryDTO {
-        Document, DocumentGroup, Backup, AllFromNow, AllInklOld, TaggedCollection
-    }
-
-    private Long withUserId;
-    private SharingPolicyTypeEntryDTO policyType;
-    private String policyValue;
+    private Long policyID;
     private String name;
     private String description;
     private Date lifespanstart;
     private Date lifespanend;
-
-    public Long getWithUserId() {
-        return this.withUserId;
-    }
-
-    public void setWithUserId(Long withUserId) {
-        this.withUserId = withUserId;
-    }
-
-    public SharingPolicyTypeEntryDTO getPolicyType() {
-        return this.policyType;
-    }
-
-    public void setPolicyType(SharingPolicyTypeEntryDTO policyType) {
-        this.policyType = policyType;
-    }
-
-    public String getPolicyValue() {
-        return this.policyValue;
-    }
-
-    public void setPolicyValue(String policyValue) {
-        this.policyValue = policyValue;
-    }
 
     public String getName() {
         return this.name;
@@ -73,5 +43,9 @@ public class SharingPolicyDTO {
 
     public void setLifespanend(Date lifespanend) {
         this.lifespanend = lifespanend;
+    }
+
+    public Long getPolicyID() {
+        return this.policyID;
     }
 }
