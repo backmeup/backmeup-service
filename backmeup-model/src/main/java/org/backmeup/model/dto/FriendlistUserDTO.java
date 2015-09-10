@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.backmeup.model.FriendlistUser.FriendListType;
 
 @XmlRootElement
-@SuppressWarnings("unused")
 public class FriendlistUserDTO {
     private Long friendId;
     private String name;
