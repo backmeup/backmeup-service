@@ -114,7 +114,7 @@ public class PluginContextTest {
         Enumeration<String> names = context.getAttributeNames();
         Assert.assertTrue(names.hasMoreElements());
         
-        context.clearAttributes();
+        context.clear();
         
         names = context.getAttributeNames();
         Assert.assertFalse(names.hasMoreElements());
