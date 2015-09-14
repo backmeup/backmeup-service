@@ -51,6 +51,17 @@ public class PluginContext {
         names.addAll(attributes.keySet());
         return Collections.enumeration(names);
     }
+    
+    /**
+     * Checks if context holds an attribute with the specified name.
+     *
+     * @param name
+     *            Name of the attribute to be removed
+     */
+    public boolean hasAttribute(String name) {
+        Object value = getAttribute(name);
+        return (value != null);
+    }
 
     /**
      * Remove the context attribute with the specified name, if any.

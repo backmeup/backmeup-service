@@ -30,6 +30,28 @@ public class PluginContextTest {
         
         Assert.assertEquals(value, expectedVal);
     }
+    
+    @Test
+    public void testHasAttribute() {
+        final String key = "test";
+        final Object value = new Object();
+        
+        PluginContext context = new PluginContext();
+        context.setAttribute(key, value);
+        
+        Assert.assertTrue(context.hasAttribute(key));
+    }
+    
+    @Test
+    public void testHasAttributeNot() {
+        final String key = "someKey";
+        final Object value = new Object();
+        
+        PluginContext context = new PluginContext();
+        context.setAttribute(key, value);
+        
+        Assert.assertFalse(context.hasAttribute("someOtherKey"));
+    }
 
     @Test
     public void testRemoveAttribute() {
