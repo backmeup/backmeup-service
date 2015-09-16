@@ -22,21 +22,28 @@ public class Metainfo {
     private static final String PROP_CREATED = "created";
     private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss z";
 
+    private static final String PROP_LOCACTION_NAME = "locName";
+    private static final String PROP_LOCACTION_LATITUDE = "locLat";
+    private static final String PROP_LOCACTION_LONGITUDE = "locLon";
+    private static final String PROP_LOCACTION_CITY = "locCity";
+    private static final String PROP_LOCACTION_COUNTRY = "locCountry";
+    private static final String PROP_AUTHOR_NAME = "authorName";
+
     private final Properties metainfo = new Properties();
 
     public void setModified(Date modifiedDate) {
         final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-        metainfo.setProperty(PROP_MODIFIED, formatter.format(modifiedDate));
+        this.metainfo.setProperty(PROP_MODIFIED, formatter.format(modifiedDate));
     }
 
     public void setBackupDate(Date backupTime) {
         final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-        metainfo.setProperty(PROP_BACKUP_TIME, formatter.format(backupTime));
+        this.metainfo.setProperty(PROP_BACKUP_TIME, formatter.format(backupTime));
     }
 
     public void setCreated(Date createdDate) {
         final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-        metainfo.setProperty(PROP_CREATED, formatter.format(createdDate));
+        this.metainfo.setProperty(PROP_CREATED, formatter.format(createdDate));
     }
 
     public Date getCreated() {
@@ -48,39 +55,39 @@ public class Metainfo {
     }
 
     public void setSource(String source) {
-        metainfo.setProperty(PROP_SOURCE, source);
+        this.metainfo.setProperty(PROP_SOURCE, source);
     }
 
     public String getSource() {
-        return metainfo.getProperty(PROP_SOURCE);
+        return this.metainfo.getProperty(PROP_SOURCE);
     }
 
     public void setType(String type) {
-        metainfo.setProperty(PROP_TYPE, type);
+        this.metainfo.setProperty(PROP_TYPE, type);
     }
 
     public String getType() {
-        return metainfo.getProperty(PROP_TYPE);
+        return this.metainfo.getProperty(PROP_TYPE);
     }
 
     public void setDestination(String destination) {
-        metainfo.setProperty(PROP_DESTINATION, destination);
+        this.metainfo.setProperty(PROP_DESTINATION, destination);
     }
 
     public String getDestination() {
-        return metainfo.getProperty(PROP_DESTINATION);
+        return this.metainfo.getProperty(PROP_DESTINATION);
     }
 
     public void setId(String id) {
-        metainfo.setProperty(PROP_ID, id);
+        this.metainfo.setProperty(PROP_ID, id);
     }
 
     public void setParent(String parentId) {
-        metainfo.setProperty(PROP_PARENT, parentId);
+        this.metainfo.setProperty(PROP_PARENT, parentId);
     }
 
     public String getParent() {
-        return metainfo.getProperty(PROP_PARENT);
+        return this.metainfo.getProperty(PROP_PARENT);
     }
 
     private Date parseDate(String input) {
@@ -103,24 +110,71 @@ public class Metainfo {
         return getAttribute(PROP_ID);
     }
 
+    public void setLocationName(String locationName) {
+        this.metainfo.setProperty(PROP_LOCACTION_NAME, locationName);
+    }
+
+    public String getLocationName() {
+        return this.metainfo.getProperty(PROP_LOCACTION_NAME);
+    }
+
+    public void setLocationLatitude(String locationLatitude) {
+        this.metainfo.setProperty(PROP_LOCACTION_LATITUDE, locationLatitude);
+    }
+
+    public String getLocationLatitude() {
+        return this.metainfo.getProperty(PROP_LOCACTION_LATITUDE);
+    }
+
+    public void setLocationLongitude(String locationLongitude) {
+        this.metainfo.setProperty(PROP_LOCACTION_LONGITUDE, locationLongitude);
+    }
+
+    public String getLocationLongitude() {
+        return this.metainfo.getProperty(PROP_LOCACTION_LONGITUDE);
+    }
+
+    public void setLocationCity(String locationCity) {
+        this.metainfo.setProperty(PROP_LOCACTION_CITY, locationCity);
+    }
+
+    public String getLocationCity() {
+        return this.metainfo.getProperty(PROP_LOCACTION_CITY);
+    }
+
+    public void setLocationCountry(String locationCountry) {
+        this.metainfo.setProperty(PROP_LOCACTION_COUNTRY, locationCountry);
+    }
+
+    public String getLocationCountry() {
+        return this.metainfo.getProperty(PROP_LOCACTION_COUNTRY);
+    }
+
+    public void setAuthorName(String authorName) {
+        this.metainfo.setProperty(PROP_AUTHOR_NAME, authorName);
+    }
+
+    public String getAuthorName() {
+        return this.metainfo.getProperty(PROP_AUTHOR_NAME);
+    }
+
     public void setAttribute(String key, String value) {
-        metainfo.setProperty(key, value);
+        this.metainfo.setProperty(key, value);
     }
 
     public String getAttribute(String key) {
-        return metainfo.getProperty(key);
+        return this.metainfo.getProperty(key);
     }
 
     public Properties getAttributes() {
-        return (Properties) metainfo.clone();
+        return (Properties) this.metainfo.clone();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Entry<Object, Object> attributes : metainfo.entrySet()) {
-            sb.append(attributes.getKey()).append(" = ")
-                    .append(attributes.getValue()).append("\n");
+        for (Entry<Object, Object> attributes : this.metainfo.entrySet()) {
+            sb.append(attributes.getKey()).append(" = ").append(attributes.getValue()).append("\n");
         }
         return sb.toString();
     }
@@ -129,10 +183,8 @@ public class Metainfo {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime
-                * result
-                + (metainfo.getProperty(PROP_ID) == null ? 0 : metainfo
-                        .getProperty(PROP_ID).hashCode());
+        result = prime * result
+                + (this.metainfo.getProperty(PROP_ID) == null ? 0 : this.metainfo.getProperty(PROP_ID).hashCode());
         return result;
     }
 
@@ -145,15 +197,12 @@ public class Metainfo {
             return false;
         }
         Metainfo other = (Metainfo) obj;
-        if (metainfo == null) {
+        if (this.metainfo == null) {
             return other.metainfo == null;
         }
-        if (metainfo.getProperty(PROP_ID) == null) {
-            return other.metainfo != null
-                    && other.metainfo.getProperty(PROP_ID) == null;
+        if (this.metainfo.getProperty(PROP_ID) == null) {
+            return other.metainfo != null && other.metainfo.getProperty(PROP_ID) == null;
         }
-        return other.metainfo != null
-                && metainfo.getProperty(PROP_ID).equals(
-                        other.metainfo.getProperty(PROP_ID));
+        return other.metainfo != null && this.metainfo.getProperty(PROP_ID).equals(other.metainfo.getProperty(PROP_ID));
     }
 }
