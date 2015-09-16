@@ -226,7 +226,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
              .then()
                  .log().all()
                  .statusCode(200)
-                 .body("activated", equalTo(false))
+                 .body("activated", equalTo(true))
                  .body("anonymous", equalTo(true))
                  .body(containsString("userId"))
                  .body(containsString("username"))
