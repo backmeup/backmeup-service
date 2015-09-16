@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.backmeup.plugin.util.GeoMetadataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,19 +120,41 @@ public class Metainfo {
     }
 
     public void setLocationLatitude(String locationLatitude) {
-        this.metainfo.setProperty(PROP_LOCACTION_LATITUDE, locationLatitude);
+        if (GeoMetadataConverter.isValidGeoCoordinate(locationLatitude)) {
+            this.metainfo.setProperty(PROP_LOCACTION_LATITUDE, locationLatitude);
+        } else {
+            try {
+                Double lat = GeoMetadataConverter.extractAndConvertGeoCoordinates(locationLatitude);
+                this.metainfo.setProperty(PROP_LOCACTION_LATITUDE, lat + "");
+            } catch (IllegalArgumentException e) {
+            }
+        }
     }
 
-    public String getLocationLatitude() {
-        return this.metainfo.getProperty(PROP_LOCACTION_LATITUDE);
+    public Double getLocationLatitude() {
+        if (this.metainfo.getProperty(PROP_LOCACTION_LATITUDE) != null) {
+            return Double.valueOf(this.metainfo.getProperty(PROP_LOCACTION_LATITUDE));
+        }
+        return -1D;
     }
 
     public void setLocationLongitude(String locationLongitude) {
-        this.metainfo.setProperty(PROP_LOCACTION_LONGITUDE, locationLongitude);
+        if (GeoMetadataConverter.isValidGeoCoordinate(locationLongitude)) {
+            this.metainfo.setProperty(PROP_LOCACTION_LONGITUDE, locationLongitude);
+        } else {
+            try {
+                Double longitude = GeoMetadataConverter.extractAndConvertGeoCoordinates(locationLongitude);
+                this.metainfo.setProperty(PROP_LOCACTION_LONGITUDE, longitude + "");
+            } catch (IllegalArgumentException e) {
+            }
+        }
     }
 
-    public String getLocationLongitude() {
-        return this.metainfo.getProperty(PROP_LOCACTION_LONGITUDE);
+    public Double getLocationLongitude() {
+        if (this.metainfo.getProperty(PROP_LOCACTION_LONGITUDE) != null) {
+            return Double.valueOf(this.metainfo.getProperty(PROP_LOCACTION_LONGITUDE));
+        }
+        return -1D;
     }
 
     public void setLocationCity(String locationCity) {
