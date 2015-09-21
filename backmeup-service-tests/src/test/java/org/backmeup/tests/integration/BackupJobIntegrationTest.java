@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.backmeup.model.constants.JobExecutionStatus;
@@ -363,7 +362,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             jobId = response.extract().path("jobId").toString();
             
-            // Wait for 2 seconds to make sure we are not deleting the 
+            // Wait for 5 seconds to make sure we are not deleting the 
             // job while creating the job execution
             Thread.sleep(5000);
         } finally {
@@ -415,7 +414,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             jobId = response.extract().path("jobId").toString();
             
-            // Wait for 2 seconds to make sure we are not deleting the 
+            // Wait for 5 seconds to make sure we are not deleting the 
             // job while creating the job execution
             Thread.sleep(5000);
         } finally {
@@ -473,7 +472,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
 
             jobId = response.extract().path("jobId").toString();
             
-            // Wait for 2 seconds to make sure we are not deleting the 
+            // Wait for 5 seconds to make sure we are not deleting the 
             // job while creating the job execution
             Thread.sleep(5000);
         } finally {
@@ -657,7 +656,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
                 .log().all()
                 .statusCode(204);
             
-            // Wait for 2 seconds to make sure we are not deleting the 
+            // Wait for 5 seconds to make sure we are not deleting the 
             // job while creating the job execution
             Thread.sleep(5000);
 
@@ -683,7 +682,6 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
         UserDTO user = TestDataManager.getUser();
         String userId = "";
         String accessToken = "";
-        List<String> actionProfiles = new ArrayList<>();
 
         PluginProfileDTO sourcePluginProfile = TestDataManager.getProfileFilegenerator();
         String sourceProfileId = "";
@@ -708,7 +706,6 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addProfile(accessToken, thumbnailActionPluginProfile.getPluginId(),
                     thumbnailActionPluginProfile);
             thumbnailActionProfileId = response.extract().path("profileId").toString();
-            actionProfiles.add(thumbnailActionProfileId);
 
             response = BackMeUpUtils.addAuthData(accessToken, sinkPluginProfile.getPluginId(),
                     sinkPluginProfile.getAuthData());
@@ -719,8 +716,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             response = BackMeUpUtils.addProfile(accessToken, sinkPluginProfile.getPluginId(), sinkPluginProfile);
             sinkProfileId = response.extract().path("profileId").toString();
 
-            BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId,
-                    actionProfiles);
+            BackupJobCreationDTO backupJob = TestDataManager.getBackupJob(sourceProfileId, sinkProfileId, thumbnailActionProfileId);
 
             response = 
             given()

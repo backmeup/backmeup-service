@@ -2,7 +2,6 @@ package org.backmeup.tests.integration.utils;
 
 import java.io.File;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.backmeup.model.constants.JobFrequency;
@@ -86,6 +85,17 @@ public class TestDataManager {
 
         return pluginProfile;
     }
+    
+    public static PluginProfileDTO getProfileZipAction() {
+        String pluginId = "org.backmeup.zip";
+        PluginType profileType = PluginType.Action;
+
+        PluginProfileDTO pluginProfile = new PluginProfileDTO();
+        pluginProfile.setPluginId(pluginId);
+        pluginProfile.setProfileType(profileType);
+
+        return pluginProfile;
+    }
 
     public static PluginProfileDTO getProfileBackmeupStorageSink() {
         String pluginId = "org.backmeup.storage";
@@ -151,8 +161,7 @@ public class TestDataManager {
         return backupJob;
     }
 
-    public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId,
-            List<String> actionProfileIds) {
+    public static BackupJobCreationDTO getBackupJob(String sourceProfileId, String sinkProfileId, String... actionProfileIds) {
         String jobTitle = "BackupJob1";
         JobFrequency schedule = JobFrequency.WEEKLY;
         Date start = new Date();
