@@ -68,13 +68,26 @@ BackMeUp's maven configuration autodeploys servlets to Tomcat.
       <password>admin</password>
     </server>
  
- <!-- Backmeup Worker -->
+	<!-- Backmeup Worker -->
     <server>
       <id>backmeup.worker.tomcat</id>
       <username>admin</username>
       <password>admin</password>
-</server>
+	</server>
 
+	<!-- Backmeup Indexer -->
+    <server>
+      <id>backmeup.indexer.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+	</server>
+	
+	<!-- Backmeup Storage -->
+    <server>
+      <id>backmeup.storage.tomcat</id>
+      <username>admin</username>
+      <password>admin</password>
+    </server>
 
 
 D) Building the backmeup-keyserver component
