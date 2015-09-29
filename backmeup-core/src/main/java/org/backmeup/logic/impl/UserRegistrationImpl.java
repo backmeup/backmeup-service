@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class UserRegistrationImpl implements UserRegistration {
 
+    private static final String EXCEPTION_TEXT_REGISTRATION = "Cannot register user";
     private static final String PARAMETER_NULL = "org.backmeup.logic.impl.BusinessLogicImpl.PARAMETER_NULL";
     private static final String VERIFICATION_EMAIL_SUBJECT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_SUBJECT";
     private static final String VERIFICATION_EMAIL_CONTENT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_CONTENT";
@@ -138,16 +139,18 @@ public class UserRegistrationImpl implements UserRegistration {
 
         setNewVerificationKeyTo(user);
 
-        BackMeUpUser newUser = save(user);
-        newUser.setPassword(user.getPassword());
-        
         try {
-            keyserverClient.registerUser(newUser.getUserId().toString(), newUser.getPassword());
+            BackMeUpUser newUser = save(user);
+            newUser.setPassword(user.getPassword());
+            
+            String serviceUserId = keyserverClient.registerUser(newUser.getUserId().toString(), newUser.getPassword());
+            newUser.setKeyserverId(serviceUserId);
+            
+            save(newUser);
+            return newUser;
         } catch (KeyserverException e) {
-            throw new BackMeUpException("Cannot register user", e);
+            throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
-        
-        return newUser;
     }
     
     @Override
@@ -166,7 +169,7 @@ public class UserRegistrationImpl implements UserRegistration {
             
             return newUser;
         } catch (KeyserverException e) {
-            throw new BackMeUpException("Cannot register user", e);
+            throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
     }
 
@@ -349,7 +352,7 @@ public class UserRegistrationImpl implements UserRegistration {
             String activationCode = t.getB64Token();
             return activationCode;
         } catch (KeyserverException e) {
-            throw new BackMeUpException("Cannot register user", e);
+            throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
     }
 }
