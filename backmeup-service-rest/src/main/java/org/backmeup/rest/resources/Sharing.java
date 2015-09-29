@@ -53,7 +53,7 @@ public class Sharing extends SecureBase {
     public Set<SharingPolicyEntry> getAllOwned() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser);
         return response;
     }
 
@@ -109,8 +109,8 @@ public class Sharing extends SecureBase {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
-                    sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(), sharingWithUserId, policyType,
+                    sharedElementID, name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -134,8 +134,8 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID,
-                    name, description, lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID, name, description,
+                    lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -304,10 +304,8 @@ public class Sharing extends SecureBase {
             UUID.fromString(value);
         } catch (Exception e) {
             LOGGER.error("", e);
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity(name + " parameter is malformed. Expecting UUID of syntax: "
-                                    + UUID.randomUUID().toString()).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity(name + " parameter is malformed. Expecting UUID of syntax: " + UUID.randomUUID().toString()).build());
         }
     }
 

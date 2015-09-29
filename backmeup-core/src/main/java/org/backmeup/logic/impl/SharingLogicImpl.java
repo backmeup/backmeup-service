@@ -41,21 +41,21 @@ public class SharingLogicImpl implements SharingLogic {
     }
 
     @Override
-    public SharingPolicyEntry add(BackMeUpUser currUser, BackMeUpUser sharingWith, SharingPolicyTypeEntry policy,
-            String sharedElementID, String name, String description, Date lifespanstart, Date lifespanend) {
+    public SharingPolicyEntry add(BackMeUpUser currUser, BackMeUpUser sharingWith, SharingPolicyTypeEntry policy, String sharedElementID,
+            String name, String description, Date lifespanstart, Date lifespanend) {
+
         try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
-            SharingPolicyEntry result = client.addSharingPolicy(new User(sharingWith.getUserId()), policy,
-                    sharedElementID, name, description, lifespanstart, lifespanend);
+            SharingPolicyEntry result = client.addSharingPolicy(new User(sharingWith.getUserId()), policy, sharedElementID, name,
+                    description, lifespanstart, lifespanend);
             return result;
         }
     }
 
     @Override
-    public SharingPolicyEntry updateOwned(BackMeUpUser currUser, Long policyID, String name,
-            String description, Date lifespanstart, Date lifespanend) {
+    public SharingPolicyEntry updateOwned(BackMeUpUser currUser, Long policyID, String name, String description, Date lifespanstart,
+            Date lifespanend) {
         try (SharingPolicyClient client = getSharingPolicyClient(currUser.getUserId())) {
-            SharingPolicyEntry result = client.updateSharingPolicy(policyID, name, description, lifespanstart,
-                    lifespanend);
+            SharingPolicyEntry result = client.updateSharingPolicy(policyID, name, description, lifespanstart, lifespanend);
             return result;
         }
     }

@@ -35,7 +35,7 @@ import org.backmeup.model.spi.PluginDescribable;
 public interface BusinessLogic {
     // authorization ----------------------------------------------------------
     Token authorize(String username, String password);
-    
+
     Token authorize(String activationCode);
 
     // user operations --------------------------------------------------------
@@ -44,17 +44,17 @@ public interface BusinessLogic {
     BackMeUpUser getUserByUsername(String username);
 
     BackMeUpUser getUserByUserId(Long userId);
-    
+
     BackMeUpUser getUserByKeyserverUserId(String keyserverUserId);
 
     BackMeUpUser updateUser(BackMeUpUser user);
 
     BackMeUpUser deleteUser(BackMeUpUser activeUser, Long userId);
-    
+
     BackMeUpUser addAnonymousUser(BackMeUpUser activeUser);
-    
+
     String getAnonymousUserActivationCode(BackMeUpUser currentUser, Long userId);
-    
+
     // plugin operations ------------------------------------------------------
     boolean isPluginAvailable(String pluginId);
 
@@ -109,20 +109,19 @@ public interface BusinessLogic {
     void deleteBackupJob(Long userId, Long jobId);
 
     // search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner,
-            String taggedCollection, Long offSetStart, Long maxResults);
+    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner, String taggedCollection,
+            Long offSetStart, Long maxResults);
 
     // sharing operations -----------------------------------------------------
-    Set<SharingPolicyEntry> getAllOwnedSharingPolicies(Long currUserId);
+    Set<SharingPolicyEntry> getAllOwnedSharingPolicies(BackMeUpUser currentUser);
 
     Set<SharingPolicyEntry> getAllIncomingSharingPolicies(Long currUserId);
 
-    SharingPolicyEntry createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId,
-            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description, Date lifespanstart,
-            Date lifespanend);
+    SharingPolicyEntry createAndAddSharingPolicy(Long currUserId, Long sharingWithUserId, SharingPolicyTypeEntry policy,
+            String sharedElementID, String name, String description, Date lifespanstart, Date lifespanend);
 
-    SharingPolicyEntry updateExistingSharingPolicy(Long currUserId, Long policyID, String name, String description,
-            Date lifespanstart, Date lifespanend);
+    SharingPolicyEntry updateExistingSharingPolicy(Long currUserId, Long policyID, String name, String description, Date lifespanstart,
+            Date lifespanend);
 
     String removeOwnedSharingPolicy(Long currUserId, Long policyID);
 
@@ -137,20 +136,18 @@ public interface BusinessLogic {
 
     Set<SharingPolicyEntry> getAllIncomingHeritagePolicies(Long currUserId);
 
-    SharingPolicyEntry createAndAddHeritagePolicy(Long currUserId, Long sharingWithUserId,
-            SharingPolicyTypeEntry policy, String sharedElementID, String name, String description, Date lifespanstart,
-            Date lifespanend);
+    SharingPolicyEntry createAndAddHeritagePolicy(Long currUserId, Long sharingWithUserId, SharingPolicyTypeEntry policy,
+            String sharedElementID, String name, String description, Date lifespanstart, Date lifespanend);
 
-    SharingPolicyEntry updateExistingHeritagePolicy(Long currUserId, Long policyID, String name, String description,
-            Date lifespanstart, Date lifespanend);
+    SharingPolicyEntry updateExistingHeritagePolicy(Long currUserId, Long policyID, String name, String description, Date lifespanstart,
+            Date lifespanend);
 
     String removeOwnedHeritagePolicy(Long currUserId, Long policyID);
 
     String activateDeadMannSwitchAndImport(Long currUserId);
 
     // tagged collections -----------------------------------------------------
-    Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId,
-            final List<UUID> lDocumentUUIDs);
+    Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId, final List<UUID> lDocumentUUIDs);
 
     Set<TaggedCollectionEntry> getAllTaggedCollectionsByNameQuery(final Long currUserId, final String name);
 
@@ -160,14 +157,12 @@ public interface BusinessLogic {
 
     String removeAllCollectionsForUser(final Long currUserId);
 
-    TaggedCollectionEntry createAndAddTaggedCollection(final Long currUserId, final String name,
-            final String description, final List<UUID> containedDocumentIDs);
-
-    String addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID,
+    TaggedCollectionEntry createAndAddTaggedCollection(final Long currUserId, final String name, final String description,
             final List<UUID> containedDocumentIDs);
 
-    String removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID,
-            final List<UUID> containedDocumentIDs);
+    String addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
+
+    String removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID, final List<UUID> containedDocumentIDs);
 
     // worker operations ------------------------------------------------------
     WorkerConfigDTO initializeWorker(WorkerInfo workerInfo);
