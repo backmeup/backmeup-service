@@ -47,11 +47,11 @@ public class UserRegistrationImpl implements UserRegistration {
     private static final String VERIFICATION_EMAIL_SUBJECT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_SUBJECT";
     private static final String VERIFICATION_EMAIL_CONTENT = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_CONTENT";
     private static final String VERIFICATION_EMAIL_MIME_TYPE = "org.backmeup.logic.impl.BusinessLogicImpl.VERIFICATION_EMAIL_MIME_TYPE";
-    
+
     private static final String CHARSET_NAME_UTF8 = "UTF-8";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRegistrationImpl.class);
-    
+
     private final ResourceBundle textBundle = ResourceBundle.getBundle("UserRegistrationImpl");
 
     @Inject
@@ -65,7 +65,7 @@ public class UserRegistrationImpl implements UserRegistration {
     @Inject
     @Configuration(key = "backmeup.emailVerificationUrl")
     private String verificationUrl;
-    
+
     @Inject
     @Configuration(key = "backmeup.minimalPasswordLength")
     private Integer minimalPasswordLength;
@@ -77,7 +77,7 @@ public class UserRegistrationImpl implements UserRegistration {
     private DataAccessLayer dal;
 
     private UserDao getUserDao() {
-        return dal.createUserDao();
+        return this.dal.createUserDao();
     }
 
     private BackMeUpUser save(BackMeUpUser user) {
@@ -96,12 +96,12 @@ public class UserRegistrationImpl implements UserRegistration {
             throw new UnknownUserException(userId);
         }
 
-        if(ensureActivated) {
+        if (ensureActivated) {
             user.ensureActivated();
         }
         return user;
     }
-    
+
     @Override
     public BackMeUpUser getUserByKeyserverUserId(String keyserverUserId) {
         BackMeUpUser user = getUserDao().findByKeyserverId(keyserverUserId);
@@ -119,7 +119,7 @@ public class UserRegistrationImpl implements UserRegistration {
             throw new UnknownUserException(username);
         }
 
-        if(ensureActivated) {
+        if (ensureActivated) {
             user.ensureActivated();
         }
         return user;
@@ -128,7 +128,7 @@ public class UserRegistrationImpl implements UserRegistration {
     @Override
     public BackMeUpUser register(BackMeUpUser user) {
         if (user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
-            throw new IllegalArgumentException(textBundle.getString(PARAMETER_NULL));
+            throw new IllegalArgumentException(this.textBundle.getString(PARAMETER_NULL));
         }
         throwIfEmailInvalid(user.getEmail());
         throwIfPasswordInvalid(user.getPassword());
@@ -140,30 +140,32 @@ public class UserRegistrationImpl implements UserRegistration {
 
         BackMeUpUser newUser = save(user);
         newUser.setPassword(user.getPassword());
-        
+
         try {
-            keyserverClient.registerUser(newUser.getUserId().toString(), newUser.getPassword());
+            String serviceUserId = this.keyserverClient.registerUser(newUser.getUserId().toString(), newUser.getPassword());
+            newUser.setKeyserverId(serviceUserId);
+            newUser = save(newUser);
         } catch (KeyserverException e) {
             throw new BackMeUpException("Cannot register user", e);
         }
-        
+
         return newUser;
     }
-    
+
     @Override
     public BackMeUpUser registerAnonymous(BackMeUpUser currentUser) {
         try {
             TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
-            AuthResponseDTO response = keyserverClient.registerAnonymousUser(token);
+            AuthResponseDTO response = this.keyserverClient.registerAnonymousUser(token);
             String anonServiceUserId = response.getServiceUserId();
-            
+
             String uuid = UUID.randomUUID().toString();
             BackMeUpUser anonUser = new BackMeUpUser(uuid, null, null, uuid + "@backmeup", null);
             anonUser.setAnonymous(true);
             anonUser.setActivated(true);
             anonUser.setKeyserverId(anonServiceUserId);
             BackMeUpUser newUser = save(anonUser);
-            
+
             return newUser;
         } catch (KeyserverException e) {
             throw new BackMeUpException("Cannot register user", e);
@@ -171,16 +173,16 @@ public class UserRegistrationImpl implements UserRegistration {
     }
 
     private void throwIfEmailInvalid(String email) {
-        Pattern emailPattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
+        Pattern emailPattern = Pattern.compile(this.emailRegex, Pattern.CASE_INSENSITIVE);
         Matcher emailMatcher = emailPattern.matcher(email);
         if (!emailMatcher.matches()) {
-            throw new NotAnEmailAddressException(emailRegex, email);
+            throw new NotAnEmailAddressException(this.emailRegex, email);
         }
     }
-    
+
     private void throwIfPasswordInvalid(String password) {
-        if (password == null || password.length() < minimalPasswordLength) {
-            throw new PasswordTooShortException(minimalPasswordLength, password == null ? 0 : password.length());
+        if (password == null || password.length() < this.minimalPasswordLength) {
+            throw new PasswordTooShortException(this.minimalPasswordLength, password == null ? 0 : password.length());
         }
     }
 
@@ -227,16 +229,16 @@ public class UserRegistrationImpl implements UserRegistration {
 
     @Override
     public void sendVerificationEmailFor(BackMeUpUser user) {
-        String verifierUrl = String.format(verificationUrl, user.getVerificationKey());
+        String verifierUrl = String.format(this.verificationUrl, user.getVerificationKey());
         String subject = "";
         try {
-            subject = new String(textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), CHARSET_NAME_UTF8);
+            subject = new String(this.textBundle.getString(VERIFICATION_EMAIL_SUBJECT).getBytes("ISO-8859-1"), CHARSET_NAME_UTF8);
             subject = MimeUtility.encodeText(subject, CHARSET_NAME_UTF8, "Q");
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Something went wrong in sendVerificationEmailFor", e);
         }
-        String text = MessageFormat.format(textBundle.getString(VERIFICATION_EMAIL_CONTENT), verifierUrl, user.getVerificationKey());
-        String mimeType = textBundle.getString(VERIFICATION_EMAIL_MIME_TYPE);
+        String text = MessageFormat.format(this.textBundle.getString(VERIFICATION_EMAIL_CONTENT), verifierUrl, user.getVerificationKey());
+        String mimeType = this.textBundle.getString(VERIFICATION_EMAIL_MIME_TYPE);
         Mailer.send(user.getEmail(), subject, text, mimeType);
     }
 
@@ -284,17 +286,17 @@ public class UserRegistrationImpl implements UserRegistration {
     public BackMeUpUser update(BackMeUpUser user) {
         BackMeUpUser persistentUser = getUserByUsername(user.getUsername(), true);
 
-        if (user.getFirstname() != null && !user.getFirstname().equals(persistentUser.getFirstname())){
+        if (user.getFirstname() != null && !user.getFirstname().equals(persistentUser.getFirstname())) {
             persistentUser.setFirstname(user.getFirstname());
         }
 
-        if (user.getLastname() != null && !user.getLastname().equals(persistentUser.getLastname())){
+        if (user.getLastname() != null && !user.getLastname().equals(persistentUser.getLastname())) {
             persistentUser.setLastname(user.getLastname());
         }
 
         if (user.getEmail() != null && !user.getEmail().equals(persistentUser.getEmail())) {
             persistentUser.setEmail(user.getEmail());
-            if (!autoVerifyUser) {
+            if (!this.autoVerifyUser) {
                 persistentUser.setActivated(false);
                 setNewVerificationKeyTo(user);
                 sendVerificationEmailFor(user);
@@ -308,17 +310,17 @@ public class UserRegistrationImpl implements UserRegistration {
     public void delete(BackMeUpUser user) {
         try {
             TokenDTO token = new TokenDTO(Kind.INTERNAL, user.getPassword());
-            keyserverClient.removeUser(token);
+            this.keyserverClient.removeUser(token);
             getUserDao().delete(user);
         } catch (Exception ex) {
             LOGGER.warn(MessageFormat.format("Couldn't delete user \"{0}\"", user.getUsername()), ex);
         }
     }
-    
+
     @Override
     public Token authorize(BackMeUpUser user, String password) {
         try {
-            AuthResponseDTO response = keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
+            AuthResponseDTO response = this.keyserverClient.authenticateUserWithPassword(user.getUserId().toString(), password);
             String token = response.getToken().getB64Token();
             Date ttl = response.getToken().getTtl().getTime();
             return new Token(token, ttl.getTime());
@@ -327,11 +329,11 @@ public class UserRegistrationImpl implements UserRegistration {
             throw new InvalidCredentialsException();
         }
     }
-    
+
     @Override
     public Token authorize(String activationCode) {
         try {
-        	AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(new TokenDTO(Kind.INTERNAL, activationCode));
+            AuthResponseDTO response = this.keyserverClient.authenticateWithInternalToken(new TokenDTO(Kind.INTERNAL, activationCode));
             String token = response.getToken().getB64Token();
             Date ttl = response.getToken().getTtl().getTime();
             return new Token(token, ttl.getTime());
@@ -345,7 +347,7 @@ public class UserRegistrationImpl implements UserRegistration {
     public String getActivationCode(BackMeUpUser currentUser, BackMeUpUser anonUser) {
         try {
             TokenDTO token = new TokenDTO(Kind.INTERNAL, currentUser.getPassword());
-            TokenDTO t = keyserverClient.getInheritanceToken(token, anonUser.getKeyserverId());
+            TokenDTO t = this.keyserverClient.getInheritanceToken(token, anonUser.getKeyserverId());
             String activationCode = t.getB64Token();
             return activationCode;
         } catch (KeyserverException e) {
