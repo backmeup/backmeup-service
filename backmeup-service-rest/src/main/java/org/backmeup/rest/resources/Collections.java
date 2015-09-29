@@ -47,11 +47,11 @@ public class Collections extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
 
         if ((lDocumentUUIDs != null) && (lDocumentUUIDs.size() > 0)) {
-            return getLogic().getAllTaggedCollectionsContainingDocuments(activeUser.getUserId(), lDocumentUUIDs);
+            return getLogic().getAllTaggedCollectionsContainingDocuments(activeUser, lDocumentUUIDs);
         } else if ((name != null) && (!name.equals(""))) {
-            return getLogic().getAllTaggedCollectionsByNameQuery(activeUser.getUserId(), name);
+            return getLogic().getAllTaggedCollectionsByNameQuery(activeUser, name);
         } else {
-            return getLogic().getAllTaggedCollections(activeUser.getUserId());
+            return getLogic().getAllTaggedCollections(activeUser);
         }
     }
 
@@ -65,13 +65,13 @@ public class Collections extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
 
         if (collectionID != null && collectionID != -1) {
-            String response = getLogic().removeTaggedCollection(activeUser.getUserId(), collectionID);
+            String response = getLogic().removeTaggedCollection(activeUser, collectionID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
             return ret;
         } else {
-            String response = getLogic().removeAllCollectionsForUser(activeUser.getUserId());
+            String response = getLogic().removeAllCollectionsForUser(activeUser);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -86,8 +86,7 @@ public class Collections extends SecureBase {
     public TaggedCollectionEntry createAndAddTaggedCollection(//
             TaggedCollectionDTO taggedColl) {
 
-        return this.createAndAddTaggedCollection(taggedColl.getName(), taggedColl.getDescription(),
-                taggedColl.getDocumentIds());
+        return this.createAndAddTaggedCollection(taggedColl.getName(), taggedColl.getDescription(), taggedColl.getDocumentIds());
     }
 
     @RolesAllowed("user")
@@ -100,7 +99,7 @@ public class Collections extends SecureBase {
             @QueryParam("documentIds") List<UUID> containedDocumentIDs) {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        return getLogic().createAndAddTaggedCollection(activeUser.getUserId(), name, description, containedDocumentIDs);
+        return getLogic().createAndAddTaggedCollection(activeUser, name, description, containedDocumentIDs);
     }
 
     @RolesAllowed("user")
@@ -124,7 +123,7 @@ public class Collections extends SecureBase {
         mandatory("documentIds", documentIDs);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        String response = getLogic().addDocumentsToTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
+        String response = getLogic().addDocumentsToTaggedCollection(activeUser, collectionID, documentIDs);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("status", response);
@@ -152,8 +151,7 @@ public class Collections extends SecureBase {
         mandatory("documentIds", documentIDs);
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        String response = getLogic().removeDocumentsFromTaggedCollection(activeUser.getUserId(), collectionID,
-                documentIDs);
+        String response = getLogic().removeDocumentsFromTaggedCollection(activeUser, collectionID, documentIDs);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("status", response);

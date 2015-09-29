@@ -52,7 +52,7 @@ public class Heritage extends SecureBase {
     public Set<SharingPolicyEntry> getAllOwned() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser);
         return response;
     }
 
@@ -63,7 +63,7 @@ public class Heritage extends SecureBase {
     public Set<SharingPolicyEntry> getAllIncoming() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser);
         return response;
     }
 
@@ -108,8 +108,8 @@ public class Heritage extends SecureBase {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser.getUserId(),
-                    sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser, sharingWithUserId, policyType, sharedElementID,
+                    name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -133,8 +133,8 @@ public class Heritage extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser.getUserId(), policyID,
-                    name, description, lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser, policyID, name, description, lifespanStart,
+                    lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -169,7 +169,7 @@ public class Heritage extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            String response = getLogic().removeOwnedHeritagePolicy(activeUser.getUserId(), policyID);
+            String response = getLogic().removeOwnedHeritagePolicy(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -192,7 +192,7 @@ public class Heritage extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
             //Trigger data import of all owned heritage policies for this user
-            String response = getLogic().activateDeadMannSwitchAndImport(activeUser.getUserId());
+            String response = getLogic().activateDeadMannSwitchAndImport(activeUser);
             //TODO AL lock the account of the sharing providing user
 
             //return Map instead of String so that JSON response can be created
@@ -251,10 +251,8 @@ public class Heritage extends SecureBase {
             UUID.fromString(value);
         } catch (Exception e) {
             LOGGER.error("", e);
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity(name + " parameter is malformed. Expecting UUID of syntax: "
-                                    + UUID.randomUUID().toString()).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity(name + " parameter is malformed. Expecting UUID of syntax: " + UUID.randomUUID().toString()).build());
         }
     }
 

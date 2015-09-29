@@ -64,7 +64,7 @@ public class Sharing extends SecureBase {
     public Set<SharingPolicyEntry> getAllIncoming() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser.getUserId());
+        Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser);
         return response;
     }
 
@@ -109,8 +109,8 @@ public class Sharing extends SecureBase {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(), sharingWithUserId, policyType,
-                    sharedElementID, name, description, lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser, sharingWithUserId, policyType, sharedElementID,
+                    name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -134,8 +134,8 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID, name, description,
-                    lifespanStart, lifespanEnd);
+            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser, policyID, name, description, lifespanStart,
+                    lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
             LOGGER.error("", e);
@@ -170,7 +170,7 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            String response = getLogic().removeOwnedSharingPolicy(activeUser.getUserId(), policyID);
+            String response = getLogic().removeOwnedSharingPolicy(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -190,7 +190,7 @@ public class Sharing extends SecureBase {
     public Map<String, String> removeAllOwned() {
 
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
+        String response = getLogic().removeAllOwnedSharingPolicies(activeUser);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("status", response);
@@ -223,7 +223,7 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
         try {
-            String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
+            String response = getLogic().declineIncomingSharing(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -247,7 +247,7 @@ public class Sharing extends SecureBase {
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
 
         try {
-            String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);
+            String response = getLogic().approveIncomingSharing(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
