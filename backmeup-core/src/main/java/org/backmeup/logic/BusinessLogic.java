@@ -109,8 +109,8 @@ public interface BusinessLogic {
     void deleteBackupJob(Long userId, Long jobId);
 
     // search operations ------------------------------------------------------
-    SearchResponse queryBackup(Long userId, String query, String source, String type, String job, String owner, String taggedCollection,
-            Long offSetStart, Long maxResults);
+    SearchResponse queryBackup(BackMeUpUser currentUser, String query, String source, String type, String job, String owner,
+            String taggedCollection, Long offSetStart, Long maxResults);
 
     // sharing operations -----------------------------------------------------
     Set<SharingPolicyEntry> getAllOwnedSharingPolicies(BackMeUpUser currentUser);

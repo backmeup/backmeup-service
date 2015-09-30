@@ -43,8 +43,7 @@ public class Search extends SecureBase {
 
         mandatory("query", query);
         BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
-        SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job, owner, tag,
-                offSetStart, maxResults);
+        SearchResponse sr = getLogic().queryBackup(activeUser, query, source, type, job, owner, tag, offSetStart, maxResults);
 
         return getMapper().map(sr, SearchResponseDTO.class);
     }
