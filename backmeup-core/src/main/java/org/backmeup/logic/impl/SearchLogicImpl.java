@@ -106,7 +106,7 @@ public class SearchLogicImpl implements SearchLogic {
         //create a keyserver tokenDTO object for this user - usable to authenticate with keyserver
         TokenDTO keyserverToken = new TokenDTO(Kind.INTERNAL, bmuUser.getPassword());
         //wrap the user object to be understood by the indexer
-        return new User(bmuUser.getUserId(), keyserverToken);
+        return new User(bmuUser.getUserId(), keyserverToken.toTokenString());
     }
 
 }
