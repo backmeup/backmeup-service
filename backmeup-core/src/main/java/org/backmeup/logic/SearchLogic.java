@@ -32,14 +32,14 @@ public interface SearchLogic {
     SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job, String owner,
             String tag, Long offSetStart, Long maxResults);
 
-    Set<FileItem> getAllFileItems(Long userId, Long jobId);
+    Set<FileItem> getAllFileItems(BackMeUpUser user, Long jobId);
 
-    ProtocolDetails getProtocolDetails(Long userId, String fileId);
+    ProtocolDetails getProtocolDetails(BackMeUpUser user, String fileId);
 
-    File getThumbnailPathForFile(Long userId, String fileId);
+    File getThumbnailPathForFile(BackMeUpUser user, String fileId);
 
-    void delete(Long userId, Long jobId, Long timestamp);
+    void delete(BackMeUpUser user, Long jobId, Long timestamp);
 
-    void deleteIndexOf(Long userId);
+    void deleteIndexOf(BackMeUpUser user);
 
 }

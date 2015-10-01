@@ -19,7 +19,6 @@ import org.backmeup.rest.auth.BackmeupPrincipal;
 /**
  * This class contains search specific operations.
  * 
- * @author Peter Kofler
  */
 @Path("search")
 public class Search extends SecureBase {
