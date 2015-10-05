@@ -14,7 +14,8 @@ public class AllowAllSecurityInterceptor implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         BackMeUpUser user = FakeUser.active();
-        requestContext.setSecurityContext(new BackmeupSecurityContext(user));
+        BackmeupSecurityContext secContext = new BackmeupSecurityContext(user.getUserId().toString(), user, "");
+        requestContext.setSecurityContext(secContext);
     }
 
 }

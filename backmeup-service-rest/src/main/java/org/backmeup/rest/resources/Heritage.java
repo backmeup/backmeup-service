@@ -51,7 +51,8 @@ public class Heritage extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public Set<SharingPolicyEntry> getAllOwned() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser.getUserId());
         return response;
     }
@@ -62,7 +63,8 @@ public class Heritage extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public Set<SharingPolicyEntry> getAllIncoming() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser.getUserId());
         return response;
     }
@@ -106,7 +108,8 @@ public class Heritage extends SecureBase {
             mandatoryLong("policyValue", sharedElementID);
         }
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser.getUserId(),
                     sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
@@ -131,7 +134,8 @@ public class Heritage extends SecureBase {
             @QueryParam("lifespanend") Date lifespanEnd) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser.getUserId(), policyID,
                     name, description, lifespanStart, lifespanEnd);
@@ -167,7 +171,8 @@ public class Heritage extends SecureBase {
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             String response = getLogic().removeOwnedHeritagePolicy(activeUser.getUserId(), policyID);
             //return Map instead of String so that JSON response can be created
@@ -189,7 +194,8 @@ public class Heritage extends SecureBase {
     @Consumes(MediaType.APPLICATION_JSON)
     public Map<String, String> activateDeadMannSwitchAndImport() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             //Trigger data import of all owned heritage policies for this user
             String response = getLogic().activateDeadMannSwitchAndImport(activeUser.getUserId());

@@ -52,7 +52,8 @@ public class Sharing extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public Set<SharingPolicyEntry> getAllOwned() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser.getUserId());
         return response;
     }
@@ -63,7 +64,8 @@ public class Sharing extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public Set<SharingPolicyEntry> getAllIncoming() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser.getUserId());
         return response;
     }
@@ -107,7 +109,8 @@ public class Sharing extends SecureBase {
             mandatoryLong("policyValue", sharedElementID);
         }
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
                     sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
@@ -132,7 +135,8 @@ public class Sharing extends SecureBase {
             @QueryParam("lifespanend") Date lifespanEnd) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID,
                     name, description, lifespanStart, lifespanEnd);
@@ -168,7 +172,8 @@ public class Sharing extends SecureBase {
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             String response = getLogic().removeOwnedSharingPolicy(activeUser.getUserId(), policyID);
             //return Map instead of String so that JSON response can be created
@@ -189,7 +194,8 @@ public class Sharing extends SecureBase {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> removeAllOwned() {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
@@ -221,7 +227,8 @@ public class Sharing extends SecureBase {
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         try {
             String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
             //return Map instead of String so that JSON response can be created
@@ -244,7 +251,8 @@ public class Sharing extends SecureBase {
             @QueryParam("policyID") Long policyID) {
 
         mandatory("policyID", policyID);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         try {
             String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);

@@ -39,7 +39,10 @@ public class Friends extends SecureBase {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public FriendlistUserDTO addFriend(FriendlistUserDTO userDTO) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         FriendlistUser user = getMapper().map(userDTO, FriendlistUser.class);
         user = getLogic().addFriend(activeUser, user);
         return getMapper().map(user, FriendlistUserDTO.class);
@@ -52,7 +55,8 @@ public class Friends extends SecureBase {
     public List<FriendlistUserDTO> getFriends(//
             @QueryParam("list") FriendListType listType) {
         mandatory("list", listType);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         List<FriendlistUser> lFriends = getLogic().getFriends(activeUser.getUserId(), listType);
         //build the return list
         List<FriendlistUserDTO> friendsDTOs = new ArrayList<>();
@@ -69,7 +73,8 @@ public class Friends extends SecureBase {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public FriendlistUserDTO updateFriend(FriendlistUserDTO userDTO) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         FriendlistUser user = getMapper().map(userDTO, FriendlistUser.class);
         user = getLogic().updateFriend(activeUser.getUserId(), user);
         return getMapper().map(user, FriendlistUserDTO.class);
@@ -85,7 +90,8 @@ public class Friends extends SecureBase {
         mandatory("friendId", friendId);
         mandatory("list", listType);
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         getLogic().removeFriend(activeUser.getUserId(), friendId, listType);
         //TODO need to delete anonymous heritage user account when removing from friends list
         Map<String, String> ret = new HashMap<String, String>();

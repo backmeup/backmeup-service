@@ -41,7 +41,9 @@ public class BackupJobs extends Base {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<BackupJobDTO> listBackupJobs(@QueryParam("status") JobStatus jobStatus) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         List<BackupJob> allJobsOfUser = getLogic().getBackupJobs(activeUser.getUserId());
         List<BackupJobDTO> jobList = new ArrayList<>();
@@ -62,7 +64,9 @@ public class BackupJobs extends Base {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobDTO createBackupJob(BackupJobCreationDTO backupJob) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         Profile sourceProfile = getLogic().getPluginProfile(activeUser, backupJob.getSource());
         Profile sinkProfile = getLogic().getPluginProfile(activeUser, backupJob.getSink());
@@ -86,7 +90,9 @@ public class BackupJobs extends Base {
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobDTO getBackupJob(@PathParam("jobId") String jobId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
         if (!activeUser.getUserId().equals(job.getUser().getUserId())) {
@@ -105,7 +111,8 @@ public class BackupJobs extends Base {
         if(Long.parseLong(jobId) != backupjob.getJobId()) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         BackupJob job = getLogic().getBackupJob(backupjob.getJobId());
         if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
@@ -122,7 +129,8 @@ public class BackupJobs extends Base {
     @DELETE
     @Path("/{jobId}")
     public void deleteBackupJob(@PathParam("jobId") String jobId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
         if (!job.getUser().getUserId().equals(activeUser.getUserId())) {
@@ -137,7 +145,8 @@ public class BackupJobs extends Base {
     @Path("/{jobId}/executions/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<BackupJobExecutionDTO> listBackupJobExecutions(@PathParam("jobId") String jobId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         List<BackupJobExecution> allJobExecsOfUser = getLogic().getBackupJobExecutions(Long.parseLong(jobId));
         List<BackupJobExecutionDTO> jobExecsList = new ArrayList<>();
@@ -157,7 +166,10 @@ public class BackupJobs extends Base {
     @POST
     @Path("/{jobId}/executions/")
     public void executeBackupJob(@PathParam("jobId") String jobId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         BackupJob job = getLogic().getBackupJob(Long.parseLong(jobId));
         if (!activeUser.getUserId().equals(job.getUser().getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
@@ -180,7 +192,8 @@ public class BackupJobs extends Base {
     @Path("/executions/{jobExecutionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecution(@PathParam("jobExecutionId") String jobExecutionId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId), false);
         if (!activeUser.getUserId().equals(exec.getUser().getUserId())) {
@@ -195,7 +208,8 @@ public class BackupJobs extends Base {
     @Path("/executions/{jobExecutionId}/redeem-token")
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecutionWithProfileData(@PathParam("jobExecutionId") String jobExecutionId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId), true);
         if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
@@ -214,7 +228,8 @@ public class BackupJobs extends Base {
         if (Long.parseLong(jobId) != jobExecution.getJobId() || (Long.parseLong(jobExecutionId) != jobExecution.getId())) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         BackupJobExecution jobExec = getLogic().getBackupJobExecution(jobExecution.getId(), false);
         if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {

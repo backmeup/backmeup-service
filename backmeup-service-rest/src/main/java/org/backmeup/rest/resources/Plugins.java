@@ -100,7 +100,9 @@ public class Plugins extends Base {
         if(authDataId.equals(-1L)) {
             pluginConfigInfo = getLogic().getPluginConfiguration(pluginId);
         } else {
-            BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+            BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+            BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+            activeUser.setPassword(principal.getAuthToken().getB64Token());
 
             AuthData authData = getLogic().getPluginAuthData(activeUser, authDataId);
             if(!authData.getPluginId().equals(pluginId)){
@@ -137,7 +139,9 @@ public class Plugins extends Base {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public PluginProfileDTO addPluginConfiguration(@PathParam("pluginId") String pluginId, PluginProfileDTO pluginProfile) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         throwIfPluginNotAvailable(pluginId);
 
@@ -174,7 +178,9 @@ public class Plugins extends Base {
             @PathParam("pluginId") String pluginId, 
             @PathParam("profileId") String profileId) {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         Profile profile = getLogic().getPluginProfile(activeUser, Long.parseLong(profileId));
 
@@ -197,7 +203,10 @@ public class Plugins extends Base {
             @QueryParam("updateProperties") @DefaultValue("false") boolean updateProperties,
             @QueryParam("updateOptions") @DefaultValue("false") boolean updateOptions,
             PluginProfileDTO pluginProfile) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         Long pId = Long.parseLong(profileId);
         Profile persistentProfile = getLogic().getPluginProfile(activeUser, pId);
         if((!activeUser.getUserId().equals(persistentProfile.getUser().getUserId())) && 
@@ -236,7 +245,9 @@ public class Plugins extends Base {
     @Path("/{pluginId}/{profileId}")
     @Produces(MediaType.APPLICATION_JSON)
     public void deletePluginConfiguration(@PathParam("pluginId") String pluginId, @PathParam("profileId") String profileId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         throwIfPluginNotAvailable(pluginId);
 
@@ -258,7 +269,9 @@ public class Plugins extends Base {
     @Path("/{pluginId}/authdata")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthDataDTO addAuthData(@PathParam("pluginId") String pluginId, AuthDataDTO authData) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         throwIfPluginNotAvailable(pluginId);
 
@@ -276,7 +289,9 @@ public class Plugins extends Base {
     @Path("/{pluginId}/authdata/{authdataId}")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthDataDTO getAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId){
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         throwIfPluginNotAvailable(pluginId);
 
@@ -296,7 +311,8 @@ public class Plugins extends Base {
     @Path("/{pluginId}/authdata")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AuthDataDTO> listAuthData(@PathParam("pluginId") String pluginId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         throwIfPluginNotAvailable(pluginId);
 
@@ -331,7 +347,9 @@ public class Plugins extends Base {
     @Path("/{pluginId}/authdata/{authdataId}")
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteAuthData(@PathParam("pluginId") String pluginId, @PathParam("authdataId") String authDataId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         throwIfPluginNotAvailable(pluginId);
 

@@ -14,7 +14,8 @@ public class SecureBase extends Base {
     private SecurityContext securityContext;
 
     protected void canOnlyWorkWithMyData(Long userId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         if (!activeUser.getUserId().equals(userId)) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }

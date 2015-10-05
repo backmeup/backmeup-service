@@ -13,7 +13,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
-import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.WorkerInfo;
 import org.backmeup.model.WorkerMetric;
 import org.backmeup.model.dto.WorkerConfigDTO;
@@ -41,12 +40,13 @@ public class Workers extends Base {
     @Path("/metrics")
     @Consumes(MediaType.APPLICATION_JSON)
     public void addWorkerMetric(List<WorkerMetricDTO> metrics) {
-        BackMeUpUser activeWorker = ((BackmeupPrincipal)securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        String activeWorkerId = principal.getEntityId();
         
         List<WorkerMetric> metricsList = new ArrayList<WorkerMetric>(metrics.size());
         for(WorkerMetricDTO m : metrics) {
             WorkerMetric model = getMapper().map(m, WorkerMetric.class);
-            model.setWorkerId(Long.toString(activeWorker.getUserId()));
+            model.setWorkerId(activeWorkerId);
             metricsList.add(model);
         }
         

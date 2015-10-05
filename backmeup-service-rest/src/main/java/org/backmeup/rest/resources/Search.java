@@ -42,7 +42,8 @@ public class Search extends SecureBase {
             @QueryParam("maxresults") Long maxResults) {
 
         mandatory("query", query);
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         SearchResponse sr = getLogic().queryBackup(activeUser.getUserId(), query, source, type, job, owner, tag,
                 offSetStart, maxResults);
 

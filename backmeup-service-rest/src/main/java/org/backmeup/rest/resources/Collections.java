@@ -44,7 +44,8 @@ public class Collections extends SecureBase {
             @QueryParam("containsName") String name,//
             @QueryParam("containsDocs") List<UUID> lDocumentUUIDs) {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         if ((lDocumentUUIDs != null) && (lDocumentUUIDs.size() > 0)) {
             return getLogic().getAllTaggedCollectionsContainingDocuments(activeUser.getUserId(), lDocumentUUIDs);
@@ -62,7 +63,8 @@ public class Collections extends SecureBase {
     public Map<String, String> removeTaggedCollections(//
             @QueryParam("collectionId") Long collectionID) {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         if (collectionID != null && collectionID != -1) {
             String response = getLogic().removeTaggedCollection(activeUser.getUserId(), collectionID);
@@ -99,7 +101,8 @@ public class Collections extends SecureBase {
             @QueryParam("description") String description, //
             @QueryParam("documentIds") List<UUID> containedDocumentIDs) {
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         return getLogic().createAndAddTaggedCollection(activeUser.getUserId(), name, description, containedDocumentIDs);
     }
 
@@ -123,7 +126,8 @@ public class Collections extends SecureBase {
         mandatory("collId", collectionID);
         mandatory("documentIds", documentIDs);
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         String response = getLogic().addDocumentsToTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
@@ -151,7 +155,8 @@ public class Collections extends SecureBase {
         mandatory("collId", collectionID);
         mandatory("documentIds", documentIDs);
 
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
         String response = getLogic().removeDocumentsFromTaggedCollection(activeUser.getUserId(), collectionID,
                 documentIDs);
         //return Map instead of String so that JSON response can be created

@@ -85,7 +85,10 @@ public class Users extends SecureBase {
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteUser(@PathParam("userId") Long userId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         if (!activeUser.getUserId().equals(userId)) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
@@ -99,7 +102,10 @@ public class Users extends SecureBase {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public UserDTO addAnonymousUser() {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         BackMeUpUser userModel = getLogic().addAnonymousUser(activeUser);
         return getMapper().map(userModel, UserDTO.class);
     }
@@ -109,7 +115,10 @@ public class Users extends SecureBase {
     @Path("/{userId}/activationCode")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> getAnonymousUserActivationCodeAsText(@PathParam("userId") Long userId) {
-        BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+        BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         String activationCode = getLogic().getAnonymousUserActivationCode(activeUser, userId);
         Map<String, String> map = new HashMap<String, String>();
         map.put("activationCode", activationCode);
@@ -122,7 +131,10 @@ public class Users extends SecureBase {
     @Produces("application/pdf")
     public Response getAnonymousUserActivationCodeAsPdf(@PathParam("userId") Long userId) {
         try {
-            BackMeUpUser activeUser = ((BackmeupPrincipal) this.securityContext.getUserPrincipal()).getUser();
+            BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
+            BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+            activeUser.setPassword(principal.getAuthToken().getB64Token());
+            
             String activationCode = getLogic().getAnonymousUserActivationCode(activeUser, userId);
             InputStream pdf = new AccessTokenPdfQRCodeGenerator().generateQRCodePDF(activationCode);
 
