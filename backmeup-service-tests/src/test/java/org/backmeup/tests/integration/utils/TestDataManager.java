@@ -13,6 +13,9 @@ import org.backmeup.model.dto.WorkerInfoDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class TestDataManager {
+    public static final String WORKER_ID = "backmeup-worker";
+    public static final String WORKER_SECRET = "REPLACE-WORKER";
+    
     public static UserDTO getUser() {
         String username = "john.doe";
         String firstname = "John";

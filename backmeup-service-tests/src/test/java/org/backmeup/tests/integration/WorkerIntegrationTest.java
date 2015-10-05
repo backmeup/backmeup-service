@@ -19,7 +19,7 @@ public class WorkerIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testInitializeWorker() {
-        String accessToken = BackMeUpUtils.authenticateWorker();
+        String accessToken = BackMeUpUtils.authenticateWorker(TestDataManager.WORKER_ID, TestDataManager.WORKER_SECRET);
         WorkerInfoDTO workerInfo = TestDataManager.getWorkerInfo();
 
         try {

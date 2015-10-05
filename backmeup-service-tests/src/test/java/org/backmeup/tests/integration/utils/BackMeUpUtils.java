@@ -106,8 +106,19 @@ public class BackMeUpUtils {
         return response.extract().path("accessToken");
     }
     
-    public static String authenticateWorker() {
-        return "BACKMEUPWORKER;mysecret!";
+    public static String authenticateWorker(String workerId, String workerSecret) {
+        ValidatableResponse response = 
+                given()
+//                    .log().all()
+                    .header("Accept", "application/json")
+                .when()
+                    .get("/authenticate/worker?workerId=" + workerId + "&workerSecret=" + workerSecret)
+                .then()
+//                    .log().all()
+                    .statusCode(200)
+                    .body(containsString("accessToken"))
+                    .body(containsString("expiresAt"));
+        return response.extract().path("accessToken");
     }
 
     // ========================================================================

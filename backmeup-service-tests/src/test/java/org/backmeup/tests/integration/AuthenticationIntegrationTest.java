@@ -74,4 +74,24 @@ public class AuthenticationIntegrationTest extends IntegrationTestBase {
             BackMeUpUtils.deleteUser(accessToken, userId);
         }
     }
+    
+    @Test
+    public void testAuthenticateWorker() {
+        String workerId = TestDataManager.WORKER_ID;
+        String workerSecret = TestDataManager.WORKER_SECRET;
+
+        try {
+            given()
+                .log().all()
+                .header("Accept", "application/json")
+            .when()
+                .get("/authenticate/worker?workerId=" + workerId + "&workerSecret=" + workerSecret)
+            .then()
+                .log().all()
+                .statusCode(200)
+                .body(containsString("accessToken"))
+                .body(containsString("expiresAt"));
+        } finally {
+        }
+    }
 }

@@ -649,7 +649,7 @@ public class BackupJobIntegrationTest extends IntegrationTestBase {
             List<BackupJobExecutionDTO> jobExecutions = BackMeUpUtils.getBackupJobExecutions(accessToken, jobId);
             String jobExecId = jobExecutions.get(0).getId().toString();
             
-            String workerAccessToken = BackMeUpUtils.authenticateWorker();
+            String workerAccessToken = BackMeUpUtils.authenticateWorker(TestDataManager.WORKER_ID, TestDataManager.WORKER_SECRET);
             
             given()
                 .log().all()
