@@ -4,18 +4,25 @@ import java.security.Principal;
 
 import javax.ws.rs.core.SecurityContext;
 
-import org.backmeup.model.BackMeUpUser;
-
 public class BackmeupSecurityContext implements SecurityContext{
-    private final BackmeupPrincipal user;
+    /**
+     * String identifier for Token authentication. Value "TOKEN"
+     */
+    public static final String AUTH_TOKEN = "TOKEN";
+    
+    private final BackmeupPrincipal principal;
 
-    public BackmeupSecurityContext(BackMeUpUser user) {
-        this.user = new BackmeupPrincipal(user.getUserId().toString(), user);
+    public BackmeupSecurityContext(String entityId, Object entity, String authToken) {
+        this(new BackmeupPrincipal(entityId, entity, authToken));
+    }
+    
+    public BackmeupSecurityContext(BackmeupPrincipal principal) {
+        this.principal = principal;
     }
 
     @Override
     public Principal getUserPrincipal() {
-        return user;
+        return principal;
     }
 
     @Override
@@ -30,7 +37,7 @@ public class BackmeupSecurityContext implements SecurityContext{
 
     @Override
     public String getAuthenticationScheme() {
-        return null;
+        return AUTH_TOKEN;
     }
 
 }
