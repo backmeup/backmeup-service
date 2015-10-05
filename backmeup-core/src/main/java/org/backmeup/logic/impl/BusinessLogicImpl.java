@@ -146,6 +146,16 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
+    
+    @Override
+    public Token authorizeWorker(final String workerId, final String workerSecret) {
+        return this.conn.txJoinReadOnly(new Callable<Token>() {
+            @Override
+            public Token call() {
+                return BusinessLogicImpl.this.workers.authorize(workerId, workerSecret);
+            }
+        });
+    }
 
     // ========================================================================
 
@@ -983,6 +993,18 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
 
+    }
+    
+    @Override
+    public WorkerInfo getWorkerByWorkerId(final String workerId) {
+        
+        return this.conn.txJoinReadOnly(new Callable<WorkerInfo>() {
+            @Override
+            public WorkerInfo call() {
+                return BusinessLogicImpl.this.workers.getWorkerByWorkerId(workerId);
+            }
+        });
+        
     }
 
     @Override

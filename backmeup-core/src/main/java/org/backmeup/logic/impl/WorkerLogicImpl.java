@@ -1,5 +1,6 @@
 package org.backmeup.logic.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -9,12 +10,18 @@ import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.WorkerInfoDao;
 import org.backmeup.dal.WorkerMetricDao;
+import org.backmeup.keyserver.client.KeyserverClient;
+import org.backmeup.keyserver.model.KeyserverException;
+import org.backmeup.keyserver.model.dto.AuthResponseDTO;
 import org.backmeup.logic.WorkerLogic;
+import org.backmeup.model.Token;
 import org.backmeup.model.WorkerInfo;
 import org.backmeup.model.WorkerMetric;
 import org.backmeup.model.constants.WorkerState;
 import org.backmeup.model.dto.WorkerConfigDTO;
 import org.backmeup.model.dto.WorkerConfigDTO.DistributionMechanism;
+import org.backmeup.model.exceptions.InvalidCredentialsException;
+import org.backmeup.model.exceptions.UnknownWorkerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +47,9 @@ public class WorkerLogicImpl implements WorkerLogic{
     @Inject
     @Configuration(key = "backmeup.osgi.exportedPackages")
     private String pluginsExportedPackages;
+    
+    @Inject
+    private KeyserverClient keyserverClient;
 
     @Inject
     private DataAccessLayer dal;
@@ -50,6 +60,19 @@ public class WorkerLogicImpl implements WorkerLogic{
     
     private WorkerMetricDao getWorkerMetricDao() {
         return dal.createWorkerMetricDao();
+    }
+    
+    @Override
+    public Token authorize(String workerId, String workerSecret) {
+        try {
+            AuthResponseDTO response = keyserverClient.authenticateApp(workerId, workerSecret);
+            String token = response.getToken().getB64Token();
+            Date ttl = response.getToken().getTtl().getTime();
+            return new Token(token, ttl.getTime());
+        } catch (KeyserverException ex) {
+            LOGGER.warn("Cannot authenticate on keyserver", ex);
+            throw new InvalidCredentialsException();
+        }
     }
 
     @Override
@@ -93,6 +116,15 @@ public class WorkerLogicImpl implements WorkerLogic{
         for (WorkerMetric m : workerMetrics) {
             getWorkerMetricDao().save(m);
         }
+    }
+
+    @Override
+    public WorkerInfo getWorkerByWorkerId(String workerId) {
+        WorkerInfo worker = getWorkerInfoDao().findById(workerId);
+        if (worker == null) {
+            throw new UnknownWorkerException(workerId);
+        }
+        return worker;
     }
 
 }

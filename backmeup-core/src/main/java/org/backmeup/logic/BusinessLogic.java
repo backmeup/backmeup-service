@@ -37,6 +37,8 @@ public interface BusinessLogic {
     Token authorize(String username, String password);
     
     Token authorize(String activationCode);
+    
+    Token authorizeWorker(String workerId, String workerSecret);
 
     // user operations --------------------------------------------------------
     BackMeUpUser addUser(BackMeUpUser user);
@@ -171,6 +173,8 @@ public interface BusinessLogic {
 
     // worker operations ------------------------------------------------------
     WorkerConfigDTO initializeWorker(WorkerInfo workerInfo);
+    
+    WorkerInfo getWorkerByWorkerId(String workerId);
 
     void addWorkerMetrics(List<WorkerMetric> workerMetrics);
 
