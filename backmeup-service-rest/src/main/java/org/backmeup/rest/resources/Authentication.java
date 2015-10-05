@@ -57,4 +57,21 @@ public class Authentication extends Base {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @PermitAll
+    @GET
+    @Path("/worker")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthInfo authenticateWorker(@QueryParam("workerId") String workerId, @QueryParam("workerSecret") String workerSecret) {
+        try {
+            Token token = getLogic().authorizeWorker(workerId, workerSecret);
+            return new AuthInfo(token.getToken(), token.getTtl());
+        } catch (InvalidCredentialsException | UnknownUserException | UserNotActivatedException ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        } catch (Exception ex) {
+            LOGGER.info("", ex);
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

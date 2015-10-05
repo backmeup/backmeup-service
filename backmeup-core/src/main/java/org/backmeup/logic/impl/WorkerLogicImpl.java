@@ -1,5 +1,6 @@
 package org.backmeup.logic.impl;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +68,15 @@ public class WorkerLogicImpl implements WorkerLogic{
         try {
             AuthResponseDTO response = keyserverClient.authenticateApp(workerId, workerSecret);
             String token = response.getToken().getB64Token();
-            Date ttl = response.getToken().getTtl().getTime();
+            
+            // AuthResponse for authenticated APPs does not contain a TTL.
+            // Therefore, make Token valid for 'today + 1 Year'.
+            Date ttl = new Date();
+            Calendar c = Calendar.getInstance(); 
+            c.setTime(ttl); 
+            c.add(Calendar.YEAR, 1);
+            ttl = c.getTime();
+            
             return new Token(token, ttl.getTime());
         } catch (KeyserverException ex) {
             LOGGER.warn("Cannot authenticate on keyserver", ex);
