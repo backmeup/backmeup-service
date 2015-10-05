@@ -19,11 +19,14 @@ import org.backmeup.keyserver.client.KeyserverClient;
 import org.backmeup.keyserver.model.KeyserverException;
 import org.backmeup.keyserver.model.Token.Kind;
 import org.backmeup.keyserver.model.dto.AuthResponseDTO;
+import org.backmeup.keyserver.model.dto.AuthResponseDTO.Role;
 import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.BusinessLogic;
 import org.backmeup.model.BackMeUpUser;
+import org.backmeup.model.WorkerInfo;
 import org.backmeup.model.exceptions.UnknownUserException;
 import org.backmeup.model.exceptions.UserNotActivatedException;
+import org.backmeup.rest.auth.BackmeupPrincipal;
 import org.backmeup.rest.auth.BackmeupSecurityContext;
 import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
@@ -77,38 +80,35 @@ public class SecurityInterceptor implements ContainerRequestFilter {
                 RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
                 Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
 
-                BackMeUpUser user = resolveUser(accessToken);
-                if(user == null) {
+                BackmeupPrincipal principal = resolvePrincipal(accessToken);
+                if(principal == null) {
                     requestContext.abortWith(ACCESS_DENIED);
                     return;
                 }
 
-                if( !isUserAllowed(user, rolesSet)) {
+                if( !isPrincipalAllowed(principal, rolesSet)) {
                     requestContext.abortWith(ACCESS_DENIED);
                     return;
                 }
 
-                user.setPassword(accessToken);
-                requestContext.setSecurityContext(new BackmeupSecurityContext(user));
+                requestContext.setSecurityContext(new BackmeupSecurityContext(principal));
             }
         }
     }
     
-    private BackMeUpUser resolveUser(final String accessToken) {
+    private BackmeupPrincipal resolvePrincipal(final String accessToken) {
         try {
-            if(accessToken.startsWith(BACKMEUP_WORKER_NAME)) {
-                BackMeUpUser worker = new BackMeUpUser(BACKMEUP_WORKER_NAME, "", "", "", "");
-                worker.setUserId(BACKMEUP_WORKER_ID);
-                return worker;
-            }
             
             TokenDTO token = new TokenDTO(Kind.INTERNAL, accessToken);
             AuthResponseDTO response = keyserverClient.authenticateWithInternalToken(token);
             
-            if(response.getUsername() != null) {
-                return logic.getUserByUserId(Long.parseLong(response.getUsername()));
-            } else {
-                return logic.getUserByKeyserverUserId(response.getServiceUserId());
+            if (response.getRoles().contains(Role.USER)) {
+                BackMeUpUser user = logic.getUserByKeyserverUserId(response.getServiceUserId());
+                return new BackmeupPrincipal(user.getUserId().toString(), user, accessToken);
+            } else if (response.getRoles().contains(Role.WORKER)) {
+                //ServiceUserId return in the AuthResponse from Keyserver is equal to AppId (WorkerId)
+                WorkerInfo worker = logic.getWorkerByWorkerId(response.getServiceUserId()); 
+                return new BackmeupPrincipal(worker.getWorkerId(), worker, accessToken);
             }
             
         } catch (KeyserverException ke) {
@@ -121,7 +121,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         return null;
     }
 
-    private boolean isUserAllowed(final BackMeUpUser user, final Set<String> rolesSet) {
+    private boolean isPrincipalAllowed(final BackmeupPrincipal principal, final Set<String> rolesSet) {
         return true;
     }
 
