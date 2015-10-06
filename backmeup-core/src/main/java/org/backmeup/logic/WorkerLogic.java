@@ -18,6 +18,7 @@ public interface WorkerLogic {
     WorkerConfigDTO initializeWorker(WorkerInfo workerInfo);
     
     WorkerInfo getWorkerByWorkerId(String workerId);
+    WorkerInfo getWorkerByWorkerId(String workerId, boolean throwIfUnknown);
 
     void addWorkerMetrics(List<WorkerMetric> workerMetrics);
 

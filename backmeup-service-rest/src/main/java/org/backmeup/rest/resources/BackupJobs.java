@@ -23,6 +23,7 @@ import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.BackupJob;
 import org.backmeup.model.BackupJobExecution;
 import org.backmeup.model.Profile;
+import org.backmeup.model.WorkerInfo;
 import org.backmeup.model.constants.JobStatus;
 import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
@@ -209,13 +210,10 @@ public class BackupJobs extends Base {
     @Produces(MediaType.APPLICATION_JSON)
     public BackupJobExecutionDTO getBackupJobExecutionWithProfileData(@PathParam("jobExecutionId") String jobExecutionId) {
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
-        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        @SuppressWarnings("unused")
+        WorkerInfo worker = principal.getEntity(WorkerInfo.class);
         
         BackupJobExecution exec = getLogic().getBackupJobExecution(Long.parseLong(jobExecutionId), true);
-        if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-
         return getMapper().map(exec, BackupJobExecutionDTO.class);
     }
     
@@ -229,12 +227,10 @@ public class BackupJobs extends Base {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
-        BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        @SuppressWarnings("unused")
+        WorkerInfo worker = principal.getEntity(WorkerInfo.class);
 
         BackupJobExecution jobExec = getLogic().getBackupJobExecution(jobExecution.getId(), false);
-        if (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
 
         if (jobExecution.getStart() != null) {
             jobExec.setStartTime(jobExecution.getStart());

@@ -106,8 +106,14 @@ public class SecurityInterceptor implements ContainerRequestFilter {
                 BackMeUpUser user = logic.getUserByKeyserverUserId(response.getServiceUserId());
                 return new BackmeupPrincipal(user.getUserId().toString(), user, accessToken);
             } else if (response.getRoles().contains(Role.WORKER)) {
-                //ServiceUserId return in the AuthResponse from Keyserver is equal to AppId (WorkerId)
+                //ServiceUserId returned in the AuthResponse from Keyserver is equal to AppId (WorkerId)
                 WorkerInfo worker = logic.getWorkerByWorkerId(response.getServiceUserId()); 
+                if(worker == null) {
+                    // TODO: In case of predefined workers (on keyserver), there is no worker info in db
+                    // Therefore, this workaround:
+                    worker = new WorkerInfo();
+                    worker.setWorkerId(response.getServiceUserId());
+                }
                 return new BackmeupPrincipal(worker.getWorkerId(), worker, accessToken);
             }
             

@@ -129,8 +129,13 @@ public class WorkerLogicImpl implements WorkerLogic{
 
     @Override
     public WorkerInfo getWorkerByWorkerId(String workerId) {
+        return getWorkerByWorkerId(workerId, false);
+    }
+    
+    @Override
+    public WorkerInfo getWorkerByWorkerId(String workerId, boolean throwIfUnknown) {
         WorkerInfo worker = getWorkerInfoDao().findById(workerId);
-        if (worker == null) {
+        if (throwIfUnknown && worker == null) {
             throw new UnknownWorkerException(workerId);
         }
         return worker;
