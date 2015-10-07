@@ -12,6 +12,8 @@ import org.backmeup.service.client.model.auth.AuthInfo;
 public interface BackmeupService {
     AuthInfo authenticate(String username, String password);
 
+    AuthInfo authenticateWorker(String workerId, String workerSecret);
+
     BackupJobDTO getBackupJob(Long jobId);
 
     BackupJobDTO updateBackupJob(BackupJobDTO backupJob);

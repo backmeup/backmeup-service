@@ -109,6 +109,28 @@ public final class BackmeupServiceClient implements BackmeupService {
             throw new BackMeUpException("Bad JSON in auth info: " + e);
         }
     }
+    
+    @Override
+    public AuthInfo authenticateWorker(String workerId, String workerSecret) {
+        Map<String, String> params = new HashMap<>();
+        params.put("workerId", workerId);
+        params.put("workerSecret", workerSecret);
+
+        Result r = execute("/authenticate/worker", ReqType.GET, params, null, null);
+        if (r.response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            throw new BackMeUpException("Failed to authenticate worker: " + r.content);
+        }
+
+        try {
+            ObjectMapper mapper = createJsonMapper();
+            AuthInfo authInfo = mapper.readValue(r.content, AuthInfo.class);
+            this.accessToken = authInfo.getAccessToken();
+            return authInfo;
+        } catch (IOException e) {
+            LOGGER.error("", e);
+            throw new BackMeUpException("Bad JSON in auth info: " + e);
+        }
+    }
 
     @Override
     public BackupJobDTO getBackupJob(Long jobId) {
