@@ -53,7 +53,8 @@ public class Heritage extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser.getUserId());
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        Set<SharingPolicyEntry> response = getLogic().getAllOwnedHeritagePolicies(activeUser);
         return response;
     }
 
@@ -65,7 +66,8 @@ public class Heritage extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser.getUserId());
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        Set<SharingPolicyEntry> response = getLogic().getAllIncomingHeritagePolicies(activeUser);
         return response;
     }
 
@@ -110,8 +112,9 @@ public class Heritage extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
         try {
-            SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser.getUserId(),
+            SharingPolicyEntry response = getLogic().createAndAddHeritagePolicy(activeUser,
                     sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -136,8 +139,9 @@ public class Heritage extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
         try {
-            SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser.getUserId(), policyID,
+            SharingPolicyEntry response = getLogic().updateExistingHeritagePolicy(activeUser, policyID,
                     name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -173,8 +177,9 @@ public class Heritage extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
         try {
-            String response = getLogic().removeOwnedHeritagePolicy(activeUser.getUserId(), policyID);
+            String response = getLogic().removeOwnedHeritagePolicy(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -196,9 +201,10 @@ public class Heritage extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
         try {
             //Trigger data import of all owned heritage policies for this user
-            String response = getLogic().activateDeadMannSwitchAndImport(activeUser.getUserId());
+            String response = getLogic().activateDeadMannSwitchAndImport(activeUser);
             //TODO AL lock the account of the sharing providing user
 
             //return Map instead of String so that JSON response can be created

@@ -11,6 +11,9 @@ import org.backmeup.index.api.IndexClient;
 import org.backmeup.index.client.IndexClientFactory;
 import org.backmeup.index.model.FileItem;
 import org.backmeup.index.model.SearchResponse;
+import org.backmeup.index.model.User;
+import org.backmeup.keyserver.model.Token.Kind;
+import org.backmeup.keyserver.model.dto.TokenDTO;
 import org.backmeup.logic.SearchLogic;
 import org.backmeup.model.BackMeUpUser;
 import org.backmeup.model.ProtocolDetails;
@@ -25,26 +28,27 @@ public class SearchLogicImpl implements SearchLogic {
     @Inject
     private IndexClientFactory indexClientFactory;
 
-    private IndexClient getIndexClient(Long userId) {
-        return this.indexClientFactory.getIndexClient(userId);
+    private IndexClient getIndexClient(User user) {
+        return this.indexClientFactory.getIndexClient(user);
     }
 
     @Override
-    public SearchResponse runSearch(BackMeUpUser user, String query, String source, String type, String job,
-            String owner, String tag, Long offSetStart, Long maxResults) {
-        try (IndexClient client = getIndexClient(user.getUserId());) {
+    public SearchResponse runSearch(BackMeUpUser bmuUser, String query, String source, String type, String job, String owner, String tag,
+            Long offSetStart, Long maxResults) {
+
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             SearchResponse result = new SearchResponse(query);
-            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, owner, tag, user.getUsername(),
-                    offSetStart, maxResults));
+            result.setDetails(client.queryBackup(result.getQuery(), source, type, job, owner, tag, bmuUser.getUsername(), offSetStart,
+                    maxResults));
             return result;
 
         }
     }
 
     @Override
-    public Set<FileItem> getAllFileItems(Long userId, Long jobId) {
-        try (IndexClient client = getIndexClient(userId)) {
+    public Set<FileItem> getAllFileItems(BackMeUpUser bmuUser, Long jobId) {
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             return client.searchAllFileItemsForJob(jobId);
 
@@ -52,8 +56,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public ProtocolDetails getProtocolDetails(Long userId, String fileId) {
-        try (IndexClient client = getIndexClient(userId)) {
+    public ProtocolDetails getProtocolDetails(BackMeUpUser bmuUser, String fileId) {
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             ProtocolDetails pd = new ProtocolDetails();
             pd.setFileInfo(client.getFileInfoForFile(fileId));
@@ -63,8 +67,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public File getThumbnailPathForFile(Long userId, String fileId) {
-        try (IndexClient client = getIndexClient(userId)) {
+    public File getThumbnailPathForFile(BackMeUpUser bmuUser, String fileId) {
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             String thumbnailPath = client.getThumbnailPathForFile(fileId);
             LOGGER.debug("Got thumbnail path: " + thumbnailPath);
@@ -77,8 +81,8 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void delete(Long userId, Long jobId, Long timestamp) {
-        try (IndexClient client = getIndexClient(userId)) {
+    public void delete(BackMeUpUser bmuUser, Long jobId, Long timestamp) {
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             client.deleteRecordsForUserAndJobAndTimestamp(jobId, new Date(timestamp));
 
@@ -86,12 +90,23 @@ public class SearchLogicImpl implements SearchLogic {
     }
 
     @Override
-    public void deleteIndexOf(Long userId) {
-        try (IndexClient client = getIndexClient(userId)) {
+    public void deleteIndexOf(BackMeUpUser bmuUser) {
+        try (IndexClient client = getIndexClient(wrap2IndexerUser(bmuUser))) {
 
             client.deleteRecordsForUser();
 
         }
+    }
+
+    /**
+     * Takes a BMUUser object, creates keyserver internal token and returns a User object which is used throughout the
+     * indexer REST calls and backend
+     */
+    private User wrap2IndexerUser(BackMeUpUser bmuUser) {
+        //create a keyserver tokenDTO object for this user - usable to authenticate with keyserver
+        TokenDTO keyserverToken = new TokenDTO(Kind.INTERNAL, bmuUser.getPassword());
+        //wrap the user object to be understood by the indexer
+        return new User(bmuUser.getUserId(), keyserverToken.toTokenString());
     }
 
 }

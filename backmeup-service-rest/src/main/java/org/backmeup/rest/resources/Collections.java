@@ -46,13 +46,14 @@ public class Collections extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         if ((lDocumentUUIDs != null) && (lDocumentUUIDs.size() > 0)) {
-            return getLogic().getAllTaggedCollectionsContainingDocuments(activeUser.getUserId(), lDocumentUUIDs);
+            return getLogic().getAllTaggedCollectionsContainingDocuments(activeUser, lDocumentUUIDs);
         } else if ((name != null) && (!name.equals(""))) {
-            return getLogic().getAllTaggedCollectionsByNameQuery(activeUser.getUserId(), name);
+            return getLogic().getAllTaggedCollectionsByNameQuery(activeUser, name);
         } else {
-            return getLogic().getAllTaggedCollections(activeUser.getUserId());
+            return getLogic().getAllTaggedCollections(activeUser);
         }
     }
 
@@ -65,15 +66,16 @@ public class Collections extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         if (collectionID != null && collectionID != -1) {
-            String response = getLogic().removeTaggedCollection(activeUser.getUserId(), collectionID);
+            String response = getLogic().removeTaggedCollection(activeUser, collectionID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
             return ret;
         } else {
-            String response = getLogic().removeAllCollectionsForUser(activeUser.getUserId());
+            String response = getLogic().removeAllCollectionsForUser(activeUser);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -103,7 +105,9 @@ public class Collections extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        return getLogic().createAndAddTaggedCollection(activeUser.getUserId(), name, description, containedDocumentIDs);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
+        return getLogic().createAndAddTaggedCollection(activeUser, name, description, containedDocumentIDs);
     }
 
     @RolesAllowed("user")
@@ -128,7 +132,9 @@ public class Collections extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        String response = getLogic().addDocumentsToTaggedCollection(activeUser.getUserId(), collectionID, documentIDs);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
+        String response = getLogic().addDocumentsToTaggedCollection(activeUser, collectionID, documentIDs);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("status", response);
@@ -157,7 +163,9 @@ public class Collections extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        String response = getLogic().removeDocumentsFromTaggedCollection(activeUser.getUserId(), collectionID,
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
+        String response = getLogic().removeDocumentsFromTaggedCollection(activeUser, collectionID,
                 documentIDs);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();

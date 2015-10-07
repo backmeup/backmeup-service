@@ -184,7 +184,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             }
         });
     }
-    
+
     @Override
     public BackMeUpUser getUserByKeyserverUserId(final String keyserverUserId) {
         return this.conn.txJoinReadOnly(new Callable<BackMeUpUser>() {
@@ -344,8 +344,7 @@ public class BusinessLogicImpl implements BusinessLogic {
 
             @Override
             public PluginConfigInfo call() {
-                PluginConfigInfo pluginConfigInfo = BusinessLogicImpl.this.plugins.getPluginConfigInfo(pluginId,
-                        authData);
+                PluginConfigInfo pluginConfigInfo = BusinessLogicImpl.this.plugins.getPluginConfigInfo(pluginId, authData);
                 return pluginConfigInfo;
 
             }
@@ -360,8 +359,7 @@ public class BusinessLogicImpl implements BusinessLogic {
             public Profile call() {
                 // Check if plugin authorization data is required and still valid
                 if ((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                    AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile.getAuthData()
-                            .getId());
+                    AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile.getAuthData().getId());
                     profile.setAuthData(authData);
 
                     String identification = BusinessLogicImpl.this.plugins.authorizePlugin(profile.getAuthData());
@@ -370,8 +368,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 // Check if plugin validation is required and properties and options are valid
                 if (BusinessLogicImpl.this.plugins.requiresValidation(profile.getPluginId())) {
-                    ValidationNotes notes = BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(),
-                            profile.getProperties(), profile.getOptions());
+                    ValidationNotes notes = BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(), profile.getProperties(),
+                            profile.getOptions());
                     if (!notes.getValidationEntries().isEmpty()) {
                         throw new ValidationException(ValidationExceptionType.ConfigException, notes);
                     }
@@ -396,8 +394,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 try {
                     // Check if plugin authorization data is required and still valid
                     if ((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                        AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile
-                                .getAuthData().getId());
+                        AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile.getAuthData().getId());
                         profile.setAuthData(authData);
 
                         String identification = BusinessLogicImpl.this.plugins.authorizePlugin(profile.getAuthData());
@@ -406,8 +403,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                     // Check if plugin validation is required and properties and options are valid
                     if (BusinessLogicImpl.this.plugins.requiresValidation(profile.getPluginId())) {
-                        notes.addAll(BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(),
-                                profile.getProperties(), profile.getOptions()));
+                        notes.addAll(BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(), profile.getProperties(),
+                                profile.getOptions()));
                     }
                     return notes;
 
@@ -428,8 +425,7 @@ public class BusinessLogicImpl implements BusinessLogic {
                 // TODO: Refactor (see addPluginProfile method); put validation logic in own method
                 // Check if plugin authorization data is required and still valid
                 if ((profile.getAuthData() != null) && (profile.getAuthData().getId() != null)) {
-                    AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile.getAuthData()
-                            .getId());
+                    AuthData authData = BusinessLogicImpl.this.profiles.getAuthData(currentUser, profile.getAuthData().getId());
                     profile.setAuthData(authData);
 
                     String identification = BusinessLogicImpl.this.plugins.authorizePlugin(profile.getAuthData());
@@ -438,8 +434,8 @@ public class BusinessLogicImpl implements BusinessLogic {
 
                 // Check if plugin validation is required and properties and options are valid
                 if (BusinessLogicImpl.this.plugins.requiresValidation(profile.getPluginId())) {
-                    ValidationNotes notes = BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(),
-                            profile.getProperties(), profile.getOptions());
+                    ValidationNotes notes = BusinessLogicImpl.this.plugins.validatePlugin(profile.getPluginId(), profile.getProperties(),
+                            profile.getOptions());
                     if (!notes.getValidationEntries().isEmpty()) {
                         throw new ValidationException(ValidationExceptionType.ConfigException, notes);
                     }
@@ -676,15 +672,12 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // search operations ------------------------------------------------------
     @Override
-    public SearchResponse queryBackup(final Long userId, final String query, final String source, final String type,
+    public SearchResponse queryBackup(final BackMeUpUser currUser, final String query, final String source, final String type,
             final String job, final String owner, final String tag, final Long offSetStart, final Long maxResults) {
         return this.conn.txNewReadOnly(new Callable<SearchResponse>() {
             @Override
             public SearchResponse call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(userId, true);
-                return BusinessLogicImpl.this.search.runSearch(user, query, source, type, job, owner, tag, offSetStart,
-                        maxResults);
+                return BusinessLogicImpl.this.search.runSearch(currUser, query, source, type, job, owner, tag, offSetStart, maxResults);
 
             }
         });
@@ -692,108 +685,91 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // sharing operations======================================================
     @Override
-    public Set<SharingPolicyEntry> getAllOwnedSharingPolicies(final Long ownerId) {
+    public Set<SharingPolicyEntry> getAllOwnedSharingPolicies(final BackMeUpUser currUser) {
         return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
             @Override
             public Set<SharingPolicyEntry> call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
-                return BusinessLogicImpl.this.share.getAllOwned(user);
+                return BusinessLogicImpl.this.share.getAllOwned(currUser);
 
             }
         });
     }
 
     @Override
-    public Set<SharingPolicyEntry> getAllIncomingSharingPolicies(final Long ownerId) {
+    public Set<SharingPolicyEntry> getAllIncomingSharingPolicies(final BackMeUpUser currUser) {
         return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
             @Override
             public Set<SharingPolicyEntry> call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
-                return BusinessLogicImpl.this.share.getAllIncoming(user);
+                return BusinessLogicImpl.this.share.getAllIncoming(currUser);
 
             }
         });
     }
 
     @Override
-    public SharingPolicyEntry createAndAddSharingPolicy(final Long currUserId, final Long sharingWithUserId,
-            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
-            final String description, final Date lifespanstart, final Date lifespanend) {
+    public SharingPolicyEntry createAndAddSharingPolicy(final BackMeUpUser currUser, final Long sharingWithUserId,
+            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name, final String description,
+            final Date lifespanstart, final Date lifespanend) {
         return this.conn.txNew(new Callable<SharingPolicyEntry>() {
             @Override
             public SharingPolicyEntry call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
                 BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
-                return BusinessLogicImpl.this.share.add(user, sharingWith, policy, sharedElementID, name, description,
-                        lifespanstart, lifespanend);
-            }
-        });
-    }
-
-    @Override
-    public SharingPolicyEntry updateExistingSharingPolicy(final Long currUserId, final Long policyID,
-            final String name, final String description, final Date lifespanstart, final Date lifespanend) {
-        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
-            @Override
-            public SharingPolicyEntry call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.updateOwned(user, policyID, name, description, lifespanstart,
+                return BusinessLogicImpl.this.share.add(currUser, sharingWith, policy, sharedElementID, name, description, lifespanstart,
                         lifespanend);
             }
         });
     }
 
     @Override
-    public String removeOwnedSharingPolicy(final Long currUserId, final Long policyID) {
+    public SharingPolicyEntry updateExistingSharingPolicy(final BackMeUpUser currUser, final Long policyID, final String name,
+            final String description, final Date lifespanstart, final Date lifespanend) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+                return BusinessLogicImpl.this.share.updateOwned(currUser, policyID, name, description, lifespanstart, lifespanend);
+            }
+        });
+    }
+
+    @Override
+    public String removeOwnedSharingPolicy(final BackMeUpUser currUser, final Long policyID) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.removeOwned(user, policyID);
+                return BusinessLogicImpl.this.share.removeOwned(currUser, policyID);
 
             }
         });
     }
 
     @Override
-    public String removeAllOwnedSharingPolicies(final Long currUserId) {
+    public String removeAllOwnedSharingPolicies(final BackMeUpUser currUser) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.removeAllOwned(user);
+                return BusinessLogicImpl.this.share.removeAllOwned(currUser);
 
             }
         });
     }
 
     @Override
-    public String approveIncomingSharing(final Long currUserId, final Long policyID) {
+    public String approveIncomingSharing(final BackMeUpUser currUser, final Long policyID) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.acceptIncomingSharing(user, policyID);
+                return BusinessLogicImpl.this.share.acceptIncomingSharing(currUser, policyID);
 
             }
         });
     }
 
     @Override
-    public String declineIncomingSharing(final Long currUserId, final Long policyID) {
+    public String declineIncomingSharing(final BackMeUpUser currUser, final Long policyID) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.share.declineIncomingSharing(user, policyID);
+                return BusinessLogicImpl.this.share.declineIncomingSharing(currUser, policyID);
 
             }
         });
@@ -801,82 +777,69 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // heritage sharing operations======================================================
     @Override
-    public Set<SharingPolicyEntry> getAllOwnedHeritagePolicies(final Long ownerId) {
+    public Set<SharingPolicyEntry> getAllOwnedHeritagePolicies(final BackMeUpUser currUser) {
         return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
             @Override
             public Set<SharingPolicyEntry> call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
-                return BusinessLogicImpl.this.heritage.getAllOwned(user);
+                return BusinessLogicImpl.this.heritage.getAllOwned(currUser);
 
             }
         });
     }
 
     @Override
-    public Set<SharingPolicyEntry> getAllIncomingHeritagePolicies(final Long ownerId) {
+    public Set<SharingPolicyEntry> getAllIncomingHeritagePolicies(final BackMeUpUser currUser) {
         return this.conn.txNewReadOnly(new Callable<Set<SharingPolicyEntry>>() {
             @Override
             public Set<SharingPolicyEntry> call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(ownerId, true);
-                return BusinessLogicImpl.this.heritage.getAllIncoming(user);
+                return BusinessLogicImpl.this.heritage.getAllIncoming(currUser);
 
             }
         });
     }
 
     @Override
-    public SharingPolicyEntry createAndAddHeritagePolicy(final Long currUserId, final Long sharingWithUserId,
-            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name,
+    public SharingPolicyEntry createAndAddHeritagePolicy(final BackMeUpUser currUser, final Long sharingWithUserId,
+            final SharingPolicyTypeEntry policy, final String sharedElementID, final String name, final String description,
+            final Date lifespanstart, final Date lifespanend) {
+        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
+            @Override
+            public SharingPolicyEntry call() {
+                BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
+                return BusinessLogicImpl.this.heritage.add(currUser, sharingWith, policy, sharedElementID, name, description,
+                        lifespanstart, lifespanend);
+            }
+        });
+    }
+
+    @Override
+    public SharingPolicyEntry updateExistingHeritagePolicy(final BackMeUpUser currUser, final Long policyID, final String name,
             final String description, final Date lifespanstart, final Date lifespanend) {
         return this.conn.txNew(new Callable<SharingPolicyEntry>() {
             @Override
             public SharingPolicyEntry call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                BackMeUpUser sharingWith = BusinessLogicImpl.this.registration.getUserByUserId(sharingWithUserId);
-                return BusinessLogicImpl.this.heritage.add(user, sharingWith, policy, sharedElementID, name,
-                        description, lifespanstart, lifespanend);
+                return BusinessLogicImpl.this.heritage.updateOwned(currUser, policyID, name, description, lifespanstart, lifespanend);
             }
         });
     }
 
     @Override
-    public SharingPolicyEntry updateExistingHeritagePolicy(final Long currUserId, final Long policyID,
-            final String name, final String description, final Date lifespanstart, final Date lifespanend) {
-        return this.conn.txNew(new Callable<SharingPolicyEntry>() {
-            @Override
-            public SharingPolicyEntry call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.heritage.updateOwned(user, policyID, name, description, lifespanstart,
-                        lifespanend);
-            }
-        });
-    }
-
-    @Override
-    public String removeOwnedHeritagePolicy(final Long currUserId, final Long policyID) {
+    public String removeOwnedHeritagePolicy(final BackMeUpUser currUser, final Long policyID) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.heritage.removeOwned(user, policyID);
+                return BusinessLogicImpl.this.heritage.removeOwned(currUser, policyID);
 
             }
         });
     }
 
     @Override
-    public String activateDeadMannSwitchAndImport(final Long currUserId) {
+    public String activateDeadMannSwitchAndImport(final BackMeUpUser currUser) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.heritage.activateDeadMannSwitchAndImport(user);
+                return BusinessLogicImpl.this.heritage.activateDeadMannSwitchAndImport(currUser);
 
             }
         });
@@ -884,96 +847,85 @@ public class BusinessLogicImpl implements BusinessLogic {
 
     // Tagged Collections =====================================================================
     @Override
-    public Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final Long currUserId,
+    public Set<TaggedCollectionEntry> getAllTaggedCollectionsContainingDocuments(final BackMeUpUser currUser,
             final List<UUID> lDocumentUUIDs) {
         return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
             @Override
             public Set<TaggedCollectionEntry> call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsContainingDocuments(user,
-                        lDocumentUUIDs);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsContainingDocuments(currUser, lDocumentUUIDs);
             }
         });
     }
 
     @Override
-    public Set<TaggedCollectionEntry> getAllTaggedCollectionsByNameQuery(final Long currUserId, final String name) {
+    public Set<TaggedCollectionEntry> getAllTaggedCollectionsByNameQuery(final BackMeUpUser currUser, final String name) {
         return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
             @Override
             public Set<TaggedCollectionEntry> call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsByNameQuery(user, name);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollectionsByNameQuery(currUser, name);
             }
         });
     }
 
     @Override
-    public Set<TaggedCollectionEntry> getAllTaggedCollections(final Long currUserId) {
+    public Set<TaggedCollectionEntry> getAllTaggedCollections(final BackMeUpUser currUser) {
         return this.conn.txNew(new Callable<Set<TaggedCollectionEntry>>() {
             @Override
             public Set<TaggedCollectionEntry> call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollections(user);
+                return BusinessLogicImpl.this.taggedCollection.getAllTaggedCollections(currUser);
             }
         });
     }
 
     @Override
-    public String removeTaggedCollection(final Long currUserId, final Long collectionID) {
+    public String removeTaggedCollection(final BackMeUpUser currUser, final Long collectionID) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.removeTaggedCollection(user, collectionID);
+                return BusinessLogicImpl.this.taggedCollection.removeTaggedCollection(currUser, collectionID);
             }
         });
     }
 
     @Override
-    public String removeAllCollectionsForUser(final Long currUserId) {
+    public String removeAllCollectionsForUser(final BackMeUpUser currUser) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.removeAllCollectionsForUser(user);
+                return BusinessLogicImpl.this.taggedCollection.removeAllCollectionsForUser(currUser);
             }
         });
     }
 
     @Override
-    public TaggedCollectionEntry createAndAddTaggedCollection(final Long currUserId, final String name,
-            final String description, final List<UUID> containedDocumentIDs) {
+    public TaggedCollectionEntry createAndAddTaggedCollection(final BackMeUpUser currUser, final String name, final String description,
+            final List<UUID> containedDocumentIDs) {
         return this.conn.txNew(new Callable<TaggedCollectionEntry>() {
             @Override
             public TaggedCollectionEntry call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.createAndAddTaggedCollection(user, name, description,
+                return BusinessLogicImpl.this.taggedCollection.createAndAddTaggedCollection(currUser, name, description,
                         containedDocumentIDs);
             }
         });
     }
 
     @Override
-    public String addDocumentsToTaggedCollection(final Long currUserId, final Long collectionID,
-            final List<UUID> containedDocumentIDs) {
+    public String addDocumentsToTaggedCollection(final BackMeUpUser currUser, final Long collectionID, final List<UUID> containedDocumentIDs) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.addDocumentsToTaggedCollection(user, collectionID,
-                        containedDocumentIDs);
+                return BusinessLogicImpl.this.taggedCollection.addDocumentsToTaggedCollection(currUser, collectionID, containedDocumentIDs);
             }
         });
     }
 
     @Override
-    public String removeDocumentsFromTaggedCollection(final Long currUserId, final Long collectionID,
+    public String removeDocumentsFromTaggedCollection(final BackMeUpUser currUser, final Long collectionID,
             final List<UUID> containedDocumentIDs) {
         return this.conn.txNew(new Callable<String>() {
             @Override
             public String call() {
-                BackMeUpUser user = BusinessLogicImpl.this.registration.getUserByUserId(currUserId, true);
-                return BusinessLogicImpl.this.taggedCollection.removeDocumentsFromTaggedCollection(user, collectionID,
+                return BusinessLogicImpl.this.taggedCollection.removeDocumentsFromTaggedCollection(currUser, collectionID,
                         containedDocumentIDs);
             }
         });

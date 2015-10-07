@@ -40,7 +40,7 @@ public class SearchTest {
         protected BusinessLogic getLogic() {
             BusinessLogic logic = mock(BusinessLogic.class);
             SearchResponse sr = FakeSearchResponse.oneFile();
-            when(logic.queryBackup(USER, "find_me", null, null, null, null, null, null, null)).thenReturn(sr);
+            when(logic.queryBackup(FakeUser.active(), "find_me", null, null, null, null, null, null, null)).thenReturn(sr);
             return logic;
         }
 
@@ -62,11 +62,9 @@ public class SearchTest {
         String body = IOUtils.toString(entity.getContent());
         System.out.println(body);
         assertTrue(body.indexOf("\"searchQuery\":\"find_me\"") >= 0);
-        assertTrue(body
-                .indexOf("\"byJob\":[{\"title\":\"first Job\",\"count\":1},{\"title\":\"next Job\",\"count\":1}]") >= 0);
+        assertTrue(body.indexOf("\"byJob\":[{\"title\":\"first Job\",\"count\":1},{\"title\":\"next Job\",\"count\":1}]") >= 0);
         assertTrue(body.indexOf("\"byType\":[{\"title\":\"Type\",\"count\":3}]") >= 0);
-        assertTrue(body
-                .indexOf("\"bySource\":[{\"title\":\"Dropbox\",\"count\":2},{\"title\":\"Facebook\",\"count\":2}]") >= 0);
+        assertTrue(body.indexOf("\"bySource\":[{\"title\":\"Dropbox\",\"count\":2},{\"title\":\"Facebook\",\"count\":2}]") >= 0);
         assertTrue(body.indexOf("\"files\":[{\"fileId\":\"fileId\",") >= 0);
     }
 

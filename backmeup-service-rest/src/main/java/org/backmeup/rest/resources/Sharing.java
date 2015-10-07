@@ -54,7 +54,8 @@ public class Sharing extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser.getUserId());
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        Set<SharingPolicyEntry> response = getLogic().getAllOwnedSharingPolicies(activeUser);
         return response;
     }
 
@@ -66,7 +67,9 @@ public class Sharing extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser.getUserId());
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
+        Set<SharingPolicyEntry> response = getLogic().getAllIncomingSharingPolicies(activeUser);
         return response;
     }
 
@@ -111,8 +114,10 @@ public class Sharing extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         try {
-            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser.getUserId(),
+            SharingPolicyEntry response = getLogic().createAndAddSharingPolicy(activeUser,
                     sharingWithUserId, policyType, sharedElementID, name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -137,8 +142,10 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         try {
-            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser.getUserId(), policyID,
+            SharingPolicyEntry response = getLogic().updateExistingSharingPolicy(activeUser, policyID,
                     name, description, lifespanStart, lifespanEnd);
             return response;
         } catch (UnknownUserException e) {
@@ -174,8 +181,10 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         try {
-            String response = getLogic().removeOwnedSharingPolicy(activeUser.getUserId(), policyID);
+            String response = getLogic().removeOwnedSharingPolicy(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -196,7 +205,9 @@ public class Sharing extends SecureBase {
 
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
-        String response = getLogic().removeAllOwnedSharingPolicies(activeUser.getUserId());
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
+        String response = getLogic().removeAllOwnedSharingPolicies(activeUser);
         //return Map instead of String so that JSON response can be created
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("status", response);
@@ -229,8 +240,10 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
+        
         try {
-            String response = getLogic().declineIncomingSharing(activeUser.getUserId(), policyID);
+            String response = getLogic().declineIncomingSharing(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
@@ -253,9 +266,10 @@ public class Sharing extends SecureBase {
         mandatory("policyID", policyID);
         BackmeupPrincipal principal = ((BackmeupPrincipal) this.securityContext.getUserPrincipal());
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
+        activeUser.setPassword(principal.getAuthToken().getB64Token());
 
         try {
-            String response = getLogic().approveIncomingSharing(activeUser.getUserId(), policyID);
+            String response = getLogic().approveIncomingSharing(activeUser, policyID);
             //return Map instead of String so that JSON response can be created
             Map<String, String> ret = new HashMap<String, String>();
             ret.put("status", response);
