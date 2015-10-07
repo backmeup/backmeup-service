@@ -1,7 +1,9 @@
 package org.backmeup.tests.integration.utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.backmeup.model.constants.JobFrequency;
@@ -10,6 +12,7 @@ import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.PluginProfileDTO;
 import org.backmeup.model.dto.UserDTO;
 import org.backmeup.model.dto.WorkerInfoDTO;
+import org.backmeup.model.dto.WorkerMetricDTO;
 import org.backmeup.model.spi.PluginDescribable.PluginType;
 
 public class TestDataManager {
@@ -197,5 +200,11 @@ public class TestDataManager {
         workerInfo.setTotalSpace(totalSpace);
 
         return workerInfo;
+    }
+    
+    public static List<WorkerMetricDTO> getWorkerMetrics() {
+        List<WorkerMetricDTO> metrics = new ArrayList<>();
+        metrics.add(new WorkerMetricDTO(new Date(), "metric1", 47.11));
+        return metrics;
     }
 }
