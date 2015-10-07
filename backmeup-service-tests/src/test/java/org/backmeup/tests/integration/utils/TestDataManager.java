@@ -186,7 +186,7 @@ public class TestDataManager {
     public static WorkerInfoDTO getWorkerInfo() {
         WorkerInfoDTO workerInfo = new WorkerInfoDTO();
 
-        workerInfo.setWorkerId(UUID.randomUUID());
+        workerInfo.setWorkerId(UUID.randomUUID().toString());
         workerInfo.setWorkerName("Hostname");
         workerInfo.setOsName(System.getProperty("os.name"));
         workerInfo.setOsVersion(System.getProperty("os.version"));
