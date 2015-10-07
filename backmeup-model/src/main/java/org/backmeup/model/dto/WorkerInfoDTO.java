@@ -1,12 +1,10 @@
 package org.backmeup.model.dto;
 
-import java.util.UUID;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class WorkerInfoDTO {
-    private UUID workerId;
+    private String workerId;
     private String workerName;
     private String osName;
     private String osVersion;
@@ -19,11 +17,11 @@ public class WorkerInfoDTO {
     
     }
 
-    public UUID getWorkerId() {
+    public String getWorkerId() {
         return workerId;
     }
 
-    public void setWorkerId(UUID workerId) {
+    public void setWorkerId(String workerId) {
         this.workerId = workerId;
     }
 
