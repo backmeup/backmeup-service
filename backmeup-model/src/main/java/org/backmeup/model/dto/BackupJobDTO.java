@@ -133,6 +133,9 @@ public class BackupJobDTO {
     }
 
     public List<PluginProfileDTO> getActions() {
+        if(actions == null) {
+            actions = new ArrayList<>();
+        }
         return actions;
     }
 
