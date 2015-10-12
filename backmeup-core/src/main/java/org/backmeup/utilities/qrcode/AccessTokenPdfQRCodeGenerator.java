@@ -66,8 +66,7 @@ public class AccessTokenPdfQRCodeGenerator {
             this.document.add(content);
             Image img;
             try {
-                img = Image.getInstance(this.generateQRCode("http://www.themis.at/activate/account?code=" + accessCode)
-                        .getAbsolutePath());
+                img = Image.getInstance(this.generateQRCode("http://www.themis.at/activate/account?code=" + accessCode).getAbsolutePath());
                 this.document.add(img);
             } catch (WriterException e) {
                 LOGGER.debug("Error creating QRCode PNG file" + e.toString());
@@ -85,6 +84,7 @@ public class AccessTokenPdfQRCodeGenerator {
     private File generateQRCode(String qrCodeData) throws IOException, WriterException {
         Random randomGenerator = new Random();
         File f = File.createTempFile("QRCode" + randomGenerator.nextInt(100000), ".png");
+        f.deleteOnExit();
         String filePath = f.getAbsolutePath();
         String charset = "UTF-8"; // or "ISO-8859-1"
         Map hintMap = new HashMap();
