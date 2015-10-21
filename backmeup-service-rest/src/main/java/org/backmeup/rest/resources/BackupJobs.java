@@ -29,7 +29,6 @@ import org.backmeup.model.dto.BackupJobCreationDTO;
 import org.backmeup.model.dto.BackupJobDTO;
 import org.backmeup.model.dto.BackupJobExecutionDTO;
 import org.backmeup.rest.auth.BackmeupPrincipal;
-import org.backmeup.rest.filters.SecurityInterceptor;
 
 
 @Path("/backupjobs")
@@ -103,7 +102,7 @@ public class BackupJobs extends Base {
         return getMapper().map(job, BackupJobDTO.class);
     }
 
-    @RolesAllowed({"user", "worker"})
+    @RolesAllowed("user")
     @PUT
     @Path("/{jobId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -116,7 +115,7 @@ public class BackupJobs extends Base {
         BackMeUpUser activeUser = principal.getEntity(BackMeUpUser.class);
 
         BackupJob job = getLogic().getBackupJob(backupjob.getJobId());
-        if ((!activeUser.getUserId().equals(job.getUser().getUserId())) && (!activeUser.getUsername().equals(SecurityInterceptor.BACKMEUP_WORKER_NAME))) {
+        if (!activeUser.getUserId().equals(job.getUser().getUserId())) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
