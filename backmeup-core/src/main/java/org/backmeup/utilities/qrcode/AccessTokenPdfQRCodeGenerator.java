@@ -8,8 +8,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 
+import org.backmeup.configuration.cdi.ConfigurationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +68,11 @@ public class AccessTokenPdfQRCodeGenerator {
             this.document.add(content);
             Image img;
             try {
-                img = Image.getInstance(this.generateQRCode("http://www.themis.at/activate/account?code=" + accessCode).getAbsolutePath());
+
+                //get the host address the system is currently running on to generate the URL for the QRCode
+                String callbackURL = getCallbackURL();
+                img = Image
+                        .getInstance(this.generateQRCode(callbackURL + "/page/loginToken.html?authCode=" + accessCode).getAbsolutePath());
                 this.document.add(img);
             } catch (WriterException e) {
                 LOGGER.debug("Error creating QRCode PNG file" + e.toString());
@@ -79,6 +85,21 @@ public class AccessTokenPdfQRCodeGenerator {
         } catch (DocumentException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getCallbackURL() {
+        Properties props = ConfigurationFactory.getProperties();
+        if ((props != null) && (props.get("backmeup.callbackUrl") != null)) {
+            String propCallbackUrl = props.get("backmeup.callbackUrl").toString();
+
+            if (propCallbackUrl.equals("###REPLACE_ME###")) {
+                return "http://localhost:8080";
+            } else {
+                //something like http://themis-dev01.backmeup.at/page/create_backup_oAuthHandler.html
+                return propCallbackUrl.substring(0, propCallbackUrl.indexOf("/", 8));
+            }
+        }
+        return "";
     }
 
     private File generateQRCode(String qrCodeData) throws IOException, WriterException {
