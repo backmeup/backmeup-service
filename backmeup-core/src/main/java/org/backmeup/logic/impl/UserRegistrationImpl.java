@@ -18,7 +18,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.backmeup.configuration.cdi.Configuration;
 import org.backmeup.dal.DataAccessLayer;
 import org.backmeup.dal.UserDao;
-import org.backmeup.index.api.IndexerUserMappingClient;
+import org.backmeup.index.client.UserMappingClientFactory;
 import org.backmeup.keyserver.client.KeyserverClient;
 import org.backmeup.keyserver.model.KeyserverException;
 import org.backmeup.keyserver.model.Token.Kind;
@@ -76,7 +76,7 @@ public class UserRegistrationImpl implements UserRegistration {
     private KeyserverClient keyserverClient;
 
     @Inject
-    private IndexerUserMappingClient indexUserClient;
+    private UserMappingClientFactory userMappingClientFactory;
 
     @Inject
     private DataAccessLayer dal;
@@ -156,7 +156,7 @@ public class UserRegistrationImpl implements UserRegistration {
 
         try {
             //notify the indexer module of the newly created user
-            this.indexUserClient.updateUserMapping(newUser.getUserId(), newUser.getKeyserverId());
+            this.userMappingClientFactory.getClient().updateUserMapping(newUser.getUserId(), newUser.getKeyserverId());
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
@@ -179,7 +179,7 @@ public class UserRegistrationImpl implements UserRegistration {
             BackMeUpUser newUser = save(anonUser);
 
             //notify the indexer module of the newly created user
-            this.indexUserClient.updateUserMapping(newUser.getUserId(), newUser.getKeyserverId());
+            this.userMappingClientFactory.getClient().updateUserMapping(newUser.getUserId(), newUser.getKeyserverId());
 
             return newUser;
         } catch (KeyserverException | IllegalArgumentException | IllegalStateException e) {
