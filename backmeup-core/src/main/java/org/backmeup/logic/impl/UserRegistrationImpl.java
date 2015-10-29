@@ -158,6 +158,7 @@ public class UserRegistrationImpl implements UserRegistration {
             //notify the indexer module of the newly created user
             this.userMappingClientFactory.getClient().updateUserMapping(newUser.getUserId(), newUser.getKeyserverId());
         } catch (IllegalArgumentException | IllegalStateException e) {
+            LOGGER.error("Error calling updateUserMapping when registering a new user account ", e);
             throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
 
@@ -183,6 +184,7 @@ public class UserRegistrationImpl implements UserRegistration {
 
             return newUser;
         } catch (KeyserverException | IllegalArgumentException | IllegalStateException e) {
+            LOGGER.error("Error calling updateUserMapping when registering a new user account ", e);
             throw new BackMeUpException(EXCEPTION_TEXT_REGISTRATION, e);
         }
     }
