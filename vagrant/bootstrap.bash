@@ -64,4 +64,5 @@ echo " "
 #wget https://www.grc.com/misc/truecrypt/truecrypt-7.1a-linux-console-x64.tar.gz
 #tar -xvf truecrypt-7.1a-linux-console-x64.tar.gz
 #./truecrypt-7.1a-setup-console-x64
-#echo " "
+#echo "done"
+
