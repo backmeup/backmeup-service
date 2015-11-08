@@ -22,7 +22,7 @@ echo " "
 
 #-------------------------------------------------------------------------------
 echo "Install needed software"
-apt-get -y install tomcat7 tomcat7-admin postgresql elasticsearch openjdk-7-jre maven git rabbitmq-server apache2
+sudo apt-get -y install tomcat7 tomcat7-admin postgresql elasticsearch openjdk-7-jre openjdk-7-jdk maven git rabbitmq-server apache2
 
 #-------------------------------------------------------------------------------
 if [ -z "$(dpkg -l | grep "x-tika")" ]
