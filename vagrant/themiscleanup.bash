@@ -20,5 +20,6 @@ sudo rm -rf /data/backmeup-worker/work/*
 sudo rm -rf /data/indexer_datasink_dir/*
 sudo rm -rf /data/thumbnails/*
 sudo rm -rf /data/backmeup-storage/*
+sudo rm -rf /var/lib/tomcat7/*myvolume.tc
 
 sudo service tomcat7 start

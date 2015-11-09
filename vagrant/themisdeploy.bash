@@ -58,8 +58,10 @@ git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-worker.git /repository/backmeup/backmeup-worker
 
 
+#replace provided configuration files
 sudo cp -f /vagrant/mvn_template_settings.xml /etc/maven/settings.xml
 sudo cp -f /vagrant/tomcat_template_tomcat-users.xml /etc/tomcat7/tomcat-users.xml
+sudo cp -f /vagrant/tomcat_template7_tomcat /etc/default/tomcat7
 sudo service tomcat7 restart 
 
 #-------------------KEYSERVER CONFIGURATION --------------------------------------------

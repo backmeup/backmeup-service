@@ -29,8 +29,8 @@ if [ -z "$(dpkg -l | grep "x-tika")" ]
 then
 	echo "Download x-tika package. This will take some time."
 	#wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://raw.githubusercontent.com/backmeup/backmeup-indexer/master/resources/tika/x-tika_0.0.16_all.deb
-	wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
-	dpkg -i /tmp/x-tika_0.0.16_all.deb
+	sudo wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
+	sudo dpkg -i /tmp/x-tika_0.0.16_all.deb
 fi
 echo " "
 
