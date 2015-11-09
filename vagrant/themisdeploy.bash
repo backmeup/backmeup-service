@@ -52,6 +52,8 @@ fi
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-service.git /repository/backmeup/backmeup-service
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-ui.git /repository/backmeup/backmeup-ui
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-storage.git /repository/backmeup/backmeup-storage
+#due to bugfixes to the release we need to point to a specific revision for storage
+git checkout fc1abb6
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-indexer.git /repository/backmeup/backmeup-indexer
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-keyserver.git /repository/backmeup/backmeup-keyserver
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-plugins.git /repository/backmeup/backmeup-plugins
@@ -134,6 +136,8 @@ sudo git checkout .
 # replace host and port in "plugin.WebServiceClient.json"
 sudo sed -i "s?themis-dev01.backmeup.at?localhost?g" app.extern.gtn.themis/www_debug/js/plugin/plugin.WebServiceClient.json
 sudo sed -i "s? 80,? 8080,?g" app.extern.gtn.themis/www_debug/js/plugin/plugin.WebServiceClient.json
+#we're using lapstone to build the ui - tell the mvn deployment target to use www instead of www_debug to deploy
+sudo sed -i "s?app.extern.gtn.themis/www_debug?app.extern.gtn.themis/www?g" pom.xml
 
 
 ####################### NOTES REGARDING DEPLOYMENT ############################
@@ -319,6 +323,11 @@ sudo rm -rf /data/backmeup-worker/plugins/dropbox-2.0.0-SNAPSHOT.jar
 #-------------------------
 #H) UI Deployment
 cd /repository/backmeup/backmeup-ui
-#Trigger the build - use integrationTests target to deploy on local tomcat
+#remove files from tomcat - no JEE app so deleting is fine
 sudo rm -rf /var/lib/tomcat7/webapps/ROOT*
+#use lapstone framework to build the application -> output in www folder
+cd app.extern.gtn.themis/
+sudo java -jar lapstone.jar -function=release -path=/repository/backmeup/backmeup-ui/app.extern.gtn.themis/
+cd ..
+#Trigger the build - use integrationTests target to deploy on local tomcat
 sudo mvn clean install -DskipTests -DintegrationTests
