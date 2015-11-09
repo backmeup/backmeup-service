@@ -10,26 +10,43 @@ fi
 if [ ! -d "/data/backmeup-service/" ]
 then
 	sudo mkdir -p /data/backmeup-service/plugins
+	sudo chmod -R 755 /data/backmeup-service
+	sudo chown -R tomcat7:tomcat7 /data/backmeup-service
 fi
 
 if [ ! -d "/data/backmeup-worker/" ]
 then
 	sudo mkdir -p /data/backmeup-worker/plugins
+	sudo chmod -R 755 /data/backmeup-worker
+	sudo chown -R tomcat7:tomcat7 /data/backmeup-worker
 fi
 
-if [ ! -d "/data/backmeup-worker/" ]
+if [ ! -d "/data/backmeup-storage/" ]
 then
 	sudo mkdir -p /data/backmeup-storage/
+	sudo chmod -R 755 /data/backmeup-storage
+	sudo chown -R tomcat7:tomcat7 /data/backmeup-storage
 fi
 
 if [ ! -d "/data/thumbnails/" ]
 then
 	sudo mkdir -p /data/thumbnails/
+	sudo chmod -R 755 /data/thumbnails
+	sudo chown -R tomcat7:tomcat7 /data/thumbnails
 fi
 
 if [ ! -d "/data/index-core/" ]
 then
 	sudo mkdir -p /data/index-core/
+	sudo chmod -R 755 /data/index-core
+	sudo chown -R tomcat7:tomcat7 /data/index-core
+fi
+
+if [ ! -d "/data/indexer_datasink_dir/" ]
+then
+	sudo mkdir -p /data/indexer_datasink_dir/
+	sudo chmod -R 755 /data/indexer_datasink_dir
+	sudo chown -R tomcat7:tomcat7 /data/indexer_datasink_dir
 fi
 
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-service.git /repository/backmeup/backmeup-service
@@ -53,10 +70,11 @@ sudo sed -i "s?org.backmeup.keyserver.core.db.derby.DerbyDatabaseImpl?org.backme
 sudo sed -i "s?org.apache.derby.jdbc.EmbeddedDriver?org.postgresql.Driver?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
 #sed -i "s|jdbc:derby:keyserver;create=true|jdbc:postgresql://themis-keysrv01.x/db_keysrv?user=dbu_keysrv\&password=pwdreplace|g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
 sudo sed -i "s?jdbc:derby:keyserver;create=true?jdbc:postgresql://localhost/db_keysrv\?user=dbu_keysrv\&password=dbu_keysrv?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
-sudo sed -i "s?REPLACE-SERVICE?7HwZXJzYWTlIHT3678TGXSSW7SERVICE?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
-sudo sed -i "s?REPLACE-WORKER?7HwZXJzYWTlIHT3678TGXSSW78WORKER?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
-sudo sed -i "s?REPLACE-INDEXER?7HwZXJzYWTlIHT3678TGXSSW7INDEXER?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
-sudo sed -i "s?REPLACE-STORAGE?7HwZXJzYWTlIHT3678TGXSSW7STORAGE?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
+# the following passwords need to be base64 encoded
+sudo sed -i "s?REPLACE-SERVICE?N0h3WlhKekdYU1NXN1NFUlZJQ0U=?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
+sudo sed -i "s?REPLACE-WORKER?N0h3WlhKekdYU1NXN1dPUktFUg==?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
+sudo sed -i "s?REPLACE-INDEXER?N0h3WlhKekdYU1NXN0lOREVYRVI=?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
+sudo sed -i "s?REPLACE-STORAGE?N0h3WlhKekdYU1NXN1NUT1JBR0U=?g" backmeup-keyserver-core/src/main/resources/backmeup-keyserver.properties
 # move postgres properties to default properties
 sudo mv backmeup-keyserver-core/src/main/resources/backmeup-keyserver-sql-postgres.properties backmeup-keyserver-core/src/main/resources/backmeup-keyserver-sql.properties
 
@@ -67,7 +85,7 @@ sudo git checkout .
 # replace callback url in "backmeup.properties"
 #sed -i "s?backmeup.callbackUrl = ###REPLACE_ME###?backmeup.callbackUrl = http://themis-dev01.backmeup.at/page/create_backup_oAuthHandler.html?g" #backmeup-service-rest/src/main/resources/backmeup.properties
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-service-rest/src/main/resources/backmeup.properties
-sudo sed -i "s?backmeup.service.appSecret = REPLACE-SERVICE?backmeup.service.appSecret = 7HwZXJzYWTlIHT3678TGXSSW7SERVICE?g" backmeup-service-rest/src/main/resources/backmeup.properties
+sudo sed -i "s?backmeup.service.appSecret = REPLACE-SERVICE?backmeup.service.appSecret = N0h3WlhKekdYU1NXN1NFUlZJQ0U=?g" backmeup-service-rest/src/main/resources/backmeup.properties
 
 #-------------------INDEXER CONFIGURATION--------------------------------------------
 # change indexer pre-build config settings
@@ -75,7 +93,7 @@ sudo sed -i "s?backmeup.service.appSecret = REPLACE-SERVICE?backmeup.service.app
 cd /repository/backmeup/backmeup-indexer
 sudo git checkout .
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-indexer-core/src/main/resources/backmeup-indexer_linux.properties
-sudo sed -i "s?backmeup.indexer.appSecret = REPLACE-INDEXER?backmeup.indexer.appSecret = 7HwZXJzYWTlIHT3678TGXSSW7INDEXER?g" backmeup-indexer-core/src/main/resources/backmeup-indexer_linux.properties
+sudo sed -i "s?backmeup.indexer.appSecret = REPLACE-INDEXER?backmeup.indexer.appSecret = N0h3WlhKekdYU1NXN0lOREVYRVI=?g" backmeup-indexer-core/src/main/resources/backmeup-indexer_linux.properties
 #sed -i "s?backmeup.storage.baseUrl = http://localhost:8080/backmeup-storage-service?backmeup.storage.baseUrl = http://themis-storage01.backmeup.at:8080/backmeup-storage-service?g" #backmeup-indexer-core/src/main/resources/backmeup-indexer_linux.properties
 #sed -i "s?backmeup.indexer.rest.host = localhost?backmeup.indexer.rest.host = themis-dev01.backmeup.at?g" backmeup-indexer-client/src/main/resources/backmeup-index-client.properties
 
@@ -85,14 +103,14 @@ cd /repository/backmeup/backmeup-storage
 sudo git checkout .
 #sed -i "s?backmeup.service.path = http://localhost:8080/backmeup-service-rest?backmeup.service.path = http://themis-dev01:8080/backmeup-service-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
-sudo sed -i "s?backmeup.storage.appSecret = REPLACE-STORAGE?backmeup.storage.appSecret = 7HwZXJzYWTlIHT3678TGXSSW7STORAGE?g" backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
+sudo sed -i "s?backmeup.storage.appSecret = REPLACE-STORAGE?backmeup.storage.appSecret = N0h3WlhKekdYU1NXN1NUT1JBR0U=?g" backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
 
 #-------------------WORKER CONFIGURATION--------------------------------------------
 # replace properties in "backmeup-worker.properties"
 cd /repository/backmeup/backmeup-worker
 sudo git checkout .
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-worker-app-servlet/src/main/resources/backmeup-worker.properties
-sudo sed -i "s?backmeup.worker.appSecret = REPLACE-WORKER?backmeup.worker.appSecret = HwZXJzYWTlIHT3678TGXSSW78WORKER?g" backmeup-worker-app-servlet/src/main/resources/backmeup-worker.properties
+sudo sed -i "s?backmeup.worker.appSecret = REPLACE-WORKER?backmeup.worker.appSecret = N0h3WlhKekdYU1NXN1dPUktFUg==?g" backmeup-worker-app-servlet/src/main/resources/backmeup-worker.properties
 
 #-------------------PLUGIN CONFIGURATION--------------------------------------------
 cd /repository/backmeup/backmeup-plugins

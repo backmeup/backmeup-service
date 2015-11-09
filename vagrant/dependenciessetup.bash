@@ -56,6 +56,8 @@ then
 	echo "tomcat7 ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/themis
 	chmod 0440 /etc/sudoers.d/themis
 fi
+
+sudo chmod -R 774 /var/log/tomcat7
 echo " "
 
 #-------------------------------------------------------------------------------
