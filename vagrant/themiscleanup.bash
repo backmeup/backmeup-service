@@ -17,7 +17,7 @@ sudo rm -rf /var/log/tomcat7/backmeup*
 sudo rm -rf /data/backmeup-service/cache/*
 sudo rm -rf /data/backmeup-worker/cache/*
 sudo rm -rf /data/backmeup-worker/work/*
-sudo rm -rf /data/index-core/datasink/*
+sudo rm -rf /data/indexer_datasink_dir/*
 sudo rm -rf /data/thumbnails/*
 sudo rm -rf /data/backmeup-storage/*
 

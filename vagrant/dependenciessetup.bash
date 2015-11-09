@@ -57,7 +57,7 @@ then
 	chmod 0440 /etc/sudoers.d/themis
 fi
 
-sudo chmod -R 774 /var/log/tomcat7
+sudo chmod -R 775 /var/log/tomcat7
 echo " "
 
 #-------------------------------------------------------------------------------

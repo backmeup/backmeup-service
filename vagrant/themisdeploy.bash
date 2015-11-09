@@ -35,11 +35,11 @@ then
 	sudo chown -R tomcat7:tomcat7 /data/thumbnails
 fi
 
-if [ ! -d "/data/index-core/" ]
+if [ ! -d "/data/indexer_temp_dir/" ]
 then
-	sudo mkdir -p /data/index-core/
-	sudo chmod -R 755 /data/index-core
-	sudo chown -R tomcat7:tomcat7 /data/index-core
+	sudo mkdir -p /data/indexer_temp_dir/
+	sudo chmod -R 755 /data/indexer_temp_dir
+	sudo chown -R tomcat7:tomcat7 /data/indexer_temp_dir
 fi
 
 if [ ! -d "/data/indexer_datasink_dir/" ]
@@ -103,7 +103,7 @@ cd /repository/backmeup/backmeup-storage
 sudo git checkout .
 #sed -i "s?backmeup.service.path = http://localhost:8080/backmeup-service-rest?backmeup.service.path = http://themis-dev01:8080/backmeup-service-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
-sudo sed -i "s?backmeup.storage.appSecret = REPLACE-STORAGE?backmeup.storage.appSecret = N0h3WlhKekdYU1NXN1NUT1JBR0U=?g" backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
+sudo sed -i "s?backmeup.storage.appSecret = REPLACE-STORAGE?backmeup.storage.appSecret = N0h3WlhKekdYU1NXN1NUT1JBR0U=?g" backmeup-storage-service/src/main/resources/backmeup-storage.properties
 
 #-------------------WORKER CONFIGURATION--------------------------------------------
 # replace properties in "backmeup-worker.properties"
@@ -309,6 +309,11 @@ do
   sudo chown tomcat7:tomcat7 /data/backmeup-worker/plugins/$file
 done
 
+#finally remove dropbox and facebook plugins as we do not provide AppSecret and proper oAuth redirect URLs within this VM
+sudo rm -rf /data/backmeup-service/plugins/facebook-2.0.0-SNAPSHOT.jar
+sudo rm -rf /data/backmeup-service/plugins/dropbox-2.0.0-SNAPSHOT.jar
+sudo rm -rf /data/backmeup-worker/plugins/facebook-2.0.0-SNAPSHOT.jar
+sudo rm -rf /data/backmeup-worker/plugins/dropbox-2.0.0-SNAPSHOT.jar
 #-------------------------
 #H) UI Deployment
 cd /repository/backmeup/backmeup-ui
