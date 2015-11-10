@@ -5,6 +5,11 @@ The following document contains a 'quickstart' guide for setting up the BackMeUp
  - a step-by-step instruction
  - hints, pitfalls, FAQ
 
+====================
+Note: A pre-configured VM containing all Themis components is provided within the /vagrant folder
+All information on provisioning the VM calling 'vagrant up' is given in /vagrant/_Readme.txt
+====================
+
 0) Required Software
 ====================
  - Linux / Windows platform. [Tested under Ubuntu 12.04/14.04 (LTS) and Windows 7 64-bit]
