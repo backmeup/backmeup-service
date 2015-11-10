@@ -23,3 +23,5 @@ RemoteSystemsTempFiles/
 # Logs
 derby.log
 hs_err_pid*.log
+/vagrant/facebook_backup_testdata
+/vagrant/.vagrant
