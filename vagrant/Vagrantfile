@@ -66,4 +66,5 @@ Vagrant.configure(2) do |config|
   config.vm.provision "truecrypt_compile", type: "shell" , path: "truecryptcompile.bash"
   config.vm.provision "themis_cleanup", type: "shell" , path: "themiscleanup.bash"
   config.vm.provision "themis_deploy", type: "shell" , path: "themisdeploy.bash"
+  config.vm.provision "themis_deploy_modified_fb_plugin", type: "shell" , path: "fbpluginlocal.bash"
 end
