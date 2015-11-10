@@ -334,8 +334,10 @@ sudo mvn clean install -DskipTests -DintegrationTests
 # Finally check again that tika is properly up and running
 if [ -z "$(dpkg -l | grep "x-tika")" ]
 then
-	echo "Download and installing x-tika package."
-	sudo wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
+	echo "Download of tika debian package failed in pre-setup - install it from repo"
+	#github does not provide access to individual files in a reliable manner without using their APIs
+	#but as we've checkout the entire repo let's install it from there
+	sudo cp -f /repository/backmeup/backmeup-indexer/resources/tika/x-tika_0.0.16_all.deb /tmp/x-tika_0.0.16_all.deb
 	sudo dpkg -i /tmp/x-tika_0.0.16_all.deb
 fi
 echo "Themis deployment completed"

@@ -27,10 +27,12 @@ sudo apt-get -y install tomcat7 tomcat7-admin postgresql elasticsearch openjdk-7
 #-------------------------------------------------------------------------------
 if [ -z "$(dpkg -l | grep "x-tika")" ]
 then
-	echo "Download x-tika package. This will take some time."
-	#wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://raw.githubusercontent.com/backmeup/backmeup-indexer/master/resources/tika/x-tika_0.0.16_all.deb
-	sudo wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
-	sudo dpkg -i /tmp/x-tika_0.0.16_all.deb
+	#echo "Download x-tika package. This will take some time."
+	#sudo wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
+	#sudo dpkg -i /tmp/x-tika_0.0.16_all.deb
+	#Note: This is likely to fail with a 503 as github does not provide downloading of single files
+	#you could give it a try via the github api but this requires an access token.
+	#So this step is performed in themisdeploy.bash when we've retrieved the file from the repo itself
 fi
 echo " "
 
