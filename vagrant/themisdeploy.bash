@@ -51,9 +51,7 @@ fi
 
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-service.git /repository/backmeup/backmeup-service
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-ui.git /repository/backmeup/backmeup-ui
-git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-storage.git /repository/backmeup/backmeup-storage
-#due to bugfixes to the release we need to point to a specific revision for storage
-git checkout fc1abb6
+git clone --branch master --depth 1 https://github.com/backmeup/backmeup-storage.git /repository/backmeup/backmeup-storage
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-indexer.git /repository/backmeup/backmeup-indexer
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-keyserver.git /repository/backmeup/backmeup-keyserver
 git clone --branch v2ThemisFinal --depth 1 https://github.com/backmeup/backmeup-plugins.git /repository/backmeup/backmeup-plugins
@@ -104,7 +102,8 @@ sudo sed -i "s?backmeup.indexer.appSecret = REPLACE-INDEXER?backmeup.indexer.app
 #-------------------STORAGE CONFIGURATION--------------------------------------------
 # replace properties in "backmeup-storage.properties"
 cd /repository/backmeup/backmeup-storage
-sudo git checkout .
+#due to bugfixes to the release we need to point to a specific revision for storage
+sudo git checkout abccf9b
 #sed -i "s?backmeup.service.path = http://localhost:8080/backmeup-service-rest?backmeup.service.path = http://themis-dev01:8080/backmeup-service-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
 #sed -i "s?backmeup.keyserver.baseUrl = http://localhost:8080/backmeup-keyserver-rest?backmeup.keyserver.baseUrl = http://themis-keysrv01:8080/backmeup-keyserver-rest?g" #backmeup-storage-service/src/main/resources-test/backmeup-storage.properties
 sudo sed -i "s?backmeup.storage.appSecret = REPLACE-STORAGE?backmeup.storage.appSecret = N0h3WlhKekdYU1NXN1NUT1JBR0U=?g" backmeup-storage-service/src/main/resources/backmeup-storage.properties
@@ -331,3 +330,12 @@ sudo java -jar lapstone.jar -function=release -path=/repository/backmeup/backmeu
 cd ..
 #Trigger the build - use integrationTests target to deploy on local tomcat
 sudo mvn clean install -DskipTests -DintegrationTests
+
+# Finally check again that tika is properly up and running
+if [ -z "$(dpkg -l | grep "x-tika")" ]
+then
+	echo "Download and installing x-tika package."
+	sudo wget --progress=bar:force -O /tmp/x-tika_0.0.16_all.deb https://github.com/backmeup/backmeup-indexer/blob/master/resources/tika/x-tika_0.0.16_all.deb?raw=true
+	sudo dpkg -i /tmp/x-tika_0.0.16_all.deb
+fi
+echo "Themis deployment completed"
